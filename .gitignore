@@ -2,4 +2,5 @@
 /backend/bin/
 /backend/appsettings.json
 /backend/.idea/
+/backend/Migrations/
 /frontend/node_modules/

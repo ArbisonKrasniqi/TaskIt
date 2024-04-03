@@ -1,0 +1,14 @@
+
+-------------------------------------------------------
+04/04/2024 - Arbison Krasniqi
+
+Microsoft.EntityFrameworkCore.SqlServer           8.0.0
+Microsoft.EntityFrameworkCore.Tools               8.0.0
+Microsoft.EntityFrameworkCore.Design              8.0.0
+//Perdoren per lidhje ne databaze
+
+Microsoft.Extensions.Identity.Core                8.0.0
+Microsoft.AspNetCore.Identity.EntityFrameworkCore 8.0.0
+Microsoft.AspNetCore.Authentication.JwtBearer     8.0.0
+//Do te perdoren per users,roles edhe JWT
+-------------------------------------------------------
