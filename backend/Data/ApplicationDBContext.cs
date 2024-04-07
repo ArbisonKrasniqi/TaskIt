@@ -33,6 +33,7 @@ public class ApplicationDBContext : IdentityDbContext<User>
                 NormalizedName = "USER"
             },
         };
-        builder.Entity<IdentityRole>().HasData(roles); }
+        builder.Entity<IdentityRole>().HasData(roles);
+    }
     
 }
