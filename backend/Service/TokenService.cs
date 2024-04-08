@@ -27,7 +27,10 @@ public class TokenService : ITokenService
         //The claims that the JWT will include
         var claims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.Email, user.Email),
+            new Claim("Id", user.Id),
+            new Claim("Name", user.FirstName+" "+user.LastName),
+            new Claim("Email", user.Email),
+            new Claim("Role", user.Role),
         };
 
         //What type of security algorithm will be used

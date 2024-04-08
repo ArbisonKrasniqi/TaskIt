@@ -83,7 +83,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 )
             };
         });
+
+
 builder.Services.AddAuthorization();
+
 
 builder.Services.AddScoped<ITokenService, TokenService>();
 
