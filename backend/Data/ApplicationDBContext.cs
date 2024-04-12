@@ -11,8 +11,9 @@ public class ApplicationDBContext : IdentityDbContext<User>
     public ApplicationDBContext(DbContextOptions dbContextOptions) 
         : base(dbContextOptions)
     {
-    
+
     }
+    public DbSet<Board> Boards { get; set;}
     //Shtohen public DbSet<Entiteti> Entiteti { get; set; } per secilin entitet perveq User
     
     //User roles

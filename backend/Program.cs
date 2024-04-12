@@ -1,8 +1,11 @@
 using backend.Data;
 using backend.Interfaces;
 using backend.Models;
+using backend.Repositories;
+
 using backend.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using backend.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -83,6 +86,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 )
             };
         });
+    
+builder.Services.AddScoped<IBoardRepository, BoardRepository>();//-------
 
 
 builder.Services.AddAuthorization(options =>
