@@ -1,5 +1,7 @@
 using backend.Data;
+using backend.Interfaces;
 using backend.Models;
+using backend.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -27,7 +30,8 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
         options.Password.RequiredLength = 8;
     })
     .AddEntityFrameworkStores<ApplicationDBContext>();
-
+    
+builder.Services.AddScoped<IBoardRepository, BoardRepository>();//-------
 
 
 var app = builder.Build();
@@ -40,5 +44,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.MapControllers();
 
 app.Run();
