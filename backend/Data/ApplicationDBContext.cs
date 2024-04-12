@@ -14,7 +14,8 @@ public class ApplicationDBContext : IdentityDbContext<User>
     
     }
     //Shtohen public DbSet<Entiteti> Entiteti { get; set; } per secilin entitet perveq User
-    
+    public DbSet<Workspace> Workspace { get; set; }
+
     //User roles
     protected override void OnModelCreating(ModelBuilder builder)
     {
