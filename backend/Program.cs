@@ -98,7 +98,7 @@ builder.Services.AddAuthorization(options =>
 
 
 builder.Services.AddScoped<ITokenService, TokenService>();
-
+builder.Services.AddScoped<IWorkspaceRepository, WorkspaceRepository>(); //Do te regjistroj nje sherbim me IWorkspaceRepository dhe WorkspaceRepository si implementimi i tij ne container te Dependency Injection
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

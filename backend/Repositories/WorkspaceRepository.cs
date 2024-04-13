@@ -20,14 +20,14 @@ public class WorkspaceRepository : IWorkspaceRepository
      ne rreshtat ku perdoret diqka prej databaze */
 
     //CREATE
-    public async Task<Workspace> CreateAsync(Workspace workspaceModel)
+    public async Task<Workspace> CreateWorkspaceAsync(Workspace workspaceModel)
     {
         await _context.Workspace.AddAsync(workspaceModel);
         await _context.SaveChangesAsync(); //per me i rujt ndryshimet ne bazen e te dhenave
         return workspaceModel;
     }
     //DELETE
-    public async Task<Workspace?> DeleteAsync(int id)
+    public async Task<Workspace?> DeleteWorkspaceAsync(int id)
     {
         var workspaceModel = await _context.Workspace.FirstOrDefaultAsync(x => x.WorkspaceId == id); // finds the Workspace with the given id
         if (workspaceModel == null)
@@ -39,19 +39,19 @@ public class WorkspaceRepository : IWorkspaceRepository
         return workspaceModel;
     }
     //GETALL
-    public async Task<List<Workspace>> GetAllAsync()
+    public async Task<List<Workspace>> GetAllWorkspacesAsync()
     {
         return await _context.Workspace.ToListAsync(); 
     }
     
     //GETBYID
-    public async Task<Workspace?> GetByIdAsync(int id)
+    public async Task<Workspace?> GetWorkspaceByIdAsync(int id)
     {
         return await _context.Workspace.FindAsync(id);
     }
     
     //UPDATE
-    public async Task<Workspace?> UpdateAsync(int id, UpdateWorkspaceRequestDto workspaceDto)
+    public async Task<Workspace?> UpdateWorkspaceAsync(int id, UpdateWorkspaceRequestDto workspaceDto)
     {
         var existingWorkspace = await _context.Workspace.FirstOrDefaultAsync(x => x.WorkspaceId == id);
         if (existingWorkspace == null)
