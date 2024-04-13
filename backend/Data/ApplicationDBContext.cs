@@ -11,8 +11,9 @@ public class ApplicationDBContext : IdentityDbContext<User>
     public ApplicationDBContext(DbContextOptions dbContextOptions) 
         : base(dbContextOptions)
     {
-    
+
     }
+    public DbSet<Board> Boards { get; set;}
     //Shtohen public DbSet<Entiteti> Entiteti { get; set; } per secilin entitet perveq User
     public DbSet<Workspace> Workspace { get; set; }
 
@@ -34,6 +35,7 @@ public class ApplicationDBContext : IdentityDbContext<User>
                 NormalizedName = "USER"
             },
         };
-        builder.Entity<IdentityRole>().HasData(roles); }
+        builder.Entity<IdentityRole>().HasData(roles);
+    }
     
 }
