@@ -9,10 +9,8 @@ namespace backend.Repositories;
 public class ListRepository : IListRepository
 {
     private readonly ApplicationDBContext _context;
-    private readonly IListRepository _listRepo;
-    public ListRepository(ApplicationDBContext context, IListRepository listRepo)
+    public ListRepository(ApplicationDBContext context)
     {
-        _listRepo = listRepo;
         _context = context;
     }
 
