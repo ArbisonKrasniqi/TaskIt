@@ -48,9 +48,23 @@ namespace backend.Repositories
             return boardsToDelete;
         }
 
+        public async Task<List<Board?>> DeleteBoardsByWorkspaceIdAsync(int workspaceId)
+        {
+            var boards = await _context.Boards.Where(b => b.WorkspaceId == workspaceId).ToListAsync();
+            _context.Boards.RemoveRange(boards);
+            await _context.SaveChangesAsync();
+            return boards;
+
+        }
+
         public async Task<List<Board>> GetAllAsync()
         {
             return await _context.Boards.ToListAsync();
+        }
+
+        public async Task<List<Board>> GetBoardsByWorkspaceIdAsync(int workspaceId)
+        {
+            return await _context.Boards.Where(b => b.WorkspaceId == workspaceId).ToListAsync();
         }
 
         public async Task<Board?> GetByIdAsync(int id)

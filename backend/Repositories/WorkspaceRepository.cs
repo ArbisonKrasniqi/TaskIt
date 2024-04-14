@@ -65,5 +65,11 @@ public class WorkspaceRepository : IWorkspaceRepository
         await _context.SaveChangesAsync();
         return existingWorkspace;
     }
+    
+    //EXISTS
+    public async Task<bool> WorkspaceExists(int id)
+    {
+        return await _context.Workspace.AnyAsync(w => w.WorkspaceId == id);
+    }
 }
 

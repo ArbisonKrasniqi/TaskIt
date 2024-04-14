@@ -15,10 +15,12 @@ namespace backend.Controllers
     public class BoardController : ControllerBase
     {
         private readonly IBoardRepository _boardRepo;
+        private readonly IWorkspaceRepository _workspaceRepo;
 
-        public BoardController(IBoardRepository boardRepo)
+        public BoardController(IBoardRepository boardRepo,IWorkspaceRepository workspaceRepo)
         {
             _boardRepo = boardRepo;
+            _workspaceRepo = workspaceRepo;
         }
 
         [HttpGet(template:"GetAllBoards")]
@@ -32,6 +34,18 @@ namespace backend.Controllers
             var boardDto = boards.Select(s => s.ToBoardDto());
 
             return Ok(boardDto);
+        }
+
+        [HttpGet("GetBoardsByWorkspaceId/{workspaceId}")]
+        public async Task<IActionResult> GetBoardsByWorkspaceId([FromRoute] int workspaceId)
+        {
+            var boards = await _boardRepo.GetBoardsByWorkspaceIdAsync(workspaceId);
+            if (boards == null)
+            {
+                return BadRequest();
+            }
+
+            return Ok(boards);
         }
 
         [HttpGet("GetBoardByID/{id:int}")]
@@ -49,10 +63,12 @@ namespace backend.Controllers
         }
 
         [HttpPost("CreateBoard/{workspaceId:int}")]
-        public async Task<IActionResult> Create([FromRoute] int workspaceId, CreateBoardDto boardDto)
+        public async Task<IActionResult> CreateBoard([FromRoute] int workspaceId, [FromBody] CreateBoardDto boardDto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest();
+            if (!await _workspaceRepo.WorkspaceExists(workspaceId))
+            {
+                return BadRequest("Workspace does not exist");
+            }
 
             var boardModel = boardDto.ToBoardFromCreate(workspaceId);
             await _boardRepo.CreateAsync(boardModel);
@@ -90,15 +106,22 @@ namespace backend.Controllers
             return Ok(boardModel);
         }
 
-        [HttpDelete(template:"DeleteBoardsWorkpaceID")]
-        public async Task<IActionResult> DeleteByWorkspace(int workspaceId)
+        [HttpDelete(template:"DeleteBoardsByWorkpaceID/{workspaceId}")]
+        public async Task<IActionResult> DeleteByWorkspace([FromRoute]int workspaceId)
         {
-            var deletedBoards = await _boardRepo.DeleteBoardsAsync(workspaceId);
-            
-            if (deletedBoards.Count == 0)
-                return NotFound(); 
+            if (!await _workspaceRepo.WorkspaceExists(workspaceId))
+            {
+                return StatusCode(404, "Workspace not found");
+            }
 
-            return Ok(deletedBoards);
+            var boardModel = await _boardRepo.DeleteBoardsByWorkspaceIdAsync(workspaceId);
+
+            if (boardModel == null)
+            {
+                return NotFound();
+            }
+
+            return NoContent();
         }
     }
 }
