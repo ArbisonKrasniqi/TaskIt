@@ -48,7 +48,35 @@ public class  TaskController : ControllerBase{
         return CreatedAtAction(nameof(GetTaskById), new { id = taskModel.TaskId}, taskModel.ToTaskDto());
     }
 
-   
+
+   [HttpPut]
+   [Route("{id}")]
+   public async Task<IActionResult> UpdateTask([FromRoute] int id, [FromBody] UpdateTaskRequestDTO updateDto){
+        var taskModel = await _taskRepo.UpdateTaskAsync(id, updateDto);
+        if(taskModel == null){
+            return NotFound();
+        }
+
+     
+        return Ok(taskModel.ToTaskDto());
+    }
+
+
+
+    [HttpDelete]
+    [Route("{id}")]
+    public async Task<IActionResult> DeleteTask([FromRoute] int id){
+        var taskModel = await _taskRepo.DeleteTaskAsync(id);
+
+        if(taskModel == null){
+            return NotFound();
+        }
+
+        _context.Task.Remove(taskModel);
+        _context.SaveChanges();
+
+        return NoContent();
+    }
 
 
 
