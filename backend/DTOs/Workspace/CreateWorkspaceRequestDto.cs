@@ -13,5 +13,5 @@ public class CreateWorkspaceRequestDto
     [MaxLength(280, ErrorMessage = "Description cannot be over 280 characters")]
     public string Description { get; set; } = string.Empty;
     
-    public int UserId { get; set; }
+    public string OwnerId { get; set; }
 }

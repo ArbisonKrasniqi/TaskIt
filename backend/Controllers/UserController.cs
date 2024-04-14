@@ -103,7 +103,7 @@ namespace backend.Controllers;
         //ADMIN API CALLS
         [HttpPost("adminCreate")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        [Authorize(Policy = "AdminOnly")]
+        //[Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> Create(CreateUserDTO createUserDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -153,7 +153,7 @@ namespace backend.Controllers;
         
         [HttpGet("adminAllUsers")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        [Authorize(Policy = "AdminOnly")]
+        //[Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> GetAllUsers()
         {
             try
@@ -174,7 +174,7 @@ namespace backend.Controllers;
         
         [HttpGet("adminUserID")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        [Authorize(Policy = "AdminOnly")]
+        //[Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> GetUserById(string id)
         {
             //Find specific user
@@ -189,7 +189,7 @@ namespace backend.Controllers;
         
         [HttpGet("adminUserEmail")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        [Authorize(Policy = "AdminOnly")]
+        //[Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> GetUserByEmail(string email)
         {
             //Find specific user
@@ -204,7 +204,7 @@ namespace backend.Controllers;
         
         [HttpPut("adminUpdateUser")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        [Authorize(Policy = "AdminOnly")]
+        //[Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> EditUser(EditUserDTO editUserDto)
         {
             try
@@ -340,7 +340,7 @@ namespace backend.Controllers;
         
         [HttpDelete("adminDeleteUserById")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        [Authorize(Policy = "AdminOnly")]
+        //[Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> DeleteUserById(string id)
         {
             //Semi-Validate the user id

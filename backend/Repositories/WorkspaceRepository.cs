@@ -43,7 +43,13 @@ public class WorkspaceRepository : IWorkspaceRepository
     {
         return await _context.Workspace.ToListAsync(); 
     }
-    
+
+    //OWNER WORKSPACES
+    public async Task<List<Workspace>> GetWorkspacesByOwnerIdAsync(string ownerId)
+    {
+        return await _context.Workspace.Where(w => w.OwnerId.Equals(ownerId)).ToListAsync();
+    }
+
     //GETBYID
     public async Task<Workspace?> GetWorkspaceByIdAsync(int id)
     {
@@ -60,7 +66,7 @@ public class WorkspaceRepository : IWorkspaceRepository
         }
 
         existingWorkspace.Title = workspaceDto.Title;
-        existingWorkspace.UserId = workspaceDto.UserId;
+        existingWorkspace.OwnerId = workspaceDto.OwnerId;
         existingWorkspace.Description = workspaceDto.Description;
         await _context.SaveChangesAsync();
         return existingWorkspace;
