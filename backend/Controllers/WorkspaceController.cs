@@ -59,14 +59,14 @@ public class WorkspaceController : ControllerBase
     }
     
     //CREATE
-    [HttpPost("{userId}")]
-    public async Task<IActionResult> CreateWorkspace ([FromBody] CreateWorkspaceRequestDto workspaceDto, [FromRoute] string userId) //fromBody sepse nuk jena tu i pas te dhanat ne URL po ne body te HTTP
+    [HttpPost("CreateWorkspace")]
+    public async Task<IActionResult> CreateWorkspace ([FromBody] CreateWorkspaceRequestDto workspaceDto) //fromBody sepse nuk jena tu i pas te dhanat ne URL po ne body te HTTP
     {
-        if (!await _userRepo.UserExists(userId))
+        if (!await _userRepo.UserExists(workspaceDto.OwnerId))
         {
             return BadRequest("User does not exist");
         }
-        var workspaceModel = workspaceDto.ToWorkspaceFromCreate(userId); //e kthen prej DTO ne workspace
+        var workspaceModel = workspaceDto.ToWorkspaceFromCreate(workspaceDto.OwnerId); //e kthen prej DTO ne workspace
         await _workspaceRepo.CreateWorkspaceAsync(workspaceModel);
         return CreatedAtAction(nameof(GetWorkspaceById), new { id = workspaceModel.WorkspaceId}, workspaceModel.ToWorkspaceDto());
         //e ekzekuton metoden getbyId edhe ja qon id e objektit te ri stockModel dhe e kthen ne formen e ToStockDto
