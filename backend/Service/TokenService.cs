@@ -30,7 +30,7 @@ public class TokenService : ITokenService
             new Claim("Id", user.Id),
             new Claim("Name", user.FirstName+" "+user.LastName),
             new Claim("Email", user.Email),
-            new Claim("Role", user.Role),
+        //TODO add user role
         };
 
         //What type of security algorithm will be used
