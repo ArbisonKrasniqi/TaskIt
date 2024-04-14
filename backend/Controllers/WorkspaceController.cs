@@ -59,14 +59,14 @@ public class WorkspaceController : ControllerBase
     }
     
     //CREATE
-    [HttpPost("{userId}")]
-    public async Task<IActionResult> CreateWorkspace ([FromBody] CreateWorkspaceRequestDto workspaceDto, [FromRoute] string userId) //fromBody sepse nuk jena tu i pas te dhanat ne URL po ne body te HTTP
+    [HttpPost("{ownerId}")]
+    public async Task<IActionResult> CreateWorkspace ([FromBody] CreateWorkspaceRequestDto workspaceDto, [FromRoute] string ownerId) //fromBody sepse nuk jena tu i pas te dhanat ne URL po ne body te HTTP
     {
-        if (!await _userRepo.UserExists(userId))
+        if (!await _userRepo.UserExists(ownerId))
         {
             return BadRequest("User does not exist");
         }
-        var workspaceModel = workspaceDto.ToWorkspaceFromCreate(userId); //e kthen prej DTO ne workspace
+        var workspaceModel = workspaceDto.ToWorkspaceFromCreate(ownerId); //e kthen prej DTO ne workspace
         await _workspaceRepo.CreateWorkspaceAsync(workspaceModel);
         return CreatedAtAction(nameof(GetWorkspaceById), new { id = workspaceModel.WorkspaceId}, workspaceModel.ToWorkspaceDto());
         //e ekzekuton metoden getbyId edhe ja qon id e objektit te ri stockModel dhe e kthen ne formen e ToStockDto
@@ -100,6 +100,23 @@ public class WorkspaceController : ControllerBase
         return NoContent();
     }
 
+    //DELETE ALL WORKSPACES
+    [HttpDelete]
+    [Route("deleteWorkspacesByOwnerId{ownerId}")]
+    public async Task<IActionResult> DeleteWorkspacesByOwnerId([FromRoute] string ownerId)
+    {
+        if (!await _userRepo.UserExists(ownerId))
+        {
+            return StatusCode(404, "User not found");
+        }
+        var workspaceModel = await _workspaceRepo.DeleteWorkspacesByOwnerIdAsync(ownerId);
+        if (workspaceModel == null)
+        {
+            return NotFound();
+        }
+
+        return NoContent();
+    }
 
 
 

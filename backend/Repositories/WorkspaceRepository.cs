@@ -38,6 +38,15 @@ public class WorkspaceRepository : IWorkspaceRepository
         await _context.SaveChangesAsync();
         return workspaceModel;
     }
+
+    public async Task<List<Workspace?>> DeleteWorkspacesByOwnerIdAsync(string ownerId)
+    {
+        var workspaces = await _context.Workspace.Where(w => w.OwnerId.Equals(ownerId)).ToListAsync();
+        _context.Workspace.RemoveRange(workspaces);
+        await _context.SaveChangesAsync();
+        return workspaces;
+    }
+
     //GETALL
     public async Task<List<Workspace>> GetAllWorkspacesAsync()
     {
