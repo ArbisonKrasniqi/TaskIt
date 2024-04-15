@@ -41,15 +41,15 @@ public class WorkspaceRepository : IWorkspaceRepository
     //GETALL
     public async Task<List<Workspace>> GetAllWorkspacesAsync()
     {
-        return await _context.Workspace.ToListAsync(); 
+        return await _context.Workspace.Include(w=> w.Boards).ToListAsync(); 
     }
     
     //GETBYID
     public async Task<Workspace?> GetWorkspaceByIdAsync(int id)
     {
-        return await _context.Workspace.FindAsync(id);
+        return await _context.Workspace.Include(w => w.Boards).FirstOrDefaultAsync(i => i.WorkspaceId == id);
     }
-    
+
     //UPDATE
     public async Task<Workspace?> UpdateWorkspaceAsync(int id, UpdateWorkspaceRequestDto workspaceDto)
     {

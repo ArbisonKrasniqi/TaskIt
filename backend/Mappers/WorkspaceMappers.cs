@@ -11,7 +11,8 @@ public static class WorkspaceMappers
         {   
             WorkspaceId = workspaceModel.WorkspaceId,
             Title = workspaceModel.Title,
-            UserId = workspaceModel.UserId
+            UserId = workspaceModel.UserId,
+            Boards = workspaceModel.Boards.Select(b=> b.ToBoardDto()).ToList()
         };
     }
 

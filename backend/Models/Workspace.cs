@@ -1,4 +1,6 @@
-﻿namespace backend.Models;
+﻿using backend.DTOs;
+
+namespace backend.Models;
 
 public class Workspace
 {
@@ -7,4 +9,5 @@ public class Workspace
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public int UserId { get; set; }
+    public List<Board> Boards { get; set; }
 }
