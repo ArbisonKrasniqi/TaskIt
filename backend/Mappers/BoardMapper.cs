@@ -13,7 +13,7 @@ namespace backend.Mappers
         {
             return new BoardDto
             {
-                Id = boardModel.Id,
+                BoardId = boardModel.BoardId,
                 Title = boardModel.Title,
                 DateCreated = boardModel.DateCreated,
                 BackgroundId = boardModel.BackgroundId,
