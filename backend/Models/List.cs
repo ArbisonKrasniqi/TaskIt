@@ -6,4 +6,6 @@ public class List
     public int index { get; set; }
     public string Title { get; set; } = string.Empty;
     public DateTime DateCreated { get; set; } = DateTime.Now;
+    
+    public int? BoardId { get; set; }
 }

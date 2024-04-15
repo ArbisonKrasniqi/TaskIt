@@ -60,4 +60,17 @@ public class ListRepository : IListRepository
         await _context.SaveChangesAsync();
         return listModel;
     }
+    
+    //
+    public async Task<List> CreateAsync(List listModel)
+    {
+        await _context.Lists.AddAsync(listModel);
+        await _context.SaveChangesAsync();
+        return listModel;
+    }
+
+    // public Task<List?> GetListByBoardId(int BoardId)
+    // {
+    //     
+    // }
 }
