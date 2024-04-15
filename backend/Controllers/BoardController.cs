@@ -72,7 +72,7 @@ namespace backend.Controllers
 
             var boardModel = boardDto.ToBoardFromCreate(workspaceId);
             await _boardRepo.CreateAsync(boardModel);
-            return CreatedAtAction(nameof(GetById), new {id = boardModel.BoardId}, boardModel.ToBoardDto());
+            return CreatedAtAction(nameof(GetById), new {id = boardModel.Id}, boardModel.ToBoardDto());
         }
 
         [HttpPut]

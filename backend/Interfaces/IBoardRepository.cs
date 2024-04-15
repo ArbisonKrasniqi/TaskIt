@@ -18,6 +18,5 @@ namespace backend.Interfaces
         Task<Board?> DeleteAsync(int id);
         Task<List<Board?>> DeleteBoardsAsync(int id);
         Task<List<Board>> DeleteBoardsByWorkspaceIdAsync(int workspaceId);
-        Task<bool> BoardExists(int boardId);
     }
 }

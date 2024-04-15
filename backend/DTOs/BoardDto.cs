@@ -7,7 +7,7 @@ namespace backend.DTOs
 {
     public class BoardDto
     {
-        public int BoardId { get; set; }
+        public int Id { get; set; }
         public string Title { get; set; } = string.Empty;
         public DateTime DateCreated { get; set; } = DateTime.Now;
         public int? BackgroundId { get; set; }

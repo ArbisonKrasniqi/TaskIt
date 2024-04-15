@@ -53,16 +53,22 @@ namespace backend.Controllers;
                     LastName = registerDto.LastName,
                     Email = registerDto.Email,
                     UserName = registerDto.Email,
-                    DateCreated = DateTime.Now
+                    Role = "User"
                 };
 
                 //Create user using CreateAsync
                 var createdUser = await _userManager.CreateAsync(user, registerDto.Password);
                 if (createdUser.Succeeded)
                 {
+                    //Add "User" role to new user
+                    var roleResult = await _userManager.AddToRoleAsync(user, "User"); ;
+                    if (roleResult.Succeeded)
+                    {
                         return Ok("User created");
+                    }
+                    return StatusCode(500, roleResult.Errors);
                 }
-                return StatusCode(500, "User could not be created");
+                return StatusCode(500, createdUser.Errors);
             }
             catch (Exception e)
             {
@@ -97,10 +103,10 @@ namespace backend.Controllers;
         //ADMIN API CALLS
         [HttpPost("adminCreate")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        //[Authorize(Policy = "AdminOnly")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> Create(CreateUserDTO createUserDto)
         {
-            if (!ModelState.IsValid) return StatusCode(400, "Wrong parameters");
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
             try
             {
@@ -111,25 +117,31 @@ namespace backend.Controllers;
                     LastName = createUserDto.LastName,
                     Email = createUserDto.Email,
                     UserName = createUserDto.Email,
-                    DateCreated = DateTime.Now
+                    Role = createUserDto.IsAdmin ? "Admin" : "User"
                 };
                 
                 //Create user using CreateAsync
                 var createdUser = await _userManager.CreateAsync(user, createUserDto.Password);
                 if (!createdUser.Succeeded) return StatusCode(500, createdUser.Errors);
-
-                if (createUserDto.IsAdmin)
+                
+                //Add the role. User role is always added by default
+                var userRoleResult = await _userManager.AddToRoleAsync(user, "User");
+                if (userRoleResult.Succeeded)
                 {
-                    var adminResult = await _userManager.AddToRoleAsync(user, "Admin");
-                    if (adminResult.Succeeded)
+                    //If new user is admin, add admin role
+                    if (createUserDto.IsAdmin)
                     {
-                        return Ok("User created");
+                        var adminRoleResult = await _userManager.AddToRoleAsync(user, "User");
+                        if (adminRoleResult.Succeeded)
+                        {
+                            return Ok("User created");
+                        }
                     }
-
-                    return StatusCode(500, "User created without admin role");
+                    //If new user is NOT admin just return Ok
+                    return Ok("User created");
+                    
                 }
-
-                return Ok("User created");
+                return StatusCode(500, "Could not create user");
 
             }
             catch (Exception e)
@@ -141,7 +153,7 @@ namespace backend.Controllers;
         
         [HttpGet("adminAllUsers")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        //[Authorize(Policy = "AdminOnly")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> GetAllUsers()
         {
             try
@@ -157,37 +169,12 @@ namespace backend.Controllers;
             {
                 return StatusCode(500, e);
             }
-        }
-
-        [HttpGet("adminAllAdmins")]
-        [Authorize(AuthenticationSchemes = "Bearer")]
-        public async Task<IActionResult> GetAllAdmins()
-        {
-            var users = await _userManager.Users.ToListAsync();
-            var admins = new List<User>();
-
-            foreach (var user in users)
-            {
-                if (await _userManager.IsInRoleAsync(user, "Admin"))
-                {
-                    var newAdmin = new User{
-                        Id = user.Id,
-                        FirstName = user.FirstName,
-                        LastName = user.LastName,
-                        Email = user.Email,
-                        DateCreated = user.DateCreated
-                    };
-                    admins.Add(newAdmin);
-                }
-            }
-
-            var adminsDto = admins.Select(admin => UserMappers.ToGetUserDTO(admin));
-            return Ok(adminsDto);
+           
         }
         
         [HttpGet("adminUserID")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        //[Authorize(Policy = "AdminOnly")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> GetUserById(string id)
         {
             //Find specific user
@@ -202,7 +189,7 @@ namespace backend.Controllers;
         
         [HttpGet("adminUserEmail")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        //[Authorize(Policy = "AdminOnly")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> GetUserByEmail(string email)
         {
             //Find specific user
@@ -217,11 +204,13 @@ namespace backend.Controllers;
         
         [HttpPut("adminUpdateUser")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        //[Authorize(Policy = "AdminOnly")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> EditUser(EditUserDTO editUserDto)
         {
+            try
+            {
                 //Check if valid ModelState(DTO) and if the role is either Admin or User
-                if (!ModelState.IsValid)
+                if (!ModelState.IsValid && editUserDto.Role != "Admin" && editUserDto.Role != "User")
                 {
                     return BadRequest("Parameters incorrect!");
                 }
@@ -271,98 +260,87 @@ namespace backend.Controllers;
 
                 //Apply current changes (Role is not changed yet)
                 var editResult = await _userManager.UpdateAsync(user);
+                
                 if (editResult.Succeeded)
                 {
-                    return Ok("User successfully updated");
-                }
-                return StatusCode(500, "User could not be updated!");
-        }
-
-       
-
-
-        [HttpPut("adminUpdateRole")]
-        [Authorize(AuthenticationSchemes = "Bearer")]
-
-        public async Task<IActionResult> UpdateRole(EditUserRoleDTO editUserRoleDto)
-        {
-            if (!ModelState.IsValid)
-                return StatusCode(400, "Wrong parameters");
-
-            var wantedRole = editUserRoleDto.isAdmin ? "Admin" : "User";
-
-            var user = await _userManager.FindByIdAsync(editUserRoleDto.Id);
-            if (user == null) return StatusCode(400, "User does not exist");
-
-            //If no roles edge case, add User role, and if wanted, add admin role.
-            var checkRole = await _userManager.GetRolesAsync(user);
-            if (checkRole.IsNullOrEmpty())
-            {
-                    if (wantedRole == "User")
+                    //First check if role list for user is empty
+                    var checkRole = await _userManager.GetRolesAsync(user);
+                    if (checkRole.IsNullOrEmpty())
                     {
-                        return Ok("No changes needed");
+                        //If its empty, just add the desired role
+                        var addRole = await _userManager.AddToRoleAsync(user, editUserDto.Role);
+                        if (addRole.Succeeded)
+                        {
+                            //Apply role attribute
+                            user.Role = editUserDto.Role;
+                            var update = await _userManager.UpdateAsync(user);
+                            if (update.Succeeded)
+                            {
+                                return Ok("User successfully updated!");
+                            }
+                        }
+                        else
+                        {
+                            return StatusCode(500, "Could not update user role!");
+                        }
                     }
 
-                    if (wantedRole == "Admin")
+                    //If current role and desired role are the same, dont do any changes.
+                    if (user.Role == editUserDto.Role)
                     {
-                        var addRoleAdmin = await _userManager.AddToRoleAsync(user, "Admin");
-                        if (addRoleAdmin.Succeeded)
+                        return Ok("User successfully updated");
+                    }
+
+                    //If they are different and current role is "User" that means desired role is "Admin"
+                    if (user.Role == "User")
+                    {
+                        //Add user to "Admin" role
+                        var addAdmin = await _userManager.AddToRoleAsync(user, editUserDto.Role);
+                        if (addAdmin.Succeeded)
                         {
-                            return Ok("Role successfully updated");
+                            //Apply role attribute
+                            user.Role = editUserDto.Role;
+                            var update = await _userManager.UpdateAsync(user);
+                            if (update.Succeeded)
+                            {
+                                return Ok("User successfully updated!");
+                            }
                         }
 
-                        return StatusCode(500, "Role could not be updated");
-
+                        return StatusCode(500, "Could not update user role!");
                     }
-                return StatusCode(400, "Wrong parameters");
-            }
-            
-            
-            //If user has desired role, do not make any changes.
-            var currentRoles = await _userManager.GetRolesAsync(user);
-            if (wantedRole == "Admin")
-            {
-                if (currentRoles.Any(currentRole => currentRole == "Admin"))
-                {
-                    return Ok("No change needed");
-                }
-            }
-            if (wantedRole == "User")
-            {
-                if (currentRoles.All(currentRole => currentRole != "Admin"))
-                {
-                    return Ok("No change needed");
-                }
-            }
-            
-            switch (wantedRole)
-            {
-                case "User":
-                    var removeAdmin = await _userManager.RemoveFromRoleAsync(user, "Admin");
-                    if (removeAdmin.Succeeded)
+
+                    //If they are different and current role is "Admin" that means desired role is "User"
+                    if (user.Role == "Admin")
                     {
-                        return Ok("Role successfully updated");
-                    }
+                        //Just remove user from Admin role.
+                        var removeAdmin = await _userManager.RemoveFromRoleAsync(user, editUserDto.Role);
+                        if (removeAdmin.Succeeded)
+                        {
+                            //Apply role attribute
+                            user.Role = editUserDto.Role;
+                            var update = await _userManager.UpdateAsync(user);
+                            if (update.Succeeded)
+                            {
+                                return Ok("User successfully updated!");
+                            }
+                        }
 
-                    return StatusCode(500, "Role could not be updated");
-                
-                case "Admin":
-                    var addAdmin = await _userManager.AddToRoleAsync(user, "Admin");
-                    if (addAdmin.Succeeded)
-                    {
-                        return Ok("Role successfully updated");
+                        return StatusCode(500, "Could not update user role!");
                     }
+                }
 
-                    return StatusCode(500, "Role could not be updated");
-                
-                default:
-                    return StatusCode(400, "Wrong parameters");
+                return StatusCode(500, "User could not be updated!");
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e);
             }
         }
-
+        
         [HttpDelete("adminDeleteUserById")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        //[Authorize(Policy = "AdminOnly")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> DeleteUserById(string id)
         {
             //Semi-Validate the user id

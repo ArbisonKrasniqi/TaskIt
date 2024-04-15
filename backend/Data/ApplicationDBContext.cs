@@ -18,7 +18,6 @@ public class ApplicationDBContext : IdentityDbContext<User>
     public DbSet<Workspace> Workspace { get; set; }
     
     public DbSet<List> Lists { get; set; }
-    public DbSet<Tasks> Tasks { get; set; }
 
     //User roles
     protected override void OnModelCreating(ModelBuilder builder)
@@ -31,7 +30,12 @@ public class ApplicationDBContext : IdentityDbContext<User>
                 {
                     Name = "Admin",
                     NormalizedName = "ADMIN"
-                }
+                },
+                new IdentityRole
+                {
+                    Name = "User",
+                    NormalizedName = "USER"
+                },
             };
         builder.Entity<IdentityRole>().HasData(roles);
     }

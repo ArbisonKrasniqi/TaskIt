@@ -38,27 +38,12 @@ public class WorkspaceRepository : IWorkspaceRepository
         await _context.SaveChangesAsync();
         return workspaceModel;
     }
-
-    public async Task<List<Workspace?>> DeleteWorkspacesByOwnerIdAsync(string ownerId)
-    {
-        var workspaces = await _context.Workspace.Where(w => w.OwnerId.Equals(ownerId)).ToListAsync();
-        _context.Workspace.RemoveRange(workspaces);
-        await _context.SaveChangesAsync();
-        return workspaces;
-    }
-
     //GETALL
     public async Task<List<Workspace>> GetAllWorkspacesAsync()
     {
         return await _context.Workspace.Include(w=> w.Boards).ToListAsync(); 
     }
-
-    //OWNER WORKSPACES
-    public async Task<List<Workspace>> GetWorkspacesByOwnerIdAsync(string ownerId)
-    {
-        return await _context.Workspace.Where(w => w.OwnerId.Equals(ownerId)).ToListAsync();
-    }
-
+    
     //GETBYID
     public async Task<Workspace?> GetWorkspaceByIdAsync(int id)
     {
@@ -75,7 +60,7 @@ public class WorkspaceRepository : IWorkspaceRepository
         }
 
         existingWorkspace.Title = workspaceDto.Title;
-        existingWorkspace.OwnerId = workspaceDto.OwnerId;
+        existingWorkspace.UserId = workspaceDto.UserId;
         existingWorkspace.Description = workspaceDto.Description;
         await _context.SaveChangesAsync();
         return existingWorkspace;
