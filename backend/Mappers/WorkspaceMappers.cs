@@ -10,19 +10,19 @@ public static class WorkspaceMappers
         return new WorkspaceDto
         {   
             WorkspaceId = workspaceModel.WorkspaceId,
+            Description = workspaceModel.Description,
             Title = workspaceModel.Title,
-            UserId = workspaceModel.UserId,
-            Boards = workspaceModel.Boards.Select(b=> b.ToBoardDto()).ToList()
+            OwnerId = workspaceModel.OwnerId
         };
     }
 
-    public static Workspace ToWorkspaceFromCreate(this CreateWorkspaceRequestDto workspaceDto)
+    public static Workspace ToWorkspaceFromCreate(this CreateWorkspaceRequestDto workspaceDto, string OwnerId)
     {
         return new Workspace
         {
             Title = workspaceDto.Title,
             Description = workspaceDto.Description,
-            UserId = workspaceDto.UserId
+            OwnerId = OwnerId
         };
     }
     public static Workspace ToWorkspaceFromUpdate(this UpdateWorkspaceRequestDto workspaceDto)
@@ -31,7 +31,7 @@ public static class WorkspaceMappers
         {
             Title = workspaceDto.Title,
             Description = workspaceDto.Description,
-            UserId = workspaceDto.UserId
+            OwnerId = workspaceDto.OwnerId
         };
     }
 }

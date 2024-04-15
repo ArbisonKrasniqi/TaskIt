@@ -8,6 +8,6 @@ public class Workspace
     public int WorkspaceId { get; set; }
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public int UserId { get; set; }
-    public List<Board> Boards { get; set; }
+    public DateTime DateCreated { get; set; } = DateTime.Now;
+    public string OwnerId { get; set; }
 }

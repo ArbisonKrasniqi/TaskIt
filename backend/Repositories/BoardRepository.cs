@@ -28,7 +28,7 @@ namespace backend.Repositories
 
         public async Task<Board?> DeleteAsync(int id)
         {
-            var boardModel = await _context.Boards.FirstOrDefaultAsync(x => x.Id == id);
+            var boardModel = await _context.Boards.FirstOrDefaultAsync(x => x.BoardId == id);
 
             if (boardModel == null)
                 return null;
@@ -84,6 +84,10 @@ namespace backend.Repositories
 
             await _context.SaveChangesAsync();
             return existingBoard;
+        }
+        public async Task<bool> BoardExists(int boardId)
+        {
+            return await _context.Boards.AnyAsync(s => s.BoardId == boardId);
         }
     }
 }

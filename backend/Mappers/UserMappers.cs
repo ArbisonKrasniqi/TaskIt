@@ -16,7 +16,7 @@ public class UserMappers
             FirstName = user.FirstName,
             LastName = user.LastName,
             Email = user.Email,
-            Role = user.Role
+            DateCreated = user.DateCreated
         };
     }
     

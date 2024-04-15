@@ -11,13 +11,13 @@ namespace backend.Controllers;
 
 public class ListController : ControllerBase
 {
-    private readonly ApplicationDBContext _context;
     private readonly IListRepository _listRepo;
+    private readonly IBoardRepository _boardRepo;
 
-    public ListController(ApplicationDBContext context, IListRepository listRepo)
+    public ListController(IListRepository listRepo , IBoardRepository boardRepo)
     {
-        _context = context;
         _listRepo = listRepo;
+        _boardRepo = boardRepo;
     }
 
     [HttpGet("GetAllLists")]
@@ -39,14 +39,7 @@ public class ListController : ControllerBase
 
         return Ok(list.ToListDto());
     }
-
-    [HttpPost("CreateList")]
-    public async Task<IActionResult> CreateList([FromBody] CreateListDTO listDto)
-    {
-        var listModel = listDto.ToListFromCreate();
-        await _listRepo.CreateListAsync(listModel);
-        return CreatedAtAction(nameof(GetById), new { ListId = listModel.ListId }, listModel.ToListDto());
-    }
+    
 
     [HttpPut("UpdateList/{ListId}")]
     
@@ -73,6 +66,34 @@ public class ListController : ControllerBase
             return NotFound();
         }
         return NoContent();
+    }
+    
+    // Http Post with relationship one to many with board 
+    [HttpPost("CreateList/{BoardId}")]
+
+    public async Task<IActionResult> CreateList([FromRoute] int BoardId,[FromRoute] CreateListDTO listDto)
+    {
+        if (!await _boardRepo.BoardExists(BoardId))
+        {
+            return BadRequest("Board did not exist");
+        }
+
+        var listModel = listDto.ToListFromCreate(BoardId);
+        await _listRepo.CreateAsync(listModel);
+        return CreatedAtAction(nameof(GetById), new { ListId = listModel.ListId }, listModel.ToListDto());
+    }
+
+    [HttpGet("GetListByBoardId")]
+    public async Task<IActionResult> GetListByBoardId([FromRoute] int BoardId)
+    {
+        var list = await _listRepo.GetListByBoardId(BoardId);
+
+        if (list == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(list.ToListDto());
     }
     
 }

@@ -1,8 +1,7 @@
-﻿namespace backend.DTOs.Workspace;
+namespace backend.DTOs.Task;
 using System.ComponentModel.DataAnnotations;
 
-public class CreateWorkspaceRequestDto
-{
+public class UpdateTaskRequestDTO{
     [Required]
     [MinLength(2, ErrorMessage = "Title must be at least 2 characters")]
     [MaxLength(280, ErrorMessage = "Title cannot be over 280 characters")]
@@ -12,6 +11,9 @@ public class CreateWorkspaceRequestDto
     [MinLength(10, ErrorMessage = "Description must be at least 10 characters")]
     [MaxLength(280, ErrorMessage = "Description cannot be over 280 characters")]
     public string Description { get; set; } = string.Empty;
+
     
-    public string OwnerId { get; set; }
+    public DateTime DateAdded { get; set; } = DateTime.Now;
+    public DateTime DueDate { get; set; }
+    public int? ListId { get; set;}
 }

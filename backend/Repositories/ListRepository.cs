@@ -9,10 +9,8 @@ namespace backend.Repositories;
 public class ListRepository : IListRepository
 {
     private readonly ApplicationDBContext _context;
-    private readonly IListRepository _listRepo;
-    public ListRepository(ApplicationDBContext context, IListRepository listRepo)
+    public ListRepository(ApplicationDBContext context)
     {
-        _listRepo = listRepo;
         _context = context;
     }
 
@@ -61,5 +59,17 @@ public class ListRepository : IListRepository
         _context.Lists.Remove(listModel);
         await _context.SaveChangesAsync();
         return listModel;
+    }
+    
+    //
+    public async Task<List> CreateAsync(List listModel)
+    {
+        await _context.Lists.AddAsync(listModel);
+        await _context.SaveChangesAsync();
+        return listModel;
+    }
+    public Task<List?> GetListByBoardId(int BoardId)
+    {
+        throw new NotImplementedException();
     }
 }

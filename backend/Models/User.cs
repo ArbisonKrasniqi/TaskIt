@@ -9,9 +9,9 @@ public class User : IdentityUser
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
     public DateTime DateCreated { get; set; } = DateTime.Now;
-    public string Role { get; set; } = string.Empty;
 
     //Relationships
+    public List<Workspace> Workspaces { get; set; } //Each user will have a list of workspaces as an owner
 }
 
 //We dont have to use all of the new attributes below
