@@ -28,7 +28,7 @@ namespace backend.Repositories
 
         public async Task<Board?> DeleteAsync(int id)
         {
-            var boardModel = await _context.Boards.FirstOrDefaultAsync(x => x.Id == id);
+            var boardModel = await _context.Boards.FirstOrDefaultAsync(x => x.BoardId == id);
 
             if (boardModel == null)
                 return null;
