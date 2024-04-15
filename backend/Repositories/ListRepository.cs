@@ -68,9 +68,8 @@ public class ListRepository : IListRepository
         await _context.SaveChangesAsync();
         return listModel;
     }
-
-    // public Task<List?> GetListByBoardId(int BoardId)
-    // {
-    //     
-    // }
+    public Task<List?> GetListByBoardId(int BoardId)
+    {
+        throw new NotImplementedException();
+    }
 }

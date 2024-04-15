@@ -11,7 +11,6 @@ public interface IListRepository
     Task<List?> CreateListAsync(List listModel);
     Task<List?> UpdateListAsync(int listId, UpdateListDTO listDto);
     Task<List?> DeleteListAsync(int listId);
-    
     //Needed for relation with the board
     Task<List> CreateAsync(List listModel);
 

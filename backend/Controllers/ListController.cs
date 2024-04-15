@@ -11,13 +11,11 @@ namespace backend.Controllers;
 
 public class ListController : ControllerBase
 {
-    private readonly ApplicationDBContext _context;
     private readonly IListRepository _listRepo;
     private readonly IBoardRepository _boardRepo;
 
-    public ListController(ApplicationDBContext context, IListRepository listRepo , IBoardRepository boardRepo)
+    public ListController(IListRepository listRepo , IBoardRepository boardRepo)
     {
-        _context = context;
         _listRepo = listRepo;
         _boardRepo = boardRepo;
     }
