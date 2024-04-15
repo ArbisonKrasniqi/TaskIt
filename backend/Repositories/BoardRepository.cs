@@ -26,9 +26,9 @@ namespace backend.Repositories
             return boardModel;
         }
 
-        public async Task<Board?> DeleteAsync(int id)
+        public async Task<Board?> DeleteAsync(int BoardId)
         {
-            var boardModel = await _context.Boards.FirstOrDefaultAsync(x => x.Id == id);
+            var boardModel = await _context.Boards.FirstOrDefaultAsync(x => x.BoardId == BoardId);
 
             if (boardModel == null)
                 return null;
@@ -50,17 +50,17 @@ namespace backend.Repositories
 
         public async Task<List<Board>> GetAllAsync()
         {
-            return await _context.Boards.ToListAsync();
+            return await _context.Boards.Include(c => c.Lists).ToListAsync();
         }
 
-        public async Task<Board?> GetByIdAsync(int id)
+        public async Task<Board?> GetByIdAsync(int BoardId)
         {
-            return await _context.Boards.FindAsync(id);
+            return await _context.Boards.Include(c => c.Lists).FirstOrDefaultAsync(i=> i.BoardId == BoardId);
         }
 
-        public async Task<Board?> UpdateAsync(int id, Board boardModel)
+        public async Task<Board?> UpdateAsync(int BoardId, Board boardModel)
         {
-            var existingBoard = await _context.Boards.FindAsync(id);
+            var existingBoard = await _context.Boards.FindAsync(BoardId);
             
             if (existingBoard == null)
                 return null;
@@ -70,6 +70,11 @@ namespace backend.Repositories
 
             await _context.SaveChangesAsync();
             return existingBoard;
+        }
+
+        public Task<bool> BoardExists(int BoardId)
+        {
+            return _context.Boards.AnyAsync(s => s.BoardId == BoardId);
         }
     }
 }
