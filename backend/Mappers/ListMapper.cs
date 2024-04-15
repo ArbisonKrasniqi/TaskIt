@@ -13,8 +13,8 @@ public static class ListMapper
             Title = listModel.Title
         };
     }
-
-    public static List ToListFromCreate(this CreateListDTO listDto)
+    
+    public static List ToListFromCreate(this CreateListDTO listDto, int BoardId)
     {
         return new List
         {
@@ -22,4 +22,5 @@ public static class ListMapper
             DateCreated = listDto.DateCreated
         };
     }
+
 }
