@@ -5,10 +5,10 @@ namespace backend.Interfaces;
 
 public interface ITaskRepository{
 
-    Task<List<Task>> GetAllTaskAsync();
-    Task<Task?> GetTaskByIdAsync(int id);
-    Task<Task> CreateTaskAsync(Task taskModel);
-    Task<Task?> UpdateTaskAsync(int id, UpdateTaskRequestDTO taskDto);
-    Task<Task?> DeleteTaskAsync(int id);
+    Task<List<Tasks>> GetAllTaskAsync();
+    Task<Tasks?> GetTaskByIdAsync(int id);
+    Task<Tasks> CreateTaskAsync(Tasks taskModel);
+    Task<Tasks?> UpdateTaskAsync(int id, UpdateTaskRequestDTO taskDto);
+    Task<Tasks?> DeleteTaskAsync(int id);
     
 }

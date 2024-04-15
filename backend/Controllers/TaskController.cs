@@ -17,9 +17,11 @@ namespace backend.Controllers;
 public class  TaskController : ControllerBase{
 
     private readonly ApplicationDBContext _context;
+    private readonly ITaskRepository _taskRepo;
 
-    public TaskController(ApplicationDBContext context){
+    public TaskController(ApplicationDBContext context, ITaskRepository taskRepo){
         _context = context;
+        _taskRepo = taskRepo;
 
     }
 
@@ -27,7 +29,7 @@ public class  TaskController : ControllerBase{
     [HttpGet]
     public async Task<IActionResult> GetAllTasks(){
         var task = await _taskRepo.GetAllTaskAsync();
-        var taskDto = task.Select(s => s.ToWorkspaceDto());
+        var taskDto = task.Select(s => s.ToTaskDto());
         return Ok(taskDto);
     }
 
@@ -38,7 +40,7 @@ public class  TaskController : ControllerBase{
         if(task == null){
             return NotFound();
         }
-        return Ok(task.ToWorkspaceDto());
+        return Ok(task.ToTaskDto());
     }
 
     [HttpPost]
@@ -50,7 +52,7 @@ public class  TaskController : ControllerBase{
 
 
    [HttpPut]
-   [Route("{id}")]
+   [Route("{id}")]   
    public async Task<IActionResult> UpdateTask([FromRoute] int id, [FromBody] UpdateTaskRequestDTO updateDto){
         var taskModel = await _taskRepo.UpdateTaskAsync(id, updateDto);
         if(taskModel == null){
@@ -72,8 +74,7 @@ public class  TaskController : ControllerBase{
             return NotFound();
         }
 
-        _context.Task.Remove(taskModel);
-        _context.SaveChanges();
+      
 
         return NoContent();
     }

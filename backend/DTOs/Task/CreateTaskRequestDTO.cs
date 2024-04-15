@@ -14,6 +14,6 @@ public class CreateTaskRequestDTO{
 
     
     public DateTime DateAdded { get; set; } = DateTime.Now;
-    public DateTime DueDate { get; set; } = DateTime.Empty
+    public DateTime DueDate { get; set; }
     public int? ListId { get; set;}
 }

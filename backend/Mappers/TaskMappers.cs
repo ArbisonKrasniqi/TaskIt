@@ -5,9 +5,9 @@ namespace backend.Mappers;
 
 public static class TaskMappers{
 
-    public static TaskDto ToTaskDto (this Task taskModel){
+    public static TaskDto ToTaskDto (this Tasks taskModel){
         return new TaskDto{
-            TaskID = taskModel.TaskID,
+            TaskID = taskModel.TaskId,
             Title = taskModel.Title,
             Description = taskModel.Description,
             DateAdded = taskModel.DateAdded,
@@ -17,23 +17,23 @@ public static class TaskMappers{
     }
 
 
-    public static Task ToTaskFromCreate(this CreateTaskRequestDTO taskDto){
-        return new Task{
+    public static Tasks ToTaskFromCreate(this CreateTaskRequestDTO taskDto){
+        return new Tasks{
             Title = taskDto.Title,
             Description = taskDto.Description,
-            DateAdded = taskModel.DateAdded,
-            DueDate = taskModel.DueDate,
+            DateAdded = taskDto.DateAdded,
+            DueDate = taskDto.DueDate,
             ListId = taskDto.ListId
         };
     }
 
 
-    public static Task ToTaskFromUpdate(this UpdateTaskRequestDto taskDto){
-        return new Task{
+    public static Tasks ToTaskFromUpdate(this UpdateTaskRequestDTO taskDto){
+        return new Tasks{
             Title = taskDto.Title,
             Description = taskDto.Description,
-            DateAdded = taskModel.DateAdded,
-            DueDate = taskModel.DueDate,
+            DateAdded = taskDto.DateAdded,
+            DueDate = taskDto.DueDate,
             ListId = taskDto.ListId
         };
     }
