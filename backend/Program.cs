@@ -4,11 +4,11 @@ using backend.Models;
 using backend.Repositories;
 using backend.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using backend.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,10 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddControllers().AddNewtonsoftJson(options =>
-{
-    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-});
+
 //Implements JWT into swagger
 builder.Services.AddSwaggerGen(option =>
 {
@@ -56,7 +53,6 @@ builder.Services.AddDbContext<ApplicationDBContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-
 builder.Services.AddIdentity<User, IdentityRole>(options =>
     {
         
@@ -88,8 +84,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 )
             };
         });
-    
-builder.Services.AddScoped<IBoardRepository, BoardRepository>();//-------
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.SameSite = SameSiteMode.Strict;
+});
+
 
 
 builder.Services.AddAuthorization(options =>
@@ -98,9 +98,25 @@ builder.Services.AddAuthorization(options =>
     //[Authorize(Policy = "AdminOnly")]
 });
 
-
 builder.Services.AddScoped<ITokenService, TokenService>();
-builder.Services.AddScoped<IWorkspaceRepository, WorkspaceRepository>(); //Do te regjistroj nje sherbim me IWorkspaceRepository dhe WorkspaceRepository si implementimi i tij ne container te Dependency Injection
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+//builder.Services.AddScoped<IBoardRepository, BoardRepository>();
+//builder.Services.AddScoped<IWorkspaceRepository, WorkspaceRepository>();
+//builder.Services.AddScoped<IListRepository, ListRepository>();
+//builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+
+// CORS configuration
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp",
+        builder =>
+        {
+            builder.WithOrigins("http://localhost:3000") // Adjust origin as needed
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -115,6 +131,9 @@ app.UseHttpsRedirection();
 //Tell the application to use Authentication and Authorization
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Apply CORS policy globally
+app.UseCors("AllowReactApp");
 
 app.MapControllers();
 

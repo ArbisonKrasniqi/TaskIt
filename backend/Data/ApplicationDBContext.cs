@@ -13,11 +13,13 @@ public class ApplicationDBContext : IdentityDbContext<User>
     {
 
     }
-    public DbSet<Board> Boards { get; set;}
-    //Shtohen public DbSet<Entiteti> Entiteti { get; set; } per secilin entitet perveq User
-    public DbSet<Workspace> Workspace { get; set; }
     
-    public DbSet<List> Lists { get; set; }
+    //Shtohen public DbSet<Entiteti> Entiteti { get; set; } per secilin entitet perveq User
+    //public DbSet<Board> Boards { get; set;}
+    //public DbSet<Workspace> Workspace { get; set; }
+    
+    //public DbSet<List> Lists { get; set; }
+    //public DbSet<Tasks> Tasks { get; set; }
 
     //User roles
     protected override void OnModelCreating(ModelBuilder builder)
@@ -30,12 +32,7 @@ public class ApplicationDBContext : IdentityDbContext<User>
                 {
                     Name = "Admin",
                     NormalizedName = "ADMIN"
-                },
-                new IdentityRole
-                {
-                    Name = "User",
-                    NormalizedName = "USER"
-                },
+                }
             };
         builder.Entity<IdentityRole>().HasData(roles);
     }
