@@ -15,8 +15,9 @@ public class ApplicationDBContext : IdentityDbContext<User>
     }
     
     //Shtohen public DbSet<Entiteti> Entiteti { get; set; } per secilin entitet perveq User
+    public DbSet<Workspace> Workspace { get; set; }
     //public DbSet<Board> Boards { get; set;}
-    //public DbSet<Workspace> Workspace { get; set; }
+
     
     //public DbSet<List> Lists { get; set; }
     //public DbSet<Tasks> Tasks { get; set; }

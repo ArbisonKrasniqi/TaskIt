@@ -35,8 +35,6 @@
       <Folder Include="DTOs\Task\Output\" />
       <Folder Include="DTOs\User\Input\" />
       <Folder Include="DTOs\User\Output\" />
-      <Folder Include="DTOs\Workspace\Input\" />
-      <Folder Include="DTOs\Workspace\Output\" />
       <Folder Include="Interfaces\" />
       <Folder Include="Mappers\" />
       <Folder Include="Models\" />
