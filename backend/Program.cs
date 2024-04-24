@@ -100,7 +100,7 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-//builder.Services.AddScoped<IBoardRepository, BoardRepository>();
+builder.Services.AddScoped<IBoardRepository, BoardRepository>();
 builder.Services.AddScoped<IWorkspaceRepository, WorkspaceRepository>();
 //builder.Services.AddScoped<IListRepository, ListRepository>();
 //builder.Services.AddScoped<ITaskRepository, TaskRepository>();

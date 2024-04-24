@@ -27,7 +27,6 @@
 
     <ItemGroup>
       <Folder Include="Controllers\" />
-      <Folder Include="DTOs\Board\Input\" />
       <Folder Include="DTOs\Board\Output\" />
       <Folder Include="DTOs\List\Input\" />
       <Folder Include="DTOs\List\Output\" />
