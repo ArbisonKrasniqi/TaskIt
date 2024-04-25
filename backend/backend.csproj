@@ -28,10 +28,6 @@
     <ItemGroup>
       <Folder Include="Controllers\" />
       <Folder Include="DTOs\Board\Output\" />
-      <Folder Include="DTOs\List\Input\" />
-      <Folder Include="DTOs\List\Output\" />
-      <Folder Include="DTOs\Task\Input\" />
-      <Folder Include="DTOs\Task\Output\" />
       <Folder Include="DTOs\User\Input\" />
       <Folder Include="DTOs\User\Output\" />
       <Folder Include="Interfaces\" />
