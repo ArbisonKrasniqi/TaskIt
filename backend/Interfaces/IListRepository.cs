@@ -16,4 +16,6 @@ public interface IListRepository
     Task<List<List>> DeleteListsByBoardIdAsync(int BoardId);
     Task<List<List>> GetListByBoardId(int BoardId);
 
+    Task<bool> ListExists(int listId);
+
 }

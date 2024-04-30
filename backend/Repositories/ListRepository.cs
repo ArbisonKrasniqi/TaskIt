@@ -83,4 +83,9 @@ public class ListRepository : IListRepository
         await _context.SaveChangesAsync();
         return lists;
     }
+
+    public async Task<bool> ListExists(int listId)
+    {
+        return await _context.List.AnyAsync(i => i.ListId == listId);
+    }
 }

@@ -18,7 +18,7 @@ public class ApplicationDBContext : IdentityDbContext<User>
     public DbSet<Workspace> Workspace { get; set; }
     public DbSet<Board> Board { get; set;}
     public DbSet<List> List { get; set; }
-    //public DbSet<Tasks> Tasks { get; set; }
+    public DbSet<Tasks> Tasks { get; set; }
 
     //User roles
     protected override void OnModelCreating(ModelBuilder builder)
