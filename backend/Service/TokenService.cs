@@ -22,7 +22,7 @@ public class TokenService : ITokenService
         _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:SigningKey"]));
     }
 
-    public string CreateToken(User user)
+    public string CreateToken(User user, string role)
     {
         //The claims that the JWT will include
         var claims = new List<Claim>
@@ -30,7 +30,7 @@ public class TokenService : ITokenService
             new Claim("Id", user.Id),
             new Claim("Name", user.FirstName+" "+user.LastName),
             new Claim("Email", user.Email),
-        //TODO add user role
+            new Claim("Role", role),
         };
 
         //What type of security algorithm will be used
@@ -39,7 +39,7 @@ public class TokenService : ITokenService
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.Now.AddHours(1),
+            Expires = DateTime.Now.AddDays(1),
             SigningCredentials = creds,
             Issuer = _config["JWT:Issuer"],
             Audience = _config["JWT:Audience"]
