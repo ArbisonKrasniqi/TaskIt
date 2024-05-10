@@ -421,7 +421,7 @@ namespace backend.Controllers;
         }
 
         [HttpDelete("adminDeleteUserById")]
-        [Authorize(AuthenticationSchemes = "Bearer")]
+        //[Authorize(AuthenticationSchemes = "Bearer")]
         //[Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> DeleteUserById(UserIdDTO userIdDto)
         {
