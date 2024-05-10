@@ -109,7 +109,7 @@ namespace backend.Controllers;
         
         //ADMIN API CALLS
         [HttpPost("adminCreate")]
-        [Authorize(AuthenticationSchemes = "Bearer")]
+        //[Authorize(AuthenticationSchemes = "Bearer")]
         //[Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> Create(CreateUserDTO createUserDto)
         {
