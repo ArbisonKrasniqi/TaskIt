@@ -153,7 +153,7 @@ namespace backend.Controllers;
         
         
         [HttpGet("adminAllUsers")]
-        [Authorize(AuthenticationSchemes = "Bearer")]
+        //[Authorize(AuthenticationSchemes = "Bearer")]
         //[Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> GetAllUsers()
         {
