@@ -38,10 +38,10 @@ const SignUpForm = () =>{
 
             <div className='container mx-auto mt-20'>
                 <div className='flex flex-col-reverse lg:flex-row w-8/12 bg-white roundes=x; mx-auto shadow-lg overflow-hidden inset-x-20 '>
-                    <div className='w-full lg:w-5/12 flex flex-col items-center justify-center p-12 bg-no-repeat bg-cover bg-center' style={{backgroundImage: 'linear-gradient(115deg, #7F9CF5, #3B82F6)'}}>
+                    <div className='w-full lg:w-5/12 flex flex-col items-center justify-center p-12 bg-no-repeat bg-cover bg-center' style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
                     <h1 className='text-white text-3xl mb-3 font-sans font-bold'>Already a member?</h1>
                         <p className='text-white mt-5 font-sans'>Welcome back! Log in and get back to tasking</p>
-                        <button type='submit' className='bg-white text-blue px-4 py-2 mt-20 rounded-md w-full'>Log in</button>
+                        <button type='submit' className='bg-white text-gray-700 px-4 py-2 mt-20 border border-solid border-gray-700 rounded-md w-[50%]  hover:border hover:border-solid hover:border-black hover:text-black font-bold'>Log in</button>
                     
                     </div>
                     <div className='w-full lg:w-7/12 py-16 px-12'>
@@ -92,10 +92,10 @@ const SignUpForm = () =>{
                                 />
                         </div>
                         {error && <ErrorMessage content={error}/>}
-                        <div className='mt-5'>
+                        <div className='mt-5 flex justify-center'>
                        
-                        <Button type="submit" name="Sign Up"/>
-
+                        <Button type="submit" name="Sign Up"></Button>
+                        
                         </div>
                     </form>
                     </div>

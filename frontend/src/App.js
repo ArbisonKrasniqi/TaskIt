@@ -2,10 +2,11 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Login from './Pages/loginPage.jsx';
 import Dashboard from './Pages/dashboard.jsx';
 import SignUpPage from './Pages/SignUpPage.jsx';
-
+import Sidebar from '../src/Components/Side/Sidebar.jsx';
 function App() {
   return (
-    <>
+   <>
+ 
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login/>}/>
