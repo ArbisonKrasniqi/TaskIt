@@ -2,9 +2,12 @@ import React, {useState} from 'react';
 import InputField from './InputField.jsx';
 import Button from './Button.jsx';
 import ErrorMessage from './ErrorMessage.jsx';
+import ModalWelcome from '../Modal/modalWelcome.jsx';
 
 
 const SignUpForm = () =>{
+    const [showModalWelcome, setShowModalWelcome]= useState(false);
+    // const [isSignUpSuccessful, setIsSignUpSuccessful] = useState(false);
 
     const [formData, setFormData] = useState({
         name: '',
@@ -23,11 +26,21 @@ const SignUpForm = () =>{
             [name]: value,
         });
     };
+    
+    const handleSignUp = () =>{
+        // setIsSignUpSuccessful(true);
 
+        setShowModalWelcome(true);
+    };
+
+    const handleCloseModal = () => {
+        setShowModalWelcome(false);
+    };
 
     const handleSubmit = (e) =>{
         e.preventDefault();
-     
+
+        handleSignUp();
 
         //..
     };
@@ -94,10 +107,16 @@ const SignUpForm = () =>{
                         {error && <ErrorMessage content={error}/>}
                         <div className='mt-5'>
                        
-                        <Button type="submit" name="Sign Up"/>
+                        <Button type="submit" name="Sign Up" redirectTo="./dashboard.jsx"/>
 
                         </div>
                     </form>
+                    {showModalWelcome &&(
+                        <ModalWelcome 
+                        signedUpUserName={formData.name} 
+                        redirectTo="./dashboard.jsx" //the current path is for demo
+                        />
+                    )}
                     </div>
                 </div>
 
