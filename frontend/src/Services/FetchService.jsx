@@ -1,5 +1,6 @@
 import { GetToken } from './TokenService';
-
+//IMPORTANT TO DO
+//HANDLE UNAUTHORIZED CALLS
 
 //api eshte URL i api endpoint
 export async function getData(api) {
@@ -12,8 +13,14 @@ export async function getData(api) {
     });
 
     if (!response.ok) {
-        throw new Error ("Error");
+        //JAVASCRIPT OBJECT NOT ACTUAL ERROR
+        const error = {
+            statusCode: response.status,
+            errorBody: await response.json()
+        };
+        throw error;
     }
+
     return await response.json();
 }
 
@@ -29,7 +36,12 @@ export async function getDataWithId(api, id) {
     });
 
     if (!response.ok) {
-        throw new Error("Error");
+        //JAVASCRIPT OBJECT NOT ACTUAL ERROR
+        const error = {
+            statusCode: response.status,
+            errorBody: await response.json()
+        };
+        throw error;
     }
 
     return await response.json();
@@ -48,7 +60,12 @@ export async function postData(api, data) {
     });
 
     if (!response.ok) {
-        throw new Error("Error");
+        //JAVASCRIPT OBJECT NOT ACTUAL ERROR
+        const error = {
+            statusCode: response.status,
+            errorBody: await response.json()
+        };
+        throw error;
     }
 
     return await response.json();
@@ -66,9 +83,17 @@ export async function deleteData(api, data) {
         body: JSON.stringify(data)
     });
 
+    
     if (!response.ok) {
-        throw new Error("Error");
+        //JAVASCRIPT OBJECT NOT ACTUAL ERROR
+        const error = {
+            statusCode: response.status,
+            errorBody: await response.json()
+        };
+        throw error;
     }
+    
+
 
     return await response.json();
 }
@@ -85,7 +110,12 @@ export async function putData(api, data) {
     });
 
     if (!response.ok) {
-        throw new Error("Error");
+        //JAVASCRIPT OBJECT NOT ACTUAL ERROR
+        const error = {
+            statusCode: response.status,
+            errorBody: await response.json()
+        };
+        throw error;
     }
 
     return await response.json();

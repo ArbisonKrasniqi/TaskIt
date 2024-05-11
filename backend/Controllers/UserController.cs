@@ -28,6 +28,7 @@ namespace backend.Controllers;
         //ITokenService is used to implement JWT in the user API
         private readonly ITokenService _tokenService;
         
+        
         public UserController(UserManager<User> userManager, SignInManager<User> signInManager, ITokenService tokenService)
         {
             _userManager = userManager;
@@ -109,7 +110,7 @@ namespace backend.Controllers;
         
         //ADMIN API CALLS
         [HttpPost("adminCreate")]
-        [Authorize(AuthenticationSchemes = "Bearer")]
+        //[Authorize(AuthenticationSchemes = "Bearer")]
         //[Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> Create(CreateUserDTO createUserDto)
         {
@@ -173,7 +174,7 @@ namespace backend.Controllers;
         }
 
         [HttpGet("adminAllAdmins")]
-        [Authorize(AuthenticationSchemes = "Bearer")]
+        //[Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> GetAllAdmins()
         {
             try
@@ -208,7 +209,7 @@ namespace backend.Controllers;
         }
         
         [HttpGet("adminUserID")]
-        [Authorize(AuthenticationSchemes = "Bearer")]
+        //[Authorize(AuthenticationSchemes = "Bearer")]
         //[Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> GetUserById(string userId)
         {
@@ -233,7 +234,7 @@ namespace backend.Controllers;
         }
         
         [HttpGet("adminUserEmail")]
-        [Authorize(AuthenticationSchemes = "Bearer")]
+        //[Authorize(AuthenticationSchemes = "Bearer")]
         //[Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> GetUserByEmail(string emailDto)
         {
@@ -262,7 +263,7 @@ namespace backend.Controllers;
         }
         
         [HttpPut("adminUpdateUser")]
-        [Authorize(AuthenticationSchemes = "Bearer")]
+        //[Authorize(AuthenticationSchemes = "Bearer")]
         //[Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> EditUser(EditUserDTO editUserDto)
         {
@@ -297,26 +298,8 @@ namespace backend.Controllers;
                             return BadRequest("New email already exists!");
                         }
                     }
-
-
-                    //Check if new password is valid
-                    bool isValidPassword = Regex.IsMatch(editUserDto.Password,
-                        @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W).{8,}$");
-                    if (isValidPassword)
-                    {
-                        //If new password is valid, replace current user PasswordHash
-                        var newHash = _userManager.PasswordHasher.HashPassword(user, editUserDto.Password);
-                        if (user.PasswordHash != newHash)
-                        {
-                            user.PasswordHash = newHash;
-                        }
-                    }
-                    else
-                    {
-                        return BadRequest("New password is not secure!");
-                    }
-
-                    //Apply current changes (Role is not changed yet)
+                    
+                    //Apply changes
                     var editResult = await _userManager.UpdateAsync(user);
                     if (editResult.Succeeded)
                     {
@@ -332,11 +315,57 @@ namespace backend.Controllers;
 
         }
 
+        [HttpPut("adminUpdatePassword")]
+        //[Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<IActionResult> UpdatePassword(EditUserPasswordDTO editUserPasswordDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Wrong Parameters");
+
+            try
+            {
+                //Check if user first exists.
+                var user = await _userManager.FindByIdAsync(editUserPasswordDto.Id);
+                if (user == null) return BadRequest("User does not exist!");
+
+                //Check if new password is valid
+
+                bool isValidPassword = Regex.IsMatch(editUserPasswordDto.Password,
+                    @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W).{8,}$");
+
+                if (isValidPassword)
+                {
+                    var newHash = _userManager.PasswordHasher.HashPassword(user, editUserPasswordDto.Password);
+                    if (user.PasswordHash != newHash)
+                    {
+                        user.PasswordHash = newHash;
+                    }
+                }
+                else
+                {
+                    return BadRequest("New password is not secure!");
+                }
+
+                //Apply changes
+                var editResult = await _userManager.UpdateAsync(user);
+                if (editResult.Succeeded)
+                {
+                    return Ok("Password successfully udpated!");
+                }
+
+                return StatusCode(500, "Password could not be changed!");
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e);
+            }
+        }
+
        
 
 
         [HttpPut("adminUpdateRole")]
-        [Authorize(AuthenticationSchemes = "Bearer")]
+        //[Authorize(AuthenticationSchemes = "Bearer")]
 
         public async Task<IActionResult> UpdateRole(EditRoleDTO editRoleDto)
         {
