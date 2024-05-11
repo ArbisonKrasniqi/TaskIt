@@ -1,28 +1,29 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, createContext } from 'react';
 import { getData } from '../../Services/FetchService.jsx';
 import UserTable from './UserTable.jsx';
 
+
+export const UserContext = createContext();
+
 const UserList = () => {
     const [users, setUsers] = useState(null);
-    useEffect(() => {
-        async function getUsers() {
-            try {
-                const data = await getData('http://localhost:5157/backend/user/adminAllUsers');
-                setUsers(data);
-            } catch (error) {
-                console.error('Error fetching data: ',error);
-            }
+    const getUsers = async () => {
+        try {
+            const data = await getData('http://localhost:5157/backend/user/adminAllUsers');
+            setUsers(data);
+        } catch (error) {
+            console.error('Error fetching data: ',error);
         }
+    };
+    useEffect(() => {
         getUsers();
     }, []);
 
-    //Now render logic using users
-
+    const contextValue = { users, setUsers, getUsers };
     return (
-    <>
-    <UserTable users= {users}/>
-
-    </>
+        <UserContext.Provider value={contextValue}>
+            <UserTable/>
+        </UserContext.Provider>
     );
 }
 

@@ -1,6 +1,11 @@
 import { deleteData } from '../../Services/FetchService.jsx';
+import React, {useContext} from 'react';
+import { UserContext } from './UserList.jsx';
+
 
 const DeleteUserButton = (props) => {
+    const userContext = useContext(UserContext);
+
     const HandleUserDelete = (id) => {
             async function deleteUser() {
                 try {
@@ -9,8 +14,12 @@ const DeleteUserButton = (props) => {
                     };
                     const response = await deleteData('http://localhost:5157/backend/user/adminDeleteUserById', data);
                     console.log(response);
+                    const updatedUsers = userContext.users.filter(user => user.id !== id);
+                    userContext.setUsers(updatedUsers);
+
                 } catch (error) {
                     console.error('Error deleting data: ', error);
+                    userContext.getUsers();
                 }
             }
             deleteUser();

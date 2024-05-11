@@ -1,10 +1,14 @@
 import DeleteUserButton from "./DeleteUserButton";
+import React, {useContext} from 'react';
+import { UserContext } from "./UserList";
 
-const UserTable = (props) => {
+const UserTable = () => {
+
+    const userContext = useContext(UserContext);
     return(
         <div className="overflow-x-auto">
         <table className="w-full text-sm text-left rtl:text-right text-gray-300 dar:text-gray-400">
-        <thead className="text-sx text-gray-700 uppercase bg-gray-50 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+        <thead className="text-sx text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
                 {/* <th className="px-6 py-3">#</th> */}
                 <th className="px-6 py-3" >First Name</th>
@@ -16,7 +20,7 @@ const UserTable = (props) => {
             </tr>
         </thead>
         <tbody>
-            {props.users ? (props.users.map((item, index) => (
+            {userContext.users ? (userContext.users.map((item, index) => (
                 <tr key={index} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                     {/* <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{index}</td> */}
                     <td className="px-6 py-4">{item.firstName}</td>
