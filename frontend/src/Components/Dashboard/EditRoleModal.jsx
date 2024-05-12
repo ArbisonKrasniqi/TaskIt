@@ -89,7 +89,7 @@ const EditRoleModal = (props) => {
                         </div>
                         <div>
                             <label className="flex items-center cursor-pointer">
-                                <div className={`relative w-11 h-6 bg-gray-200 rounded-full ${isAdmin ? 'bg-blue-600' : 'bg-gray-700'}`}>
+                                <div className={`relative w-11 h-6 bg-blue-600 rounded-full ${isAdmin ? 'bg-blue-600' : 'bg-gray-700'}`}>
                                     <input type="checkbox" className="sr-only" checked={isAdmin} onChange={toggleIsAdmin} />
                                     <div className={`absolute left-0 top-0 w-6 h-6 bg-white border-2 rounded-full transition-transform ${isAdmin ? 'translate-x-full' : ''} transform`}></div>
                                 </div>
