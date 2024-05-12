@@ -137,13 +137,13 @@ namespace backend.Controllers;
                     var adminResult = await _userManager.AddToRoleAsync(user, "Admin");
                     if (adminResult.Succeeded)
                     {
-                        return Ok(UserMappers.ToGetUserDTO(user));
+                        return Ok(UserMappers.ToGetUserDTO(user, "Admin"));
                     }
 
                     return StatusCode(500, "User created without admin role");
                 }
 
-                return Ok(UserMappers.ToGetUserDTO(user));
+                return Ok(UserMappers.ToGetUserDTO(user, "User"));
 
             }
             catch (Exception e)
@@ -160,11 +160,16 @@ namespace backend.Controllers;
         {
             try
             {
-                //Get a list of all users
+                // Get a list of all users
                 var users = await _userManager.Users.ToListAsync();
-                
-                //Turn every user in list into GetUserDTO
-                var usersDto = users.Select(user => UserMappers.ToGetUserDTO(user));
+                var usersDto = new List<GetUserDTO>();
+                foreach (var user in users)
+                {
+                    var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+                    var userDto = UserMappers.ToGetUserDTO(user, isAdmin ? "Admin" : "User");
+                    usersDto.Add(userDto);
+                }
+
                 return Ok(usersDto);
             }
             catch (Exception e)
@@ -198,7 +203,7 @@ namespace backend.Controllers;
                     }
                 }
 
-                var adminsDto = admins.Select(admin => UserMappers.ToGetUserDTO(admin));
+                var adminsDto = admins.Select(admin => UserMappers.ToGetUserDTO(admin, "Admin"));
                 return Ok(adminsDto);
             }
             catch (Exception e)
@@ -224,7 +229,13 @@ namespace backend.Controllers;
                     return StatusCode(404, "User does not exist!");
                 }
 
-                return Ok(UserMappers.ToGetUserDTO(user));
+                var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+
+                if (isAdmin)
+                {
+                    return Ok(UserMappers.ToGetUserDTO(user, "Admin"));
+                }
+                return Ok(UserMappers.ToGetUserDTO(user, "User"));
             }
             catch (Exception e)
             {
@@ -252,7 +263,13 @@ namespace backend.Controllers;
                     return StatusCode(404, "Email does not exist!");
                 }
 
-                return Ok(UserMappers.ToGetUserDTO(user));
+                var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+                if (isAdmin)
+                {
+                    return Ok(UserMappers.ToGetUserDTO(user, "Admin"));
+                }
+                return Ok(UserMappers.ToGetUserDTO(user, "User"));
+                
             }
             catch (Exception e)
             {
@@ -384,14 +401,14 @@ namespace backend.Controllers;
                 if (checkRole.IsNullOrEmpty())
                 {
                     if (wantedRole == "User")
-                        return Ok(UserMappers.ToGetUserDTO(user));
+                        return Ok(UserMappers.ToGetUserDTO(user, "User"));
 
                     if (wantedRole == "Admin")
                     {
                         var addRoleAdmin = await _userManager.AddToRoleAsync(user, "Admin");
                         if (addRoleAdmin.Succeeded)
                         {
-                            return Ok(UserMappers.ToGetUserDTO(user));
+                            return Ok(UserMappers.ToGetUserDTO(user, "Admin"));
                         }
 
                         return StatusCode(500, "Role could not be updated");
@@ -406,7 +423,7 @@ namespace backend.Controllers;
                 {
                     if (currentRoles.Any(currentRole => currentRole == "Admin"))
                     {
-                        return Ok(UserMappers.ToGetUserDTO(user));
+                        return Ok(UserMappers.ToGetUserDTO(user, "Admin"));
                     }
                 }
 
@@ -414,7 +431,7 @@ namespace backend.Controllers;
                 {
                     if (currentRoles.All(currentRole => currentRole != "Admin"))
                     {
-                        return Ok(UserMappers.ToGetUserDTO(user));
+                        return Ok(UserMappers.ToGetUserDTO(user, "User"));
                     }
                 }
 
@@ -424,7 +441,7 @@ namespace backend.Controllers;
                         var removeAdmin = await _userManager.RemoveFromRoleAsync(user, "Admin");
                         if (removeAdmin.Succeeded)
                         {
-                            return Ok(UserMappers.ToGetUserDTO(user));
+                            return Ok(UserMappers.ToGetUserDTO(user, "User"));
                         }
 
                         return StatusCode(500, "Role could not be updated");
@@ -433,7 +450,7 @@ namespace backend.Controllers;
                         var addAdmin = await _userManager.AddToRoleAsync(user, "Admin");
                         if (addAdmin.Succeeded)
                         {
-                            return Ok(UserMappers.ToGetUserDTO(user));
+                            return Ok(UserMappers.ToGetUserDTO(user, "Admin"));
                         }
 
                         return StatusCode(500, "Role could not be updated");
@@ -462,11 +479,16 @@ namespace backend.Controllers;
                 var user = await _userManager.FindByIdAsync(userIdDto.id);
                 if (user == null) return StatusCode(404, "User does not exist!");
 
+                var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
                 //Delete found user
                 var result = await _userManager.DeleteAsync(user);
                 if (result.Succeeded)
                 {
-                    return Ok(UserMappers.ToGetUserDTO(user));
+                    if (isAdmin)
+                    {
+                        return Ok(UserMappers.ToGetUserDTO(user, "Admin"));
+                    }
+                    return Ok(UserMappers.ToGetUserDTO(user, "User"));
                 }
 
                 return StatusCode(500, "User could not be deleted");

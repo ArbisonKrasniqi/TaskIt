@@ -21,7 +21,9 @@ const UserList = () => {
             const data = await getData('http://localhost:5157/backend/user/adminAllUsers');
             setUsers(data);
         } catch (error) {
-            console.error('Error fetching data: ',error);
+                    setErrorMessage(error.message);
+                    //Beje UserErrorModal te shfaqet
+                    setShowUserErrorModal(true);
         }
     };
     useEffect(() => {
@@ -38,7 +40,6 @@ const UserList = () => {
         <UserContext.Provider value={contextValue}>
 
             <UserTable/>
-
             {/*Fillimisht UserErrorModal nuk shfaqet sepse showUserErrorModal eshte false (false && _____ == false*/}
             {showUserErrorModal && <UserErrorModal/>}
         </UserContext.Provider>

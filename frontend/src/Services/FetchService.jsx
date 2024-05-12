@@ -13,12 +13,7 @@ export async function getData(api) {
     });
 
     if (!response.ok) {
-        //JAVASCRIPT OBJECT NOT ACTUAL ERROR
-        const error = {
-            statusCode: response.status,
-            errorBody: await response.json()
-        };
-        throw error;
+        throw new Error(response.status+": "+ await response.json())
     }
 
     return await response.json();
@@ -36,12 +31,7 @@ export async function getDataWithId(api, id) {
     });
 
     if (!response.ok) {
-        //JAVASCRIPT OBJECT NOT ACTUAL ERROR
-        const error = {
-            statusCode: response.status,
-            errorBody: await response.json()
-        };
-        throw error;
+        throw new Error(response.status+": "+ await response.json())
     }
 
     return await response.json();
@@ -60,12 +50,7 @@ export async function postData(api, data) {
     });
 
     if (!response.ok) {
-        //JAVASCRIPT OBJECT NOT ACTUAL ERROR
-        const error = {
-            statusCode: response.status,
-            errorBody: await response.json()
-        };
-        throw error;
+        throw new Error(response.status+": "+ await response.json())
     }
 
     return await response.json();
@@ -85,12 +70,7 @@ export async function deleteData(api, data) {
 
     
     if (!response.ok) {
-        //JAVASCRIPT OBJECT NOT ACTUAL ERROR
-        const error = {
-            statusCode: response.status,
-            errorBody: await response.json()
-        };
-        throw error;
+        throw new Error(response.status+": "+ await response.json())
     }
     
 
@@ -110,12 +90,7 @@ export async function putData(api, data) {
     });
 
     if (!response.ok) {
-        //JAVASCRIPT OBJECT NOT ACTUAL ERROR
-        const error = {
-            statusCode: response.status,
-            errorBody: await response.json()
-        };
-        throw error;
+        throw new Error(response.status+": "+ await response.json())
     }
 
     return await response.json();

@@ -26,7 +26,8 @@ const DeleteUserButton = (props) => {
                     //Nese ka pasur error
 
                     //Vendos ErrorMessage
-                    userContext.setErrorMessage(error.statusCode+": "+error.errorBody);
+                    
+                    userContext.setErrorMessage(error.message);
 
                     //Beje UserErrorModal te shfaqet
                     userContext.setShowUserErrorModal(true);

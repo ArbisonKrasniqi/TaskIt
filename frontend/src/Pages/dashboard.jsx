@@ -2,10 +2,9 @@ import UserList from "../Components/Dashboard/UserList";
 
 const Dashboard = () => {
 
-    return (<>
-    <h1>Dashboard page</h1>
-    <UserList/>
-    </>
+    return (<div className="w-[100%] h-[100%] p-0 m-0 bg-gray-800">
+        <UserList/>
+    </div>
 );
 }
 

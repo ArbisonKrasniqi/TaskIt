@@ -62,7 +62,9 @@ const EditInfoModal = (props) => {
         } catch (error) {
 
             //Nese ka error, trego pse nuk mund te editohej.
-            console.error("Could not edit user: ", error);
+            userContext.setErrorMessage(error.message);
+            userContext.setShowUserErrorModal(true);
+            userContext.getUsers();
 
             //Pastaj mbyll modal.
             props.setShowEditInfoModal(false);
@@ -73,7 +75,7 @@ const EditInfoModal = (props) => {
 
     return(
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center z-50 bg-gray-900 bg-opacity-50">
-            <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-700 dark:text-gray-400 p-8 rounded-lg shadow-md w-1/3 h-auto">
+            <form onSubmit={handleSubmit} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 text-gray-400 p-8 rounded-lg shadow-md w-1/3 h-auto">
                 <div className="mb-6">
                     <label htmlFor="default-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
                     <input value={email}
@@ -105,7 +107,6 @@ const EditInfoModal = (props) => {
                     <button onClick={() => props.setShowEditInfoModal(false)} className="w-[45%] focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Close</button>
                     <button type="submit" className="w-[45%] focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Update</button>
                 </div>
-                
             </form>
         </div>
     )
