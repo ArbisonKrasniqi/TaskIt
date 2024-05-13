@@ -1,9 +1,8 @@
-
 import React, { useState } from 'react';
-import UpdateUserModal from './UpdateUserModal.jsx';
-import EditInfoModal from './EditInfoModal';
-import EditPasswordModal from './EditPasswordModal';
-import EditRoleModal from './EditRoleModal';
+import UpdateUserModal from '../Modals/UpdateUserModal.jsx';
+import EditInfoModal from '../Modals/EditInfoModal.jsx';
+import EditPasswordModal from '../Modals/EditPasswordModal.jsx';
+import EditRoleModal from '../Modals/EditRoleModal.jsx';
 
 const UpdateUserButton = () => {
 

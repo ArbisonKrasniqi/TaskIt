@@ -1,7 +1,7 @@
-import { UpdateContext } from './UserTable';
-import { UserContext } from './UserList';
+import { UpdateContext } from '../UserTable';
+import { UserContext } from '../UserList';
 import { useContext, useState } from 'react';
-import { putData } from '../../Services/FetchService';
+import { putData } from '../../../../Services/FetchService';
 
 const EditRoleModal = (props) => {
     const updateContext = useContext(UpdateContext);

@@ -1,4 +1,4 @@
-import UserList from "../Components/Dashboard/UserList";
+import UserList from "../Components/Dashboard/Users/UserList";
 
 const Dashboard = () => {
 

@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { UserContext } from "./UserList";
+import { UserContext } from "../UserList";
 
 const UserErrorModal = () => {
     const userContext = useContext(UserContext)

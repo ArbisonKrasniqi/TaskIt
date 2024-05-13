@@ -1,5 +1,5 @@
-import DeleteUserButton from "./DeleteUserButton.jsx";
-import UpdateUserButton from "./UpdateUserButton.jsx"
+import DeleteUserButton from "./Buttons/DeleteUserButton.jsx";
+import UpdateUserButton from "./Buttons/UpdateUserButton.jsx"
 import React, {useContext, createContext} from 'react';
 import { UserContext } from "./UserList";
 

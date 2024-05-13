@@ -1,7 +1,7 @@
 import React, { useState , useContext } from 'react';
-import { UpdateContext } from './UserTable';
-import { UserContext } from './UserList';
-import { putData } from '../../Services/FetchService';
+import { UpdateContext } from '../UserTable';
+import { UserContext } from '../UserList';
+import { putData } from '../../../../Services/FetchService';
 
 
 const EditInfoModal = (props) => {

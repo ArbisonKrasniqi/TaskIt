@@ -1,6 +1,6 @@
-import { deleteData } from '../../Services/FetchService.jsx';
+import { deleteData } from '../../../../Services/FetchService.jsx';
 import React, {useContext} from 'react';
-import { UserContext } from './UserList.jsx';
+import { UserContext } from '../UserList.jsx';
 
 
 const DeleteUserButton = (props) => {

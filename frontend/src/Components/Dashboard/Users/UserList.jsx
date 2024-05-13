@@ -1,7 +1,7 @@
 import { useState, useEffect, createContext } from 'react';
-import { getData } from '../../Services/FetchService.jsx';
+import { getData } from '../../../Services/FetchService.jsx';
 import UserTable from './UserTable.jsx';
-import UserErrorModal from './UserErrorModal.jsx';
+import UserErrorModal from './Modals/UserErrorModal.jsx';
 
 
 export const UserContext = createContext();

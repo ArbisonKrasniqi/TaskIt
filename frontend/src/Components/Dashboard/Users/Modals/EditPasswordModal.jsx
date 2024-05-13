@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
-import { UpdateContext } from './UserTable';
-import { putData } from '../../Services/FetchService';
-import { UserContext } from './UserList';
+import { UpdateContext } from '../UserTable';
+import { putData } from '../../../../Services/FetchService';
+import { UserContext } from '../UserList';
 
 const EditPasswordModal = (props) => {
     const updateContext = useContext(UpdateContext);
