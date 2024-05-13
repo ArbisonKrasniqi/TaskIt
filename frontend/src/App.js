@@ -5,7 +5,8 @@ import SignUpPage from './Pages/signUpPage.jsx';
 
 function App() {
   return (
-    <>
+   <>
+ {/*<Sidebar emri="Test" /> */} 
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login/>}/>

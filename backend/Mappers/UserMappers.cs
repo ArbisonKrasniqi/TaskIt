@@ -9,7 +9,7 @@ namespace backend.Mappers;
 public static class UserMappers
 {
     
-    public static GetUserDTO ToGetUserDTO(User user)
+    public static GetUserDTO ToGetUserDTO(User user, string role)
     {
         return new GetUserDTO
         {
@@ -17,7 +17,8 @@ public static class UserMappers
             FirstName = user.FirstName,
             LastName = user.LastName,
             Email = user.Email,
-            DateCreated = user.DateCreated
+            DateCreated = user.DateCreated,
+            Role = role
         };
     }
     

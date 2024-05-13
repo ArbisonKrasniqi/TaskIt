@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Microsoft.AspNetCore.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -128,13 +127,14 @@ if ( app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// Apply CORS policy globally
+app.UseCors("AllowReactApp");
+
 //Tell the application to use Authentication and Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Apply CORS policy globally
-app.UseCors("AllowReactApp");
-
 app.MapControllers();
+
 
 app.Run();
