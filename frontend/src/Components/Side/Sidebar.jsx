@@ -6,6 +6,8 @@ import { IoIosSettings } from "react-icons/io";
 import { PiTable } from "react-icons/pi";
 import { LuCalendarDays } from "react-icons/lu";
 import { FaPlus } from "react-icons/fa6";
+import FetchService from "../../Services/FetchService.jsx";
+
 const Sidebar = (props) =>{
 const[open, setOpen] = useState(true);
 const Menus = [
@@ -24,10 +26,13 @@ const WorkspaceViews = [
     {title: "Table", tag: "PiTable"},
     {title: "Calendar", tag: "LuCalendarDays"},
 ]
+
+
     return(
         <div className="flex">
             <div className={`${open ? 'w-72' : 'w-8'} duration-100 h-screen p-5 pt-8 relative`} style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
             
+        
 
         <SlArrowLeft className={`absolute cursor pointer rounded-full h-6 px-2 right-1 w-8 mt-2 border-2 text-center border-gray-700 bg-gray-800 text-gray-400 font-extrabold ${!open && "rotate-180 -right-3"}`}
            onClick={()=>setOpen(!open)}

@@ -6,7 +6,7 @@ import Sidebar from '../src/Components/Side/Sidebar.jsx';
 function App() {
   return (
    <>
- 
+ {/*<Sidebar emri="Test" /> */} 
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login/>}/>

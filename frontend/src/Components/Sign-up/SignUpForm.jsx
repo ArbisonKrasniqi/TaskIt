@@ -8,7 +8,7 @@ const SignUpForm = () =>{
 
     const [formData, setFormData] = useState({
         name: '',
-        surname: '',
+        lastName: '',
         email: '',
         password: '',
         confirmPassword: '',
@@ -27,9 +27,50 @@ const SignUpForm = () =>{
 
     const handleSubmit = (e) =>{
         e.preventDefault();
-     
+    
+        var nameRegex = /^[a-zA-Z\s]+$/;
+        if (!nameRegex.test(formData.name.trim())) {
+            setError('Please enter a valid name.');
+            return false;
+        }
+    
+        var lastNameRegex = /^[a-zA-Z\s]+$/;
+        if (!lastNameRegex.test(formData.lastName.trim())) {
+            setError('Please enter a valid surname.');
+            return false;
+        }
 
-        //..
+        var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,4}$/;
+        if(!emailRegex.test(formData.email)){
+            setError('Please enter a valid email address.');
+            return false;
+        }
+
+        var passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*\W).{8,}$/;
+
+        if(!passwordRegex.test(formData.password)){
+            let errorMessage = '';
+            if (formData.password.length < 8) {
+                errorMessage = 'Password must be at least 8 characters long.';
+            } else if (!/(?=.*[A-Z])/.test(formData.password)) {
+                errorMessage = 'Password must contain at least one uppercase letter.';
+            } else if (!/(?=.*\d)/.test(formData.password)) {
+                errorMessage = 'Password must contain at least one number.';
+            } else if (!/(?=.*\W)/.test(formData.password)) {
+                errorMessage = 'Password must contain at least one special character.';
+            }
+            setError(errorMessage);
+            return false;
+        }
+        
+
+        if(formData.password !== formData.confirmPassword){
+            setError('Passwords do not match.');
+            return false;
+        }
+        // If all validations pass, clear the error and submit the form
+        setError('');
+        // Submit the form
     };
 
 
@@ -51,16 +92,16 @@ const SignUpForm = () =>{
                                 <InputField 
                                     type="text"
                                     name="name"
-                                    placeholder="Name"
+                                    placeholder="First Name"
                                     value={formData.name}
                                     onChange={handleInputChange}
                                 />
 
                                 <InputField 
                                      type="text"
-                                     name="surname"
-                                     placeholder="Surname"
-                                     value={formData.surname}
+                                     name="lastName"
+                                     placeholder="Last Name"
+                                     value={formData.lastName}
                                      onChange={handleInputChange}
                                 />
                         </div>
@@ -94,7 +135,7 @@ const SignUpForm = () =>{
                         {error && <ErrorMessage content={error}/>}
                         <div className='mt-5 flex justify-center'>
                        
-                        <Button type="submit" name="Sign Up"></Button>
+                        <Button type="submit" name="Sign Up" ></Button>
                         
                         </div>
                     </form>
