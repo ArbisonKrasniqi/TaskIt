@@ -11,6 +11,7 @@ public static class WorkspaceMappers
         {   
             WorkspaceId = workspaceModel.WorkspaceId,
             Title = workspaceModel.Title,
+            Description = workspaceModel.Description,
             OwnerId = workspaceModel.OwnerId
            
         };
