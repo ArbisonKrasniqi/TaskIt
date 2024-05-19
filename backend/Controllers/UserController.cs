@@ -28,12 +28,14 @@ namespace backend.Controllers;
         //ITokenService is used to implement JWT in the user API
         private readonly ITokenService _tokenService;
         
-        
-        public UserController(UserManager<User> userManager, SignInManager<User> signInManager, ITokenService tokenService)
+        //ITokenRepo to implement refresh tokens
+        private readonly ITokenRepository _tokenRepo;
+        public UserController(UserManager<User> userManager, SignInManager<User> signInManager, ITokenService tokenService, ITokenRepository tokenRepo)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _tokenService = tokenService;
+            _tokenRepo = tokenRepo;
         }
         
         
@@ -93,11 +95,19 @@ namespace backend.Controllers;
                 //Check password with found user
                 var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
                 if (!result.Succeeded) return Unauthorized("Username not found and/or password incorrect!");
+
+                var refreshToken = _tokenService.GenerateRefreshToken(user);
+                
+                //Add associated refresh token to user.
+                //If user already has refresh token, this overwrites it.
+                await _tokenRepo.AddRefreshToken(refreshToken);
+                
                 return Ok
                 (
                     new LoggedInDTO
                     {
-                        Token = _tokenService.CreateToken(user, role)
+                        accessToken = _tokenService.CreateToken(user, role),
+                        refreshToken = refreshToken.Token
                     }
                 ); 
             }

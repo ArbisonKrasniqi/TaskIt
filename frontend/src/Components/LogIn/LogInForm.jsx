@@ -2,6 +2,8 @@ import React,{useState} from 'react';
 import InputField from '../Sign-up/InputField.jsx';
 import ErrorMessage from '../Sign-up/ErrorMessage.jsx';
 import Button from '../Sign-up/Button.jsx';
+import { StoreTokens } from '../../Services/TokenService.jsx';
+import { postData } from '../../Services/FetchService.jsx';
 
 const LogInForm =  () =>{
     const [formData,setFormData] = useState({
@@ -20,8 +22,15 @@ const LogInForm =  () =>{
         });
     };
 
-    const handleSubmit = (e)=>{
+    const handleSubmit = async (e) => {
         e.preventDefault();
+
+        try {
+            const response = await postData('http://localhost:5157/backend/user/login', formData);
+            StoreTokens(response.data.accessToken, response.data.refreshToken);
+        } catch (error) {
+            console.error("Login failed: ", error);
+        }
     };
 
     const handleClick = () => {
@@ -30,7 +39,7 @@ const LogInForm =  () =>{
     
 
     return(
-        <div className='container mx-auto mt-20'>
+        <div className='container mx-auto mt-20 h-[1000px]'>
             <div className='flex flex-col lg:flex-row w-full lg:w-8/12 h-screen lg:h-96 bg-white roundes=x; mx-auto shadow-lg overflow-hidden inset-x-20'>
                 <div className='flex lg:flex-row justify-center items-center w-full lg:w-7/12 py-16 px-12 '>
                     <form onSubmit={handleSubmit} >
@@ -52,7 +61,7 @@ const LogInForm =  () =>{
                             name="password"
                             placeholder="Password"
                             value={formData.password}
-                            onSubmit={handleInputChange}
+                            onChange={handleInputChange}
                             />
                         </div>
                         {error && <ErrorMessage content={error}/>}
