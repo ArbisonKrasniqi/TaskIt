@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import UserList from "../Components/Dashboard/Users/UserList";
+import UserList from "../Components/Dashboard/Users/UsersList.jsx";
 import { ValidateAdmin, ValidateToken} from "../Services/TokenService";
 import { useNavigate } from "react-router-dom";
 import WorkspacesList from "../Components/Dashboard/Workspaces/WorkspacesList";

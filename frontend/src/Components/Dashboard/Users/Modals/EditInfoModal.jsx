@@ -2,8 +2,8 @@ import React, { useState , useContext } from 'react';
 import { UpdateContext } from '../UsersTable';
 import { UserContext } from '../UsersList';
 import { putData } from '../../../../Services/FetchService';
-import UpdateButton from '../../Buttons/UpdateButton';
-import CloseButton from '../../Buttons/CloseButton';
+import CustomButton from '../../Buttons/CustomButton';
+
 const EditInfoModal = (props) => {
 
     //Inicializo te dy kontekstet
@@ -104,8 +104,8 @@ const EditInfoModal = (props) => {
                 </div>
                 <div className="flex justify-around">
                     {/*Nese shtypet butoni close, atehere mbyll modal duke vendosur vleren false*/}
-                    <CloseButton onClick={() => props.setShowEditInfoModal(false)} type="button" name="Close" />
-                    <UpdateButton type="submit" name="Update"/>
+                    <CustomButton color="longRed" onClick={() => props.setShowEditInfoModal(false)} type="button" text="Close"/>
+                    <CustomButton color="longGreen" type="submit" text="Update"/>
                 </div>
             </form>
         </div>

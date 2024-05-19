@@ -2,8 +2,7 @@ import { UpdateContext } from '../UsersTable';
 import { UserContext } from '../UsersList';
 import { useContext, useState } from 'react';
 import { putData } from '../../../../Services/FetchService';
-import UpdateButton from '../../Buttons/UpdateButton';
-import CloseButton from '../../Buttons/CloseButton';
+import CustomButton from '../../Buttons/CustomButton';
 
 const EditRoleModal = (props) => {
     const updateContext = useContext(UpdateContext);
@@ -101,8 +100,8 @@ const EditRoleModal = (props) => {
                 </div>
     
                 <div className="flex justify-around">
-                    <CloseButton onClick= {() => props.setShowEditRoleModal(false)} type="button" name="Close" />
-                    <UpdateButton type="submit" name="Update"/>
+                    <CustomButton color="longRed" onClick= {() => props.setShowEditRoleModal(false)} type="button" text="Close"  />
+                    <CustomButton color="longGreen" type="submit" text="Update"/>
                 </div>
             </form>
         </div>

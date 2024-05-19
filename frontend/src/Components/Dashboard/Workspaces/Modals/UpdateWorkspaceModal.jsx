@@ -2,8 +2,7 @@ import React, { useState , useContext } from 'react';
 import { putData } from '../../../../Services/FetchService';
 import { UpdateContext } from '../WorkspacesTable';
 import { WorkspacesContext } from '../WorkspacesList';
-import UpdateButton from '../../Buttons/UpdateButton';
-import CloseButton from '../../Buttons/CloseButton';
+import CustomButton from '../../Buttons/CustomButton';
 const UpdateWorkspaceModal= (props) => {
 
     const updateContext = useContext(UpdateContext);
@@ -89,8 +88,8 @@ const UpdateWorkspaceModal= (props) => {
             </div>
             <div className="flex justify-around">
                 {/*Nese shtypet butoni close, atehere mbyll modal duke vendosur vleren false*/}
-                <CloseButton onClick={() => props.setShowUpdateInfoModal(false)} type="button" name="Close" />
-                <UpdateButton type="submit" name="Update"/>
+                <CustomButton onClick={() => props.setShowUpdateInfoModal(false)} type="button" text="Close" color="longRed"/>
+                <CustomButton type="submit" text="Update" color="longGreen"/>
             </div>
         </form>
     </div>

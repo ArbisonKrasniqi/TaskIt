@@ -2,8 +2,7 @@ import React, { useState, useContext } from 'react';
 import { UpdateContext } from '../UsersTable';
 import { putData } from '../../../../Services/FetchService';
 import { UserContext } from '../UsersList';
-import UpdateButton from '../../Buttons/UpdateButton';
-import CloseButton from '../../Buttons/CloseButton';
+import CustomButton from '../../Buttons/CustomButton';
 
 const EditPasswordModal = (props) => {
     const updateContext = useContext(UpdateContext);
@@ -105,8 +104,8 @@ const EditPasswordModal = (props) => {
                     <p className="text-xs text-gray-500 dark:text-gray-400">Password must contain at least 8 characters, an uppercase letter, a lowercase letter, a number, and a special character</p>
                 </div>
                 <div className="flex justify-around">
-                    <CloseButton onClick={() => props.setShowEditPasswordModal(false)} type="button" name="Close" />
-                    <UpdateButton type="submit" name="Update"/>
+                    <CustomButton color="longRed" onClick={() => props.setShowEditPasswordModal(false)} type="button" text="Close" />
+                    <CustomButton color="longGreen" type="submit" text="Update"/>
                 </div>
             </form>
         </div>
