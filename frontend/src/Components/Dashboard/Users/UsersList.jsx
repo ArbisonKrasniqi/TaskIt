@@ -1,12 +1,12 @@
 import { useState, useEffect, createContext } from 'react';
 import { getData } from '../../../Services/FetchService.jsx';
-import UserTable from './UserTable.jsx';
+import UsersTable from './UsersTable.jsx';
 import UserErrorModal from './Modals/UserErrorModal.jsx';
 
 
 export const UserContext = createContext();
 
-const UserList = () => {
+const UsersList = () => {
     //Ketu do te ruhet lista e usereve qe vjen nga API
     const [users, setUsers] = useState(null);
 
@@ -39,11 +39,11 @@ const UserList = () => {
     return (
         <UserContext.Provider value={contextValue}>
 
-            <UserTable/>
+            <UsersTable/>
             {/*Fillimisht UserErrorModal nuk shfaqet sepse showUserErrorModal eshte false (false && _____ == false*/}
             {showUserErrorModal && <UserErrorModal/>}
         </UserContext.Provider>
     );
 }
 
-export default UserList
+export default UsersList

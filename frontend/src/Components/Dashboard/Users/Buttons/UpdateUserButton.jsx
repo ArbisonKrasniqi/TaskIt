@@ -3,6 +3,7 @@ import UpdateUserModal from '../Modals/UpdateUserModal.jsx';
 import EditInfoModal from '../Modals/EditInfoModal.jsx';
 import EditPasswordModal from '../Modals/EditPasswordModal.jsx';
 import EditRoleModal from '../Modals/EditRoleModal.jsx';
+import EditButton from '../../Buttons/EditButton.jsx';
 
 const UpdateUserButton = () => {
 
@@ -44,7 +45,7 @@ const UpdateUserButton = () => {
 
     return(
         <>
-            <button onClick={toggleModal} type="button" className="focus:outline-none text-white bg-orange-400 hover:bg-orange-500 focus:ring-4 focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:focus:ring-orange-900">Edit</button>
+            <EditButton onClick={toggleModal} type="button" name="Edit" />
             {showModal && <UpdateUserModal handleEditInfoClick={handleEditInfoClick}
                                             handleEditPasswordClick={handleEditPasswordClick}
                                             handleEditRoleClick={handleEditRoleClick}

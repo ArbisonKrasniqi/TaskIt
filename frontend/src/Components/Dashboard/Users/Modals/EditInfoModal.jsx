@@ -1,9 +1,9 @@
 import React, { useState , useContext } from 'react';
-import { UpdateContext } from '../UserTable';
-import { UserContext } from '../UserList';
+import { UpdateContext } from '../UsersTable';
+import { UserContext } from '../UsersList';
 import { putData } from '../../../../Services/FetchService';
-
-
+import UpdateButton from '../../Buttons/UpdateButton';
+import CloseButton from '../../Buttons/CloseButton';
 const EditInfoModal = (props) => {
 
     //Inicializo te dy kontekstet
@@ -104,8 +104,8 @@ const EditInfoModal = (props) => {
                 </div>
                 <div className="flex justify-around">
                     {/*Nese shtypet butoni close, atehere mbyll modal duke vendosur vleren false*/}
-                    <button onClick={() => props.setShowEditInfoModal(false)} className="w-[45%] focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Close</button>
-                    <button type="submit" className="w-[45%] focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Update</button>
+                    <CloseButton onClick={() => props.setShowEditInfoModal(false)} type="button" name="Close" />
+                    <UpdateButton type="submit" name="Update"/>
                 </div>
             </form>
         </div>
