@@ -17,6 +17,7 @@ public class User : IdentityUser
     public DateTime DateCreated { get; set; } = DateTime.Now;
 
     public List<Workspace> Workspaces { get; set; }
+    public RefreshToken refreshToken { get; set; } = null;
 }
 
 //We dont have to use all of the new attributes below

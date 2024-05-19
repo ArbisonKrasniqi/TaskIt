@@ -26,13 +26,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Controllers\" />
       <Folder Include="DTOs\Board\Output\" />
       <Folder Include="DTOs\User\Output\" />
-      <Folder Include="Interfaces\" />
       <Folder Include="Mappers\" />
-      <Folder Include="Models\" />
-      <Folder Include="Repositories\" />
       <Folder Include="Service\" />
     </ItemGroup>
 
