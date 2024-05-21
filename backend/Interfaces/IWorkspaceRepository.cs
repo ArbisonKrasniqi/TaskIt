@@ -13,4 +13,5 @@ public interface IWorkspaceRepository
     Task<List<Workspace?>> GetWorkspacesByOwnerIdAsync(string ownerId);
     Task<List<Workspace?>> DeleteWorkspacesByOwnerIdAsync(string ownerId);
     Task<bool> WorkspaceExists(int id);
+
 }

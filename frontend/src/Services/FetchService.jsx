@@ -45,7 +45,7 @@ export async function getData(apiEndpoint) {
 
 export async function getDataWithId(apiEndpoint, id) {
   try {
-    const response = await api.get(`${apiEndpoint}/${id}`);
+    const response = await api.get(`${apiEndpoint}=${id}`);
     return response;
   } catch (error) {
     throw error;

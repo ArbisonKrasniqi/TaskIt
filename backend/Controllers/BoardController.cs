@@ -90,7 +90,7 @@ namespace backend.Controllers
         [HttpPost("CreateBoard")]
         public async Task<IActionResult> CreateBoard(CreateBoardDto boardDto)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }

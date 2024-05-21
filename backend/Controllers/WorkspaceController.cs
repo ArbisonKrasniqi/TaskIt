@@ -72,6 +72,8 @@ public class WorkspaceController : ControllerBase
         }
 
     }
+    
+    
     //GETBYID
     [HttpGet("GetWorkspaceById")]
     public async Task<IActionResult> GetWorkspaceById(int workspaceId)
@@ -192,7 +194,7 @@ public class WorkspaceController : ControllerBase
         {
             if (!await _userRepo.UserExists(ownerIdDto.OwnerId))
             {
-                return NotFound("User not found");
+                return NotFound("User not found!");
             }
 
             var workspaceModels = await _workspaceRepo.DeleteWorkspacesByOwnerIdAsync(ownerIdDto.OwnerId);
@@ -205,9 +207,10 @@ public class WorkspaceController : ControllerBase
         }
         catch (Exception e)
         {
-            return StatusCode(500, "Internal server error");  
+            return StatusCode(500, "Internal server error!");  
         }
     }
-
+    
+    
 
 }

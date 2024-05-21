@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SlArrowLeft } from "react-icons/sl";
 import { CiViewBoard } from "react-icons/ci";
 import { IoPersonOutline } from "react-icons/io5";
@@ -6,9 +6,24 @@ import { IoIosSettings } from "react-icons/io";
 import { PiTable } from "react-icons/pi";
 import { LuCalendarDays } from "react-icons/lu";
 import { FaPlus } from "react-icons/fa6";
-import FetchService from "../../Services/FetchService.jsx";
+import {getDataWithId} from "../../Services/FetchService.jsx";
 
 const Sidebar = (props) =>{
+
+
+const [boards, setBoards] =useState([]);
+
+
+const getBoards = async () => {
+try{
+    const data = await getDataWithId('http://localhost:5157/backend/board/GetBoardsByWorkspaceId?workspaceId',1013);
+    setBoards(data);
+}catch(error){
+    console.error('Ka ndodhur një gabim gjatë marrjes së të dhënave:', error);
+}
+};
+getBoards();
+
 const[open, setOpen] = useState(true);
 const Menus = [
     {title: "Boards", tag: "CiViewBoard"},
@@ -72,10 +87,20 @@ const WorkspaceViews = [
             <h1 className={`w-full origin-left font-sans text-gray-400 font-bold text-l ${!open && "scale-0"}`}>Your boards</h1>
             <FaPlus className="text-gray-400 cursor-pointer"/>
             </div>
-
-
+            <ul>
+                    {boards.length > 0 ? (
+                        boards.map((board, index) => (
+                            <li key={index} className={`text-gray-400 text-l font-semibold flex items-center gap-x-4 cursor-pointer p-2 hover:bg-gray-500 ${!open && "scale-0"}`}>
+                                <span>{board.title}</span>
+                            </li>
+                        ))
+                    ) : (
+                        <li className="text-gray-400 text-l font-semibold flex items-center gap-x-4 cursor-pointer p-2">
+                            <span>No boards found</span>
+                        </li>
+                    )}
+                </ul>
             </div>
-            
           
         </div>
 
