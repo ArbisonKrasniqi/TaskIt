@@ -1,12 +1,12 @@
 import DeleteUserButton from "./Buttons/DeleteUserButton.jsx";
 import UpdateUserButton from "./Buttons/UpdateUserButton.jsx"
 import React, {useContext, createContext} from 'react';
-import { UserContext } from "./UserList";
+import { UserContext } from "./UsersList.jsx";
 
 
 export const UpdateContext = createContext();
 
-const UserTable = () => {
+const UsersTable = () => {
 
     const userContext = useContext(UserContext);
     //Therritet konteksti nga userContext per te pasur qasje ne funksionet dhe variablat
@@ -60,4 +60,4 @@ const UserTable = () => {
     );
 }
 
-export default UserTable
+export default UsersTable
