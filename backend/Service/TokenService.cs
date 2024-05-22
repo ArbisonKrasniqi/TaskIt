@@ -40,7 +40,7 @@ public class TokenService : ITokenService
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.Now.AddMinutes(60),
+            Expires = DateTime.Now.AddMinutes(1),
             SigningCredentials = creds,
             Issuer = _config["JWT:Issuer"],
             Audience = _config["JWT:Audience"]
@@ -63,7 +63,7 @@ public class TokenService : ITokenService
         var refreshToken = new RefreshToken
         {
             Token = Convert.ToBase64String(randomNumber),
-            Expires = DateTime.Now.AddMinutes(15),
+            Expires = DateTime.Now.AddDays(30),
             UserId = user.Id
         };
         

@@ -31,7 +31,7 @@ const EditPasswordModal = (props) => {
                 password: newPassword
             }
 
-            const response = await putData('http://localhost:5157/backend/user/adminUpdatePassword', data);
+            const response = await putData('/backend/user/adminUpdatePassword', data);
             console.log(response);
 
             props.setShowEditPasswordModal(false);

@@ -16,7 +16,7 @@ const WorkspacesTable = () => {
               const data = {
                   workspaceId: id
               };
-              const response = await deleteData('http://localhost:5157/backend/workspace/DeleteWorkspace', data);
+              const response = await deleteData('/backend/workspace/DeleteWorkspace', data);
               console.log(response);
               //e perdorim workspaceContext ku i kena krejt workspaces dhe e fshijna nga lista workspace-in qe e bonem delete
               const updatedWorkspaces = workspacesContext.workspaces.filter(workspace => workspace.workspaceId !==id);

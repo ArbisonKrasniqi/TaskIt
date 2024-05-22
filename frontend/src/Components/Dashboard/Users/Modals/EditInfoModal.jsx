@@ -32,7 +32,7 @@ const EditInfoModal = (props) => {
                 lastName: lastName
             };
 
-            const response = await putData('http://localhost:5157/backend/user/adminUpdateUser', data);
+            const response = await putData('/backend/user/adminUpdateUser', data);
             console.log(response);
 
             //Nese ska error

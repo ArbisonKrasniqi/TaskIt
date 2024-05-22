@@ -18,7 +18,7 @@ const UsersList = () => {
     //Funksioni getUsers thirret kur deshirohet te perditesohet lista e users duke bere fetch API
     const getUsers = async () => {
         try {
-            const response = await getData('http://localhost:5157/backend/user/adminAllUsers');
+            const response = await getData('/backend/user/adminAllUsers');
             setUsers(response.data);
         } catch (error) {
                     setErrorMessage(error.message);

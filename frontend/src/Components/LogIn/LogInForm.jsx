@@ -26,7 +26,7 @@ const LogInForm =  () =>{
         e.preventDefault();
 
         try {
-            const response = await postData('http://localhost:5157/backend/user/login', formData);
+            const response = await postData('/backend/user/login', formData);
             StoreTokens(response.data.accessToken, response.data.refreshToken);
         } catch (error) {
             console.error("Login failed: ", error);

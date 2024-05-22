@@ -96,14 +96,14 @@ const SignUpForm = () =>{
         };
 
         try {
-            const response = await postData('http://localhost:5157/backend/user/register', registerData);
+            const response = await postData('/backend/user/register', registerData);
             console.log(response);
         } catch (error) {
             console.error("Signup failed: ", error.message);
         }
 
         try {
-            const loginResponse = await postData('http://localhost:5157/backend/user/login', loginData);
+            const loginResponse = await postData('/backend/user/login', loginData);
             StoreTokens(loginResponse.data.accessToken, loginResponse.data.refreshToken);
             setShowModalWelcome(true);
         } catch (error) {
