@@ -1,4 +1,5 @@
-﻿using backend.DTOs.User.Input;
+﻿using backend.DTOs.Members;
+using backend.DTOs.User.Input;
 using backend.DTOs.Workspace;
 using backend.Interfaces;
 using backend.Mappers;
@@ -11,16 +12,17 @@ namespace backend.Controllers;
 public class MembersController: ControllerBase
 {
     private readonly IMembersRepository _membersRepo; //qe me kon immutable
-  
+    private readonly IWorkspaceRepository _workspaceRepo;
 
-    public MembersController(IMembersRepository userWorkspaceRepo)
+    public MembersController(IMembersRepository userWorkspaceRepo, IWorkspaceRepository workspaceRepo)
     {
         _membersRepo = userWorkspaceRepo;
+        _workspaceRepo = workspaceRepo;
     }
 
     [HttpPost]
     [Route("AddMember")]
-    public async Task<IActionResult> AddMember([FromBody] UserIdDTO userId, [FromQuery] WorkspaceIdDto workspaceId)
+    public async Task<IActionResult> AddMember(AddMemberDto addMemberDto)
     {
         if (!ModelState.IsValid)
         {
@@ -28,7 +30,7 @@ public class MembersController: ControllerBase
         }
         try
         {
-            await _membersRepo.AddMemberAsync(userId, workspaceId);
+            await _membersRepo.AddMemberAsync(addMemberDto);
             return StatusCode(200, "Member added!");
 
         }
@@ -58,7 +60,7 @@ public class MembersController: ControllerBase
 
     [HttpDelete]
     [Route("RemoveMember")]
-    public async Task<IActionResult> RemoveMember([FromBody] UserIdDTO userId, [FromQuery] WorkspaceIdDto workspaceId)
+    public async Task<IActionResult> RemoveMember(RemoveMemberDto removeMemberDto)
     {
         if (!ModelState.IsValid)
         {
@@ -66,7 +68,7 @@ public class MembersController: ControllerBase
         }
         try
         {
-            var result = await _membersRepo.RemoveMemberAsync(userId, workspaceId);
+            var result = await _membersRepo.RemoveMemberAsync(removeMemberDto);
             if (result == null)
             {
                 return StatusCode(500, "User could not removed");

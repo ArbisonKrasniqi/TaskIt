@@ -25,6 +25,7 @@ public class WorkspaceRepository : IWorkspaceRepository
     public async Task<Workspace> CreateWorkspaceAsync(Workspace workspaceModel)
     {
             await _context.Workspace.AddAsync(workspaceModel);
+            await _context.SaveChangesAsync(); 
             
             var ownerMember = new Models.Members
             {
@@ -55,12 +56,20 @@ public class WorkspaceRepository : IWorkspaceRepository
 //GETBYOWNERID
     public async Task<List<Workspace?>> GetWorkspacesByOwnerIdAsync(string ownerId)
     {
-        return await _context.Workspace.Where(w => w.OwnerId.Equals(ownerId)).ToListAsync();
+        return await _context.Workspace
+            .Include(w => w.Boards)
+            .Include(w => w.Members) // Përfshijmë anëtarët
+            .Where(w => w.OwnerId.Equals(ownerId))
+            .ToListAsync();
     }
-//GetAllWorkspaces by member id
+//GETBYMEMBERID
     public async Task<List<Workspace?>> GetWorkspacesByMemberIdAsync(string memberId)
     {
-        return await _context.Workspace.Where(w => w.Members.Any(m => m.UserId == memberId)).ToListAsync();
+        return await _context.Workspace
+            .Include(w => w.Boards)
+            .Include(w => w.Members) // Përfshijmë anëtarët
+            .Where(w => w.Members.Any(m => m.UserId == memberId))
+            .ToListAsync();
     }
 
 //DELETEBYOWNERID
@@ -76,15 +85,21 @@ public class WorkspaceRepository : IWorkspaceRepository
     //GETALL
     public async Task<List<Workspace>> GetAllWorkspacesAsync()
     {
-        //await _context.Workspace.Include(w=> w.Boards).ToListAsync(); 
-       return await _context.Workspace.ToListAsync(); 
+        
+       return await _context.Workspace
+           .Include(w=>w.Boards)
+           .Include(w => w.Members) // Përfshijmë anëtarët
+           .ToListAsync();
     }
     
     //GETBYID
     public async Task<Workspace?> GetWorkspaceByIdAsync(int id)
     {
        // return await _context.Workspace.Include(w => w.Boards).FirstOrDefaultAsync(i => i.WorkspaceId == id);
-       return await _context.Workspace.FirstOrDefaultAsync(i => i.WorkspaceId == id);
+       return await _context.Workspace
+           .Include(w=>w.Boards)
+           .Include(w => w.Members) // Përfshijmë anëtarët
+           .FirstOrDefaultAsync(i => i.WorkspaceId == id);
     }
 
     //UPDATE

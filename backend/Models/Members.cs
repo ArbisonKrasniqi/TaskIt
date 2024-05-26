@@ -1,10 +1,14 @@
-﻿namespace backend.Models;
+﻿using System.ComponentModel.DataAnnotations;
 
-public class Members
+namespace backend.Models
 {
-    public int Id { get; set; }
-    public string UserId { get; set; }
-    public DateTime DateJoined { get; set; }
-    public User User { get; set; }
-    public int WorkspaceId { get; set; }
+    public class Members
+    {
+        [Key]
+        public int MemberId { get; set; }
+        public string UserId { get; set; }
+        public DateTime DateJoined { get; set; }
+        public User User { get; set; }
+        public int WorkspaceId { get; set; }
+    }
 }

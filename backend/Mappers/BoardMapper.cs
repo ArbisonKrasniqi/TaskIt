@@ -18,7 +18,14 @@ namespace backend.Mappers
                 WorkspaceId = boardModel.WorkspaceId
             };
         }
-
+        public static BoardsDto ToBoardDto2(this Board boardModel)
+        {
+            return new BoardsDto
+            {
+                BoardId = boardModel.BoardId,
+                Title = boardModel.Title
+            };
+        }
         public static Board ToBoardFromCreate(this CreateBoardDto boardDto)
         {
             return new Board

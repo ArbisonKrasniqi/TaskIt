@@ -1,4 +1,6 @@
-﻿using backend.DTOs.Workspace;
+﻿using backend.DTOs.Board.Output;
+using backend.DTOs.Members.Output;
+using backend.DTOs.Workspace;
 using backend.Models;
 
 namespace backend.Mappers;
@@ -12,8 +14,9 @@ public static class WorkspaceMappers
             WorkspaceId = workspaceModel.WorkspaceId,
             Title = workspaceModel.Title,
             Description = workspaceModel.Description,
-            OwnerId = workspaceModel.OwnerId
-           
+            OwnerId = workspaceModel.OwnerId,
+            Boards = workspaceModel.Boards?.Select(b => b.ToBoardDto()).ToList() ?? new List<BoardDto>(),
+            Members = workspaceModel.Members?.Select(m => m.ToMemberDto()).ToList() ?? new List<MemberDto>()
         };
     }
 

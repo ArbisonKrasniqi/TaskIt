@@ -1,4 +1,5 @@
 ﻿using backend.Data;
+using backend.DTOs.Members;
 using backend.DTOs.User.Input;
 using backend.DTOs.Workspace;
 using backend.Interfaces;
@@ -14,17 +15,17 @@ public class MembersRepository : IMembersRepository
         _context = context;
     }
 //ADD MEMBERS
-    public async Task AddMemberAsync(UserIdDTO userId, WorkspaceIdDto workspaceId)
+    public async Task AddMemberAsync(AddMemberDto addMemberDto)
     {
         var workspace = await _context.Workspace
             .Include(w => w.Members)
-            .FirstOrDefaultAsync(x => x.WorkspaceId == workspaceId.WorkspaceId);
+            .FirstOrDefaultAsync(x => x.WorkspaceId == addMemberDto.WorkspaceId);
         if (workspace == null)
         {
             throw new ArgumentNullException( "Workspace not found!");
         }
 
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId.id);
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == addMemberDto.UserId);
         if (user == null)
         {
             throw new ArgumentNullException("User not found!");
@@ -35,16 +36,16 @@ public class MembersRepository : IMembersRepository
             workspace.Members = new List<Models.Members>();
         }
 
-        if (workspace.Members.Any(m => m.UserId == userId.id))
+        if (workspace.Members.Any(m => m.UserId == addMemberDto.UserId))
         {
             throw new InvalidOperationException("User is already a member of this workspace!");
         }
 
         var member = new Models.Members
         {
-            UserId = userId.id,
+            UserId = addMemberDto.UserId,
             DateJoined = DateTime.Now,
-            WorkspaceId = workspaceId.WorkspaceId,
+            WorkspaceId = addMemberDto.WorkspaceId,
             User = user
         };
 
@@ -67,19 +68,19 @@ public class MembersRepository : IMembersRepository
     }
     
     //Remove member from workspace
-    public async Task<User> RemoveMemberAsync(UserIdDTO userId, WorkspaceIdDto workspaceId)
+    public async Task<User> RemoveMemberAsync(RemoveMemberDto removeMemberDto)
     {
         var workspace = await _context.Workspace
             .Include(w => w.Members)
             .ThenInclude(m => m.User)
-            .FirstOrDefaultAsync(x => x.WorkspaceId == workspaceId.WorkspaceId);
+            .FirstOrDefaultAsync(x => x.WorkspaceId == removeMemberDto.WorkspaceId);
 
         if (workspace == null)
         {
             throw new ArgumentNullException("Workspace not found!");
         }
 
-        var member = workspace.Members.FirstOrDefault(m => m.UserId == userId.id);
+        var member = workspace.Members.FirstOrDefault(m => m.UserId == removeMemberDto.UserId);
     
         if (member == null)
         {
@@ -87,7 +88,7 @@ public class MembersRepository : IMembersRepository
         }
 
         // Ensure you are not trying to remove the owner
-        if (workspace.OwnerId == userId.id)
+        if (workspace.OwnerId == removeMemberDto.UserId)
         {
             throw new Exception("Cannot remove the owner of the workspace");
         }
