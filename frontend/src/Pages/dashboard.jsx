@@ -3,6 +3,7 @@ import UserList from "../Components/Dashboard/Users/UsersList.jsx";
 import { ValidateAdmin, ValidateToken} from "../Services/TokenService";
 import { useNavigate } from "react-router-dom";
 import WorkspacesList from "../Components/Dashboard/Workspaces/WorkspacesList";
+import BoardsList from "../Components/Dashboard/Boards/BoardsList.jsx"
 
 const Dashboard = () => {
 
@@ -31,6 +32,8 @@ const Dashboard = () => {
         <UserList/>
         
         <WorkspacesList/>
+
+        <BoardsList/>
     </div>
 );
 }

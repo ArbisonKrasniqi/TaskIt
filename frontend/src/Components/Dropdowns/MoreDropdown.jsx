@@ -3,7 +3,7 @@ import WorkspaceDropdown from './WorkspaceDropdown';
 import RecentDropdown from './RecentDropDown';
 import StarredDropdown from './StarredDropdown';
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
-import { DropdownContext } from '../Navbar';
+import { DropdownContext } from '../Navbar/Navbar';
 
 const MoreDropdown = (props) => {
 

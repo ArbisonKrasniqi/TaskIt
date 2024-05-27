@@ -90,7 +90,7 @@ namespace backend.Controllers
         [HttpPost("CreateBoard")]
         public async Task<IActionResult> CreateBoard(CreateBoardDto boardDto)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
@@ -115,15 +115,18 @@ namespace backend.Controllers
         [Route("UpdateBoard")]
         public async Task<IActionResult> UpdateBoard(UpdateBoardRequestDto updateDto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             try
             {
-                if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
-
-                var board = await _boardRepo.UpdateBoardAsync(updateDto.ToBoardFromUpdate());
-
+                var board = await _boardRepo.UpdateBoardAsync(updateDto);
+    
                 if (board == null)
                     return NotFound("Board Not Found!");
+                
 
                 return Ok(board.ToBoardDto());
             }

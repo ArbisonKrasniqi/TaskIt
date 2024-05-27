@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import { MdNotificationsNone } from "react-icons/md";
-import { DropdownContext } from '../../Navbar';
+import { DropdownContext } from '../Navbar';
 
 const NotificationButton = (props) => {
 

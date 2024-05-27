@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 import CreateDropdown from './CreateDropdown'
 import { FaPlus } from "react-icons/fa6";
-import { DropdownContext } from '../Navbar';
+import { DropdownContext } from '../Navbar/Navbar';
 
 const PlusDropdown = (props) => {
 

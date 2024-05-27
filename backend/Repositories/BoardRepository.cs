@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using backend.Data;
+using backend.DTOs.Board.Input;
 using backend.Interfaces;
 using backend.Models;
 using Microsoft.EntityFrameworkCore;
@@ -45,15 +46,16 @@ namespace backend.Repositories
         }
         
         //UpdatesAsync -->Gets the board with the given Id and updates with the given attributes
-        public async Task<Board?> UpdateBoardAsync(Board boardModel)
+        public async Task<Board?> UpdateBoardAsync(UpdateBoardRequestDto boardDto)
         {
-            var existingBoard = await _context.Board.FirstOrDefaultAsync(i => i.BoardId == boardModel.BoardId);
+            var existingBoard = await _context.Board.FirstOrDefaultAsync(i => i.BoardId == boardDto.BoardId);
             
             if (existingBoard == null)
                 return null;
 
-            existingBoard.Title = boardModel.Title;
-            existingBoard.BackgroundId = boardModel.BackgroundId;
+            existingBoard.Title = boardDto.Title;
+            existingBoard.BackgroundId = boardDto.BackgroundId;
+            existingBoard.WorkspaceId = boardDto.WorkspaceId;
 
             await _context.SaveChangesAsync();
             return existingBoard;

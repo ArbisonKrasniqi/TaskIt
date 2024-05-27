@@ -1,13 +1,13 @@
 import React, { useState, useEffect,createContext } from 'react';
-import WorkspaceDropdown from './Dropdowns/WorkspaceDropdown';
-import RecentDropdown from './Dropdowns/RecentDropDown';
-import StarredDropdown from './Dropdowns/StarredDropdown';
-import CreateDropdown from './Dropdowns/CreateDropdown';
-import MoreDropdown from './Dropdowns/MoreDropdown';
-import PlusDropdown from './Dropdowns/PlusDropdown';
+import WorkspaceDropdown from '../Dropdowns/WorkspaceDropdown';
+import RecentDropdown from '../Dropdowns/RecentDropDown';
+import StarredDropdown from '../Dropdowns/StarredDropdown';
+import CreateDropdown from '../Dropdowns/CreateDropdown';
+import MoreDropdown from '../Dropdowns/MoreDropdown';
+import PlusDropdown from '../Dropdowns/PlusDropdown';
 import Searchbar from '../Searchbar/Searchbar';
-import NotificationButton from './Notification/NotificationButton/NotificationButton';
-import NavbarProfilePic from './ProfilePic/NavbarProfilePic';
+import NotificationButton from './Notification/NotificationButton';
+import NavbarProfilePic from '../ProfilePic/NavbarProfilePic';
 
 export const DropdownContext = createContext();
 

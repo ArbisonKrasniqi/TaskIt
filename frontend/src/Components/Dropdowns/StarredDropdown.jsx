@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
-import { DropdownContext } from '../Navbar';
+import { DropdownContext } from '../Navbar/Navbar';
 
 const StarredDropdown = (props) => {
 
