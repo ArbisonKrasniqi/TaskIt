@@ -27,6 +27,8 @@
 
     <ItemGroup>
       <Folder Include="DTOs\Members\" />
+      <Folder Include="DTOs\Board\Output\" />
+      <Folder Include="DTOs\User\Output\" />
       <Folder Include="Mappers\" />
       <Folder Include="Service\" />
     </ItemGroup>

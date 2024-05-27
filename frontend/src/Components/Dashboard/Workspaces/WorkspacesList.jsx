@@ -14,8 +14,8 @@ const WorkspacesList = () => {
 
     const getWorkspaces = async () => {
         try{
-            const data = await getData('http://localhost:5157/backend/workspace/GetAllWorkspaces');
-            setWorkspaces(data);
+            const data = await getData('/backend/workspace/GetAllWorkspaces');
+            setWorkspaces(data.data);
         }catch(error){
             setErrorMessage(error.message);
             setShowWorkspacesErrorModal(true); //shfaqe WorkspaceErrorModalin

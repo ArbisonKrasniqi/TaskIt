@@ -3,7 +3,7 @@ import UpdateUserModal from '../Modals/UpdateUserModal.jsx';
 import EditInfoModal from '../Modals/EditInfoModal.jsx';
 import EditPasswordModal from '../Modals/EditPasswordModal.jsx';
 import EditRoleModal from '../Modals/EditRoleModal.jsx';
-import EditButton from '../../Buttons/EditButton.jsx';
+import CustomButton from '../../Buttons/CustomButton.jsx';
 
 const UpdateUserButton = () => {
 
@@ -45,7 +45,7 @@ const UpdateUserButton = () => {
 
     return(
         <>
-            <EditButton onClick={toggleModal} type="button" name="Edit" />
+            <CustomButton onClick={toggleModal} type="button" text="Edit" color="orange" />
             {showModal && <UpdateUserModal handleEditInfoClick={handleEditInfoClick}
                                             handleEditPasswordClick={handleEditPasswordClick}
                                             handleEditRoleClick={handleEditRoleClick}

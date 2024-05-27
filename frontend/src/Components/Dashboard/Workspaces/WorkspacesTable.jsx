@@ -1,7 +1,8 @@
 import React, {useContext, createContext} from 'react';
-import DeleteWorkspaceButton from "./Buttons/DeleteWorkspaceButton.jsx";
 import UpdateWorkspaceButton from "./Buttons/UpdateWorkspaceButton.jsx";
 import { WorkspacesContext} from './WorkspacesList.jsx';
+import CustomButton from '../Buttons/CustomButton.jsx';
+import { deleteData } from '../../../Services/FetchService.jsx';
 
 export const UpdateContext = createContext();
 
@@ -9,6 +10,28 @@ const WorkspacesTable = () => {
 
     const workspacesContext = useContext(WorkspacesContext); //thirret konteksti qe me mujt me ju qas variablave/funksioneve
 
+    const HandleWorkspaceDelete = (id) => {
+      async function deleteWorkspace(){
+          try{
+              const data = {
+                  workspaceId: id
+              };
+              const response = await deleteData('/backend/workspace/DeleteWorkspace', data);
+              console.log(response);
+              //e perdorim workspaceContext ku i kena krejt workspaces dhe e fshijna nga lista workspace-in qe e bonem delete
+              const updatedWorkspaces = workspacesContext.workspaces.filter(workspace => workspace.workspaceId !==id);
+              workspacesContext.setWorkspaces(updatedWorkspaces);
+          }
+          catch(error){
+              workspacesContext.setErrorMessage(error.message + id); //vendose messazhin
+
+              workspacesContext.setShowWorkspacesErrorModal(true); //shfaqe modalin e errorit
+
+              workspacesContext.getWorkspaces(); //bej fetch workspaces per me perditsu listen
+          }
+      }
+      deleteWorkspace();
+  }
 
 return(
 
@@ -39,7 +62,7 @@ return(
                   <td className="px-6 py-4">{workspace.title}</td>
                   <td className="px-6 py-4">{workspace.description}</td>
                   <td className="px-6 py-4">{workspace.ownerId}</td>
-                  <td className="px-6 py-4"> <UpdateContext.Provider value={workspace}> <UpdateWorkspaceButton/>  </UpdateContext.Provider> <DeleteWorkspaceButton id={workspace.workspaceId}/> </td>
+                  <td className="px-6 py-4"> <UpdateContext.Provider value={workspace}> <UpdateWorkspaceButton/>  </UpdateContext.Provider> <CustomButton color="red" text="Delete" onClick={()=>{ HandleWorkspaceDelete(workspace.workspaceId)}}/> </td>
         </tr>
       ))): (
 

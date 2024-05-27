@@ -28,19 +28,22 @@ namespace backend.Controllers;
         //ITokenService is used to implement JWT in the user API
         private readonly ITokenService _tokenService;
         
-        
-        public UserController(UserManager<User> userManager, SignInManager<User> signInManager, ITokenService tokenService)
+        //ITokenRepo to implement refresh tokens
+        private readonly ITokenRepository _tokenRepo;
+        public UserController(UserManager<User> userManager, SignInManager<User> signInManager, ITokenService tokenService, ITokenRepository tokenRepo)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _tokenService = tokenService;
+            _tokenRepo = tokenRepo;
         }
         
         
         //LOGIN AND REGISTER
         //Register as a normal user
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDTO registerDto)
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<IActionResult> Register(RegisterDTO registerDto)
         {
             try
             {
@@ -93,11 +96,19 @@ namespace backend.Controllers;
                 //Check password with found user
                 var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
                 if (!result.Succeeded) return Unauthorized("Username not found and/or password incorrect!");
+
+                var refreshToken = _tokenService.GenerateRefreshToken(user);
+                
+                //Add associated refresh token to user.
+                //If user already has refresh token, this overwrites it.
+                await _tokenRepo.AddRefreshToken(refreshToken);
+                
                 return Ok
                 (
                     new LoggedInDTO
                     {
-                        Token = _tokenService.CreateToken(user, role)
+                        accessToken = _tokenService.CreateToken(user, role),
+                        refreshToken = refreshToken.Token
                     }
                 ); 
             }
@@ -110,8 +121,8 @@ namespace backend.Controllers;
         
         //ADMIN API CALLS
         [HttpPost("adminCreate")]
-        //[Authorize(AuthenticationSchemes = "Bearer")]
-        //[Authorize(Policy = "AdminOnly")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> Create(CreateUserDTO createUserDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -154,8 +165,8 @@ namespace backend.Controllers;
         
         
         [HttpGet("adminAllUsers")]
-        //[Authorize(AuthenticationSchemes = "Bearer")]
-        //[Authorize(Policy = "AdminOnly")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> GetAllUsers()
         {
             try
@@ -179,7 +190,7 @@ namespace backend.Controllers;
         }
 
         [HttpGet("adminAllAdmins")]
-        //[Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> GetAllAdmins()
         {
             try
@@ -214,8 +225,8 @@ namespace backend.Controllers;
         }
         
         [HttpGet("adminUserID")]
-        //[Authorize(AuthenticationSchemes = "Bearer")]
-        //[Authorize(Policy = "AdminOnly")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> GetUserById(string userId)
         {
             if (!ModelState.IsValid) return BadRequest("Id cannot be empty");
@@ -245,8 +256,8 @@ namespace backend.Controllers;
         }
         
         [HttpGet("adminUserEmail")]
-        //[Authorize(AuthenticationSchemes = "Bearer")]
-        //[Authorize(Policy = "AdminOnly")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> GetUserByEmail(string emailDto)
         {
             if (!ModelState.IsValid)
@@ -280,8 +291,8 @@ namespace backend.Controllers;
         }
         
         [HttpPut("adminUpdateUser")]
-        //[Authorize(AuthenticationSchemes = "Bearer")]
-        //[Authorize(Policy = "AdminOnly")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> EditUser(EditUserDTO editUserDto)
         {
                 //Check if valid ModelState(DTO) and if the role is either Admin or User
@@ -333,7 +344,8 @@ namespace backend.Controllers;
         }
 
         [HttpPut("adminUpdatePassword")]
-        //[Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> UpdatePassword(EditUserPasswordDTO editUserPasswordDto)
         {
             if (!ModelState.IsValid)
@@ -382,7 +394,8 @@ namespace backend.Controllers;
 
 
         [HttpPut("adminUpdateRole")]
-        //[Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Policy = "AdminOnly")]
 
         public async Task<IActionResult> UpdateRole(EditRoleDTO editRoleDto)
         {
@@ -467,8 +480,8 @@ namespace backend.Controllers;
         }
 
         [HttpDelete("adminDeleteUserById")]
-        //[Authorize(AuthenticationSchemes = "Bearer")]
-        //[Authorize(Policy = "AdminOnly")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> DeleteUserById(UserIdDTO userIdDto)
         {
             if (userIdDto.id.IsNullOrEmpty()) return BadRequest("Id cannot be empty!");

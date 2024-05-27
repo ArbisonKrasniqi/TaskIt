@@ -2,9 +2,17 @@ import React, {useState} from 'react';
 import InputField from './InputField.jsx';
 import Button from './Button.jsx';
 import ErrorMessage from './ErrorMessage.jsx';
+import ModalWelcome from '../Modal/modalWelcome.jsx';
+import { postData } from '../../Services/FetchService.jsx';
+import { StoreTokens } from '../../Services/TokenService.jsx';
 
 
 const SignUpForm = () =>{
+    const [showModalWelcome, setShowModalWelcome]= useState(false);
+
+    //Qiky modal perdoret nese ka signup por ska mujt me sign in.
+    const [showModalSuccess, setShowModalSuccess] = useState(false);
+    // const [isSignUpSuccessful, setIsSignUpSuccessful] = useState(false);
 
     const [formData, setFormData] = useState({
         name: '',
@@ -24,8 +32,11 @@ const SignUpForm = () =>{
         });
     };
 
+    const handleCloseModal = () => {
+        setShowModalWelcome(false);
+    };
 
-    const handleSubmit = (e) =>{
+    const handleSubmit = async (e) =>{
         e.preventDefault();
     
         var nameRegex = /^[a-zA-Z\s]+$/;
@@ -71,6 +82,33 @@ const SignUpForm = () =>{
         // If all validations pass, clear the error and submit the form
         setError('');
         // Submit the form
+
+        const registerData = {
+            firstName: formData.name,
+            lastName: formData.lastName,
+            email: formData.email,
+            password: formData.password
+        };
+
+        const loginData = {
+            email: formData.email,
+            password: formData.password
+        };
+
+        try {
+            const response = await postData('/backend/user/register', registerData);
+            console.log(response);
+        } catch (error) {
+            console.error("Signup failed: ", error.message);
+        }
+
+        try {
+            const loginResponse = await postData('/backend/user/login', loginData);
+            StoreTokens(loginResponse.data.accessToken, loginResponse.data.refreshToken);
+            setShowModalWelcome(true);
+        } catch (error) {
+            
+        }
     };
 
 
@@ -139,6 +177,19 @@ const SignUpForm = () =>{
                         
                         </div>
                     </form>
+                    {showModalWelcome &&(
+                        <ModalWelcome 
+                        signedUpUserName={formData.name} 
+                        redirectTo="/" //the current path is for demo
+                        />
+                    )}
+
+                    {showModalSuccess &&(
+                        <ModalWelcome 
+                        signedUpUserName={formData.name} 
+                        redirectTo="/login" //the current path is for demo
+                        />
+                    )}
                     </div>
                 </div>
 

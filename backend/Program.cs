@@ -109,6 +109,7 @@ builder.Services.AddScoped<IWorkspaceRepository, WorkspaceRepository>();
 builder.Services.AddScoped<IListRepository, ListRepository>();
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 builder.Services.AddScoped<IMembersRepository, MembersRepository>();
+builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 
 // CORS configuration
 builder.Services.AddCors(options =>

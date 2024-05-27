@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import UpdateWorkspaceModal from '../Modals/UpdateWorkspaceModal';
-import EditButton from '../../Buttons/EditButton';
+import CustomButton from '../../Buttons/CustomButton';
 
 const UpdateWorkspaceButton = () => {
 
@@ -12,7 +12,7 @@ const UpdateWorkspaceButton = () => {
 
     return(
         <>
-        <EditButton onClick={handleEditInfoClick} type="button" name="Edit" />
+        <CustomButton onClick={handleEditInfoClick} type="button" text="Edit" color="orange" />
         {showUpdateInfoModal && <UpdateWorkspaceModal setShowUpdateInfoModal={setShowUpdateInfoModal}/>}
         </>
     );

@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using backend.Interfaces;
 using backend.Models;
@@ -39,7 +40,7 @@ public class TokenService : ITokenService
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.Now.AddDays(1),
+            Expires = DateTime.Now.AddMinutes(1),
             SigningCredentials = creds,
             Issuer = _config["JWT:Issuer"],
             Audience = _config["JWT:Audience"]
@@ -51,5 +52,23 @@ public class TokenService : ITokenService
 
         //WriteToken(token) turns the token from an object datatype to string
         return tokenHandler.WriteToken(token);
+    }
+    
+    public RefreshToken GenerateRefreshToken(User user)
+    {
+        var randomNumber = new byte[32];
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(randomNumber);
+        
+        var refreshToken = new RefreshToken
+        {
+            Token = Convert.ToBase64String(randomNumber),
+            Expires = DateTime.Now.AddDays(30),
+            UserId = user.Id
+        };
+        
+        
+        
+        return refreshToken;
     }
 }

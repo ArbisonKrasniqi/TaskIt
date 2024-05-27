@@ -1,9 +1,13 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Login from './Pages/loginPage.jsx';
 import Dashboard from './Pages/dashboard.jsx';
-import SignUpPage from './Pages/SignUpPage.jsx';
-import Sidebar from '../src/Components/Side/Sidebar.jsx';
+import Preview from './Components/Preview/header.jsx';
+
+import SignUpPage from './Pages/signUpPage.jsx';
+
+
 function App() {
+
   return (
    <>
  <Sidebar emri="Test" ></Sidebar> 
@@ -12,9 +16,12 @@ function App() {
           <Route path="/login" element={<Login/>}/>
           <Route path="/signUp" element={<SignUpPage/>}/>
           <Route path="/dashboard" element={<Dashboard/>}/>
+          <Route path="/preview" element={<Preview/>}/>
         </Routes>
       </BrowserRouter>
+
     </>
+    
   );
 }
 
