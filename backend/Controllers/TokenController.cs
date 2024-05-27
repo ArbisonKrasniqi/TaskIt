@@ -13,7 +13,7 @@ namespace backend.Controllers;
 
 [ApiController]
 [Route("backend/token")]
-[Authorize(AuthenticationSchemes = "Bearer")]
+//[Authorize(AuthenticationSchemes = "Bearer")]
 public class TokenController : ControllerBase
 {
     private readonly ITokenService _tokenService;
@@ -32,25 +32,10 @@ public class TokenController : ControllerBase
     [HttpPost("refreshToken")]
     public async Task<IActionResult> Refresh(RequestRefreshTokenDTO requestRefreshTokenDto)
     {
-        //Merr Id te userit nga JWT qe eshte perdorur per autentifikim
-        var userId = User.Claims.FirstOrDefault(c => c.Type == "Id").Value;
-
-        //Nese eshte null atehere tokeni nuk eshte valid. (ska shanc me ndodh)
-        if (userId == null)
-        {
-            return Unauthorized("Your token is invalid");
-        }
-
-        //Merr user nga databaza bazuar nga id ne jwt
-        var user = await _userManager.FindByIdAsync(userId);
-        if (user == null)
-        {
-            //Nese user nuk ekziston atehere nuk eshte user-i valid
-            return Unauthorized("User does not exist");
-        }
+        var storedToken = await _tokenRepo.GetRefreshTokenValue(requestRefreshTokenDto.refreshToken);
         
-        //Merr refresh tokenin i cili eshte i ruajtur ne databaze 
-        var storedToken = await _tokenRepo.GetUserRefreshToken(user);
+        //Merr user nga databaza bazuar nga id ne jwt
+        var user = await _userManager.FindByIdAsync(storedToken.UserId);
 
         //Check if stored token is expired
         if (storedToken.Expires < DateTime.Now)
@@ -61,7 +46,7 @@ public class TokenController : ControllerBase
         //Shiko se tokeni i derguar nga front eshte i njejte me ate i ruajtur ne databaze
         //Nese nuk jane, i bie qe tokeni i derguar nga front eshte perdorur me para dhe nuk vlen me.
         
-        if (storedToken.Token == requestRefreshTokenDto.refreshToken)
+        if (storedToken.Token != null)
         {
             //Nese tokenet jane te njejte atehere gjenero nje JWT token te ri.
             var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");

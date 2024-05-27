@@ -23,7 +23,7 @@ const EditRoleModal = (props) => {
                 isAdmin: isAdmin
             }
 
-            const response = await putData('http://localhost:5157/backend/user/adminUpdateRole', data);
+            const response = await putData('/backend/user/adminUpdateRole', data);
             console.log(response);
 
             const updatedUsers = userContext.users.map(user => {

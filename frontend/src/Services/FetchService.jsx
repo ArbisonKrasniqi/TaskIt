@@ -1,12 +1,12 @@
 import axios from 'axios';
-import { GetAccessToken } from './TokenService';
+import { getAccessToken } from './TokenService';
 
 const api = axios.create({
-  baseURL: 'YOUR_API_BASE_URL', // Replace this with your API base URL
+  baseURL: 'http://localhost:5157', // Replace this with your API base URL
 });
 
 api.interceptors.request.use((config) => {
-  config.headers.Authorization = `Bearer ${GetAccessToken()}`;
+  config.headers.Authorization = `Bearer ${getAccessToken()}`;
   return config;
 });
 
@@ -21,7 +21,7 @@ export async function getData(apiEndpoint) {
 
 export async function getDataWithId(apiEndpoint, id) {
   try {
-    const response = await api.get(`${apiEndpoint}/${id}`);
+    const response = await api.get(`${apiEndpoint}=${id}`);
     return response;
   } catch (error) {
     throw error;

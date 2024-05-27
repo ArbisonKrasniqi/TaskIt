@@ -53,7 +53,7 @@ public class WorkspaceController : ControllerBase
 
     }
 
-    [HttpGet("GetWorkspaceByOwnerId")]
+    [HttpGet("GetWorkspacesByOwnerId")]
     public async Task<IActionResult> GetWorkspacesByOwnerId(string OwnerId)
     {
         try
@@ -72,6 +72,27 @@ public class WorkspaceController : ControllerBase
         }
 
     }
+
+    [HttpGet("GetWorkspacesByMemberId")]
+    public async Task<IActionResult> GetWorkspacesByMemberId(string memberId)
+    {
+        try
+        {
+            var workspaces = await _workspaceRepo.GetWorkspacesByMemberIdAsync(memberId);
+            if (workspaces.Count == 0)
+            {
+                return NotFound("Workspaces not found!");
+            }
+
+            return Ok(workspaces);
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, "Internal server error!");
+        }
+    }
+    
+
     //GETBYID
     [HttpGet("GetWorkspaceById")]
     public async Task<IActionResult> GetWorkspaceById(int workspaceId)
@@ -95,9 +116,7 @@ public class WorkspaceController : ControllerBase
 
     //CREATE
     [HttpPost("CreateWorkspace")]
-    public async Task<IActionResult>
-        CreateWorkspace(
-            CreateWorkspaceRequestDto workspaceDto) //fromBody sepse nuk jena tu i pas te dhanat ne URL po ne body te HTTP
+    public async Task<IActionResult>CreateWorkspace(CreateWorkspaceRequestDto workspaceDto) //fromBody sepse nuk jena tu i pas te dhanat ne URL po ne body te HTTP
     {
         if (!ModelState.IsValid)
         {
@@ -111,15 +130,14 @@ public class WorkspaceController : ControllerBase
 
         try
         {
-            var workspaceModel = workspaceDto.ToWorkspaceFromCreate(); //e kthen prej DTO ne workspace
-            await _workspaceRepo.CreateWorkspaceAsync(workspaceModel);
-            return CreatedAtAction(nameof(GetWorkspaceById), new { id = workspaceModel.WorkspaceId },
-                workspaceModel.ToWorkspaceDto());
+            var workspaceModel = workspaceDto.ToWorkspaceFromCreate(); // e kthen prej DTO ne workspace
+            var createdWorkspace = await _workspaceRepo.CreateWorkspaceAsync(workspaceModel);
+            return CreatedAtAction(nameof(GetWorkspaceById), new { id = createdWorkspace.WorkspaceId }, createdWorkspace.ToWorkspaceDto());
             //e ekzekuton metoden getbyId edhe ja qon id e objektit te ri stockModel dhe e kthen ne formen e ToStockDto
         }
         catch (Exception e)
         {
-            return StatusCode(500, "Internal server error");
+            return StatusCode(500, "Internal server error"+e.Message);
         }
 
 
@@ -192,7 +210,7 @@ public class WorkspaceController : ControllerBase
         {
             if (!await _userRepo.UserExists(ownerIdDto.OwnerId))
             {
-                return NotFound("User not found");
+                return NotFound("User not found!");
             }
 
             var workspaceModels = await _workspaceRepo.DeleteWorkspacesByOwnerIdAsync(ownerIdDto.OwnerId);
@@ -205,9 +223,10 @@ public class WorkspaceController : ControllerBase
         }
         catch (Exception e)
         {
-            return StatusCode(500, "Internal server error");  
+            return StatusCode(500, "Internal server error!");  
         }
     }
-
+    
+    
 
 }

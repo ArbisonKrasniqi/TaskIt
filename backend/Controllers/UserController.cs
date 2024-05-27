@@ -42,7 +42,8 @@ namespace backend.Controllers;
         //LOGIN AND REGISTER
         //Register as a normal user
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDTO registerDto)
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<IActionResult> Register(RegisterDTO registerDto)
         {
             try
             {
@@ -120,8 +121,8 @@ namespace backend.Controllers;
         
         //ADMIN API CALLS
         [HttpPost("adminCreate")]
-        //[Authorize(AuthenticationSchemes = "Bearer")]
-        //[Authorize(Policy = "AdminOnly")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> Create(CreateUserDTO createUserDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -164,8 +165,8 @@ namespace backend.Controllers;
         
         
         [HttpGet("adminAllUsers")]
-        //[Authorize(AuthenticationSchemes = "Bearer")]
-        //[Authorize(Policy = "AdminOnly")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> GetAllUsers()
         {
             try
@@ -189,7 +190,7 @@ namespace backend.Controllers;
         }
 
         [HttpGet("adminAllAdmins")]
-        //[Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> GetAllAdmins()
         {
             try
@@ -224,8 +225,8 @@ namespace backend.Controllers;
         }
         
         [HttpGet("adminUserID")]
-        //[Authorize(AuthenticationSchemes = "Bearer")]
-        //[Authorize(Policy = "AdminOnly")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> GetUserById(string userId)
         {
             if (!ModelState.IsValid) return BadRequest("Id cannot be empty");
@@ -255,8 +256,8 @@ namespace backend.Controllers;
         }
         
         [HttpGet("adminUserEmail")]
-        //[Authorize(AuthenticationSchemes = "Bearer")]
-        //[Authorize(Policy = "AdminOnly")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> GetUserByEmail(string emailDto)
         {
             if (!ModelState.IsValid)
@@ -290,8 +291,8 @@ namespace backend.Controllers;
         }
         
         [HttpPut("adminUpdateUser")]
-        //[Authorize(AuthenticationSchemes = "Bearer")]
-        //[Authorize(Policy = "AdminOnly")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> EditUser(EditUserDTO editUserDto)
         {
                 //Check if valid ModelState(DTO) and if the role is either Admin or User
@@ -343,7 +344,8 @@ namespace backend.Controllers;
         }
 
         [HttpPut("adminUpdatePassword")]
-        //[Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> UpdatePassword(EditUserPasswordDTO editUserPasswordDto)
         {
             if (!ModelState.IsValid)
@@ -392,7 +394,8 @@ namespace backend.Controllers;
 
 
         [HttpPut("adminUpdateRole")]
-        //[Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Policy = "AdminOnly")]
 
         public async Task<IActionResult> UpdateRole(EditRoleDTO editRoleDto)
         {
@@ -477,8 +480,8 @@ namespace backend.Controllers;
         }
 
         [HttpDelete("adminDeleteUserById")]
-        //[Authorize(AuthenticationSchemes = "Bearer")]
-        //[Authorize(Policy = "AdminOnly")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> DeleteUserById(UserIdDTO userIdDto)
         {
             if (userIdDto.id.IsNullOrEmpty()) return BadRequest("Id cannot be empty!");

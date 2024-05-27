@@ -20,6 +20,11 @@ public class TokenRepository : ITokenRepository
         return await _context.RefreshTokens.FirstOrDefaultAsync(t => t.UserId == user.Id);
     }
 
+    public async Task<RefreshToken> GetRefreshTokenValue(string refreshTokenValue)
+    {
+        return await _context.RefreshTokens.FirstOrDefaultAsync(t => t.Token == refreshTokenValue);
+    }
+
     public async Task<RefreshToken> AddRefreshToken(RefreshToken refreshToken)
     {
         //Gjej refreshTokenin ekzistues per userin qe kerkon refresh 

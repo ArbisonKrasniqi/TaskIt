@@ -17,7 +17,7 @@ const UsersTable = () => {
                 const data = {
                     id: id
                 };
-                const response = await deleteData('http://localhost:5157/backend/user/adminDeleteUserById', data);
+                const response = await deleteData('/backend/user/adminDeleteUserById', data);
                 console.log(response);
 
                 //Ne rast se nuk eshte bere ndonje error

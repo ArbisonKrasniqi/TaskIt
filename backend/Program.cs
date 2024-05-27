@@ -17,6 +17,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddControllers().AddNewtonsoftJson(options =>
+{
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+});
+
 //Implements JWT into swagger
 builder.Services.AddSwaggerGen(option =>
 {
@@ -103,6 +108,7 @@ builder.Services.AddScoped<IBoardRepository, BoardRepository>();
 builder.Services.AddScoped<IWorkspaceRepository, WorkspaceRepository>();
 builder.Services.AddScoped<IListRepository, ListRepository>();
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+builder.Services.AddScoped<IMembersRepository, MembersRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 
 // CORS configuration

@@ -28,7 +28,7 @@ const UpdateWorkspaceModal= (props) => {
                 ownerId: ownerId
             };
 
-            const response = await putData('http://localhost:5157/backend/workspace/UpdateWorkspace', data);
+            const response = await putData('/backend/workspace/UpdateWorkspace', data);
             console.log(response);
             const updatedWorkspaces = workspacesContext.workspaces.map(workspace => {
                 if(workspace.workspaceId === updateContext.workspaceId){

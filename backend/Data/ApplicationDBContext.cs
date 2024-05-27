@@ -19,6 +19,7 @@ public class ApplicationDBContext : IdentityDbContext<User>
     public DbSet<Board> Board { get; set;}
     public DbSet<List> List { get; set; }
     public DbSet<Tasks> Tasks { get; set; }
+    public DbSet<Members> Members { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     //User roles
     protected override void OnModelCreating(ModelBuilder builder)
