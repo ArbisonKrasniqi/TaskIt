@@ -11,21 +11,23 @@ import CreateBoardModal from "./CreateBoardModal.jsx";
 import { FaTrashCan } from "react-icons/fa6";
 import { deleteData } from "../../Services/FetchService.jsx";
 
-const Sidebar = (props) =>{
+const Sidebar = (props) => {
 
 
 const [boards, setBoards] =useState([]);
 
 
-const getBoards = async () => {
-try{
-    const data = await getDataWithId('http://localhost:5157/backend/board/GetBoardsByWorkspaceId?workspaceId',5);
-    setBoards(data);
-}catch(error){
-    console.error('Ka ndodhur një gabim gjatë marrjes së të dhënave:', error);
-}
-};
-getBoards();
+useEffect(() => {
+    const getBoards = async () => {
+        try {
+            const data = await getDataWithId('http://localhost:5157/backend/board/GetBoardsByWorkspaceId?workspaceId', 5);
+            setBoards(data.data);
+        } catch (error) {
+            console.error(error.message);
+        }
+    };
+    getBoards();
+}, []);
 
 const[open, setOpen] = useState(true);
 const Menus = [
@@ -53,7 +55,11 @@ const deleteBoard = async (boardId) => {
     try {
       await deleteData('http://localhost:5157/backend/board/DeleteBoardByID', data);
       // Remove the deleted board from the state
-      setBoards((prevBoards) => prevBoards.filter((board) => board.id !== boardId));
+
+      //TEMPORARY FIX
+      const dataResponse = await getDataWithId('http://localhost:5157/backend/board/GetBoardsByWorkspaceId?workspaceId', 5);
+      setBoards(dataResponse.data);
+      //setBoards((prevBoards) => prevBoards.filter((board) => board.id !== boardId));
     } catch (error) {
       console.error('Error deleting board:', error);
     }

@@ -53,7 +53,7 @@ const LogInForm =  () =>{
     };
 
     const handleClick = () => {
-        window.location.href = '';
+        //Navigate user to main page
     };
     
 
