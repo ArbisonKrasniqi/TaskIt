@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using backend.Mappers;
+using backend.Mappers.Board;
+using backend.Mappers.Workspace;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -122,6 +125,11 @@ builder.Services.AddCors(options =>
                 .AllowAnyHeader();
         });
 });
+
+//AutoMappers
+builder.Services.AddAutoMapper(typeof(BoardProfile).Assembly);
+builder.Services.AddAutoMapper(typeof(WorkspaceProfile).Assembly);
+
 
 var app = builder.Build();
 

@@ -22,19 +22,22 @@ namespace backend.Repositories
         //GetAllAsync --> Gets all boards that exists
         public async Task<List<Board>> GetAllBoardsAsync()
         {
-            return await _context.Board.ToListAsync();
+            return await _context.Board
+                .Include(b => b.Lists).ToListAsync();
         }
         
         //GetByIdAsync --> Gets the board that has the given Id
         public async Task<Board?> GetBoardByIdAsync(int id)
         {
-            return await _context.Board.FirstOrDefaultAsync(i => i.BoardId == id);
+            return await _context.Board.
+                Include(b => b.Lists).FirstOrDefaultAsync(i => i.BoardId == id);
         }
         
         //GetBoardsByWorkspaceIdAsync --> Gets all boards that have the given workspaceId
         public async Task<List<Board>> GetBoardsByWorkspaceIdAsync(int workspaceId)
         {
-            return await _context.Board.Where(b => b.WorkspaceId == workspaceId).ToListAsync();
+            return await _context.Board.
+                Include(b => b.Lists).Where(b => b.WorkspaceId == workspaceId).ToListAsync();
         }
         
         //CreateAsync -->Adds a new board with the given attributes

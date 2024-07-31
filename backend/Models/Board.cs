@@ -12,5 +12,6 @@ namespace backend.Models
         public DateTime DateCreated { get; set; } = DateTime.Now;
         public int? BackgroundId { get; set; }
         public int? WorkspaceId { get; set; }
+        public List<List>? Lists { get; set; }
     }
 }

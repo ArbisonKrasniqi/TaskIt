@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using backend.DTOs.List;
 
 namespace backend.DTOs.Board.Output
 {
@@ -16,5 +17,6 @@ namespace backend.DTOs.Board.Output
         [Required]
         [Range(0, int.MaxValue, ErrorMessage = "WorkspaceId Can Not Be Negative!")]
         public int? WorkspaceId { get; set; }
+        public List<ListDTO> Lists { get; set; }
     }
 }

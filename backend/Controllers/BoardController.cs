@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using backend.DTOs.Board.Input;
+using backend.DTOs.Board.Output;
 using backend.DTOs.Workspace;
 using backend.Interfaces;
 using backend.Mappers;
+using backend.Mappers.Board;
+using backend.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers
@@ -17,11 +21,13 @@ namespace backend.Controllers
     {
         private readonly IBoardRepository _boardRepo;
         private readonly IWorkspaceRepository _workspaceRepo;
+        private readonly IMapper _mapper;
 
-        public BoardController(IBoardRepository boardRepo,IWorkspaceRepository workspaceRepo)
+        public BoardController(IBoardRepository boardRepo,IWorkspaceRepository workspaceRepo, IMapper mapper)
         {
             _boardRepo = boardRepo;
             _workspaceRepo = workspaceRepo;
+            _mapper = mapper;
         }
 
         [HttpGet(template:"GetAllBoards")]
@@ -34,7 +40,7 @@ namespace backend.Controllers
                 if (boards.Count() == 0)
                     return NotFound("There are no boards");
 
-                var boardDto = boards.Select(s => s.ToBoardDto());
+                var boardDto = _mapper.Map<IEnumerable<BoardDto>>(boards);
 
                 return Ok(boardDto);
             }
@@ -61,7 +67,8 @@ namespace backend.Controllers
                     return BadRequest("Boards Not Found!");
                 }
 
-                return Ok(boards);
+                var boardDtos = _mapper.Map<IEnumerable<BoardDto>>(boards);
+                return Ok(boardDtos);
             }
             catch (Exception e)
             {
@@ -79,7 +86,8 @@ namespace backend.Controllers
                 if (board == null)
                     return NotFound("Board Not Found!");
 
-                return Ok(board.ToBoardDto());
+                var boardDto = _mapper.Map<BoardDto>(board);
+                return Ok(boardDto);
             }
             catch (Exception e)
             {
@@ -101,9 +109,9 @@ namespace backend.Controllers
 
             try
             {
-                var boardModel = boardDto.ToBoardFromCreate();
+                var boardModel = _mapper.Map<Board>(boardDto);
                 await _boardRepo.CreateBoardAsync(boardModel);
-                return CreatedAtAction(nameof(GetBoardById), new { id = boardModel.BoardId }, boardModel.ToBoardDto());
+                return CreatedAtAction(nameof(GetBoardById), new { id = boardModel.BoardId }, _mapper.Map<BoardDto>(boardModel));
             }
             catch (Exception e)
             {
@@ -126,9 +134,9 @@ namespace backend.Controllers
     
                 if (board == null)
                     return NotFound("Board Not Found!");
-                
 
-                return Ok(board.ToBoardDto());
+                var boardDto = _mapper.Map<BoardDto>(board);
+                return Ok(boardDto);
             }
             catch (Exception e)
             {
