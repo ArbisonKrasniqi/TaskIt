@@ -38,21 +38,59 @@ public class WorkspaceRepository : IWorkspaceRepository
             _context.Members.Add(ownerMember);
             await _context.SaveChangesAsync();   //per me i rujt ndryshimet ne bazen e te dhenave
             return workspaceModel;
-       
-        
     }
-    //DELETE
+    
+    //DELETEWorkspace
     public async Task<Workspace?> DeleteWorkspaceAsync(int id)
     {
-        var workspaceModel = await _context.Workspace.FirstOrDefaultAsync(x => x.WorkspaceId == id); // finds the Workspace with the given id
+        var workspaceModel = await _context.Workspace
+            .Include(w => w.Boards)
+            .Include(w => w.Members)
+            .FirstOrDefaultAsync(x => x.WorkspaceId == id);
+
         if (workspaceModel == null)
         {
-            throw new Exception("Workspace not found");
+            return null;
         }
-        _context.Workspace.Remove(workspaceModel); // te remove nuk perdorim await sepse nuk osht funksion async sepse sosht i nderlikuar
+
+        _context.Board.RemoveRange(workspaceModel.Boards);
+        _context.Members.RemoveRange(workspaceModel.Members);
+
+        _context.Workspace.Remove(workspaceModel);
         await _context.SaveChangesAsync();
         return workspaceModel;
     }
+    
+    
+    //DELETEWorkspacesBYOWNERID
+    public async Task<List<Workspace?>>DeleteWorkspacesByOwnerIdAsync(string ownerId)
+    {
+        var workspaces = await _context.Workspace.Include(w=>w.Boards)
+            .Include(w=>w.Members)
+            .Where(w => w.OwnerId.Equals(ownerId)).ToListAsync();
+
+        foreach (var workspace in workspaces)
+        {
+            _context.Board.RemoveRange(workspace.Boards);
+            _context.Members.RemoveRange(workspace.Members);
+        }
+
+        _context.Workspace.RemoveRange(workspaces);
+        await _context.SaveChangesAsync();
+        return workspaces;
+
+    }
+    
+    //GETALL
+    public async Task<List<Workspace>> GetAllWorkspacesAsync()
+    {
+        
+        return await _context.Workspace
+            .Include(w=>w.Boards)
+            .Include(w => w.Members) // Përfshijmë anëtarët
+            .ToListAsync();
+    }
+    
 //GETBYOWNERID
     public async Task<List<Workspace?>> GetWorkspacesByOwnerIdAsync(string ownerId)
     {
@@ -62,6 +100,8 @@ public class WorkspaceRepository : IWorkspaceRepository
             .Where(w => w.OwnerId.Equals(ownerId))
             .ToListAsync();
     }
+    
+    
 //GETBYMEMBERID
     public async Task<List<Workspace?>> GetWorkspacesByMemberIdAsync(string memberId)
     {
@@ -71,26 +111,7 @@ public class WorkspaceRepository : IWorkspaceRepository
             .Where(w => w.Members.Any(m => m.UserId == memberId))
             .ToListAsync();
     }
-
-//DELETEBYOWNERID
-    public async Task<List<Workspace?>>DeleteWorkspacesByOwnerIdAsync(string ownerId)
-    {
-       var workspaces = await _context.Workspace.Where(w => w.OwnerId.Equals(ownerId)).ToListAsync();
-       _context.Workspace.RemoveRange(workspaces);
-       await _context.SaveChangesAsync();
-       return workspaces;
-
-    }
-
-    //GETALL
-    public async Task<List<Workspace>> GetAllWorkspacesAsync()
-    {
-        
-       return await _context.Workspace
-           .Include(w=>w.Boards)
-           .Include(w => w.Members) // Përfshijmë anëtarët
-           .ToListAsync();
-    }
+    
     
     //GETBYID
     public async Task<Workspace?> GetWorkspaceByIdAsync(int id)

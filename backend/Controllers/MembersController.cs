@@ -60,7 +60,7 @@ public class MembersController: ControllerBase
 
     [HttpDelete]
     [Route("RemoveMember")]
-    public async Task<IActionResult> RemoveMember(RemoveMemberDto removeMemberDto)
+    public async Task<IActionResult> RemoveMember([FromBody] RemoveMemberDto removeMemberDto)
     {
         if (!ModelState.IsValid)
         {
@@ -68,7 +68,7 @@ public class MembersController: ControllerBase
         }
         try
         {
-            var result = await _membersRepo.RemoveMemberAsync(removeMemberDto);
+            var result = await _membersRepo.RemoveMemberAsync(removeMemberDto.WorkspaceId, removeMemberDto.UserId);
             if (result == null)
             {
                 return StatusCode(500, "User could not removed");
@@ -78,7 +78,7 @@ public class MembersController: ControllerBase
         }
         catch (Exception e)
         {
-            return StatusCode(500, "Internal server error");  
+            return StatusCode(500, "Internal server error: "+ e.Message);  
         }
     }
 }

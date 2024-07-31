@@ -14,4 +14,5 @@ public static class MemberMapper
             UserId = memberModel.UserId
         };
     }
+    
 }
