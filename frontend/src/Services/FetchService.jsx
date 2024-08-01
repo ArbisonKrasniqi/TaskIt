@@ -37,10 +37,11 @@ export async function postData(apiEndpoint, data) {
   }
 }
 
-export async function deleteData(apiEndpoint, data) {
+export async function deleteData(apiEndpoint, boardId) {
   try {
-    const response = await api.delete(apiEndpoint, { data });
-    return response;
+    const response = await axios.delete(apiEndpoint, {
+      params: { boardId: boardId }
+    });
   } catch (error) {
     throw error;
   }

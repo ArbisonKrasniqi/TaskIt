@@ -1,4 +1,6 @@
-﻿using backend.DTOs.Members;
+﻿using AutoMapper;
+using backend.DTOs.Members;
+using backend.DTOs.Members.Output;
 using backend.DTOs.User.Input;
 using backend.DTOs.Workspace;
 using backend.Interfaces;
@@ -13,11 +15,13 @@ public class MembersController: ControllerBase
 {
     private readonly IMembersRepository _membersRepo; //qe me kon immutable
     private readonly IWorkspaceRepository _workspaceRepo;
+    private readonly IMapper _mapper;
 
-    public MembersController(IMembersRepository userWorkspaceRepo, IWorkspaceRepository workspaceRepo)
+    public MembersController(IMembersRepository userWorkspaceRepo, IWorkspaceRepository workspaceRepo, IMapper mapper)
     {
         _membersRepo = userWorkspaceRepo;
         _workspaceRepo = workspaceRepo;
+        _mapper = mapper;
     }
 
     [HttpPost]

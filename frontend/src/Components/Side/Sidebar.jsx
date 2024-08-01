@@ -20,14 +20,23 @@ const [boards, setBoards] =useState([]);
 useEffect(() => {
     const getBoards = async () => {
         try {
-            const data = await getDataWithId('http://localhost:5157/backend/board/GetBoardsByWorkspaceId?workspaceId', 5);
-            setBoards(data.data);
+            const data = await getDataWithId('http://localhost:5157/backend/board/GetBoardsByWorkspaceId?workspaceId', 10);
+            if (Array.isArray(data)) {
+                setBoards(data);
+            } else {
+                setBoards([]); // Handle unexpected response format
+            }
         } catch (error) {
             console.error(error.message);
         }
     };
     getBoards();
 }, []);
+
+const handleCreateBoard = (newBoard)=>{
+    setBoards((prevBoards) => [...prevBoards, newBoard]);
+};
+
 
 const[open, setOpen] = useState(true);
 const Menus = [
@@ -49,21 +58,21 @@ const WorkspaceViews = [
 const [openModal, setOpenModal] = useState(false);
 
 const deleteBoard = async (boardId) => {
-    const data = {
-        boardId: boardId
-    };
+    console.log('Deleting board with ID:', boardId);
     try {
-      await deleteData('http://localhost:5157/backend/board/DeleteBoardByID', data);
-      // Remove the deleted board from the state
-
-      //TEMPORARY FIX
-      const dataResponse = await getDataWithId('http://localhost:5157/backend/board/GetBoardsByWorkspaceId?workspaceId', 5);
+      await deleteData('http://localhost:5157/backend/board/DeleteBoardByID', boardId);
+      console.log('Successfully deleted board with ID:', boardId);
+      // Filter the board out from the local state
+      setBoards((prevBoards) => prevBoards.filter((board) => board.boardId !== boardId));
+      // Temporarily refresh the list of boards
+      const dataResponse = await getDataWithId('http://localhost:5157/backend/board/GetBoardsByWorkspaceId?workspaceId', 10);
       setBoards(dataResponse.data);
-      //setBoards((prevBoards) => prevBoards.filter((board) => board.id !== boardId));
+
     } catch (error) {
       console.error('Error deleting board:', error);
     }
-  };
+};
+
   
     return(
         <div className="flex">
@@ -109,21 +118,23 @@ const deleteBoard = async (boardId) => {
             <br/>
            <button onClick={()=>setOpenModal(true)} className={`text-gray-400 cursor-pointer ${!open && "scale-0"}`}><FaPlus/></button>
 
-           <CreateBoardModal open={openModal} onClose={()=> setOpenModal(false)}></CreateBoardModal>
+           <CreateBoardModal open={openModal} onClose={()=> setOpenModal(false)} onBoardCreated={handleCreateBoard}></CreateBoardModal>
 
             </div>
             <ul>
-    {boards.length > 0 ? (
+    {boards.length === 0 ? (
+          <li className={`text-gray-400 text-l font-semibold flex items-center gap-x-4 cursor-pointer p-2 ${!open && "scale-0"}`}>
+          <span>No boards found</span>
+      </li>
+
+
+    ) : (
         boards.map((board, index) => (
             <li key={index} className={`flex justify-between text-gray-400 text-l font-semibold items-center cursor-pointer p-2 hover:bg-gray-500 ${!open && "scale-0"}`}>
                 <span>{board.title}</span>
                 <FaTrashCan onClick={() => deleteBoard(board.boardId)} />
             </li>
         ))
-    ) : (
-        <li className={`text-gray-400 text-l font-semibold flex items-center gap-x-4 cursor-pointer p-2 ${!open && "scale-0"}`}>
-            <span>No boards found</span>
-        </li>
     )}
 </ul>
 

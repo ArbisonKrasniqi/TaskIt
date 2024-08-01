@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using backend.Mappers;
 using backend.Mappers.Board;
+using backend.Mappers.Member;
 using backend.Mappers.Workspace;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,7 +20,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddAutoMapper(typeof(Program).Assembly);
+
 
 
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
@@ -129,9 +130,11 @@ builder.Services.AddCors(options =>
 });
 
 //AutoMappers
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 builder.Services.AddAutoMapper(typeof(BoardProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(WorkspaceProfile).Assembly);
-
+builder.Services.AddAutoMapper(typeof(MemberProfile).Assembly);
 
 var app = builder.Build();
 
