@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using backend.Mappers;
+using backend.Mappers.Background;
 using backend.Mappers.Board;
 using backend.Mappers.Workspace;
 
@@ -113,6 +114,7 @@ builder.Services.AddScoped<IListRepository, ListRepository>();
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 builder.Services.AddScoped<IMembersRepository, MembersRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
+builder.Services.AddScoped<IBackgroundRepository, BackgroundRepository>();
 
 // CORS configuration
 builder.Services.AddCors(options =>
@@ -129,7 +131,7 @@ builder.Services.AddCors(options =>
 //AutoMappers
 builder.Services.AddAutoMapper(typeof(BoardProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(WorkspaceProfile).Assembly);
-
+builder.Services.AddAutoMapper(typeof(BackgroundProfile).Assembly);
 
 var app = builder.Build();
 
