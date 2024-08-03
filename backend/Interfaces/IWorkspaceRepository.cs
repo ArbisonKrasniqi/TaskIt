@@ -5,7 +5,7 @@ namespace backend.Interfaces;
 
 public interface IWorkspaceRepository
 {
-    Task<List<Workspace>> GetAllWorkspacesAsync();
+    Task<List<Workspace?>> GetAllWorkspacesAsync();
     Task<Workspace?> GetWorkspaceByIdAsync(int id); //? sepse e perdorim FirstOrDefault dhe mundet me kthy null
     Task<Workspace> CreateWorkspaceAsync(Workspace workspaceModel);
     Task<Workspace?> UpdateWorkspaceAsync(UpdateWorkspaceRequestDto workspaceDto);

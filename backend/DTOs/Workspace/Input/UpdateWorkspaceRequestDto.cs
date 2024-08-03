@@ -13,5 +13,6 @@ public class UpdateWorkspaceRequestDto
     [MinLength(10, ErrorMessage = "Description must be at least 10 characters")]
     [MaxLength(280, ErrorMessage = "Description cannot be over 280 characters")]
     public string Description { get; set; } = string.Empty;
-    public string OwnerId { get; set; }
+
+    public string OwnerId { get; set; } = string.Empty;
 }

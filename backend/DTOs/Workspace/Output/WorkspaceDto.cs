@@ -17,7 +17,8 @@ public class WorkspaceDto
     [MinLength(10, ErrorMessage = "Description must be at least 10 characters")]
     [MaxLength(280, ErrorMessage = "Description cannot be over 280 characters")]
     public string Description { get; set; } = string.Empty;
-    public string OwnerId { get; set; }
+
+    public string OwnerId { get; set; } = string.Empty;
     public List<MemberDto> Members { get; set; }= new List<MemberDto>();
     public List<BoardDto> Boards { get; set; }=new List<BoardDto>();
 

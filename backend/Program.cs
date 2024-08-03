@@ -11,6 +11,7 @@ using Microsoft.OpenApi.Models;
 using backend.Mappers;
 using backend.Mappers.Board;
 using backend.Mappers.Member;
+using backend.Mappers.StarredBoard;
 using backend.Mappers.Workspace;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -116,7 +117,9 @@ builder.Services.AddScoped<IListRepository, ListRepository>();
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 builder.Services.AddScoped<IMembersRepository, MembersRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
-
+builder.Services.AddScoped<IStarredBoardRepository, StarredBoardRepository>();
+builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<BoardRepository>();
 // CORS configuration
 builder.Services.AddCors(options =>
 {
@@ -135,6 +138,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddAutoMapper(typeof(BoardProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(WorkspaceProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(MemberProfile).Assembly);
+builder.Services.AddAutoMapper(typeof(StarredBoardProfile).Assembly);
 
 var app = builder.Build();
 

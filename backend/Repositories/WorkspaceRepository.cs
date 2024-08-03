@@ -82,7 +82,7 @@ public class WorkspaceRepository : IWorkspaceRepository
     }
     
     //GETALL
-    public async Task<List<Workspace>> GetAllWorkspacesAsync()
+    public async Task<List<Workspace?>> GetAllWorkspacesAsync()
     {
         
         return await _context.Workspace
