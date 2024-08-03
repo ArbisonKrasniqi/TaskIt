@@ -59,7 +59,7 @@ namespace backend.Controllers
                 
                 if (boards.Count == 0)
                 {
-                    return BadRequest("Boards Not Found!");
+                    return  Ok(new List<BoardDto>()); // Return an empty list if no boards are found
                 }
 
                 var boardDtos = _mapper.Map<IEnumerable<BoardDto>>(boards);
@@ -145,7 +145,7 @@ namespace backend.Controllers
 
         [HttpDelete]
         [Route("DeleteBoardByID")]
-        public async Task<IActionResult> DeleteBoard(BoardIdDto boardIdDto)
+        public async Task<IActionResult> DeleteBoard([FromQuery] BoardIdDto boardIdDto)
         {
             if  (!ModelState.IsValid)
                 return BadRequest(ModelState);

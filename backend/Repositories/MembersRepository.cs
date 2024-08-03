@@ -68,19 +68,19 @@ public class MembersRepository : IMembersRepository
     }
     
     //Remove member from workspace
-    public async Task<User> RemoveMemberAsync(RemoveMemberDto removeMemberDto)
+    public async Task<User> RemoveMemberAsync(int workspaceId, string memberId)
     {
         var workspace = await _context.Workspace
             .Include(w => w.Members)
             .ThenInclude(m => m.User)
-            .FirstOrDefaultAsync(x => x.WorkspaceId == removeMemberDto.WorkspaceId);
+            .FirstOrDefaultAsync(x => x.WorkspaceId == workspaceId);
 
         if (workspace == null)
         {
             throw new ArgumentNullException("Workspace not found!");
         }
 
-        var member = workspace.Members.FirstOrDefault(m => m.UserId == removeMemberDto.UserId);
+        var member = workspace.Members.FirstOrDefault(m => m.UserId == memberId);
     
         if (member == null)
         {
@@ -88,7 +88,7 @@ public class MembersRepository : IMembersRepository
         }
 
         // Ensure you are not trying to remove the owner
-        if (workspace.OwnerId == removeMemberDto.UserId)
+        if (workspace.OwnerId == memberId)
         {
             throw new Exception("Cannot remove the owner of the workspace");
         }

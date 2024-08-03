@@ -9,5 +9,5 @@ public interface IMembersRepository
 {
     Task AddMemberAsync (AddMemberDto addMemberDto);
     Task<List<User>> GetAllMembersAsync(int workspaceId);
-    Task<User> RemoveMemberAsync(RemoveMemberDto removeMemberDto);
+    Task<User> RemoveMemberAsync(int workspaceId, string memberId);
 }

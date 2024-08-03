@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { postData } from './../../Services/FetchService';
 
-const CreateBoardModal = ({ open, onClose, children }) => {
+const CreateBoardModal = ({ open, onClose, onBoardCreated, children }) => {
     const [boardTitle, setBoardTitle] = useState('');
     const [backgroundId, setBackgroundId] = useState(null);
-    const [workspaceId, setWorkspaceId] = useState(5); // Assuming workspaceId is known/fixed for now
+    const [workspaceId, setWorkspaceId] = useState(10); // Assuming workspaceId is known/fixed for now
     const [clicked, setClicked] = useState(false);
 
     const handleTitleChange = (e) => {
@@ -22,13 +22,15 @@ const CreateBoardModal = ({ open, onClose, children }) => {
             backgroundId: backgroundId,
             workspaceId: workspaceId,
         };
-
+        console.log('Creating board with data:', newBoard);
         try {
             const response = await postData('http://localhost:5157/backend/board/CreateBoard', newBoard);
-            console.log('Board created successfully:', response);
+            console.log('Board created successfully:', response.data);
+            onBoardCreated(response.data);
             onClose(); // Close the modal after creating the board
         } catch (error) {
             console.error('Failed to create board', error);
+            console.log('Error response data: ', error.response.data);
         }
     };
 
@@ -57,7 +59,7 @@ const CreateBoardModal = ({ open, onClose, children }) => {
                             key={id}
                             onClick={() => handleBackgroundClick(id)}
                             className={`w-10 h-10 rounded-lg px-3 ${
-                                backgroundId === id  && clicked==true? 'border-8 border-grey-500' : 'border-2 border-transparent'
+                                backgroundId === id  && clicked===true? 'border-8 border-grey-500' : 'border-2 border-transparent'
                             } ${
                                 id === 1
                                     ? 'bg-gradient-to-r from-blue-400 to-indigo-500'

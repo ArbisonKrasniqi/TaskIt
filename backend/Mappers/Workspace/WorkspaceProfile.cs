@@ -18,5 +18,7 @@ public class WorkspaceProfile : Profile
 
         CreateMap<CreateWorkspaceRequestDto, Models.Workspace>();
         CreateMap<UpdateWorkspaceRequestDto, Models.Workspace>();
+        CreateMap<Models.Members, MemberDto>();
+        CreateMap<Models.Board, BoardDto>();
     }
 }

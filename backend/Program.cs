@@ -11,6 +11,8 @@ using Microsoft.OpenApi.Models;
 using backend.Mappers;
 using backend.Mappers.Background;
 using backend.Mappers.Board;
+using backend.Mappers.Member;
+using backend.Mappers.StarredBoard;
 using backend.Mappers.Workspace;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +22,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+
 
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
@@ -115,7 +119,7 @@ builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 builder.Services.AddScoped<IMembersRepository, MembersRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddScoped<IBackgroundRepository, BackgroundRepository>();
-
+builder.Services.AddScoped<IStarredBoardRepository, StarredBoardRepository>();
 // CORS configuration
 builder.Services.AddCors(options =>
 {
@@ -129,9 +133,13 @@ builder.Services.AddCors(options =>
 });
 
 //AutoMappers
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 builder.Services.AddAutoMapper(typeof(BoardProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(WorkspaceProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(BackgroundProfile).Assembly);
+builder.Services.AddAutoMapper(typeof(MemberProfile).Assembly);
+builder.Services.AddAutoMapper(typeof(StarredBoardProfile).Assembly);
 
 var app = builder.Build();
 

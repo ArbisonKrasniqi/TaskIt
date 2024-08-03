@@ -31,15 +31,15 @@ namespace backend.Controllers
                 var workspaces = await _workspaceRepo.GetAllWorkspacesAsync();
                 if (workspaces.Count == 0)
                 {
-                    return NotFound("There are no workspaces!");
+                    return Ok(new List<WorkspaceDto>()); //me kthy list te zbrazet
                 }
 
-                var workspaceDtos = _mapper.Map<IEnumerable<WorkspaceDto>>(workspaces);
+                var workspaceDtos = _mapper.Map<List<WorkspaceDto>>(workspaces);
                 return Ok(workspaceDtos);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return StatusCode(500, "Internal server error!");
+                return StatusCode(500, "Internal server error!"+e.Message);
             }
         }
 
@@ -51,15 +51,15 @@ namespace backend.Controllers
                 var workspaces = await _workspaceRepo.GetWorkspacesByOwnerIdAsync(ownerId);
                 if (workspaces.Count == 0)
                 {
-                    return NotFound("Workspaces not found!");
+                    return Ok(new List<WorkspaceDto>());
                 }
 
                 var workspaceDtos = _mapper.Map<IEnumerable<WorkspaceDto>>(workspaces);
                 return Ok(workspaceDtos);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return StatusCode(500, "Internal server error!");
+                return StatusCode(500, "Internal server error!"+ e.Message);
             }
         }
 
@@ -71,15 +71,15 @@ namespace backend.Controllers
                 var workspaces = await _workspaceRepo.GetWorkspacesByMemberIdAsync(memberId);
                 if (workspaces.Count == 0)
                 {
-                    return NotFound("Workspaces not found!");
+                    return Ok(new List<WorkspaceDto>());
                 }
 
                 var workspaceDtos = _mapper.Map<IEnumerable<WorkspaceDto>>(workspaces);
                 return Ok(workspaceDtos);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return StatusCode(500, "Internal server error!");
+                return StatusCode(500, "Internal server error!"+ e.Message);
             }
         }
 
@@ -97,9 +97,9 @@ namespace backend.Controllers
                 var workspaceDto = _mapper.Map<WorkspaceDto>(workspace);
                 return Ok(workspaceDto);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return StatusCode(500, "Internal server error!");
+                return StatusCode(500, "Internal server error!"+e.Message);
             }
         }
 
@@ -148,9 +148,9 @@ namespace backend.Controllers
                 var updatedWorkspaceDto = _mapper.Map<WorkspaceDto>(workspaceModel);
                 return Ok(updatedWorkspaceDto);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return StatusCode(500, "Internal server error");
+                return StatusCode(500, "Internal server error"+e.Message);
             }
         }
 
@@ -172,9 +172,9 @@ namespace backend.Controllers
 
                 return Ok("Workspace Deleted!");
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return StatusCode(500, "Internal server error");
+                return StatusCode(500, "Internal server error"+e.Message);
             }
         }
 
@@ -201,10 +201,12 @@ namespace backend.Controllers
 
                 return Ok("Workspaces Deleted!");
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return StatusCode(500, "Internal server error!");
+                return StatusCode(500, "Internal server error!"+e.Message);
             }
         }
+     
+
     }
 }

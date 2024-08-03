@@ -1,4 +1,6 @@
-﻿using backend.DTOs.Members;
+﻿using AutoMapper;
+using backend.DTOs.Members;
+using backend.DTOs.Members.Output;
 using backend.DTOs.User.Input;
 using backend.DTOs.Workspace;
 using backend.Interfaces;
@@ -13,11 +15,13 @@ public class MembersController: ControllerBase
 {
     private readonly IMembersRepository _membersRepo; //qe me kon immutable
     private readonly IWorkspaceRepository _workspaceRepo;
+    private readonly IMapper _mapper;
 
-    public MembersController(IMembersRepository userWorkspaceRepo, IWorkspaceRepository workspaceRepo)
+    public MembersController(IMembersRepository userWorkspaceRepo, IWorkspaceRepository workspaceRepo, IMapper mapper)
     {
         _membersRepo = userWorkspaceRepo;
         _workspaceRepo = workspaceRepo;
+        _mapper = mapper;
     }
 
     [HttpPost]
@@ -60,7 +64,7 @@ public class MembersController: ControllerBase
 
     [HttpDelete]
     [Route("RemoveMember")]
-    public async Task<IActionResult> RemoveMember(RemoveMemberDto removeMemberDto)
+    public async Task<IActionResult> RemoveMember([FromBody] RemoveMemberDto removeMemberDto)
     {
         if (!ModelState.IsValid)
         {
@@ -68,7 +72,7 @@ public class MembersController: ControllerBase
         }
         try
         {
-            var result = await _membersRepo.RemoveMemberAsync(removeMemberDto);
+            var result = await _membersRepo.RemoveMemberAsync(removeMemberDto.WorkspaceId, removeMemberDto.UserId);
             if (result == null)
             {
                 return StatusCode(500, "User could not removed");
@@ -78,7 +82,7 @@ public class MembersController: ControllerBase
         }
         catch (Exception e)
         {
-            return StatusCode(500, "Internal server error");  
+            return StatusCode(500, "Internal server error: "+ e.Message);  
         }
     }
 }
