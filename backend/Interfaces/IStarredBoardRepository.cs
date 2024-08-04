@@ -9,4 +9,5 @@ public interface IStarredBoardRepository
     Task<List<StarredBoard>> GetStarredBoardsAsync(string userId);
     Task<StarredBoard?> GetStarredBoardByIdAsync(int id);
     Task<bool> IsBoardStarredAsync(string userId, int boardId);
+   
 }

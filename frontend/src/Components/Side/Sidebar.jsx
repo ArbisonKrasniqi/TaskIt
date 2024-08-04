@@ -6,7 +6,7 @@ import { IoIosSettings } from "react-icons/io";
 import { PiTable } from "react-icons/pi";
 import { LuCalendarDays } from "react-icons/lu";
 import { FaPlus } from "react-icons/fa6";
-import {getDataWithId} from "../../Services/FetchService.jsx";
+import {deleteData, getDataWithId, postData} from "../../Services/FetchService.jsx";
 import CreateBoardModal from "./CreateBoardModal.jsx";
 import { FaEllipsisH } from "react-icons/fa";
 import SortModal from "./SortModal.jsx";
@@ -16,6 +16,7 @@ import { MdOutlineStarPurple500 } from "react-icons/md";
 
 const Sidebar = (props) => {
 
+    const USERID = "96dd1b34-b03b-4255-ab26-1f29f0675755";
 
 const [boards, setBoards] =useState([]);
 const[open, setOpen] = useState(true);
@@ -27,13 +28,14 @@ const [hoveredIndex, setHoveredIndex] = useState(null);
 const [openCloseModal, setOpenCloseModal] = useState(false);
 const [selectedBoardTitle, setSelectedBoardTitle] = useState("");
 const[roli, setRoli] = useState("Owner");
-const [starred, setStarred] = useState(false);
+
+
 
 
 useEffect(() => {
     const getBoards = async () => {
         try {
-            const response = await getDataWithId('http://localhost:5157/backend/board/GetBoardsByWorkspaceId?workspaceId', 10);
+            const response = await getDataWithId('http://localhost:5157/backend/board/GetBoardsByWorkspaceId?workspaceId', 1);
             const data = response.data;
 
             console.log('Fetched data: ', data);
@@ -48,6 +50,13 @@ useEffect(() => {
                 else{
                     sortedBoards = data; //sepse i merr te sortume by recent nga dataabaza
                 }
+
+                const starredBoards = JSON.parse(localStorage.getItem('starredBoards')) || [];
+                sortedBoards.forEach(board => {
+                    board.starred = starredBoards.includes(board.boardId);
+                });
+                sortedBoards = moveStarredBoardsToTop(sortedBoards);
+
                 setBoards(sortedBoards);
                 setSelectedSort(sortType);
             } else {
@@ -69,9 +78,6 @@ const handleCreateBoard = (newBoard)=>{
     setBoards((prevBoards) => [...prevBoards, newBoard]);
 };
 
-const handleStarredChange = () =>{
-    setStarred(!starred);
-}
 
 
 
@@ -92,16 +98,16 @@ const WorkspaceViews = [
     {title: "Calendar", tag: "LuCalendarDays"},
 ]
 
+const moveStarredBoardsToTop = (boards) => {
+    return boards.sort((a, b) => b.starred - a.starred);
+};
 
 const sortAlphabetically = (boards) => {
     return boards.slice().sort((a, b) => a.title.localeCompare(b.title));
   };
 
-
-  
-  
   const sortByRecent = async () => {
-    const dataResponse = await getDataWithId('http://localhost:5157/backend/board/GetBoardsByWorkspaceId?workspaceId', 10);
+    const dataResponse = await getDataWithId('http://localhost:5157/backend/board/GetBoardsByWorkspaceId?workspaceId', 1);
     return dataResponse.data;
   };
 
@@ -117,8 +123,55 @@ const sortAlphabetically = (boards) => {
     } else {
       sortedBoards = await sortByRecent();
     }
+    sortedBoards = moveStarredBoardsToTop(sortedBoards);
+    
     setBoards(sortedBoards);
   };
+
+
+
+  const handleStarBoard = async(board)=>{
+    const isStarred =board.starred;
+    const data = {
+        BoardId: board.boardId,
+        UserId: USERID,
+    };
+    try{
+    if(isStarred){ //pra starred=true ather bone unstar
+        const dataUnstar = await deleteData('http://localhost:5157/backend/starredBoard/UnstarBoard', data);
+        console.log(dataUnstar.data);
+
+        //REMOVE FROM LOCALSTORAGE
+        let starredBoards = JSON.parse(localStorage.getItem('starredBoards')) || [];
+        
+        starredBoards = starredBoards.filter(id=> id !== board.boardId);
+        localStorage.setItem('starredBoards', JSON.stringify(starredBoards));
+    
+    }
+    else{ //dmth starred=false ather bone star
+        const dataResponse = await postData('http://localhost:5157/backend/starredBoard/StarBoard', data);
+        console.log(dataResponse.data);
+
+        //ADD TO LOCAL STORAGE
+        let starredBoards = JSON.parse(localStorage.getItem('starredBoards')) || [];
+        starredBoards.push(board.boardId);
+        localStorage.setItem('starredBoards', JSON.stringify(starredBoards));
+    }
+    
+    setBoards(prevBoards => {
+        const updatedBoards = prevBoards.map(b =>
+          b.boardId === board.boardId ? { ...b, starred: !isStarred } : b
+        );
+        console.log('Updated Boards:', updatedBoards);
+        return moveStarredBoardsToTop(updatedBoards);
+      });
+    }
+    catch(error){
+        console.error("Error starring/unstarring the board:", error.response ? error.response.data : error.message);
+    }
+
+};
+
 
 
     return(
@@ -201,10 +254,12 @@ const sortAlphabetically = (boards) => {
             )}
                     <CloseBoardModal open={openCloseModal} boardTitle={selectedBoardTitle} onClose={()=> setOpenCloseModal(false)} role={roli}></CloseBoardModal>
 
-                    {hoveredIndex===index && (      
-                <button className={`text-gray-400 cursor-pointer text-lg ${!open && "scale-0"}`} onClick={()=> handleStarredChange()}> {starred ?<MdOutlineStarPurple500 /> :<MdOutlineStarOutline /> } </button>
+                     
+                          
+                <button className={`text-gray-400 cursor-pointer text-lg ${!open && "scale-0"}`} onClick={()=>handleStarBoard(board)} >{(board.starred) ? <MdOutlineStarPurple500 />: (hoveredIndex===index ) ? <MdOutlineStarOutline/>  : ''}</button>
                 
-            )}
+                
+           
 
                    
 

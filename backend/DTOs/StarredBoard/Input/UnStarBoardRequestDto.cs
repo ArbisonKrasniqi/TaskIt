@@ -1,7 +1,11 @@
-﻿namespace backend.DTOs.StarredBoard;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace backend.DTOs.StarredBoard;
 
 public class UnStarBoardRequestDto
 {
-    public int BoardId { get; set; } = 0;
-    public string UserId { get; set; } = string.Empty;
+    [Required]
+    public int BoardId { get; set; } 
+    [Required]
+    public string UserId { get; set; }
 }

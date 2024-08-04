@@ -13,5 +13,6 @@ namespace backend.Models
         public int? BackgroundId { get; set; }
         public int? WorkspaceId { get; set; }
         public List<List>? Lists { get; set; }
+        public bool Starred { get; set; } = false;
     }
 }

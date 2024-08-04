@@ -118,8 +118,6 @@ builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 builder.Services.AddScoped<IMembersRepository, MembersRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddScoped<IStarredBoardRepository, StarredBoardRepository>();
-builder.Services.AddScoped<UserRepository>();
-builder.Services.AddScoped<BoardRepository>();
 // CORS configuration
 builder.Services.AddCors(options =>
 {
