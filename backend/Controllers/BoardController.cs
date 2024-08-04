@@ -1,15 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using backend.DTOs.Board.Input;
 using backend.DTOs.Board.Output;
 using backend.DTOs.Workspace;
 using backend.Interfaces;
-using backend.Mappers;
-using backend.Mappers.Board;
 using backend.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,12 +14,14 @@ namespace backend.Controllers
     {
         private readonly IBoardRepository _boardRepo;
         private readonly IWorkspaceRepository _workspaceRepo;
+        private readonly IBackgroundRepository _backgroundRepo;
         private readonly IMapper _mapper;
 
-        public BoardController(IBoardRepository boardRepo,IWorkspaceRepository workspaceRepo, IMapper mapper)
+        public BoardController(IBoardRepository boardRepo,IWorkspaceRepository workspaceRepo, IBackgroundRepository backgroundRepo, IMapper mapper)
         {
             _boardRepo = boardRepo;
             _workspaceRepo = workspaceRepo;
+            _backgroundRepo = backgroundRepo;
             _mapper = mapper;
         }
 
@@ -46,7 +41,7 @@ namespace backend.Controllers
             }
             catch (Exception e)
             {
-                return StatusCode(500, "Internal Server Error!");
+                return StatusCode(500, "Internal Server Error!"+e.Message);
             }
         }
 
@@ -72,7 +67,7 @@ namespace backend.Controllers
             }
             catch (Exception e)
             {
-                return StatusCode(500, "Internal Server Error!");
+                return StatusCode(500, "Internal Server Error!"+e.Message);
             }
         }
 
@@ -91,7 +86,7 @@ namespace backend.Controllers
             }
             catch (Exception e)
             {
-                return StatusCode(500, "Internal Server Error!");
+                return StatusCode(500, "Internal Server Error!"+e.Message);
             }
         }
 
@@ -106,6 +101,10 @@ namespace backend.Controllers
             {
                 return BadRequest("Workspace not Found!");
             }
+            if (!await _backgroundRepo.BackgroundExists(boardDto.BackgroundId))
+            {
+                return BadRequest("Background Not Found!");
+            }
 
             try
             {
@@ -115,7 +114,7 @@ namespace backend.Controllers
             }
             catch (Exception e)
             {
-                return StatusCode(500, "Internal Server Error!");
+                return StatusCode(500, "Internal Server Error!"+e.Message);
             }
         }
 
@@ -140,7 +139,7 @@ namespace backend.Controllers
             }
             catch (Exception e)
             {
-                return StatusCode(500, "Internal Server Error!");
+                return StatusCode(500, "Internal Server Error!"+e.Message);
             }
         }
 
@@ -162,7 +161,7 @@ namespace backend.Controllers
             }
             catch (Exception e)
             {
-                return StatusCode(500, "Internal Server Error!");
+                return StatusCode(500, "Internal Server Error!"+e.Message);
             }
         }
 
@@ -190,7 +189,7 @@ namespace backend.Controllers
             }
             catch (Exception e)
             {
-                return StatusCode(500, "Internal Server Error!");
+                return StatusCode(500, "Internal Server Error!"+e.Message);
             }
         }
     }
