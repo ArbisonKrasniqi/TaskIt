@@ -2,12 +2,12 @@ import React, { useContext, useState } from 'react';
 import { DropdownContext } from '../Navbar/Navbar';
 import CreateBoardModal from '../Side/CreateBoardModal';
 import CreateWorkspaceModal from '../Side/CreateWorkspaceModal';
-import { useBoards } from '../Side/WorkspaceContext.jsx';
+import { WorkspaceContext } from '../Side/WorkspaceContext.jsx';
 
 const CreateDropdown = (props) => {
 
     const dropdownContext = useContext(DropdownContext);
-    const { handleCreateWorkspace, handleCreateBoard } = useBoards();
+    const { handleCreateWorkspace, handleCreateBoard } = useContext(WorkspaceContext);
 
     const [openBoardModal, setOpenBoardModal] = useState(false);
     const [openWorkspaceModal, setOpenWorkspaceModal] = useState(false);

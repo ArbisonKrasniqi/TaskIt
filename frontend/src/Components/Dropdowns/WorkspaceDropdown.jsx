@@ -1,12 +1,12 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import { DropdownContext } from '../Navbar/Navbar';
 import { getDataWithId } from '../../Services/FetchService';
-import { useBoards } from '../Side/WorkspaceContext';
+import { WorkspaceContext } from '../Side/WorkspaceContext';
 
 const WorkspaceDropdown = (props) => {
 
-  const { workspaces, setWorkspaces} = useBoards();
+  const { workspaces, setWorkspaces} = useContext(WorkspaceContext);
   
     const dropdownContext = useContext(DropdownContext)
 
@@ -34,7 +34,7 @@ const WorkspaceDropdown = (props) => {
       };
       getWorkspaces();
       console.log(workspaces);
-    },[]);
+    });
 
     return (
       <div className={`relative ${props.width <= 880 && 'hidden'}`}>

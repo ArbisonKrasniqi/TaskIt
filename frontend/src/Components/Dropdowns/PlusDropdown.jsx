@@ -3,14 +3,14 @@ import { FaPlus } from "react-icons/fa6";
 import { DropdownContext } from '../Navbar/Navbar';
 import CreateBoardModal from '../Side/CreateBoardModal';
 import CreateWorkspaceModal from '../Side/CreateWorkspaceModal';
-import { useBoards } from '../Side/WorkspaceContext.jsx';
+import { WorkspaceContext } from '../Side/WorkspaceContext.jsx';
 
 const PlusDropdown = (props) => {
 
     const dropdownContext = useContext(DropdownContext);
-    const { boards, setBoards, handleCreateBoard } = useBoards();
+    const { handleCreateBoard } = useContext(WorkspaceContext);
 
-    const [workspaces, setWorkspaces] = useState([]);
+    const [ setWorkspaces] = useState([]);
     const [openBoardModal, setOpenBoardModal] = useState(false);
     const [openWorkspaceModal, setOpenWorkspaceModal] = useState(false);
 

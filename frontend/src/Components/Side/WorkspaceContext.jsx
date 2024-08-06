@@ -8,6 +8,7 @@ export const WorkspaceProvider = ({ children }) => {
     const WorkspaceId = 1;
     const[open, setOpen] = useState(true);
     const [workspace, setWorkspace] = useState(null);
+    const [workspaces, setWorkspaces] = useState(null);
     const [boards, setBoards] = useState([]);
     const [selectedSort, setSelectedSort] = useState('Alphabetically');
     const [openModal, setOpenModal] = useState(false);
@@ -68,11 +69,15 @@ console.log(workspaceTitle);
         };
         getBoards();
         console.log("Boards fetched:", boards);
-    }, []);
+    });
 
     const handleCreateBoard = (newBoard) => {
         setBoards((prevBoards) => [...prevBoards, newBoard]);
     };
+
+    const handleCreateWorkspace = (newWorkspace) => {
+      setWorkspaces((prevWorkspaces) => [...prevWorkspaces, newWorkspace]);
+  }
 
     const moveStarredBoardsToTop = (boards) => {
         return boards.sort((a, b) => b.starred - a.starred);
@@ -144,10 +149,10 @@ console.log(workspaceTitle);
             USERID,
             WorkspaceId,
             workspace,
+            workspaces,
+            setWorkspaces,
             boards,
             selectedSort,
-            openModal,
-            hoveredIndex,
             open,
             setOpen,
             workspaceTitle,
@@ -162,21 +167,18 @@ console.log(workspaceTitle);
             handleCreateBoard,
             setHoveredIndex,
             hoveredIndex,
-            setSelectedBoardTitle, 
-            setOpenCloseModal,
+            setSelectedBoardTitle,
             selectedBoardTitle,
             roli,
             hoveredBoardIndex,
             setHoveredBoardIndex,
-            handleCreateBoard,
             moveStarredBoardsToTop,
             sortAlphabetically,
             sortByRecent,
             handleSortChange,
             handleStarBoard,
-            setOpenModal,
-            setHoveredIndex,
             getBackgroundImageUrl,
+            handleCreateWorkspace
         }}>
             {children}
         </WorkspaceContext.Provider>

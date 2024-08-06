@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { DropdownContext } from '../Navbar/Navbar';
-import { getDataWithId } from '../../Services/FetchService';
-import { useBoards } from '../Side/WorkspaceContext.jsx';
+// import { getDataWithId } from '../../Services/FetchService';
+import { WorkspaceContext } from '../Side/WorkspaceContext.jsx';
 
 const RecentDropdown = (props) => {
 
@@ -30,7 +30,7 @@ const RecentDropdown = (props) => {
       
 
     const dropdownContext = useContext(DropdownContext);
-    const { boards, setBoards, handleCreateBoard } = useBoards();
+    const { boards, setBoards, handleCreateBoard } = useContext(WorkspaceContext);
 
     // useEffect(() => {
     //     const getRecentBoards = async () => {
