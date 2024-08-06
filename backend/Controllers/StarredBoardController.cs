@@ -55,6 +55,9 @@ namespace backend.Controllers
                 return StatusCode(500, "Internal Server Error: " + e.Message);
             }
         }
+     
+
+
         
         
         //GET ALL 
@@ -77,8 +80,7 @@ namespace backend.Controllers
                 return StatusCode(500, "Internal Server Error! " + e.Message);
             }
         }
-
-
+        
         //GET
         //GET STARRED BOARD BY ID
         [HttpGet("{id}")] //mekthy bordin e bere star ne baze te id se tij
@@ -103,7 +105,7 @@ namespace backend.Controllers
 
         //DELETE
         [HttpDelete("UnstarBoard")]
-        public async Task<IActionResult> UnStarBoard(UnStarBoardRequestDto unStarBoardDto)
+        public async Task<IActionResult> UnStarBoard([FromQuery] UnStarBoardRequestDto unStarBoardDto)
         {
             if (!ModelState.IsValid)
             {
@@ -111,22 +113,23 @@ namespace backend.Controllers
             }
             try
             {
-                var starredBoardModel =
-                    await _starredBoardRepo.UnStarBoardAsync(unStarBoardDto.UserId, unStarBoardDto.BoardId);
-                if (starredBoardModel == null)
+                var unstarredBoardModel = _mapper.Map<StarredBoard>(unStarBoardDto);
+                
+                var unstarredBoard = await _starredBoardRepo.UnStarBoardAsync(unstarredBoardModel.UserId, unstarredBoardModel.BoardId);
+                if (unstarredBoard == null)
                 {
-                    return NotFound("Board Not Found!");
+                    return NotFound("Board Not Found or Not Starred!");
                 }
 
-                return Ok("Board UnStarred!");
+                var unstarredBoardDto = _mapper.Map<StarredBoardDto>(unstarredBoard);
+    
+                return Ok(unstarredBoardDto);
             }
             catch (Exception e)
             {
                 return StatusCode(500, "Internal Server Error "+ e.Message);
             }
         }
-
-
 
     }
 }

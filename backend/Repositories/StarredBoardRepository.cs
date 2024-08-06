@@ -44,6 +44,11 @@
              BoardId = boardId,
              UserId = userId
          };
+         
+         var board = await _boardRepo.GetBoardByIdAsync(boardId);
+         board.Starred = true;
+         _context.Board.Update(board);
+         
          await _context.StarredBoard.AddAsync(starredBoard);
          await _context.SaveChangesAsync();
  
@@ -73,7 +78,10 @@
          {
              return null;
          }
- 
+         var board = await _boardRepo.GetBoardByIdAsync(boardId);
+         board.Starred = false;
+         _context.Board.Update(board);
+         
          _context.StarredBoard.Remove(starredBoard);
          await _context.SaveChangesAsync();
          return starredBoard;
@@ -90,7 +98,7 @@
      {
          return await _context.StarredBoard.FindAsync(id);
      }
-     
+
      //IS BOARD STARRED
      public async Task<bool> IsBoardStarredAsync(string userId, int boardId)
      {

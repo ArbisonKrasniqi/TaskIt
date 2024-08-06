@@ -18,5 +18,6 @@ namespace backend.DTOs.Board.Output
         [Range(0, int.MaxValue, ErrorMessage = "WorkspaceId Can Not Be Negative!")]
         public int? WorkspaceId { get; set; }
         public List<ListDTO> Lists { get; set; }
+        public bool Starred { get; set; } = false;
     }
 }

@@ -1,11 +1,37 @@
-import React, { useState } from 'react';
-import { postData } from './../../Services/FetchService';
+import React, { useState, useEffect } from 'react'; 
+import { postData, getData } from './../../Services/FetchService';
 
 const CreateBoardModal = ({ open, onClose, onBoardCreated, children }) => {
     const [boardTitle, setBoardTitle] = useState('');
-    const [backgroundId, setBackgroundId] = useState(null);
+    const [backgroundId, setBackgroundId] = useState(1);
     const [workspaceId, setWorkspaceId] = useState(1); // Assuming workspaceId is known/fixed for now
     const [clicked, setClicked] = useState(false);
+    const [backgrounds, setBackgrounds] = useState([]);
+
+
+
+     useEffect(()=>{
+     const getBackgrounds = async () =>{
+         try{
+             const backgroundsResponse = await getData('http://localhost:5157/backend/background/GetAllBackgrounds');
+             const backgroundsData = backgroundsResponse.data;
+            console.log("Background fetched:",backgroundsData);
+
+             if (backgroundsData && Array.isArray(backgroundsData) && backgroundsData.length > 0) {
+                 setBackgrounds(backgroundsData);
+            }else {
+                console.error('Data is null, not an array, or empty:', backgroundsData);
+                 setBackgrounds([]); //trajtohen si te dhena te zbrazeta
+             }
+         }catch (error) {
+             console.error(error.message);
+         }
+     };
+     getBackgrounds();
+ }, []);
+
+
+
 
     const handleTitleChange = (e) => {
         setBoardTitle(e.target.value);
@@ -25,19 +51,23 @@ const CreateBoardModal = ({ open, onClose, onBoardCreated, children }) => {
         console.log('Creating board with data:', newBoard);
         try {
             const response = await postData('http://localhost:5157/backend/board/CreateBoard', newBoard);
-            console.log('Board created successfully:', response.data);
-            onBoardCreated(response.data);
-            onClose(); // Close the modal after creating the board
+          
+                console.log('Board created successfully:', response.data);
+                onBoardCreated(response.data);
+                onClose(); // Close the modal after creating the board
+           
+            
         } catch (error) {
-            console.error('Failed to create board', error);
             console.log('Error response data: ', error.response.data);
         }
     };
 
+    if(!open) return null;
+
     return (
         <div
             className={`
-        fixed inset-0 flex justify-center items-center transition-colors 
+        fixed z-30 inset-0 flex justify-center items-center transition-colors 
         ${open ? "visible bg-black/20" : "invisible"}
         `}>
             <div
@@ -53,36 +83,16 @@ const CreateBoardModal = ({ open, onClose, onBoardCreated, children }) => {
                 <br></br>
                 <p className="w-full origin-left font-sans text-gray-400 font-semibold text-l">Background</p>
                 <br></br>
-                <div className="flex flex-wrap justify-between gap-2">
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((id) => (
+                {/* <div className="flex flex-wrap justify-between gap-2">
+                    {backgrounds.map((background) => (
                         <button
-                            key={id}
-                            onClick={() => handleBackgroundClick(id)}
+                            key={background.id}
+                            onClick={() => handleBackgroundClick(background.id)}
                             className={`w-10 h-10 rounded-lg px-3 ${
-                                backgroundId === id  && clicked===true? 'border-8 border-grey-500' : 'border-2 border-transparent'
-                            } ${
-                                id === 1
-                                    ? 'bg-gradient-to-r from-blue-400 to-indigo-500'
-                                    : id === 2
-                                    ? 'bg-gradient-to-r from-red-400 to-red-500'
-                                    : id === 3
-                                    ? 'bg-gradient-to-r from-pink-400 to-pink-500'
-                                    : id === 4
-                                    ? 'bg-gradient-to-r from-purple-400 to-purple-500'
-                                    : id === 5
-                                    ? 'bg-gradient-to-r from-green-400 to-green-500'
-                                    : id === 6
-                                    ? 'bg-gradient-to-r from-yellow-400 to-yellow-500'
-                                    : id === 7
-                                    ? 'bg-gradient-to-r from-teal-400 to-teal-500'
-                                    : id === 8
-                                    ? 'bg-gradient-to-r from-gray-400 to-gray-500'
-                                    : id === 9
-                                    ? 'bg-gradient-to-r from-cyan-400 to-cyan-500'
-                                    : 'bg-gradient-to-r from-lime-400 to-lime-500'
-                            }`}></button>
+                                backgroundId === background.id  && clicked? 'border-8 border-grey-500' : 'border-2 border-transparent'
+                            } `}></button>
                     ))}
-                </div>
+                </div> */}
                 <br></br>
                 <p className="w-full origin-left font-sans text-gray-400 font-semibold text-l">Board Title</p>
                 <br></br>

@@ -11,5 +11,6 @@ public class StarredBoardProfile : Profile
         CreateMap<StarBoardRequestDto, StarredBoard>();
         CreateMap<StarredBoard, StarredBoardIDDto>();
         CreateMap<UnStarBoardRequestDto, StarredBoard>();
+        CreateMap<StarredBoardDto, Board>();
     }
 }

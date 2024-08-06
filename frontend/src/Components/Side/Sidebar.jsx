@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState,useContext } from "react";
 import { SlArrowLeft } from "react-icons/sl";
 import { CiViewBoard } from "react-icons/ci";
 import { IoPersonOutline } from "react-icons/io5";
@@ -6,70 +6,25 @@ import { IoIosSettings } from "react-icons/io";
 import { PiTable } from "react-icons/pi";
 import { LuCalendarDays } from "react-icons/lu";
 import { FaPlus } from "react-icons/fa6";
-import {getDataWithId} from "../../Services/FetchService.jsx";
 import CreateBoardModal from "./CreateBoardModal.jsx";
 import { FaEllipsisH } from "react-icons/fa";
 import SortModal from "./SortModal.jsx";
 import CloseBoardModal from "./CloseBoardModal.jsx";
 import { MdOutlineStarOutline } from "react-icons/md";
 import { MdOutlineStarPurple500 } from "react-icons/md";
-import { useBoards } from './WorkspaceContext.jsx';
-
-const Sidebar = (props) => {
-
-    const { boards, setBoards, handleCreateBoard } = useBoards();
-
-const[open, setOpen] = useState(true);
-const [hover, setHover] = useState(false);
-const [openModal, setOpenModal] = useState(false);
-const [openSortModal, setOpenSortModal] = useState(false);
-const [selectedSort, setSelectedSort] = useState('alphabetically');
-const [hoveredIndex, setHoveredIndex] = useState(null);
-const [openCloseModal, setOpenCloseModal] = useState(false);
-const [selectedBoardTitle, setSelectedBoardTitle] = useState("");
-const[roli, setRoli] = useState("Owner");
-const [starred, setStarred] = useState(false);
-
-
-useEffect(() => {
-    const getBoards = async () => {
-        try {
-            const response = await getDataWithId('http://localhost:5157/backend/board/GetBoardsByWorkspaceId?workspaceId', 1);
-            const data = response.data;
-
-            console.log('Fetched data: ', data);
-
-            if (data && Array.isArray(data) && data.length > 0) {
-
-                let sortType = localStorage.getItem('selectedSort') || 'alphabetically';
-                let sortedBoards= [];
-                if(sortType === 'alphabetically'){
-                    sortedBoards = sortAlphabetically(data);
-                }
-                else{
-                    sortedBoards = data; //sepse i merr te sortume by recent nga dataabaza
-                }
-                setBoards(sortedBoards);
-                setSelectedSort(sortType);
-            } else {
-                console.error('Data is null, not an array, or empty:', data);
-                setBoards([]); //trajtohen si te dhena te zbrazeta
-            }
-        } catch (error) {
-            console.error(error.message);
-            setBoards([]); // nrast qe ndodh ndonje gabim
-        }
-    };
-    getBoards();
-    console.log(boards);
-}, []);
+import { FiSquare } from "react-icons/fi";
+import { WorkspaceContext } from './WorkspaceContext';
+const Sidebar = () => {
 
 
 
 
-const handleStarredChange = () =>{
-    setStarred(!starred);
-}
+    const { 
+        workspace, open, setOpen, workspaceTitle, setHover, hover, openCloseModal,
+        setOpenSortModal, setOpenCloseModal, openSortModal, setOpenModal, openModal, 
+        handleCreateBoard, setHoveredIndex, hoveredIndex, setSelectedBoardTitle, 
+         selectedBoardTitle, roli, boards, selectedSort, handleSortChange, 
+        handleStarBoard, getBackgroundImageUrl } = useContext(WorkspaceContext);
 
 
 
@@ -91,37 +46,11 @@ const WorkspaceViews = [
 ]
 
 
-const sortAlphabetically = (boards) => {
-    return boards.slice().sort((a, b) => a.title.localeCompare(b.title));
-  };
-
-
-  
-  
-  const sortByRecent = async () => {
-    const dataResponse = await getDataWithId('http://localhost:5157/backend/board/GetBoardsByWorkspaceId?workspaceId', 1);
-    return dataResponse.data;
-  };
-
-  const handleSortChange = async (sortType) => {
-    setSelectedSort(sortType);
-    setOpenSortModal(false);
-    
-    localStorage.setItem('selectedSort', sortType);
-
-    let sortedBoards = [];
-    if (sortType === 'alphabetically') {
-      sortedBoards = sortAlphabetically(boards);
-    } else {
-      sortedBoards = await sortByRecent();
-    }
-    setBoards(sortedBoards);
-  };
 
 
     return(
         <div className="flex">
-            <div className={`${open ? 'w-72' : 'w-8'} duration-100 h-screen p-5 pt-8 relative`} style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
+            <div className={`${open ? 'w-72' : 'w-8'} duration-100 h-screen p-5 pt-8 relative border-r border-r-solid border-r-gray-500`} style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
             
         
 
@@ -130,8 +59,8 @@ const sortAlphabetically = (boards) => {
             ></SlArrowLeft>
 
            <div className="flex gap-x-3 items-center">
-           <button className={`w-10 h-10 text-black bg-gradient-to-r from-blue-400 to-indigo-500 font-bold text-xl rounded-lg text-center px-3 items-center dark:bg-blue-600 dark:focus:ring-blue-800 duration-200 ${!open && "scale-0"}`}>{props.emri.charAt(0)}</button>
-           <h1 className={`w-full origin-left font-sans text-gray-400 font-bold text-xl duration-200 ${!open && "scale-0"}`}>{props.emri}</h1> 
+           <button className={`w-10 h-10 text-black bg-gradient-to-r from-blue-400 to-indigo-500 font-bold text-xl rounded-lg text-center px-3 items-center dark:bg-blue-600 dark:focus:ring-blue-800 duration-200 ${!open && "scale-0"}`}>{workspaceTitle.charAt(0)}</button>
+           <h1 className={`w-full origin-left font-sans text-gray-400 font-bold text-xl duration-200 ${!open && "scale-0"}`}>{workspaceTitle}</h1> 
            </div> 
            
            <hr className="w-full border-gray-400 mt-3"></hr>
@@ -186,11 +115,25 @@ const sortAlphabetically = (boards) => {
         boards.map((board, index) => (
             <li key={index} 
             className={`flex justify-between text-gray-400 text-lg font-semibold items-center mt-2 p-1 cursor-pointer hover:bg-gray-500 ${!open && "scale-0"}`}
-             onMouseEnter={() => setHoveredIndex(index)}p-
+             onMouseEnter={() => setHoveredIndex(index)}
             onMouseLeave={() => setHoveredIndex(null)}>
-
+                <div className="flex items-center gap-x-2 ">
+          
+                <div 
+        className="relative flex items-center justify-center" 
+        style={{ 
+          width: '1.5em', 
+          height: '1.5em', 
+          backgroundImage: `url(${getBackgroundImageUrl(board)})`, 
+          backgroundSize: 'cover', 
+          backgroundPosition: 'center' 
+        }}
+      >
+        <FiSquare className="text-4xl absolute" />
+      </div>
+                
                 <span>{board.title}</span>
-
+                </div>
                 <div className="flex justify-between">
 
                 {hoveredIndex===index && (      
@@ -199,10 +142,12 @@ const sortAlphabetically = (boards) => {
             )}
                     <CloseBoardModal open={openCloseModal} boardTitle={selectedBoardTitle} onClose={()=> setOpenCloseModal(false)} role={roli}></CloseBoardModal>
 
-                    {hoveredIndex===index && (      
-                <button className={`text-gray-400 cursor-pointer text-lg ${!open && "scale-0"}`} onClick={()=> handleStarredChange()}> {starred ?<MdOutlineStarPurple500 /> :<MdOutlineStarOutline /> } </button>
+                     
+                          
+                <button className={`text-gray-400 cursor-pointer text-lg ${!open && "scale-0"}`} onClick={()=>handleStarBoard(board)} >{(board.starred) ? <MdOutlineStarPurple500 />: (hoveredIndex===index ) ? <MdOutlineStarOutline/>  : ''}</button>
                 
-            )}
+                
+           
 
                    
 
@@ -221,5 +166,6 @@ const sortAlphabetically = (boards) => {
     );
 
 }
+
 
 export default Sidebar

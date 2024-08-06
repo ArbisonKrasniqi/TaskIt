@@ -46,8 +46,9 @@ const CloseBoardModal = ({open, boardTitle ,onClose, role}) =>{
         };
 
         if(!open) return null; //kontrollojm a me e shfaq modalin
+
     return(
-        <div className="fixed inset-0 flex items-center justify-start p-4 ml-60 zIndex: 1000">
+        <div className="fixed inset-0 z-50 flex items-center justify-start p-4 ml-60 ">
             <div className="bg-white border border-gray-300 rounded-lg shadow-lg w-60">
             <div className="p-2 flex justify-between items-center">
             <h3 className="text-gray-700 font-semibold">{boardTitle}</h3>

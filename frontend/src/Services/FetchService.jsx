@@ -37,15 +37,39 @@ export async function postData(apiEndpoint, data) {
   }
 }
 
-export async function deleteData(apiEndpoint, boardId) {
+
+export async function deleteData(endpoint, params) {
+  let url = endpoint;
+  if (params && Object.keys(params).length > 0) {
+      const queryString = new URLSearchParams(params).toString();
+      url = `${endpoint}?${queryString}`;
+  }
+
+  const options = {
+      method: 'DELETE',
+      headers: {
+          'Content-Type': 'application/json',
+      },
+  };
+
   try {
-    const response = await axios.delete(apiEndpoint, {
-      params: { boardId: boardId }
-    });
+      const response = await fetch(url, options);
+      const responseText = await response.text(); // Get the raw response text
+
+      console.log('Response Text:', responseText); // Log it for debugging
+
+      if (!response.ok) {
+          throw new Error(`Error: ${response.status} - ${responseText}`);
+      }
+
+      return JSON.parse(responseText); // Parse the JSON manually
   } catch (error) {
-    throw error;
+      console.error('Error:', error);
+      throw error;
   }
 }
+
+
 
 export async function putData(apiEndpoint, data) {
   try {
