@@ -234,7 +234,7 @@ const Navbar = () => {
     }, [])
 
     return (
-        <div className='bg-gray-800 w-full h-12 flex justify-between items-center'>
+        <div className='bg-gray-800 w-full h-12 flex justify-between items-center border-b border-b-solid border-b-gray-500'>
             
             <DropdownContext.Provider value={values}>
                 <div className='flex items-center'>
