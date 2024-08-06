@@ -1,13 +1,18 @@
-import Navbar from '../Components/Navbar/Navbar'
+// Main.jsx
+import React from 'react';
+import Navbar from '../Components/Navbar/Navbar';
 import Sidebar from '../Components/Side/Sidebar';
+import { BoardsProvider } from '../Components/Side/WorkspaceContext';
 
 const Main = () => {
-    return (
-        <div className="w-full">
-            <Navbar/>
-            <Sidebar emri="Test"/>
-    </div>
-    );
-}
+  return (
+    <BoardsProvider>
+      <div>
+      <Navbar />
+        <Sidebar emri="Test" />
+      </div>
+    </BoardsProvider>
+  );
+};
 
-export default Main
+export default Main;

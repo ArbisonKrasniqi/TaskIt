@@ -4,7 +4,7 @@ import { postData } from './../../Services/FetchService';
 const CreateBoardModal = ({ open, onClose, onBoardCreated, children }) => {
     const [boardTitle, setBoardTitle] = useState('');
     const [backgroundId, setBackgroundId] = useState(null);
-    const [workspaceId, setWorkspaceId] = useState(10); // Assuming workspaceId is known/fixed for now
+    const [workspaceId, setWorkspaceId] = useState(1); // Assuming workspaceId is known/fixed for now
     const [clicked, setClicked] = useState(false);
 
     const handleTitleChange = (e) => {

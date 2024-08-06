@@ -13,11 +13,12 @@ import SortModal from "./SortModal.jsx";
 import CloseBoardModal from "./CloseBoardModal.jsx";
 import { MdOutlineStarOutline } from "react-icons/md";
 import { MdOutlineStarPurple500 } from "react-icons/md";
+import { useBoards } from './WorkspaceContext.jsx';
 
 const Sidebar = (props) => {
 
+    const { boards, setBoards, handleCreateBoard } = useBoards();
 
-const [boards, setBoards] =useState([]);
 const[open, setOpen] = useState(true);
 const [hover, setHover] = useState(false);
 const [openModal, setOpenModal] = useState(false);
@@ -33,7 +34,7 @@ const [starred, setStarred] = useState(false);
 useEffect(() => {
     const getBoards = async () => {
         try {
-            const response = await getDataWithId('http://localhost:5157/backend/board/GetBoardsByWorkspaceId?workspaceId', 10);
+            const response = await getDataWithId('http://localhost:5157/backend/board/GetBoardsByWorkspaceId?workspaceId', 1);
             const data = response.data;
 
             console.log('Fetched data: ', data);
@@ -64,10 +65,7 @@ useEffect(() => {
 }, []);
 
 
-const handleCreateBoard = (newBoard)=>{
-   
-    setBoards((prevBoards) => [...prevBoards, newBoard]);
-};
+
 
 const handleStarredChange = () =>{
     setStarred(!starred);
@@ -101,7 +99,7 @@ const sortAlphabetically = (boards) => {
   
   
   const sortByRecent = async () => {
-    const dataResponse = await getDataWithId('http://localhost:5157/backend/board/GetBoardsByWorkspaceId?workspaceId', 10);
+    const dataResponse = await getDataWithId('http://localhost:5157/backend/board/GetBoardsByWorkspaceId?workspaceId', 1);
     return dataResponse.data;
   };
 

@@ -8,11 +8,11 @@
  public class StarredBoardRepository : IStarredBoardRepository
  {
      private readonly ApplicationDBContext _context;
-     private readonly UserRepository _userRepo;
-     private readonly BoardRepository _boardRepo;
+     private readonly IUserRepository _userRepo;
+     private readonly IBoardRepository _boardRepo;
  
  
-     public StarredBoardRepository(ApplicationDBContext context, UserRepository userRepo, BoardRepository boardRepo)
+     public StarredBoardRepository(ApplicationDBContext context, IUserRepository userRepo, IBoardRepository boardRepo)
      {
          _context = context;
          _userRepo = userRepo;

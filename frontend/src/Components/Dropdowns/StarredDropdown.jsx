@@ -19,7 +19,7 @@ const StarredDropdown = (props) => {
 
     const dynamicClassName = () => {
         if (width > 1070) {
-          return 'absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg p-2 shadow-lg';
+          return 'absolute left-0 mt-2 w-48 bg-gray-800 rounded-lg p-2 shadow-lg';
         } else if (width > 880 && width<=1070) {
           return 'absolute left-[120px] top-[-7px] w-48 bg-gray-800 rounded-lg p-2 shadow-lg';
         } else {
