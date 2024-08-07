@@ -28,6 +28,7 @@ export async function getDataWithId(apiEndpoint, id) {
   }
 }
 
+
 export async function postData(apiEndpoint, data) {
   try {
     const response = await api.post(apiEndpoint, data);
@@ -41,34 +42,23 @@ export async function postData(apiEndpoint, data) {
 export async function deleteData(endpoint, params) {
   let url = endpoint;
   if (params && Object.keys(params).length > 0) {
-      const queryString = new URLSearchParams(params).toString();
-      url = `${endpoint}?${queryString}`;
+    const queryString = new URLSearchParams(params).toString();
+    url = `${endpoint}?${queryString}`;
   }
-
-  const options = {
-      method: 'DELETE',
-      headers: {
-          'Content-Type': 'application/json',
-      },
-  };
 
   try {
-      const response = await fetch(url, options);
-      const responseText = await response.text(); // Get the raw response text
+    const response = await axios.delete(url, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
-      console.log('Response Text:', responseText); // Log it for debugging
-
-      if (!response.ok) {
-          throw new Error(`Error: ${response.status} - ${responseText}`);
-      }
-
-      return JSON.parse(responseText); // Parse the JSON manually
+    return response.data; // Axios automatically parses JSON responses
   } catch (error) {
-      console.error('Error:', error);
-      throw error;
+    console.error('Error:', error);
+    throw error;
   }
 }
-
 
 
 export async function putData(apiEndpoint, data) {

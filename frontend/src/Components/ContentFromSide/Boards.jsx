@@ -1,5 +1,5 @@
-import {deleteData, getDataWithId, postData,} from "../../Services/FetchService.jsx";
-import { useEffect, useState } from "react";
+
+import { useEffect, useState, useCallback  } from "react";
 import { GoPencil } from "react-icons/go";
 import { IoPersonAddOutline } from "react-icons/io5";
 import { CiSearch } from "react-icons/ci";
@@ -8,13 +8,17 @@ import CreateBoardModal from "../Side/CreateBoardModal.jsx";
 import { FaPlus } from "react-icons/fa";
 import React, { useContext } from 'react';
 import { WorkspaceContext } from '../Side/WorkspaceContext';
-
+import ClosedBoardsModal from "./ClosedBoardsModal.jsx";
 import { MdOutlineStarOutline } from "react-icons/md";
 import { MdOutlineStarPurple500 } from "react-icons/md";
+import LimitModal from "./LimitModal.jsx";
 
 
 const Boards = () =>{
-    const { workspace, boards, handleCreateBoard, openModal, setOpenModal, handleStarBoard, handleSortChange, setOpenSortModal, openSortModal, selectedSort, getBackgroundImageUrl,hoveredBoardIndex, setHoveredBoardIndex } = useContext(WorkspaceContext);
+    const { workspace,openClosedBoardsModal, showLimitModal, setShowLimitModal, boardCount, setOpenClosedBoardsModal, boards, handleCreateBoard, openModal, setOpenModal, setOpenCloseModal, handleStarBoard, handleSortChange, setOpenSortModal, openSortModal, selectedSort, getBackgroundImageUrl,hoveredBoardIndex, setHoveredBoardIndex } = useContext(WorkspaceContext);
+
+    
+  
 
     if (workspace == null) {
         return <div>Loading...</div>;
@@ -38,18 +42,18 @@ return (
 
     </div>
     <div className="font-semibold font-sans text-gray-400 flex justify-normal mt-10 flex-col ml-20 mr-20 flex-wrap">
-        <h2 className="text-2xl ">Boards</h2>
+        <h2 className="text-2xl ">Boards {boardCount}/10</h2>
 
-        <div className="flex flex-row justify-normal">
+        <div className="flex flex-row flex-wrap gap-10">
 
         <div className="flex flex-col mt-5 flex-wrap" >
-            <label for="sortDropdown">Sort </label>
-            <button onClick={()=>{setOpenSortModal(prev => !prev); setOpenModal(false)}} className="bg-transparent border border-solid border-gray-500 flex flex-row mt-2 rounded-md pl-5 pr-5 pt-2 pb-2 w-[180px]">{selectedSort}</button>
+            <label>Sort </label>
+            <button onClick={()=>{setOpenSortModal(prev => !prev); setOpenModal(false); setOpenClosedBoardsModal(false)}} className="bg-transparent border border-solid border-gray-500 flex flex-row mt-2 rounded-md pl-5 pr-5 pt-2 pb-2 w-[180px]">{selectedSort}</button>
            
             <SortModal open={openSortModal} onClose={()=> setOpenSortModal(false)} selectedSort={selectedSort} onSortChange={handleSortChange}></SortModal>
             </div>
 
-        <div className="flex flex-col mt-5 ml-20">
+        <div className="flex flex-col mt-5">
         <label for="searchBoard">Search</label>
         <div className="bg-transparent border border-solid border-gray-500 flex flex-row mt-2 rounded-md ">
         <CiSearch className="mt-3 ml-1 font-bold" />    
@@ -64,14 +68,15 @@ return (
 
         <ul className="flex flex-wrap flex-row justify-between gap-3">
         <li className="w-[300px] h-[100px] flex justify-normal text-gray-400 text-lg font-semibold items-center mt-2 p-1 cursor-pointer hover:bg-gray-500 border border-solid border-gray-700">
-        <button onClick={()=>setOpenModal(prev => !prev)} className="w-full h-full flex items-center text-gray-400 cursor-pointer gap-2 p-1">
+        <button onClick={()=>{boardCount>=10 ? setShowLimitModal(true) : setOpenModal(prev => !prev); setOpenClosedBoardsModal(false)}} className="w-full h-full flex items-center text-gray-400 cursor-pointer gap-2 p-1">
           <FaPlus/> Create new Board
             </button>
+            {showLimitModal && <LimitModal onClose={() => setShowLimitModal(false)} />}
         </li>
         <CreateBoardModal open={openModal} onClose={()=> setOpenModal(false)} onBoardCreated={handleCreateBoard}></CreateBoardModal>
        
         {boards.length===0? (
-          <li>  <span>No boards found</span> </li>
+          <li className="mt-10">  <span>No boards found</span> </li>
         ) : (
             boards.map((board, index)=>(
                
@@ -105,8 +110,11 @@ return (
         }
         </ul>
         </div>
-        <button className="flex justify-center text-black font-sans text-center font-semibold bg-blue-600 items-center border border-solid border-blue-700 rounded-lg  mt-10 hover:bg-blue-500 w-[200px] h-[40px]"> View Closed Boards</button>
-     
+        <button className="flex justify-center text-black font-sans text-center font-semibold bg-blue-600 items-center border border-solid border-blue-700 rounded-lg  mt-10 hover:bg-blue-500 w-[200px] h-[40px]"
+        onClick={()=> setOpenClosedBoardsModal(prev => !prev)}
+        > View Closed Boards</button>
+
+<ClosedBoardsModal open={openClosedBoardsModal} onClose={()=> {setOpenClosedBoardsModal(false); setOpenCloseModal(false);}}></ClosedBoardsModal>
     </div>
     </div>
 );

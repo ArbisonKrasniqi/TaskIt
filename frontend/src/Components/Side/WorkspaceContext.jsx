@@ -1,6 +1,8 @@
 import React, {createContext, useState, useEffect} from 'react';
 import { getDataWithId, deleteData, postData } from '../../Services/FetchService';
 import myImage from './background.jpg';
+
+
 export const WorkspaceContext = createContext();
 
 export const WorkspaceProvider = ({ children }) => {
@@ -18,6 +20,10 @@ export const WorkspaceProvider = ({ children }) => {
     const [selectedBoardTitle, setSelectedBoardTitle] = useState("");
     const [openCloseModal, setOpenCloseModal] = useState(false);
     const[roli, setRoli] = useState("Owner");
+    const [openClosedBoardsModal, setOpenClosedBoardsModal] = useState(false);
+    const [showLimitModal, setShowLimitModal] = useState(false);
+    const boardCount = boards.length;
+   
     useEffect(() => {
         const getWorkspace = async () => {
             try {
@@ -74,6 +80,50 @@ console.log(workspaceTitle);
         setBoards((prevBoards) => [...prevBoards, newBoard]);
     };
 
+
+
+        // const fetchClosedBoards = async () =>{
+        //     try{
+        //         const response = await getDataWithId('http://localhost:5157/backend/board/GetClosedBoards?workspaceId', WorkspaceId);
+        //         const responseData = response.data;
+        //         console.log("Closed boards fetched: ",responseData);
+    
+        //         setClosedBoards(responseData);
+        //     }catch(error){
+        //         console.error("Error fetching closed boards! ",error);
+        //     }
+        // };
+        
+        
+    
+
+
+
+    const handleCloseBoard = async (boardId) => {
+        try{
+            const closedBoard = {
+                boardId: boardId,
+                userId: USERID,
+                
+            };
+            const response = await postData('http://localhost:5157/backend/board/Close', closedBoard);
+            console.log("Board closed ",response.data);
+           
+            
+            setBoards((prevBoards) => prevBoards.filter((b)=> b.boardId !== boardId));
+            
+            // const closedBoardData = response.data;
+            // setClosedBoards((prevClosedBoards)=> [...prevClosedBoards, closedBoardData]);
+        }
+        catch(error){
+            console.error("Error closing board:", error);
+        }
+    }
+
+    
+
+
+    
     const moveStarredBoardsToTop = (boards) => {
         return boards.sort((a, b) => b.starred - a.starred);
     };
@@ -159,7 +209,6 @@ console.log(workspaceTitle);
             openSortModal,
             setOpenModal,
             openModal,
-            handleCreateBoard,
             setHoveredIndex,
             hoveredIndex,
             setSelectedBoardTitle, 
@@ -177,6 +226,13 @@ console.log(workspaceTitle);
             setOpenModal,
             setHoveredIndex,
             getBackgroundImageUrl,
+            handleCloseBoard,
+            setOpenClosedBoardsModal,
+            openClosedBoardsModal,
+            setBoards,
+            showLimitModal,
+            setShowLimitModal,
+            boardCount,
         }}>
             {children}
         </WorkspaceContext.Provider>

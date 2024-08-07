@@ -7,7 +7,7 @@ const CreateBoardModal = ({ open, onClose, onBoardCreated, children }) => {
     const [workspaceId, setWorkspaceId] = useState(1); // Assuming workspaceId is known/fixed for now
     const [clicked, setClicked] = useState(false);
     const [backgrounds, setBackgrounds] = useState([]);
-
+    const [errorMessage, setErrorMessage] = useState('');
 
 
      useEffect(()=>{
@@ -43,6 +43,11 @@ const CreateBoardModal = ({ open, onClose, onBoardCreated, children }) => {
     };
 
     const handleCreateBoard = async () => {
+        if (boardTitle.length < 2 || boardTitle.length > 20) {
+            setErrorMessage('Board title must be between 2 and 20 characters.');
+            return;
+        }
+
         const newBoard = {
             title: boardTitle,
             backgroundId: backgroundId,
@@ -104,6 +109,7 @@ const CreateBoardModal = ({ open, onClose, onBoardCreated, children }) => {
                     value={boardTitle}
                     onChange={handleTitleChange}
                 />
+                   {errorMessage && <p className="text-red-500 text-sm">{errorMessage}</p>}
                 <br /><br />
                 <button
                     className="bg-gray-800 font-bold text-white px-4 py-2 rounded-md w-[60%] hover:text-white hover:bg-gray-900 transition-colors duration-300 ease-in-out"

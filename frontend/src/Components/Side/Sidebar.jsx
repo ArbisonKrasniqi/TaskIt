@@ -14,19 +14,21 @@ import { MdOutlineStarOutline } from "react-icons/md";
 import { MdOutlineStarPurple500 } from "react-icons/md";
 import { FiSquare } from "react-icons/fi";
 import { WorkspaceContext } from './WorkspaceContext';
+import LimitModal from "../ContentFromSide/LimitModal.jsx";
 const Sidebar = () => {
 
 
 
 
     const { 
-        workspace, open, setOpen, workspaceTitle, setHover, hover, openCloseModal,
+       USERID, workspace, open, setOpen, workspaceTitle, setHover, hover, openCloseModal,
         setOpenSortModal, setOpenCloseModal, openSortModal, setOpenModal, openModal, 
         handleCreateBoard, setHoveredIndex, hoveredIndex, setSelectedBoardTitle, 
          selectedBoardTitle, roli, boards, selectedSort, handleSortChange, 
-        handleStarBoard, getBackgroundImageUrl } = useContext(WorkspaceContext);
+        handleStarBoard, getBackgroundImageUrl, handleCloseBoard,setOpenClosedBoardsModal, 
+        showLimitModal, setShowLimitModal, boardCount } = useContext(WorkspaceContext);
 
-
+        const [boardToClose, setBoardToClose] = useState(null);
 
 const Menus = [
     {title: "Boards", tag: "CiViewBoard"},
@@ -98,7 +100,8 @@ const WorkspaceViews = [
             )}
             <SortModal open={openSortModal} onClose={()=> setOpenSortModal(false)} selectedSort={selectedSort} onSortChange={handleSortChange}></SortModal>
                   
-                   <button onClick={()=>setOpenModal(true)} className={`text-gray-400 cursor-pointer p-1 ${!open && "scale-0"}`}><FaPlus/></button>
+                   <button onClick={()=>{boardCount>=10 ? setShowLimitModal(true) : setOpenModal(true); setOpenClosedBoardsModal(false)}} className={`text-gray-400 cursor-pointer p-1 ${!open && "scale-0"}`}><FaPlus/></button>
+                   {showLimitModal && <LimitModal onClose={() => setShowLimitModal(false)} />}
            <CreateBoardModal open={openModal} onClose={()=> setOpenModal(false)} onBoardCreated={handleCreateBoard}></CreateBoardModal>
             </div>
 
@@ -137,10 +140,10 @@ const WorkspaceViews = [
                 <div className="flex justify-between">
 
                 {hoveredIndex===index && (      
-                <button onClick={()=> {setOpenCloseModal(prev=> !prev); setSelectedBoardTitle(board.title); setOpenSortModal(false)}} className={`text-gray-400 cursor-pointer ${!open && "scale-0"} mr-3`}><FaEllipsisH /></button>
+                <button onClick={()=> {setBoardToClose(board); setOpenCloseModal(prev=> !prev); setSelectedBoardTitle(board.title); setOpenSortModal(false); setOpenClosedBoardsModal(false)}} className={`text-gray-400 cursor-pointer ${!open && "scale-0"} mr-3`}><FaEllipsisH /></button>
                 
             )}
-                    <CloseBoardModal open={openCloseModal} boardTitle={selectedBoardTitle} onClose={()=> setOpenCloseModal(false)} role={roli}></CloseBoardModal>
+                    <CloseBoardModal open={openCloseModal} boardTitle={selectedBoardTitle} onClose={()=> setOpenCloseModal(false)} role={roli} boardId={boardToClose?.boardId} userId={USERID} onBoardClosed={handleCloseBoard}></CloseBoardModal>
 
                      
                           

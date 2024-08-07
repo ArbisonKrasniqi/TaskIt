@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from 'react';
+import { postData } from '../../Services/FetchService';
 
 
-const CloseBoardModal = ({open, boardTitle ,onClose, role}) =>{
+const CloseBoardModal = ({open, boardTitle ,onClose, role, boardId, userId, onBoardClosed}) =>{
   
 
     const [action, setAction] = useState("Leave"); 
@@ -41,14 +42,20 @@ const CloseBoardModal = ({open, boardTitle ,onClose, role}) =>{
                 }
         };
         const handleClose = () => {
+            onBoardClosed(boardId);
             setClicked(false);
             onClose();
         };
 
+
         if(!open) return null; //kontrollojm a me e shfaq modalin
 
     return(
-        <div className="fixed inset-0 z-50 flex items-center justify-start p-4 ml-60 ">
+        <div className="fixed inset-0 z-50 flex items-center justify-start p-4 ml-60 "  onClick={(e) => {
+            if (e.target.className.includes('modal-overlay')) {
+                e.stopPropagation(); // Prevent modal from closing on backdrop click
+            }
+        }}>
             <div className="bg-white border border-gray-300 rounded-lg shadow-lg w-60">
             <div className="p-2 flex justify-between items-center">
             <h3 className="text-gray-700 font-semibold">{boardTitle}</h3>
