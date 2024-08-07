@@ -192,5 +192,68 @@ namespace backend.Controllers
                 return StatusCode(500, "Internal Server Error!"+e.Message);
             }
         }
+
+        [HttpPost("Close")]
+        public async Task<IActionResult> CloseBoard(CloseBoardRequestDto dto)
+        {
+            try
+            {
+                var result = await _boardRepo.CloseBoardAsync(dto.BoardId, dto.userId);
+                if (!result)
+                {
+                    return NotFound();
+                }
+
+                return Ok("Board closed");
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, "Internal Server Error!"+e.Message);
+            }
+        }
+
+        [HttpPost("Reopen")]
+        public async Task<IActionResult> ReopenBoard(CloseBoardRequestDto dto)
+        {
+            try
+            {
+                var result = await _boardRepo.ReopenBoardAsync(dto.BoardId, dto.userId);
+                if (!result)
+                {
+                    return NotFound();
+                }
+
+                return Ok("Board reopened");
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, "Internal Server Error!"+e.Message);
+            }
+        }
+
+        [HttpGet("GetClosedBoards")]
+        public async Task<IActionResult> GetClosedBoards(int workspaceId)
+        {
+            try
+            {
+                var closedBoards = await _boardRepo.GetClosedBoardsAsync(workspaceId);
+
+                if (closedBoards.Count == 0)
+                {
+                    return  Ok(new List<BoardDto>()); 
+                }
+                
+                
+                var closedBoardsDto = _mapper.Map<IEnumerable<BoardDto>>(closedBoards);
+
+                return Ok(closedBoardsDto);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, "Internal Server Error!"+e.Message);
+            }
+        }
+
+
     }
 }

@@ -6,6 +6,7 @@ using backend.Data;
 using backend.DTOs.Board.Input;
 using backend.Interfaces;
 using backend.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace backend.Repositories
@@ -23,7 +24,7 @@ namespace backend.Repositories
         public async Task<List<Board>> GetAllBoardsAsync()
         {
             return await _context.Board
-                .Include(b => b.Lists).ToListAsync();
+                .Include(b => b.Lists).Where(b=> !b.IsClosed).ToListAsync();
         }
         
         //GetByIdAsync --> Gets the board that has the given Id
@@ -37,12 +38,17 @@ namespace backend.Repositories
         public async Task<List<Board>> GetBoardsByWorkspaceIdAsync(int workspaceId)
         {
             return await _context.Board.
-                Include(b => b.Lists).Where(b => b.WorkspaceId == workspaceId).ToListAsync();
+                Include(b => b.Lists).Where(b => b.WorkspaceId == workspaceId && !b.IsClosed).ToListAsync();
         }
         
         //CreateAsync -->Adds a new board with the given attributes
         public async Task<Board> CreateBoardAsync(Board boardModel)
         {
+            int boardCount = await _context.Board.CountAsync(b => b.WorkspaceId == boardModel.WorkspaceId);
+            if (boardCount >= 10)
+            {
+                throw new InvalidOperationException("Cannot create more than 10 boards in the same workspace.");
+            }
             await _context.Board.AddAsync(boardModel);
             await _context.SaveChangesAsync();
             return boardModel;
@@ -94,5 +100,70 @@ namespace backend.Repositories
         {
             return await _context.Board.AnyAsync(i => i.BoardId == boardId);
         }
+        
+        
+        //Close Board
+        public async Task<bool> CloseBoardAsync(int boardId, string userId)
+        {
+            var workspace = await (from b in _context.Board
+                join w in _context.Workspace
+                    on b.WorkspaceId equals w.WorkspaceId
+                where b.BoardId == boardId
+                select w).FirstOrDefaultAsync();
+            
+            if (workspace == null || workspace.OwnerId != userId)
+            {
+                return false;
+            }
+
+            var board = await _context.Board.FindAsync(boardId);   
+            if (board == null)
+            {
+                return false;
+            }
+
+            board.IsClosed = true;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        
+        //Reopen Board
+        public async Task<bool> ReopenBoardAsync(int boardId, string userId)
+        {
+            var workspace = await (from b in _context.Board
+                join w in _context.Workspace
+                    on b.WorkspaceId equals w.WorkspaceId
+                where b.BoardId == boardId
+                select w).FirstOrDefaultAsync();
+            
+            if (workspace == null || workspace.OwnerId != userId)
+            {
+                return false;
+            }
+
+            var board = await _context.Board.FindAsync(boardId);   
+            if (board == null)
+            {
+                return false;
+            }
+
+            board.IsClosed = false;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        
+        //GetClosedBoards
+        public async Task<List<Board>> GetClosedBoardsAsync(int workspaceId)
+        {
+            var closedBoards = await (from b in _context.Board
+                join w in _context.Workspace
+                    on b.WorkspaceId equals w.WorkspaceId
+                where b.IsClosed && w.WorkspaceId==workspaceId
+                select b).ToListAsync();
+            
+            
+            return closedBoards;
+        }
     }
+    
 }
