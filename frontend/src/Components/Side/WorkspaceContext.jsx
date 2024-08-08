@@ -4,7 +4,7 @@ import myImage from './background.jpg';
 export const WorkspaceContext = createContext();
 
 export const WorkspaceProvider = ({ children }) => {
-    const USERID = "96dd1b34-b03b-4255-ab26-1f29f0675755";
+    const USERID = "asdajsdanlkdjad";
     const WorkspaceId = 1;
     const[open, setOpen] = useState(true);
     const [workspace, setWorkspace] = useState(null);
@@ -19,6 +19,8 @@ export const WorkspaceProvider = ({ children }) => {
     const [selectedBoardTitle, setSelectedBoardTitle] = useState("");
     const [openCloseModal, setOpenCloseModal] = useState(false);
     const[roli, setRoli] = useState("Owner");
+    const [members, setMembers] = useState([]);
+
     useEffect(() => {
         const getWorkspace = async () => {
             try {
@@ -35,7 +37,7 @@ export const WorkspaceProvider = ({ children }) => {
     }, [WorkspaceId]);
 
     
-const workspaceTitle = workspace? workspace.title : 'Workspace';
+const workspaceTitle = workspace ? workspace.title : 'Workspace';
 console.log(workspaceTitle);
     useEffect(() => {
         const getBoards = async () => {
@@ -69,7 +71,28 @@ console.log(workspaceTitle);
         };
         getBoards();
         console.log("Boards fetched:", boards);
-    });
+    },[WorkspaceId]);
+
+    useEffect(() => {
+        const getMembers = async () => {
+            try {
+                const response = await getDataWithId('http://localhost:5157/backend/Members/getAllMembers?workspaceId', WorkspaceId);
+                const data = response.data;
+                console.log('Fetcheddata: ',data);
+                if (data && Array.isArray(data) && data.length>0) {
+                    setMembers(data);
+                } else {
+                    console.log('Data is null, not as an array or empty: ',data);
+                }
+                console.log("DATAAA",members);
+            } catch (error) {
+                console.error(error.message);
+                setMembers([]);
+            }
+        };
+        getMembers();
+        console.log('Members fetched: ',members);
+    },[]);
 
     const handleCreateBoard = (newBoard) => {
         setBoards((prevBoards) => [...prevBoards, newBoard]);
