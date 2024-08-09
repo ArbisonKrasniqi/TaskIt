@@ -4,7 +4,7 @@ import { WorkspaceContext } from "../Side/WorkspaceContext";
 
 const Members = () => {
 
-    const { members, setMembers,  WorkspaceId } = useContext(WorkspaceContext);
+    const { members } = useContext(WorkspaceContext);
 
     return(
         <div className={`duration-100 h-full`} style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>

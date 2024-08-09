@@ -204,6 +204,7 @@ console.log(workspaceTitle);
             handleStarBoard,
             getBackgroundImageUrl,
             handleCreateWorkspace,
+            members,
             starredBoards: boards.filter(board => board.starred),
         }}>
             {children}
