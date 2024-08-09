@@ -42,7 +42,7 @@ namespace backend.Controllers;
         //LOGIN AND REGISTER
         //Register as a normal user
         [HttpPost("register")]
-        [Authorize(AuthenticationSchemes = "Bearer")]
+        //[Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> Register(RegisterDTO registerDto)
         {
             try
@@ -121,8 +121,8 @@ namespace backend.Controllers;
         
         //ADMIN API CALLS
         [HttpPost("adminCreate")]
-        [Authorize(AuthenticationSchemes = "Bearer")]
-        [Authorize(Policy = "AdminOnly")]
+        //[Authorize(AuthenticationSchemes = "Bearer")]
+        //[Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> Create(CreateUserDTO createUserDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
