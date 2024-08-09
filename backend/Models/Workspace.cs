@@ -10,7 +10,7 @@ public class Workspace
     
     [Required]
     [MinLength(2, ErrorMessage = "Title must be at least 2 characters")]
-    [MaxLength(280, ErrorMessage = "Title cannot be over 280 characters")]
+    [MaxLength(25, ErrorMessage = "Title cannot be over 25 characters")]
     public string Title { get; set; } = string.Empty;
     
     [Required]

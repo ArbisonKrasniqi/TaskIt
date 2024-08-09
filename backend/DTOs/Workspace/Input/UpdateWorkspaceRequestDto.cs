@@ -6,7 +6,7 @@ public class UpdateWorkspaceRequestDto
     public int WorkspaceId { get; set; }
     [Required]
     [MinLength(2, ErrorMessage = "Title must be at least 2 characters")]
-    [MaxLength(280, ErrorMessage = "Title cannot be over 280 characters")]
+    [MaxLength(20, ErrorMessage = "Title cannot be over 20 characters")]
     public string Title { get; set; } = string.Empty;
     
     [Required]

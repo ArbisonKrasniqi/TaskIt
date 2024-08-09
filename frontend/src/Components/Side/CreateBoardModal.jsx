@@ -83,10 +83,10 @@ const CreateBoardModal = ({ open, onClose, onBoardCreated, children }) => {
                     className="absolute top-1 right-2 p-1 rounded-lg text-gray-400 bg-white hover:bg-gray-50 hover:text-gray-600">
                     X
                 </button>
-                <p className="w-full origin-left font-sans text-gray-400 font-bold text-l">Create Board</p>
+                <p className="w-full origin-left font-sans text-gray-500 font-bold text-l">Create Board</p>
                 <hr className="w-full border-gray-400 mt-3"></hr>
                 <br></br>
-                <p className="w-full origin-left font-sans text-gray-400 font-semibold text-l">Background</p>
+                <p className="w-full origin-left font-sans text-gray-500 font-semibold text-l">Background</p>
                 <br></br>
                 {/* <div className="flex flex-wrap justify-between gap-2">
                     {backgrounds.map((background) => (
@@ -99,7 +99,7 @@ const CreateBoardModal = ({ open, onClose, onBoardCreated, children }) => {
                     ))}
                 </div> */}
                 <br></br>
-                <p className="w-full origin-left font-sans text-gray-400 font-semibold text-l">Board Title</p>
+                <p className="w-full origin-left font-sans text-gray-500 font-semibold text-l">Board Title</p>
                 <br></br>
                 <input
                     type="text"

@@ -80,21 +80,6 @@ console.log(workspaceTitle);
         setBoards((prevBoards) => [...prevBoards, newBoard]);
     };
 
-
-
-        // const fetchClosedBoards = async () =>{
-        //     try{
-        //         const response = await getDataWithId('http://localhost:5157/backend/board/GetClosedBoards?workspaceId', WorkspaceId);
-        //         const responseData = response.data;
-        //         console.log("Closed boards fetched: ",responseData);
-    
-        //         setClosedBoards(responseData);
-        //     }catch(error){
-        //         console.error("Error fetching closed boards! ",error);
-        //     }
-        // };
-        
-        
     
 
 
@@ -233,6 +218,7 @@ console.log(workspaceTitle);
             showLimitModal,
             setShowLimitModal,
             boardCount,
+            setWorkspace,
         }}>
             {children}
         </WorkspaceContext.Provider>

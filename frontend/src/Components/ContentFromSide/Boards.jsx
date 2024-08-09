@@ -12,13 +12,24 @@ import ClosedBoardsModal from "./ClosedBoardsModal.jsx";
 import { MdOutlineStarOutline } from "react-icons/md";
 import { MdOutlineStarPurple500 } from "react-icons/md";
 import LimitModal from "./LimitModal.jsx";
-
+import UpdateWorkspaceModal from "./UpdateWorkspaceModal.jsx";
 
 const Boards = () =>{
-    const { workspace,openClosedBoardsModal, showLimitModal, setShowLimitModal, boardCount, setOpenClosedBoardsModal, boards, handleCreateBoard, openModal, setOpenModal, setOpenCloseModal, handleStarBoard, handleSortChange, setOpenSortModal, openSortModal, selectedSort, getBackgroundImageUrl,hoveredBoardIndex, setHoveredBoardIndex } = useContext(WorkspaceContext);
+    const { workspace,openClosedBoardsModal, showLimitModal, setShowLimitModal, 
+        boardCount, setOpenClosedBoardsModal, boards, handleCreateBoard, openModal, 
+        setOpenModal, setOpenCloseModal, handleStarBoard, handleSortChange, setOpenSortModal,
+         openSortModal, selectedSort, getBackgroundImageUrl,hoveredBoardIndex, 
+         setHoveredBoardIndex, setWorkspace } = useContext(WorkspaceContext);
 
-    
-  
+    const[updateWorkspaceModal, setUpdateWorkspaceModal] = useState(false);
+
+    const handleWorkspaceUpdate = (updatedWorkspace) => {
+        setWorkspace((prev) => ({
+          ...prev,
+          title: updatedWorkspace.Title,
+          description: updatedWorkspace.Description,
+        }));
+      };
 
     if (workspace == null) {
         return <div>Loading...</div>;
@@ -29,14 +40,19 @@ return (
         <div className="flex justify-around items-center gap-x-3">
             <div className="flex justify-normal gap-x-3 mt-5 items-center">
             <button className={`w-20 h-20 text-black bg-gradient-to-r from-blue-400 to-indigo-500 font-bold text-4xl rounded-lg text-center p-1 items-center duration-200 mt-5 mb-5`}>
-                {workspace.title.charAt(0)}
+                {workspace.title? workspace.title.charAt(0): ''}
             </button>
             <h1 className={`origin-left mt-5 mb-5 font-sans text-gray-400 font-bold text-2xl duration-20 text-center`}>
                 {workspace.title}
             </h1>
+            <button onClick={()=>{setUpdateWorkspaceModal(prev => !prev);}}>
             <GoPencil className=" text-gray-400 font-bold text-2xl duration-20 mt-5 mb-5 cursor-pointer hover:text-3xl"/>
+            </button>
+            <UpdateWorkspaceModal open={updateWorkspaceModal} onClose={()=>setUpdateWorkspaceModal(false)} workspace={workspace} onWorkspaceUpdated={handleWorkspaceUpdate}></UpdateWorkspaceModal>
             </div>
-            <button className="flex justify-center text-black font-sans font-semibold text-center bg-blue-500 p-3 border border-solid border-blue-700 rounded-lg  mt-10 hover:bg-blue-400"> <IoPersonAddOutline className="mr-1 mt-1 font-bold" />Invite workspace members</button>
+            <button className="flex justify-center text-black font-sans font-semibold text-center bg-blue-500 p-3 border border-solid border-blue-700 rounded-lg  mt-10 hover:bg-blue-400">
+            <IoPersonAddOutline className="mr-1 mt-1 font-bold" />
+            Invite workspace members</button>
         </div>
         <hr className="w-full border-gray-400 mt-3"></hr>
 
@@ -63,11 +79,11 @@ return (
 
         </div>
        
-         <div className="mt-5 flex flex-row">
+         <div className="mt-5 flex flex-row max-w-[1200px] gap-3">
 
 
-        <ul className="flex flex-wrap flex-row justify-between gap-3">
-        <li className="w-[300px] h-[100px] flex justify-normal text-gray-400 text-lg font-semibold items-center mt-2 p-1 cursor-pointer hover:bg-gray-500 border border-solid border-gray-700">
+        <ul className="flex flex-wrap flex-row justify-between gap-10">
+        <li className="w-[300px] h-[150px] flex justify-normal text-gray-400 text-lg font-semibold items-center mt-2 p-1 cursor-pointer hover:bg-gray-500 border border-solid border-gray-700">
         <button onClick={()=>{boardCount>=10 ? setShowLimitModal(true) : setOpenModal(prev => !prev); setOpenClosedBoardsModal(false)}} className="w-full h-full flex items-center text-gray-400 cursor-pointer gap-2 p-1">
           <FaPlus/> Create new Board
             </button>
@@ -84,7 +100,7 @@ return (
                onMouseEnter={() => setHoveredBoardIndex(index)}
                onMouseLeave={() => setHoveredBoardIndex(null)} 
                style={{  width: '300px', 
-                        height: '100px',}}
+                        height: '150px',}}
                         className={`flex justify-normal text-white text-lg font-semibold items-center mt-3 cursor-pointer border border-solid border-gray-700 ${hoveredBoardIndex===index ? ` bg-gray-400 opacity-50`: ''} `}>
                             
                 <div className="relative w-full h-full"
