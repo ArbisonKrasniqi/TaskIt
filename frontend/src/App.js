@@ -5,7 +5,8 @@ import Main from './Pages/Main.jsx'
 import Preview from './Components/Preview/header.jsx';
 import Boards from './Components/ContentFromSide/Boards.jsx';
 
-import SignUpPage from './Pages/signUpPage.jsx';
+//import SignUpPage
+
 import Board from './Components/Board.jsx';
 import Test from './Components/Test.jsx';
 
