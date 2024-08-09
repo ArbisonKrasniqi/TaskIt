@@ -60,6 +60,7 @@ console.log(workspaceTitle);
                     sortedBoards = moveStarredBoardsToTop(sortedBoards);
                     setBoards(sortedBoards);
                     setSelectedSort(sortType);
+                    
                 } else {
                     console.error('Data is null, not an array, or empty:', data);
                     setBoards([]); // Trajtohen si të dhëna të zbrazëta
@@ -73,18 +74,17 @@ console.log(workspaceTitle);
         console.log("Boards fetched:", boards);
     },[WorkspaceId]);
 
+
     useEffect(() => {
         const getMembers = async () => {
             try {
                 const response = await getDataWithId('http://localhost:5157/backend/Members/getAllMembers?workspaceId', WorkspaceId);
                 const data = response.data;
-                console.log('Fetcheddata: ',data);
                 if (data && Array.isArray(data) && data.length>0) {
                     setMembers(data);
                 } else {
                     console.log('Data is null, not as an array or empty: ',data);
                 }
-                console.log("DATAAA",members);
             } catch (error) {
                 console.error(error.message);
                 setMembers([]);
@@ -150,6 +150,7 @@ console.log(workspaceTitle);
                 starredBoards.push(board.boardId);
                 localStorage.setItem('starredBoards', JSON.stringify(starredBoards));
             }
+    
             setBoards(prevBoards => {
                 const updatedBoards = prevBoards.map(b =>
                     b.boardId === board.boardId ? { ...b, starred: !isStarred } : b
@@ -161,6 +162,7 @@ console.log(workspaceTitle);
             console.error("Error starring/unstarring the board:", error.response ? error.response.data : error.message);
         }
     };
+    
     const getBackgroundImageUrl = (board) => {
         // const background = backgrounds.find(b=>b.backgroundId === board.backgroundId);
         // return background? background.imageUrl : '';
@@ -201,7 +203,8 @@ console.log(workspaceTitle);
             handleSortChange,
             handleStarBoard,
             getBackgroundImageUrl,
-            handleCreateWorkspace
+            handleCreateWorkspace,
+            starredBoards: boards.filter(board => board.starred),
         }}>
             {children}
         </WorkspaceContext.Provider>
