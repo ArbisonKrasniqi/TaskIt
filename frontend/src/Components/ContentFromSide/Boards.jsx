@@ -13,6 +13,10 @@ import { MdOutlineStarOutline } from "react-icons/md";
 import { MdOutlineStarPurple500 } from "react-icons/md";
 import LimitModal from "./LimitModal.jsx";
 import UpdateWorkspaceModal from "./UpdateWorkspaceModal.jsx";
+import { MdOutlineStarOutline } from "react-icons/md";
+import { MdOutlineStarPurple500 } from "react-icons/md";
+import SideMenusHeader from "./SideMenusHeader.jsx";
+
 
 const Boards = () =>{
     const { workspace,openClosedBoardsModal, showLimitModal, setShowLimitModal, 
@@ -56,7 +60,6 @@ return (
         </div>
         <hr className="w-full border-gray-400 mt-3"></hr>
 
-    </div>
     <div className="font-semibold font-sans text-gray-400 flex justify-normal mt-10 flex-col ml-20 mr-20 flex-wrap">
         <h2 className="text-2xl ">Boards {boardCount}/10</h2>
 

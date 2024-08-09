@@ -1,4 +1,6 @@
-import Navbar from '../Components/Navbar/Navbar'
+// Main.jsx
+import React from 'react';
+import Navbar from '../Components/Navbar/Navbar';
 import Sidebar from '../Components/Side/Sidebar';
 import Boards from '../Components/ContentFromSide/Boards';
 import { WorkspaceProvider } from '../Components/Side/WorkspaceContext';

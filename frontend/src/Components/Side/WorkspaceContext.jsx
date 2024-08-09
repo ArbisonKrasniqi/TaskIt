@@ -6,10 +6,11 @@ import myImage from './background.jpg';
 export const WorkspaceContext = createContext();
 
 export const WorkspaceProvider = ({ children }) => {
-    const USERID = "96dd1b34-b03b-4255-ab26-1f29f0675755";
+    const USERID = "asdajsdanlkdjad";
     const WorkspaceId = 1;
     const[open, setOpen] = useState(true);
     const [workspace, setWorkspace] = useState(null);
+    const [workspaces, setWorkspaces] = useState(null);
     const [boards, setBoards] = useState([]);
     const [selectedSort, setSelectedSort] = useState('Alphabetically');
     const [openModal, setOpenModal] = useState(false);
@@ -24,6 +25,8 @@ export const WorkspaceProvider = ({ children }) => {
     const [showLimitModal, setShowLimitModal] = useState(false);
     const boardCount = boards.length;
    
+    const [members, setMembers] = useState([]);
+
     useEffect(() => {
         const getWorkspace = async () => {
             try {
@@ -40,7 +43,7 @@ export const WorkspaceProvider = ({ children }) => {
     }, [WorkspaceId]);
 
     
-const workspaceTitle = workspace? workspace.title : 'Workspace';
+const workspaceTitle = workspace ? workspace.title : 'Workspace';
 console.log(workspaceTitle);
     useEffect(() => {
         const getBoards = async () => {
@@ -63,6 +66,7 @@ console.log(workspaceTitle);
                     sortedBoards = moveStarredBoardsToTop(sortedBoards);
                     setBoards(sortedBoards);
                     setSelectedSort(sortType);
+                    
                 } else {
                     console.error('Data is null, not an array, or empty:', data);
                     setBoards([]); // Trajtohen si të dhëna të zbrazëta
@@ -74,7 +78,27 @@ console.log(workspaceTitle);
         };
         getBoards();
         console.log("Boards fetched:", boards);
-    }, []);
+    },[WorkspaceId]);
+
+
+    useEffect(() => {
+        const getMembers = async () => {
+            try {
+                const response = await getDataWithId('http://localhost:5157/backend/Members/getAllMembers?workspaceId', WorkspaceId);
+                const data = response.data;
+                if (data && Array.isArray(data) && data.length>0) {
+                    setMembers(data);
+                } else {
+                    console.log('Data is null, not as an array or empty: ',data);
+                }
+            } catch (error) {
+                console.error(error.message);
+                setMembers([]);
+            }
+        };
+        getMembers();
+        console.log('Members fetched: ',members);
+    },[]);
 
     const handleCreateBoard = (newBoard) => {
         setBoards((prevBoards) => [...prevBoards, newBoard]);
@@ -109,6 +133,10 @@ console.log(workspaceTitle);
 
 
     
+    const handleCreateWorkspace = (newWorkspace) => {
+      setWorkspaces((prevWorkspaces) => [...prevWorkspaces, newWorkspace]);
+  }
+
     const moveStarredBoardsToTop = (boards) => {
         return boards.sort((a, b) => b.starred - a.starred);
     };
@@ -157,6 +185,7 @@ console.log(workspaceTitle);
                 starredBoards.push(board.boardId);
                 localStorage.setItem('starredBoards', JSON.stringify(starredBoards));
             }
+    
             setBoards(prevBoards => {
                 const updatedBoards = prevBoards.map(b =>
                     b.boardId === board.boardId ? { ...b, starred: !isStarred } : b
@@ -168,6 +197,7 @@ console.log(workspaceTitle);
             console.error("Error starring/unstarring the board:", error.response ? error.response.data : error.message);
         }
     };
+    
     const getBackgroundImageUrl = (board) => {
         // const background = backgrounds.find(b=>b.backgroundId === board.backgroundId);
         // return background? background.imageUrl : '';
@@ -179,10 +209,10 @@ console.log(workspaceTitle);
             USERID,
             WorkspaceId,
             workspace,
+            workspaces,
+            setWorkspaces,
             boards,
             selectedSort,
-            openModal,
-            hoveredIndex,
             open,
             setOpen,
             workspaceTitle,
@@ -196,20 +226,16 @@ console.log(workspaceTitle);
             openModal,
             setHoveredIndex,
             hoveredIndex,
-            setSelectedBoardTitle, 
-            setOpenCloseModal,
+            setSelectedBoardTitle,
             selectedBoardTitle,
             roli,
             hoveredBoardIndex,
             setHoveredBoardIndex,
-            handleCreateBoard,
             moveStarredBoardsToTop,
             sortAlphabetically,
             sortByRecent,
             handleSortChange,
             handleStarBoard,
-            setOpenModal,
-            setHoveredIndex,
             getBackgroundImageUrl,
             handleCloseBoard,
             setOpenClosedBoardsModal,
@@ -219,6 +245,9 @@ console.log(workspaceTitle);
             setShowLimitModal,
             boardCount,
             setWorkspace,
+            handleCreateWorkspace,
+            members,
+            starredBoards: boards.filter(board => board.starred),
         }}>
             {children}
         </WorkspaceContext.Provider>
