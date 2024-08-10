@@ -20,17 +20,9 @@ const Boards = () =>{
         boardCount, setOpenClosedBoardsModal, boards, handleCreateBoard, openModal, 
         setOpenModal, setOpenCloseModal, handleStarBoard, handleSortChange, setOpenSortModal,
          openSortModal, selectedSort, getBackgroundImageUrl,hoveredBoardIndex, 
-         setHoveredBoardIndex, setWorkspace } = useContext(WorkspaceContext);
+         setHoveredBoardIndex } = useContext(WorkspaceContext);
 
-    const[updateWorkspaceModal, setUpdateWorkspaceModal] = useState(false);
-
-    const handleWorkspaceUpdate = (updatedWorkspace) => {
-        setWorkspace((prev) => ({
-          ...prev,
-          title: updatedWorkspace.Title,
-          description: updatedWorkspace.Description,
-        }));
-      };
+  
 
     if (workspace == null) {
         return <div>Loading...</div>;
