@@ -105,6 +105,16 @@ console.log(workspaceTitle);
     };
 
     
+    const[updateWorkspaceModal, setUpdateWorkspaceModal] = useState(false);
+
+    const handleWorkspaceUpdate = (updatedWorkspace) => {
+        setWorkspace((prev) => ({
+          ...prev,
+          title: updatedWorkspace.Title,
+          description: updatedWorkspace.Description,
+        }));
+      };
+
 
 
 
@@ -247,6 +257,9 @@ console.log(workspaceTitle);
             setWorkspace,
             handleCreateWorkspace,
             members,
+            updateWorkspaceModal,
+            setUpdateWorkspaceModal,
+            handleWorkspaceUpdate,
             starredBoards: boards.filter(board => board.starred),
         }}>
             {children}
