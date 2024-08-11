@@ -1,14 +1,16 @@
-import React, {createContext, useState, useEffect} from 'react';
+import React, {createContext, useContext , useState, useEffect} from 'react';
 import { getDataWithId, deleteData, postData } from '../../Services/FetchService';
 import myImage from './background.jpg';
+import { MainContext } from '../../Pages/MainContext';
 
 
 export const WorkspaceContext = createContext();
 
 export const WorkspaceProvider = ({ children }) => {
-    const USERID = "asdajsdanlkdjad";
-    const WorkspaceId = 1;
-    const[open, setOpen] = useState(true);
+    const mainContext = useContext(MainContext);
+    const USERID = mainContext.userInfo.userId;
+    const WorkspaceId = mainContext.workspaceId;
+    const [open, setOpen] = useState(true);
     const [workspace, setWorkspace] = useState(null);
     const [workspaces, setWorkspaces] = useState(null);
     const [boards, setBoards] = useState([]);
@@ -20,7 +22,7 @@ export const WorkspaceProvider = ({ children }) => {
     const [openSortModal, setOpenSortModal] = useState(false);
     const [selectedBoardTitle, setSelectedBoardTitle] = useState("");
     const [openCloseModal, setOpenCloseModal] = useState(false);
-    const[roli, setRoli] = useState("Owner");
+    const [roli, setRoli] = useState("Owner");
     const [openClosedBoardsModal, setOpenClosedBoardsModal] = useState(false);
     const [showLimitModal, setShowLimitModal] = useState(false);
     const boardCount = boards.length;
@@ -44,7 +46,6 @@ export const WorkspaceProvider = ({ children }) => {
 
     
 const workspaceTitle = workspace ? workspace.title : 'Workspace';
-console.log(workspaceTitle);
     useEffect(() => {
         const getBoards = async () => {
             try {
@@ -260,6 +261,7 @@ console.log(workspaceTitle);
             updateWorkspaceModal,
             setUpdateWorkspaceModal,
             handleWorkspaceUpdate,
+            handleCreateBoard,
             starredBoards: boards.filter(board => board.starred),
         }}>
             {children}

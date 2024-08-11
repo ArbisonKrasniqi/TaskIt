@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react'; 
+import React, { useState, useEffect, useContext } from 'react'; 
 import { postData, getData } from './../../Services/FetchService';
+import { MainContext } from '../../Pages/MainContext';
 
 const CreateBoardModal = ({ open, onClose, onBoardCreated, children }) => {
+    const mainContext = useContext(MainContext);
     const [boardTitle, setBoardTitle] = useState('');
-    const [backgroundId, setBackgroundId] = useState(1);
-    const [workspaceId, setWorkspaceId] = useState(1); // Assuming workspaceId is known/fixed for now
+    const [backgroundId, setBackgroundId] = useState(2);
+    const [workspaceId, setWorkspaceId] = useState(mainContext.workspaceId);
     const [clicked, setClicked] = useState(false);
     const [backgrounds, setBackgrounds] = useState([]);
     const [errorMessage, setErrorMessage] = useState('');

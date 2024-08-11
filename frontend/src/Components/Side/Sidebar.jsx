@@ -51,8 +51,8 @@ const WorkspaceViews = [
 
 
     return(
-        <div className="flex">
-            <div className={`${open ? 'w-72' : 'w-8'} duration-100 h-screen p-5 pt-8 relative border-r border-r-solid border-r-gray-500`} style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
+        <div className="flex min-h-screen">
+            <div className={`${open ? 'w-72' : 'w-8'} duration-100 h-full p-5 pt-8 relative border-r border-r-solid border-r-gray-500`} style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
             
         
 
@@ -162,7 +162,6 @@ const WorkspaceViews = [
 </ul>
 
             </div>
-          
         </div>
 
 

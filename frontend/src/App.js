@@ -21,13 +21,13 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/main" element={<Main/>}/>
+          <Route path="/:opened/:workspaceId?/:boardId?/:taskId?" element={<Main/>}/>
           <Route path="/boards" element={<Boards/>}/>
           <Route path="/login" element={<Login/>}/>
        
           <Route path="/dashboard" element={<Dashboard/>}/>
           <Route path="/preview" element={<Preview/>}/>
-          <Route path="/boards/:id" element={<Board/>} />
-          <Route path="/:userId/:workspaceId?/:boardId?" element={<Test/>} />
+          {/* <Route path="/:userId/:workspaceId?/:boardId?" element={<Test/>} /> */}
         </Routes>
       </BrowserRouter>
 

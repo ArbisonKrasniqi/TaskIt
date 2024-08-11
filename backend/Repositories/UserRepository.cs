@@ -15,4 +15,19 @@ public class UserRepository : IUserRepository
     {
         return await _context.Users.AnyAsync(s => s.Id.Equals(id));
     }
+
+    public async Task<bool> UserOwnsWorkspace(string userId, int workspaceId)
+    {
+        //Check if user owns workspace
+        var workspaceModel =
+            await _context.Workspace.FirstOrDefaultAsync(x => x.WorkspaceId == workspaceId && x.OwnerId == userId);
+        return workspaceModel != null;
+    }
+
+    public async Task<bool> UserIsMember(string userId, int workspaceId)
+    {
+        var workspaceModel =
+            await _context.Members.FirstOrDefaultAsync(x => x.WorkspaceId == workspaceId && x.UserId == userId);
+        return workspaceModel != null;
+    }
 }

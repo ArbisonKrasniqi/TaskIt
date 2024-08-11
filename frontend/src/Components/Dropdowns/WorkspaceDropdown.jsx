@@ -3,15 +3,17 @@ import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import { DropdownContext } from '../Navbar/Navbar';
 import { getDataWithId } from '../../Services/FetchService';
 import { WorkspaceContext } from '../Side/WorkspaceContext';
+import { MainContext } from '../../Pages/MainContext';
 
 const WorkspaceDropdown = (props) => {
   const { workspaces, setWorkspaces } = useContext(WorkspaceContext);
   const dropdownContext = useContext(DropdownContext);
+  const mainContext = useContext(MainContext);
 
   useEffect(() => {
     const getWorkspaces = async () => {
       try {
-        const response = await getDataWithId('http://localhost:5157/backend/workspace/GetWorkspacesByMemberId?memberId', 'asdajsdanlkdjad'); //static id for now
+        const response = await getDataWithId('http://localhost:5157/backend/workspace/GetWorkspacesByMemberId?memberId', mainContext.userInfo.userId);
         const data = response.data;
 
         console.log('Fetched data: ', data);
