@@ -4,6 +4,7 @@ import Navbar from '../Components/Navbar/Navbar';
 import Sidebar from '../Components/Side/Sidebar';
 import Boards from '../Components/ContentFromSide/Boards';
 import { WorkspaceProvider } from '../Components/Side/WorkspaceContext';
+import WorkspaceSettings from '../Components/ContentFromSide/WorkspaceSettings';
 import { useState } from "react"; 
 const Main = () => {
     const [open, setOpen] = useState(true);
@@ -23,7 +24,9 @@ const Main = () => {
                 
                 {/* Boards content on the right */}
                 <div className='w-full flex-grow'>
-                    <Boards />
+                {//<Boards />
+                }
+                <WorkspaceSettings/>   
                 </div>
             </div>
         </div>

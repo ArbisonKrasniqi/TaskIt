@@ -6,8 +6,8 @@ import myImage from './background.jpg';
 export const WorkspaceContext = createContext();
 
 export const WorkspaceProvider = ({ children }) => {
-    const USERID = "asdajsdanlkdjad";
-    const WorkspaceId = 1;
+    const USERID = "96dd1b34-b03b-4255-ab26-1f29f0675755";
+    const WorkspaceId = 2;
     const[open, setOpen] = useState(true);
     const [workspace, setWorkspace] = useState(null);
     const [workspaces, setWorkspaces] = useState(null);
@@ -105,6 +105,16 @@ console.log(workspaceTitle);
     };
 
     
+    const[updateWorkspaceModal, setUpdateWorkspaceModal] = useState(false);
+
+    const handleWorkspaceUpdate = (updatedWorkspace) => {
+        setWorkspace((prev) => ({
+          ...prev,
+          title: updatedWorkspace.Title,
+          description: updatedWorkspace.Description,
+        }));
+      };
+
 
 
 
@@ -125,20 +135,12 @@ console.log(workspaceTitle);
             // setClosedBoards((prevClosedBoards)=> [...prevClosedBoards, closedBoardData]);
         }
         catch(error){
-            console.error("Error closing board:", error);
+            console.error("Error closing board:",error.response?.data || error.message);
         }
     }
 
     
-    const[updateWorkspaceModal, setUpdateWorkspaceModal] = useState(false);
 
-    const handleWorkspaceUpdate = (updatedWorkspace) => {
-        setWorkspace((prev) => ({
-          ...prev,
-          title: updatedWorkspace.Title,
-          description: updatedWorkspace.Description,
-        }));
-      };
 
     
     const handleCreateWorkspace = (newWorkspace) => {
@@ -202,7 +204,7 @@ console.log(workspaceTitle);
                 return moveStarredBoardsToTop(updatedBoards);
             });
         } catch (error) {
-            console.error("Error starring/unstarring the board:", error.response ? error.response.data : error.message);
+            console.error("Error starring/unstarring the board:", error.message);
         }
     };
     
@@ -255,9 +257,10 @@ console.log(workspaceTitle);
             setWorkspace,
             handleCreateWorkspace,
             members,
-            setUpdateWorkspaceModal,
             updateWorkspaceModal,
+            setUpdateWorkspaceModal,
             handleWorkspaceUpdate,
+            handleCreateBoard,
             starredBoards: boards.filter(board => board.starred),
         }}>
             {children}
