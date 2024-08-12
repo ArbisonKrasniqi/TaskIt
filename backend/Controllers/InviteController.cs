@@ -167,6 +167,18 @@ namespace backend.Controllers
                 return BadRequest("Invitee Not Found!");
             }
 
+            var workspace = await _workspaceRepo.GetWorkspaceByIdAsync(inviteDto.WorkspaceId);
+            if (workspace.OwnerId != inviteDto.InviterId)
+            {
+                return BadRequest("Only the owner of workspace can invite others!");
+            }
+            
+            if (workspace.Members.Any(member => member.UserId == inviteDto.InviteeId))
+            {
+                return BadRequest("Invitee is already a member of the workspace.");
+            }
+
+            
             try
             {
                 var inviteModel = _mapper.Map<Invite>(inviteDto);

@@ -1,5 +1,6 @@
 ﻿using backend.Data;
 using backend.DTOs.Invite.Input;
+using backend.DTOs.Members;
 using backend.Interfaces;
 using backend.Models;
 using Microsoft.EntityFrameworkCore;
@@ -10,10 +11,12 @@ namespace backend.Repositories;
 public class InviteRepository : IInviteRepository
 {
     private readonly ApplicationDBContext _context;
+    private readonly IMembersRepository _memberRepo;
 
-    public InviteRepository(ApplicationDBContext context)
+    public InviteRepository(ApplicationDBContext context, IMembersRepository memberRepo)
     {
         _context = context;
+        _memberRepo = memberRepo;
     }
     
     //GetAllAsync 
@@ -38,7 +41,7 @@ public class InviteRepository : IInviteRepository
     public async Task<List<Invite?>> GetInvitesByInviteeAsync(string inviteeId)
     {
         return await _context.Invite.Where(i=>i.InviteeId==inviteeId).ToListAsync();
-    }
+    }   
     
     //GetInvitesByWorkspace
     public async Task<List<Invite>> GetInvitesByWorkspaceAsync(int id)
@@ -91,6 +94,24 @@ public class InviteRepository : IInviteRepository
         }
 
         invite.InviteStatus = updateInviteDto.InviteStatus; //accept ose decline psh
+
+        if (invite.InviteStatus == "Accepted")
+        {
+            var addMemberDto = new AddMemberDto
+            {
+                UserId = invite.InviteeId,
+                WorkspaceId = invite.WorkspaceId
+            };
+            try
+            {
+                await _memberRepo.AddMemberAsync(addMemberDto);
+            }
+            catch (Exception e)
+            {
+                throw new InvalidOperationException("Failed to add member to the workspace");
+            }
+
+        }
         await _context.SaveChangesAsync();
         return invite;
     }
