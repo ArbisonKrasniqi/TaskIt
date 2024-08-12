@@ -45,6 +45,7 @@ export const WorkspaceProvider = ({ children }) => {
     
 const workspaceTitle = workspace ? workspace.title : 'Workspace';
 console.log(workspaceTitle);
+
     useEffect(() => {
         const getBoards = async () => {
             try {
@@ -69,7 +70,7 @@ console.log(workspaceTitle);
                     
                 } else {
                     console.error('Data is null, not an array, or empty:', data);
-                    setBoards([]); // Trajtohen si të dhëna të zbrazëta
+                    setBoards([]); // Trajtohen si te dhëna të zbrazëta
                 }
             } catch (error) {
                 console.error(error.message);

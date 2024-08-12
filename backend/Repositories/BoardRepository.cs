@@ -14,10 +14,12 @@ namespace backend.Repositories
     public class BoardRepository : IBoardRepository
     {
         private readonly ApplicationDBContext _context;
+  
         
         public BoardRepository(ApplicationDBContext context)
         {
             _context=context;
+          
         }
         
         //GetAllAsync --> Gets all boards that exists
@@ -77,7 +79,12 @@ namespace backend.Repositories
 
             if (boardModel == null)
                 return null;
-
+            var starredBoard = await _context.StarredBoard.FirstOrDefaultAsync(x => x.BoardId == id);
+            
+            if (starredBoard == null)
+                return null;
+            
+            _context.StarredBoard.Remove(starredBoard);
             _context.Board.Remove(boardModel);
             await _context.SaveChangesAsync();
             return boardModel;
