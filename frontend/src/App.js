@@ -4,6 +4,7 @@ import Dashboard from './Pages/dashboard.jsx';
 import Main from './Pages/Main.jsx'
 import Preview from './Components/Preview/header.jsx';
 import Boards from './Components/ContentFromSide/Boards.jsx';
+import TaskModal from './Components/TaskModal/TaskModal.jsx';
 
 //import SignUpPage
 
@@ -28,6 +29,7 @@ function App() {
           <Route path="/preview" element={<Preview/>}/>
           <Route path="/boards/:id" element={<Board/>} />
           <Route path="/:userId/:workspaceId?/:boardId?" element={<Test/>} />
+          <Route path="/task" element={<TaskModal/>}/>
         </Routes>
       </BrowserRouter>
 
