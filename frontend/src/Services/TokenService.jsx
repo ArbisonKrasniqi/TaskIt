@@ -82,7 +82,7 @@ export const checkAndRefreshToken = async () => {
                 console.info("Tokens successfully refreshed because they almost expired");
                 return true;
             } else {
-                console.info("Refresh token invalid! Please log in!");
+                console.info("Refresh token invalid! PLease log in!");
                 return false;
             }
         }

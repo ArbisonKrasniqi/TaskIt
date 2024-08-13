@@ -29,10 +29,12 @@ const Main = () => {
                 });
             } else {
                 navigate('/login'); //If no access token exists
+                console.info("Trying to move to login");
             }
 
-            if (!checkAndRefreshToken()){ //If invalid refresh
+            if (await !checkAndRefreshToken()){ //If invalid refresh
                 navigate('/login');
+                console.info("trying to move to login idk");
             }
         }
         updateUserInfoToken();

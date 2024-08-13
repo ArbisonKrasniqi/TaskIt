@@ -15,13 +15,14 @@ import { MdOutlineStarPurple500 } from "react-icons/md";
 import { FiSquare } from "react-icons/fi";
 import { WorkspaceContext } from './WorkspaceContext';
 import LimitModal from "../ContentFromSide/LimitModal.jsx";
+import { MainContext } from "../../Pages/MainContext.jsx";
 const Sidebar = () => {
 
 
 
-
+    const mainContext = useContext(MainContext);
     const { 
-       USERID, workspace, open, setOpen, workspaceTitle, setHover, hover, openCloseModal,
+        workspace, open, setOpen, workspaceTitle, setHover, hover, openCloseModal,
         setOpenSortModal, setOpenCloseModal, openSortModal, setOpenModal, openModal, 
         handleCreateBoard, setHoveredIndex, hoveredIndex, setSelectedBoardTitle, 
          selectedBoardTitle, roli, boards, selectedSort, handleSortChange, 
@@ -143,7 +144,7 @@ const WorkspaceViews = [
                 <button onClick={()=> {setBoardToClose(board); setOpenCloseModal(prev=> !prev); setSelectedBoardTitle(board.title); setOpenSortModal(false); setOpenClosedBoardsModal(false)}} className={`text-gray-400 cursor-pointer ${!open && "scale-0"} mr-3`}><FaEllipsisH /></button>
                 
             )}
-                    <CloseBoardModal open={openCloseModal} boardTitle={selectedBoardTitle} onClose={()=> setOpenCloseModal(false)} role={roli} boardId={boardToClose?.boardId} userId={USERID} onBoardClosed={handleCloseBoard}></CloseBoardModal>
+                    <CloseBoardModal open={openCloseModal} boardTitle={selectedBoardTitle} onClose={()=> setOpenCloseModal(false)} role={roli} boardId={boardToClose?.boardId} userId={mainContext.userInfo.userId} onBoardClosed={handleCloseBoard}></CloseBoardModal>
 
                      
                           

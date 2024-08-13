@@ -8,11 +8,10 @@ export const WorkspaceContext = createContext();
 
 export const WorkspaceProvider = ({ children }) => {
     const mainContext = useContext(MainContext);
-    const USERID = mainContext.userInfo.userId;
-    const WorkspaceId = mainContext.workspaceId;
+    const [WorkspaceId, setWorkspaceId] = useState(mainContext.workspaceId);
     const [open, setOpen] = useState(true);
     const [workspace, setWorkspace] = useState(null);
-    const [workspaces, setWorkspaces] = useState(null);
+    const [workspaces, setWorkspaces] = useState([]);
     const [boards, setBoards] = useState([]);
     const [selectedSort, setSelectedSort] = useState('Alphabetically');
     const [openModal, setOpenModal] = useState(false);
@@ -123,7 +122,7 @@ const workspaceTitle = workspace ? workspace.title : 'Workspace';
         try{
             const closedBoard = {
                 boardId: boardId,
-                userId: USERID,
+                userId: mainContext.userInfo.userId,
                 
             };
             const response = await postData('http://localhost:5157/backend/board/Close', closedBoard);
@@ -178,7 +177,7 @@ const workspaceTitle = workspace ? workspace.title : 'Workspace';
         const isStarred = board.starred;
         const data = {
             BoardId: board.boardId,
-            UserId: USERID,
+            UserId: mainContext.userInfo.userId,
         };
         try {
             if (isStarred) { // Pra starred=true, atëherë bëje unstar
@@ -217,7 +216,6 @@ const workspaceTitle = workspace ? workspace.title : 'Workspace';
 
     return (
         <WorkspaceContext.Provider value={{
-            USERID,
             WorkspaceId,
             workspace,
             workspaces,

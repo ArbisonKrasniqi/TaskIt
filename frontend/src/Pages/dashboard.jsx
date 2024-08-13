@@ -12,7 +12,10 @@ const Dashboard = () => {
 
     useEffect(() => {
         const validateUser = async () => {
-          checkAndRefreshToken();
+          if (await !checkAndRefreshToken()) {
+            console.info("You are not logged in");
+            navigate('/login');
+          }
           const isAdmin = validateAdmin();
           if (!isAdmin) {
               console.info("You are not an administrator.");

@@ -13,23 +13,26 @@ const WorkspaceDropdown = (props) => {
   useEffect(() => {
     const getWorkspaces = async () => {
       try {
-        const response = await getDataWithId('http://localhost:5157/backend/workspace/GetWorkspacesByMemberId?memberId', mainContext.userInfo.userId);
-        const data = response.data;
+        if (mainContext.userInfo.userId) { // Check if userId is available
+          const response = await getDataWithId('http://localhost:5157/backend/workspace/GetWorkspacesByMemberId?memberId', mainContext.userInfo.userId);
+          const data = response.data;
 
-        console.log('Fetched data: ', data);
+          console.log('Fetched workspaces: ', data);
 
-        if (data && Array.isArray(data) && data.length > 0) {
-          setWorkspaces(data);
-        } else {
-          console.log('Data is null, not an array, or empty:', data);
-          setWorkspaces([]);
+          if (data && Array.isArray(data) && data.length > 0) {
+            setWorkspaces(data);
+          } else {
+            console.log('Data is null, not an array, or empty:', data);
+            setWorkspaces([]);
+          }
         }
       } catch (error) {
         setWorkspaces([]);
       }
     };
+
     getWorkspaces();
-  }, [setWorkspaces]); // Added dependency array with setWorkspaces
+  }, [mainContext.userInfo.userId]);
 
   return (
     <div className={`relative ${props.width <= 880 && 'hidden'}`}>
@@ -45,7 +48,7 @@ const WorkspaceDropdown = (props) => {
           {workspaces.length > 0 ? (
             workspaces.map((workspace) => (
               <button
-                key={workspace.id}
+                key={workspace.workspaceId}
                 className='block w-full text-left px-4 py-2 bg-gray-800 text-gray-400 rounded-lg hover:bg-gray-700'
               >
                 {workspace.title}
