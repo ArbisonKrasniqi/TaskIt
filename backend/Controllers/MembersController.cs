@@ -51,7 +51,11 @@ public class MembersController: ControllerBase
         try
         {
             var members = await _membersRepo.GetAllMembersAsync(workspaceId);
-            return Ok(members);
+
+            if (members.Count() == 0) return Ok(new List<MemberDto>());
+
+            var memberDtos = _mapper.Map<IEnumerable<MemberDto>>(members);
+            return Ok(memberDtos);
         }
         catch (Exception e)
         {

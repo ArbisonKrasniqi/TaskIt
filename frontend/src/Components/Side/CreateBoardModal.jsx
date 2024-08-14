@@ -65,7 +65,7 @@ const CreateBoardModal = ({ open, onClose, onBoardCreated, children }) => {
            
             
         } catch (error) {
-            console.log('Error response data: ', error.response.data);
+            console.log('Error response data: ', error.message);
         }
     };
 

@@ -2,12 +2,15 @@
 import React, { createContext, useEffect } from 'react';
 import Navbar from '../Components/Navbar/Navbar';
 import Sidebar from '../Components/Side/Sidebar';
+import { WorkspaceProvider } from '../Components/Side/WorkspaceContext';
 import Boards from '../Components/ContentFromSide/Boards';
+import Workspaces from '../Components/ContentFromSide/Workspaces';
+import WorkspaceSettings from '../Components/ContentFromSide/WorkspaceSettings';
 import { MainContext } from './MainContext.jsx';
 import { getAccessToken, checkAndRefreshToken } from '../Services/TokenService.jsx';
-import { WorkspaceProvider } from '../Components/Side/WorkspaceContext';
 import { useParams } from 'react-router-dom';
 import { useState } from "react"; 
+import List from '../Components/List/List';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 

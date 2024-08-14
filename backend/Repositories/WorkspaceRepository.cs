@@ -108,7 +108,7 @@ public class WorkspaceRepository : IWorkspaceRepository
         return await _context.Workspace
             .Include(w => w.Boards)
             .Include(w => w.Members) // Përfshijmë anëtarët
-            .Where(w => w.Members.Any(m => m.UserId == memberId))
+            .Where(w => w.Members.Any(m => m.UserId == memberId) && w.OwnerId != memberId)
             .ToListAsync();
     }
     

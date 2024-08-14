@@ -22,6 +22,8 @@ const Boards = () =>{
          openSortModal, selectedSort, getBackgroundImageUrl,hoveredBoardIndex, 
          setHoveredBoardIndex } = useContext(WorkspaceContext);
 
+  
+
     if (workspace == null) {
         return <div>Loading...</div>;
     }

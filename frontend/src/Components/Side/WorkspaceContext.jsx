@@ -69,7 +69,7 @@ const workspaceTitle = workspace ? workspace.title : 'Workspace';
                     
                 } else {
                     console.error('Data is null, not an array, or empty:', data);
-                    setBoards([]); // Trajtohen si të dhëna të zbrazëta
+                    setBoards([]); // Trajtohen si te dhëna të zbrazëta
                 }
             } catch (error) {
                 console.error(error.message);
@@ -135,7 +135,7 @@ const workspaceTitle = workspace ? workspace.title : 'Workspace';
             // setClosedBoards((prevClosedBoards)=> [...prevClosedBoards, closedBoardData]);
         }
         catch(error){
-            console.error("Error closing board:", error);
+            console.error("Error closing board:",error.response?.data || error.message);
         }
     }
 
@@ -204,7 +204,7 @@ const workspaceTitle = workspace ? workspace.title : 'Workspace';
                 return moveStarredBoardsToTop(updatedBoards);
             });
         } catch (error) {
-            console.error("Error starring/unstarring the board:", error.response ? error.response.data : error.message);
+            console.error("Error starring/unstarring the board:", error.message);
         }
     };
     
