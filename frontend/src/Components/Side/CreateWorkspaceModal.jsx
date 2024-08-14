@@ -32,7 +32,7 @@ const CreateWorkspaceModal = ({open, onClose, onWorkspaceCreated, children}) => 
       onClose();
     } catch (error) {
       console.log('Failed to create board',error);
-      console.log('Error response data:',error.response.data);
+      console.log('Error response data:', error.message);
     }
   };
 
