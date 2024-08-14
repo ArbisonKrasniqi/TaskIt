@@ -1,16 +1,17 @@
-import React, {createContext, useState, useEffect} from 'react';
+import React, {createContext, useContext , useState, useEffect} from 'react';
 import { getDataWithId, deleteData, postData } from '../../Services/FetchService';
 import myImage from './background.jpg';
+import { MainContext } from '../../Pages/MainContext';
 
 
 export const WorkspaceContext = createContext();
 
 export const WorkspaceProvider = ({ children }) => {
-    const USERID = "96dd1b34-b03b-4255-ab26-1f29f0675755";
-    const WorkspaceId = 2;
-    const[open, setOpen] = useState(true);
+    const mainContext = useContext(MainContext);
+    const [WorkspaceId, setWorkspaceId] = useState(mainContext.workspaceId);
+    const [open, setOpen] = useState(true);
     const [workspace, setWorkspace] = useState(null);
-    const [workspaces, setWorkspaces] = useState(null);
+    const [workspaces, setWorkspaces] = useState([]);
     const [boards, setBoards] = useState([]);
     const [selectedSort, setSelectedSort] = useState('Alphabetically');
     const [openModal, setOpenModal] = useState(false);
@@ -20,7 +21,7 @@ export const WorkspaceProvider = ({ children }) => {
     const [openSortModal, setOpenSortModal] = useState(false);
     const [selectedBoardTitle, setSelectedBoardTitle] = useState("");
     const [openCloseModal, setOpenCloseModal] = useState(false);
-    const[roli, setRoli] = useState("Owner");
+    const [roli, setRoli] = useState("Owner");
     const [openClosedBoardsModal, setOpenClosedBoardsModal] = useState(false);
     const [showLimitModal, setShowLimitModal] = useState(false);
     const boardCount = boards.length;
@@ -44,8 +45,6 @@ export const WorkspaceProvider = ({ children }) => {
 
     
 const workspaceTitle = workspace ? workspace.title : 'Workspace';
-console.log(workspaceTitle);
-
     useEffect(() => {
         const getBoards = async () => {
             try {
@@ -123,7 +122,7 @@ console.log(workspaceTitle);
         try{
             const closedBoard = {
                 boardId: boardId,
-                userId: USERID,
+                userId: mainContext.userInfo.userId,
                 
             };
             const response = await postData('http://localhost:5157/backend/board/Close', closedBoard);
@@ -178,7 +177,7 @@ console.log(workspaceTitle);
         const isStarred = board.starred;
         const data = {
             BoardId: board.boardId,
-            UserId: USERID,
+            UserId: mainContext.userInfo.userId,
         };
         try {
             if (isStarred) { // Pra starred=true, atëherë bëje unstar
@@ -217,7 +216,6 @@ console.log(workspaceTitle);
 
     return (
         <WorkspaceContext.Provider value={{
-            USERID,
             WorkspaceId,
             workspace,
             workspaces,

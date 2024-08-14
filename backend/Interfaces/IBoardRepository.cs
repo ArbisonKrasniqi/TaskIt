@@ -16,5 +16,6 @@ namespace backend.Interfaces
         Task<bool> CloseBoardAsync(int boardId, string userId);
         Task<bool> ReopenBoardAsync(int boardId, string userId);
         Task<List<Board>> GetClosedBoardsAsync(int workspaceId);
+        Task<bool> BoardInWorkspace(int boardId, int workspaceId);
     }
 }

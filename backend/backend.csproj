@@ -30,7 +30,6 @@
       <Folder Include="DTOs\Members\" />
       <Folder Include="DTOs\Board\Output\" />
       <Folder Include="DTOs\User\Output\" />
-      <Folder Include="Service\" />
     </ItemGroup>
 
 </Project>

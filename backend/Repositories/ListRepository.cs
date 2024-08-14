@@ -88,4 +88,20 @@ public class ListRepository : IListRepository
     {
         return await _context.List.AnyAsync(i => i.ListId == listId);
     }
+
+    public async Task<bool> ListInBoard(int listId, int boardId)
+    {
+        var boardModel = await _context.Board.FirstOrDefaultAsync(x => x.BoardId == boardId);
+        var listModel = await _context.List.FirstOrDefaultAsync(x => x.ListId == listId);
+        if (boardModel != null && listModel != null)
+        {
+            if (listModel.BoardId == boardId)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
 }

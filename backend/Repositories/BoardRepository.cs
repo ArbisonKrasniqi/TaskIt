@@ -171,6 +171,22 @@ namespace backend.Repositories
             
             return closedBoards;
         }
+
+        public async Task<bool> BoardInWorkspace(int boardId, int workspaceId)
+        {
+            var workspaceModel = await _context.Workspace.FirstOrDefaultAsync(x => x.WorkspaceId == workspaceId);
+            var boardModel = await _context.Board.FirstOrDefaultAsync(x => x.BoardId == boardId);
+
+            if (workspaceModel != null && boardModel != null)
+            {
+                if (boardModel.WorkspaceId == workspaceId)
+                {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
     }
     
 }

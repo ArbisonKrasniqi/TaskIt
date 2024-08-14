@@ -3,12 +3,14 @@ import { LuArchive } from "react-icons/lu";
 import {deleteData, getDataWithId, postData } from "../../Services/FetchService.jsx";
 import { IoTrashOutline } from "react-icons/io5";
 import { WorkspaceContext } from '../Side/WorkspaceContext.jsx';
+import { MainContext } from '../../Pages/MainContext.jsx';
 
 
 
 
 const ClosedBoardsModal = ({ open, onClose }) => {
-    const { WorkspaceId, USERID, boards, setBoards } = useContext(WorkspaceContext);
+    const { WorkspaceId, boards, setBoards } = useContext(WorkspaceContext);
+    const mainContext = useContext(MainContext);
     const [closedBoards, setClosedBoards] = useState([]);
 
 
@@ -32,7 +34,7 @@ const ClosedBoardsModal = ({ open, onClose }) => {
         try{
             const board = {
                 boardId: boardId,
-                userId: USERID,
+                userId: mainContext.userInfo.userId,
             };
             const response = await postData('http://localhost:5157/backend/board/Reopen', board);
             console.log("Board reopened: ",response.data);
