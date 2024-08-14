@@ -6,7 +6,6 @@ import { WorkspaceProvider } from '../Components/Side/WorkspaceContext';
 import Boards from '../Components/ContentFromSide/Boards';
 import Workspaces from '../Components/ContentFromSide/Workspaces';
 import WorkspaceSettings from '../Components/ContentFromSide/WorkspaceSettings';
-import Boards from '../Components/ContentFromSide/Boards';
 import { MainContext } from './MainContext.jsx';
 import { getAccessToken, checkAndRefreshToken } from '../Services/TokenService.jsx';
 import { useParams } from 'react-router-dom';
