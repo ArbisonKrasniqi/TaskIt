@@ -6,7 +6,6 @@ namespace backend.Interfaces;
 public interface IListRepository
 {
     Task<List<List>> GetAllListsAsync();
-
     Task<List?> GetListByIdAsync(int listId);
     Task<List?> CreateListAsync(List listModel);
     Task<List?> UpdateListAsync(UpdateListDTO listDto);
@@ -15,7 +14,6 @@ public interface IListRepository
     Task<List> CreateAsync(List listModel);
     Task<List<List>> DeleteListsByBoardIdAsync(int BoardId);
     Task<List<List>> GetListByBoardId(int BoardId);
-
     Task<bool> ListExists(int listId);
-
+    Task<bool> ListInBoard(int listId, int boardId);
 }

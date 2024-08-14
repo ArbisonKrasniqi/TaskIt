@@ -16,5 +16,6 @@ public interface ITaskRepository{
     Task<Tasks> CreateAsync (Tasks taskModel);
     Task<List<Tasks>> DeleteTaskByListIdAsync (int ListId);
     Task<List<Tasks>> GetTaskByListId (int ListId);
-    
+    Task<bool> TaskInList(int taskId, int listId);
+
 }

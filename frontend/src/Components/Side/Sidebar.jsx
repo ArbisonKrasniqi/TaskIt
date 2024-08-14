@@ -15,13 +15,14 @@ import { MdOutlineStarPurple500 } from "react-icons/md";
 import { FiSquare } from "react-icons/fi";
 import { WorkspaceContext } from './WorkspaceContext';
 import LimitModal from "../ContentFromSide/LimitModal.jsx";
+import { MainContext } from "../../Pages/MainContext.jsx";
 const Sidebar = () => {
 
 
 
-
+    const mainContext = useContext(MainContext);
     const { 
-       USERID, workspace, open, setOpen, workspaceTitle, setHover, hover, openCloseModal,
+        workspace, open, setOpen, workspaceTitle, setHover, hover, openCloseModal,
         setOpenSortModal, setOpenCloseModal, openSortModal, setOpenModal, openModal, 
         handleCreateBoard, setHoveredIndex, hoveredIndex, setSelectedBoardTitle, 
          selectedBoardTitle, roli, boards, selectedSort, handleSortChange, 
@@ -51,8 +52,8 @@ const WorkspaceViews = [
 
 
     return(
-        <div className="flex">
-            <div className={`${open ? 'w-72' : 'w-8'} duration-100 h-screen p-5 pt-8 relative border-r border-r-solid border-r-gray-500`} style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
+        <div className="flex min-h-screen">
+            <div className={`${open ? 'w-72' : 'w-8'} duration-100 h-full p-5 pt-8 relative border-r border-r-solid border-r-gray-500`} style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
             
         
 
@@ -143,7 +144,7 @@ const WorkspaceViews = [
                 <button onClick={()=> {setBoardToClose(board); setOpenCloseModal(prev=> !prev); setSelectedBoardTitle(board.title); setOpenSortModal(false); setOpenClosedBoardsModal(false)}} className={`text-gray-400 cursor-pointer ${!open && "scale-0"} mr-3`}><FaEllipsisH /></button>
                 
             )}
-                    <CloseBoardModal open={openCloseModal} boardTitle={selectedBoardTitle} onClose={()=> setOpenCloseModal(false)} role={roli} boardId={boardToClose?.boardId} userId={USERID} onBoardClosed={handleCloseBoard}></CloseBoardModal>
+                    <CloseBoardModal open={openCloseModal} boardTitle={selectedBoardTitle} onClose={()=> setOpenCloseModal(false)} role={roli} boardId={boardToClose?.boardId} userId={mainContext.userInfo.userId} onBoardClosed={handleCloseBoard}></CloseBoardModal>
 
                      
                           
@@ -162,7 +163,6 @@ const WorkspaceViews = [
 </ul>
 
             </div>
-          
         </div>
 
 

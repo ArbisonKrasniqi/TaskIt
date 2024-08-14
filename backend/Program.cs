@@ -1,4 +1,5 @@
 using backend.Data;
+using backend.DTOs.Invite.Input;
 using backend.Interfaces;
 using backend.Models;
 using backend.Repositories;
@@ -120,6 +121,7 @@ builder.Services.AddScoped<IMembersRepository, MembersRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddScoped<IBackgroundRepository, BackgroundRepository>();
 builder.Services.AddScoped<IStarredBoardRepository, StarredBoardRepository>();
+builder.Services.AddScoped<IInviteRepository, InviteRepository>();
 // CORS configuration
 builder.Services.AddCors(options =>
 {

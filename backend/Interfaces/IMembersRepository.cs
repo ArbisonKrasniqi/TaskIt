@@ -8,6 +8,6 @@ using backend.Models;
 public interface IMembersRepository
 {
     Task AddMemberAsync (AddMemberDto addMemberDto);
-    Task<List<User>> GetAllMembersAsync(int workspaceId);
+    Task<List<Members>> GetAllMembersAsync(int workspaceId);
     Task<User> RemoveMemberAsync(int workspaceId, string memberId);
 }
