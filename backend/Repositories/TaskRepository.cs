@@ -86,5 +86,18 @@ public class TaskRepository : ITaskRepository{
         return await _context.Tasks.Where(x => x.ListId == ListId).ToListAsync();
     }
 
-   
+    public async Task<bool> TaskInList(int taskId, int listId)
+    {
+        var listModel = await _context.List.FirstOrDefaultAsync(x => x.ListId == listId);
+        var taskModel = await _context.Tasks.FirstOrDefaultAsync(x => x.TaskId == taskId);
+        if (listModel != null && taskModel != null)
+        {
+            if (taskModel.ListId == listId)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

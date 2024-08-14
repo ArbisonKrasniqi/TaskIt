@@ -53,7 +53,7 @@ public class MembersRepository : IMembersRepository
         await _context.SaveChangesAsync();
     }
 //Get all members of a workspace
-    public async Task<List<User>> GetAllMembersAsync(int workspaceId)
+    public async Task<List<Members>> GetAllMembersAsync(int workspaceId)
     {
         var workspace = await _context.Workspace
             .Include(w => w.Members)
@@ -64,7 +64,7 @@ public class MembersRepository : IMembersRepository
             throw new ArgumentNullException( "Workspace not found!");
         }
 
-        return workspace.Members.Select(m => m.User).ToList();
+        return workspace.Members.ToList();
     }
     
     //Remove member from workspace

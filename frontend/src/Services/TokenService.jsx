@@ -2,6 +2,7 @@ import Cookies from 'js-cookie';
 import { jwtDecode } from 'jwt-decode'
 import { postData } from './FetchService';
 
+
 export function validateAdmin() {
     const token = getAccessToken();
     if (!token) {
@@ -60,4 +61,38 @@ export const isTokenExpiring = (expiryTime) => {
     const currentTime = Math.floor((Date.now()) / 1000);
     const timeUntilExpiry = expiryTime - currentTime;
     return timeUntilExpiry < 30;
+}
+
+export const checkAndRefreshToken = async () => {
+    const accessToken = getAccessToken();
+    const refreshToken = getRefreshToken();
+
+    if (!refreshToken) {
+        console.info("You are not logged in");
+        return false;
+    }
+
+    if (accessToken && refreshToken) {
+        const decodedToken = jwtDecode(accessToken);
+        const expiryTime = decodedToken.exp;
+
+        if (isTokenExpiring(expiryTime)) {
+            var refreshResult = await refreshTokens();
+            if (refreshResult) {
+                console.info("Tokens successfully refreshed because they almost expired");
+                return true;
+            } else {
+                console.info("Refresh token invalid! PLease log in!");
+                return false;
+            }
+        }
+    } else if (!accessToken && refreshToken) {
+        var refreshResult = await refreshTokens();
+        if (refreshResult) {
+            console.info("Token successfully refreshed because it expired");
+        } else {
+            console.info("Refresh token invalid! PLease log in!");
+            return false;
+        }
+    }
 }

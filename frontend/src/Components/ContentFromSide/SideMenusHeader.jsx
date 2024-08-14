@@ -6,9 +6,7 @@ import UpdateWorkspaceModal from "./UpdateWorkspaceModal.jsx";
 const SideMenusHeader = () => {
 
     const {workspace, setUpdateWorkspaceModal,updateWorkspaceModal,handleWorkspaceUpdate} = useContext(WorkspaceContext);
-
-    console.log('workspace:', workspace);
-
+    
     // Ensure workspace is not null or undefined
     if (!workspace) {
         console.error('Workspace is null or undefined');

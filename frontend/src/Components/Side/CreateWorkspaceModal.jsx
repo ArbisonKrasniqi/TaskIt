@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { postData } from './../../Services/FetchService'
+import { MainContext } from '../../Pages/MainContext';
 
 const CreateWorkspaceModal = ({open, onClose, onWorkspaceCreated, children}) => {
+  const mainContext = useContext(MainContext);
   const [workspaceTitle, setWorkspaceTitle] = useState('');
   const [workspaceDescription, setWorkspacecDescription] = useState('');
-  const [ownerId, setOwnerId] = useState('asdajsdanlkdjad');
+  const [ownerId, setOwnerId] = useState(mainContext.userInfo.userId);
 
   const handleTitleChange = (e) => {
     setWorkspaceTitle(e.target.value);
@@ -30,7 +32,7 @@ const CreateWorkspaceModal = ({open, onClose, onWorkspaceCreated, children}) => 
       onClose();
     } catch (error) {
       console.log('Failed to create board',error);
-      console.log('Error response data:',error.response.data);
+      console.log('Error response data:', error.message);
     }
   };
 

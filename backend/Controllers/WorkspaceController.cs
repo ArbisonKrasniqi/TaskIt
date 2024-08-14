@@ -1,10 +1,14 @@
-﻿using AutoMapper;
+﻿using System.Security.Claims;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using backend.Data;
 using backend.DTOs;
 using backend.DTOs.Workspace;
 using backend.Interfaces;
 using backend.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend.Controllers
 {
@@ -22,7 +26,9 @@ namespace backend.Controllers
             _workspaceRepo = workspaceRepo;
             _mapper = mapper;
         }
-
+        
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Policy = "AdminOnly")]
         [HttpGet("GetAllWorkspaces")]
         public async Task<IActionResult> GetAllWorkspaces()
         {
@@ -44,18 +50,28 @@ namespace backend.Controllers
         }
 
         [HttpGet("GetWorkspacesByOwnerId")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> GetWorkspacesByOwnerId(string ownerId)
         {
             try
-            {
-                var workspaces = await _workspaceRepo.GetWorkspacesByOwnerIdAsync(ownerId);
-                if (workspaces.Count == 0)
+            { 
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+                var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+
+                if (userId == ownerId || userTokenRole == "Admin")
                 {
-                    return Ok(new List<WorkspaceDto>());
+                    var workspaces = await _workspaceRepo.GetWorkspacesByOwnerIdAsync(ownerId);
+                    if (workspaces.Count == 0)
+                    {
+                        return Ok(new List<WorkspaceDto>());
+                    }
+
+                    var workspaceDtos = _mapper.Map<IEnumerable<WorkspaceDto>>(workspaces);
+                    return Ok(workspaceDtos);
                 }
 
-                var workspaceDtos = _mapper.Map<IEnumerable<WorkspaceDto>>(workspaces);
-                return Ok(workspaceDtos);
+                return StatusCode(400, "You are not authorized!");
+
             }
             catch (Exception e)
             {
@@ -64,18 +80,27 @@ namespace backend.Controllers
         }
 
         [HttpGet("GetWorkspacesByMemberId")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> GetWorkspacesByMemberId(string memberId)
         {
             try
             {
-                var workspaces = await _workspaceRepo.GetWorkspacesByMemberIdAsync(memberId);
-                if (workspaces.Count == 0)
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+                var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+
+                if (userId == memberId || userTokenRole == "Admin")
                 {
-                    return Ok(new List<WorkspaceDto>());
+                    var workspaces = await _workspaceRepo.GetWorkspacesByMemberIdAsync(memberId);
+                    if (workspaces.Count == 0)
+                    {
+                        return Ok(new List<WorkspaceDto>());
+                    }
+
+                    var workspaceDtos = _mapper.Map<IEnumerable<WorkspaceDto>>(workspaces);
+                    return Ok(workspaceDtos);
                 }
 
-                var workspaceDtos = _mapper.Map<IEnumerable<WorkspaceDto>>(workspaces);
-                return Ok(workspaceDtos);
+                return Unauthorized("You are not authorized");
             }
             catch (Exception e)
             {
@@ -84,18 +109,29 @@ namespace backend.Controllers
         }
 
         [HttpGet("GetWorkspaceById")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> GetWorkspaceById(int workspaceId)
         {
             try
             {
-                var workspace = await _workspaceRepo.GetWorkspaceByIdAsync(workspaceId);
-                if (workspace == null)
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+                var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+                var userOwnsWorkspace = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
+                if (userOwnsWorkspace || userTokenRole == "Admin")
                 {
-                    return NotFound("Workspace not found!");
+                    var workspace = await _workspaceRepo.GetWorkspaceByIdAsync(workspaceId);
+                    if (workspace == null)
+                    {
+                        return NotFound("Workspace not found!");
+                    }
+
+                    var workspaceDto = _mapper.Map<WorkspaceDto>(workspace);
+                    return Ok(workspaceDto);
                 }
 
-                var workspaceDto = _mapper.Map<WorkspaceDto>(workspace);
-                return Ok(workspaceDto);
+                return Unauthorized("You are not authorized");
+
+
             }
             catch (Exception e)
             {
@@ -104,24 +140,33 @@ namespace backend.Controllers
         }
 
         [HttpPost("CreateWorkspace")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> CreateWorkspace(CreateWorkspaceRequestDto workspaceDto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            if (!await _userRepo.UserExists(workspaceDto.OwnerId))
-            {
-                return NotFound("User not found");
-            }
-
             try
             {
-                var workspaceModel = _mapper.Map<Workspace>(workspaceDto);
-                var createdWorkspace = await _workspaceRepo.CreateWorkspaceAsync(workspaceModel);
-                var createdWorkspaceDto = _mapper.Map<WorkspaceDto>(createdWorkspace);
-                return CreatedAtAction(nameof(GetWorkspaceById), new { id = createdWorkspace.WorkspaceId }, createdWorkspaceDto);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                if (!await _userRepo.UserExists(workspaceDto.OwnerId))
+                {
+                    return NotFound("User not found");
+                }
+                
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+                var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+
+                if (userId == workspaceDto.OwnerId || userTokenRole == "Admin")
+                {
+                    var workspaceModel = _mapper.Map<Workspace>(workspaceDto);
+                    var createdWorkspace = await _workspaceRepo.CreateWorkspaceAsync(workspaceModel);
+                    var createdWorkspaceDto = _mapper.Map<WorkspaceDto>(createdWorkspace);
+                    return CreatedAtAction(nameof(GetWorkspaceById), new { id = createdWorkspace.WorkspaceId }, createdWorkspaceDto);
+                }
+                return StatusCode(400, "You are not authorized!");
+                
             }
             catch (Exception e)
             {
@@ -130,6 +175,7 @@ namespace backend.Controllers
         }
 
         [HttpPut("UpdateWorkspace")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> UpdateWorkspace(UpdateWorkspaceRequestDto updateDto)
         {
             if (!ModelState.IsValid)
@@ -139,14 +185,22 @@ namespace backend.Controllers
 
             try
             {
-                var workspaceModel = await _workspaceRepo.UpdateWorkspaceAsync(updateDto);
-                if (workspaceModel == null)
-                {
-                    return NotFound("Workspace not found!");
-                }
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+                var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
 
-                var updatedWorkspaceDto = _mapper.Map<WorkspaceDto>(workspaceModel);
-                return Ok(updatedWorkspaceDto);
+                if (userId == updateDto.OwnerId || userTokenRole == "Admin")
+                {
+                    var workspaceModel = await _workspaceRepo.UpdateWorkspaceAsync(updateDto);
+                    if (workspaceModel == null)
+                    {
+                        return NotFound("Workspace not found!");
+                    }
+
+                    var updatedWorkspaceDto = _mapper.Map<WorkspaceDto>(workspaceModel);
+                    return Ok(updatedWorkspaceDto);
+                }
+                return StatusCode(400, "You are not authorized!");
+                
             }
             catch (Exception e)
             {
@@ -155,6 +209,7 @@ namespace backend.Controllers
         }
 
         [HttpDelete("DeleteWorkspace")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> DeleteWorkspace(WorkspaceIdDto workspaceIdDto)
         {
             if (!ModelState.IsValid)
@@ -164,13 +219,22 @@ namespace backend.Controllers
 
             try
             {
-                var workspaceModel = await _workspaceRepo.DeleteWorkspaceAsync(workspaceIdDto.WorkspaceId);
-                if (workspaceModel == null)
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+                var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+
+                if (await _userRepo.UserOwnsWorkspace(userId, workspaceIdDto.WorkspaceId) || userTokenRole == "Admin") //If user owns workspace or is admin
                 {
-                    return NotFound("Workspace not found!");
+                    var workspaceModel = await _workspaceRepo.DeleteWorkspaceAsync(workspaceIdDto.WorkspaceId);
+                    if (workspaceModel == null)
+                    {
+                        return NotFound("Workspace not found!");
+                    }
+
+                    return Ok("Workspace Deleted!");  
                 }
 
-                return Ok("Workspace Deleted!");
+                return StatusCode(400, "You are not authorized!");
+
             }
             catch (Exception e)
             {
@@ -179,6 +243,7 @@ namespace backend.Controllers
         }
 
         [HttpDelete("deleteWorkspacesByOwnerId")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> DeleteWorkspacesByOwnerId(OwnerIdDTO ownerIdDto)
         {
             if (!ModelState.IsValid)
@@ -188,18 +253,27 @@ namespace backend.Controllers
 
             try
             {
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+                var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+
                 if (!await _userRepo.UserExists(ownerIdDto.OwnerId))
                 {
                     return NotFound("User not found!");
                 }
 
-                var workspaceModels = await _workspaceRepo.DeleteWorkspacesByOwnerIdAsync(ownerIdDto.OwnerId);
-                if (workspaceModels == null)
+                if (userId == ownerIdDto.OwnerId || userTokenRole == "Admin")
                 {
-                    return NotFound("Workspaces not found!");
+                    var workspaceModels = await _workspaceRepo.DeleteWorkspacesByOwnerIdAsync(ownerIdDto.OwnerId);
+                    if (workspaceModels == null)
+                    {
+                        return NotFound("Workspaces not found!");
+                    }
+
+                    return Ok("Workspaces Deleted!");
                 }
 
-                return Ok("Workspaces Deleted!");
+                return StatusCode(400, "You are not authorized!");
+
             }
             catch (Exception e)
             {

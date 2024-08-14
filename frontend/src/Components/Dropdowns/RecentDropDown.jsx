@@ -71,7 +71,7 @@ const RecentDropdown = (props) => {
                     {boards.length > 0 ? (
                         boards.map((board) => (
                             <button 
-                            key={board.id}
+                            key={board.boardId}
                             className='block w-full text-left px-4 py-2 bg-gray-800 text-gray-400 rounded-lg hover:bg-gray-700'
                             >
                                 {board.title}
