@@ -14,12 +14,12 @@ namespace backend.Repositories
     public class BoardRepository : IBoardRepository
     {
         private readonly ApplicationDBContext _context;
-  
+     
         
         public BoardRepository(ApplicationDBContext context)
         {
             _context=context;
-          
+       
         }
         
         //GetAllAsync --> Gets all boards that exists
@@ -85,6 +85,7 @@ namespace backend.Repositories
                 return null;
             
             _context.StarredBoard.Remove(starredBoard);
+            _context.List.RemoveRange(boardModel.Lists);
             _context.Board.Remove(boardModel);
             await _context.SaveChangesAsync();
             return boardModel;
@@ -93,10 +94,15 @@ namespace backend.Repositories
         //DeleteBoardsByWorkspaceIdAsync -->Deletes all boards with the given workspaceId
         public async Task<List<Board>> DeleteBoardsByWorkspaceIdAsync(int workspaceId)
         {
-            var boards = await _context.Board.Where(b => b.WorkspaceId == workspaceId).ToListAsync();
+            var boards = await _context.Board
+                .Include(b=>b.Lists)
+                .Where(b => b.WorkspaceId == workspaceId)
+                .ToListAsync();
 
-            if (boards.Count == 0) return null;  //If no boards were deleted , return null         
-
+            foreach (var board in boards)
+            {
+                _context.List.RemoveRange(board.Lists);
+            }
             _context.Board.RemoveRange(boards);
             await _context.SaveChangesAsync();
             return boards;

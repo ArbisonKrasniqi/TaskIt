@@ -100,6 +100,10 @@ public class MembersRepository : IMembersRepository
         return member.User;
     }
 
+    public async Task<bool> IsAMember(string userId, int? workspaceId)
+    {
+        return await _context.Members.AnyAsync(s => s.UserId == userId && s.WorkspaceId == workspaceId);
+    }
 
 
 }

@@ -16,7 +16,7 @@ public class UserRepository : IUserRepository
         return await _context.Users.AnyAsync(s => s.Id.Equals(id));
     }
 
-    public async Task<bool> UserOwnsWorkspace(string userId, int workspaceId)
+    public async Task<bool> UserOwnsWorkspace(string userId, int? workspaceId)
     {
         //Check if user owns workspace
         var workspaceModel =

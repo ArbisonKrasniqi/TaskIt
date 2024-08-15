@@ -3,6 +3,7 @@ using backend.DTOs.Board.Input;
 using backend.DTOs.List;
 using backend.Interfaces;
 using backend.Mappers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 namespace backend.Controllers;
@@ -14,13 +15,16 @@ public class ListController : ControllerBase
 {
     private readonly IListRepository _listRepo;
     private readonly IBoardRepository _boardRepo;
+    private readonly IMembersRepository _membersRepo;
 
-    public ListController(IListRepository listRepo , IBoardRepository boardRepo)
+    public ListController(IListRepository listRepo , IBoardRepository boardRepo, IMembersRepository membersRepo)
     {
         _listRepo = listRepo;
         _boardRepo = boardRepo;
+        _membersRepo = membersRepo;
     }
-
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(Policy = "AdminOnly")]
     [HttpGet("GetAllLists")]
     public async Task<IActionResult> GetAllLists()
     {
@@ -41,49 +45,85 @@ public class ListController : ControllerBase
             return StatusCode(500,"Internal Server Error!");
         }
     }
-
+    
+    [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpGet("GetListById")]
     public async Task<IActionResult> GetById(int ListId)
     {
         try{
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+            var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+
         var list = await _listRepo.GetListByIdAsync(ListId);
         if (list == null)
         {
             return NotFound("List Not Found");
         }
-        return Ok(list.ToListDto());
+
+        if (!await _boardRepo.BoardExists(list.BoardId))
+        {
+            return StatusCode(404, "Board Not Found");
+        }
+        var board = await _boardRepo.GetBoardByIdAsync(list.BoardId);
+        var workspaceId = board.WorkspaceId;
+
+        var isMember = await _membersRepo.IsAMember(userId, workspaceId);
+
+        if (isMember || userTokenRole == "Admin") 
+        {
+            return Ok(list.ToListDto());
+        }
+        return StatusCode(401, "You are not authorized!");
+      
         }catch (Exception e)
         {
             return StatusCode(500, "Internal server error");
         }
     }
-    
 
+    [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpPut("UpdateList")]
-    
+
     public async Task<IActionResult> UpdateList(UpdateListDTO updateListDto)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
-        try
+        if (!await _boardRepo.BoardExists(updateListDto.BoardId))
         {
-            var listModel = await _listRepo.UpdateListAsync(updateListDto);
-
-            if (listModel == null)
+            return StatusCode(404, "Board Not Found");
+        }
+            try
             {
-                return NotFound("List Not Found");
-            }
-        
-            return Ok(listModel.ToListDto());
-        }
-        catch (Exception e)
-        {
-            return StatusCode(500, "Internal Server Errror!");
-        }
-    }
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+                var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
 
+                var board = await _boardRepo.GetBoardByIdAsync(updateListDto.BoardId);
+                var workspaceId = board.WorkspaceId;
+                var isMember = await _membersRepo.IsAMember(userId, workspaceId);
+
+                if (isMember || userTokenRole == "Admin")
+                {
+                    var listModel = await _listRepo.UpdateListAsync(updateListDto);
+
+                    if (listModel == null)
+                    {
+                        return NotFound("List Not Found");
+                    }
+
+                    return Ok(listModel.ToListDto());
+                }
+
+                return StatusCode(401, "You are not authorized!");
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, "Internal Server Errror!");
+            }
+        }
+  
+    [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpDelete("DeleteList")]
 
     public async Task<IActionResult> DeleteList(ListIdDTO listIdDto)
@@ -92,17 +132,34 @@ public class ListController : ControllerBase
         {
             return BadRequest(ModelState);
         }
-
+       
         try
         {
-            var listModel = await _listRepo.DeleteListAsync(listIdDto.ListId);
-            
-            if (listModel == null)
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+            var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+
+            var list = await _listRepo.GetListByIdAsync(listIdDto.ListId);
+            if (list == null)
             {
-                return NotFound("List does not exist");
+                return NotFound("List Not Found");
             }
 
-            return Ok("List Deleted");
+            if (!await _boardRepo.BoardExists(list.BoardId))
+            {
+                return StatusCode(404, "Board Not Found");
+            }
+            var board = await _boardRepo.GetBoardByIdAsync(list.BoardId);
+            var workspaceId = board.WorkspaceId;
+
+            var isMember = await _membersRepo.IsAMember(userId, workspaceId);
+
+            if (isMember || userTokenRole == "Admin")
+            {
+                var listModel = await _listRepo.DeleteListAsync(listIdDto.ListId);
+
+                return Ok("List Deleted");
+            }
+            return StatusCode(401, "You are not authorized!");
         }
         catch (Exception e)
         {
@@ -111,6 +168,7 @@ public class ListController : ControllerBase
     }
     
     // Http Post with relationship one to many with board 
+    [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpPost("CreateList")]
 
     public async Task<IActionResult> CreateList(CreateListDTO listDto)
@@ -119,24 +177,33 @@ public class ListController : ControllerBase
         {
             return BadRequest(ModelState);
         }
-
         try
         {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+            var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+
             if (!await _boardRepo.BoardExists(listDto.BoardId))
             {
-                return BadRequest("Board did not exist");
+                return BadRequest("Board not found!");
             }
+            var board = await _boardRepo.GetBoardByIdAsync(listDto.BoardId);
+            var workspaceId = board.WorkspaceId;
+            var isMember = await _membersRepo.IsAMember(userId, workspaceId);
 
-            var listModel = listDto.ToListFromCreate();
-            await _listRepo.CreateAsync(listModel);
-            return CreatedAtAction(nameof(GetById), new { ListId = listModel.ListId }, listModel.ToListDto());
+            if (isMember || userTokenRole == "Admin")
+            {
+                var listModel = listDto.ToListFromCreate();
+                await _listRepo.CreateAsync(listModel);
+                return CreatedAtAction(nameof(GetById), new { ListId = listModel.ListId }, listModel.ToListDto());
+            } 
+            return StatusCode(401, "You are not authorized!");
         }
         catch (Exception e)
         {
             return StatusCode(500, "Internal Server Errror!");
         }
     }
-
+    [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpGet("GetListByBoardId")]
     public async Task<IActionResult> GetListByBoardId(int BoardId)
     {
@@ -146,22 +213,32 @@ public class ListController : ControllerBase
             {
                 return NotFound("Board Not Found");
             }
-            
-            var lists = await _listRepo.GetListByBoardId(BoardId);
 
-            if (lists.Count == 0)
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+            var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+            var board = await _boardRepo.GetBoardByIdAsync(BoardId);
+            var workspaceId = board.WorkspaceId;
+            var isMember = await _membersRepo.IsAMember(userId, workspaceId);
+
+            if (isMember || userTokenRole == "Admin")
             {
-                return BadRequest("Lists Not Found");
-            }
+                var lists = await _listRepo.GetListByBoardId(BoardId);
 
-            return Ok(lists);
+                if (lists.Count == 0)
+                {
+                    return BadRequest("Lists Not Found");
+                }
+
+                return Ok(lists);
+            }
+            return StatusCode(401, "You are not authorized!");
         }
         catch (Exception e)
         {
             return StatusCode(500, "Internal Server Errror!");
         }
     }
-
+    [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpDelete("DeleteListByBoardId")]
     public async Task<IActionResult> DeleteListByBoardId(BoardIdDto boardIdDto)
     {
@@ -177,14 +254,24 @@ public class ListController : ControllerBase
 
         try
         {
-            var listModel = await _listRepo.DeleteListsByBoardIdAsync(boardIdDto.BoardId);
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+            var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+            var board = await _boardRepo.GetBoardByIdAsync(boardIdDto.BoardId);
+            var workspaceId = board.WorkspaceId;
+            var isMember = await _membersRepo.IsAMember(userId, workspaceId);
 
-            if (listModel.Count == 0)
+            if (isMember || userTokenRole == "Admin")
             {
-                return NotFound("Lists not found!");
-            }
+                var listModel = await _listRepo.DeleteListsByBoardIdAsync(boardIdDto.BoardId);
 
-            return Ok("Lists Deleted");
+                if (listModel.Count == 0)
+                {
+                    return NotFound("Lists not found!");
+                }
+
+                return Ok("Lists Deleted");
+            }
+            return StatusCode(401, "You are not authorized!");
         }
         catch (Exception e)
         {

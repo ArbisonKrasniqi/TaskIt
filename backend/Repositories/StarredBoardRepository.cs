@@ -45,10 +45,6 @@
              UserId = userId
          };
          
-         var board = await _boardRepo.GetBoardByIdAsync(boardId);
-         board.Starred = true;
-         _context.Board.Update(board);
-         
          await _context.StarredBoard.AddAsync(starredBoard);
          await _context.SaveChangesAsync();
  
@@ -78,10 +74,7 @@
          {
              return null;
          }
-         var board = await _boardRepo.GetBoardByIdAsync(boardId);
-         board.Starred = false;
-         _context.Board.Update(board);
-         
+   
          _context.StarredBoard.Remove(starredBoard);
          await _context.SaveChangesAsync();
          return starredBoard;
@@ -93,6 +86,13 @@
          return await _context.StarredBoard.Where(x => x.UserId == userId).ToListAsync();
      }
  
+     // GET STARRED BOARDS BY WORKSPACE
+     public async Task<List<StarredBoard>> GetStarredBoardsByWorkspaceAsync(string userId, int workspaceId)
+     {
+         return await _context.StarredBoard.Where(x => x.UserId == userId && x.WorkspaceId == workspaceId)
+             .ToListAsync();
+     }
+
      //GETSTARRED BOARD BY ID
      public async Task<StarredBoard?> GetStarredBoardByIdAsync(int id)
      {

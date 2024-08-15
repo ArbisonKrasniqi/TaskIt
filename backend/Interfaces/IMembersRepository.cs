@@ -10,4 +10,5 @@ public interface IMembersRepository
     Task AddMemberAsync (AddMemberDto addMemberDto);
     Task<List<Members>> GetAllMembersAsync(int workspaceId);
     Task<User> RemoveMemberAsync(int workspaceId, string memberId);
+    Task<bool> IsAMember(string userId, int? workspaceId);
 }

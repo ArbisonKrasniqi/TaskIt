@@ -54,7 +54,6 @@ public class ListRepository : IListRepository
         {
             return null;
         }
-
         _context.List.Remove(listModel);
         await _context.SaveChangesAsync();
         return listModel;

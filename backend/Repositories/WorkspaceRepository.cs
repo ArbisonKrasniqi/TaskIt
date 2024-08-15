@@ -11,11 +11,13 @@ namespace backend.Repositories;
 public class WorkspaceRepository : IWorkspaceRepository
 {
     private readonly ApplicationDBContext _context;
+    private readonly IBoardRepository _boardRepo;
 
 //constructor
     public WorkspaceRepository(ApplicationDBContext context)
     {
         _context = context;
+      
     }
     /*Task a wrapper for an object duhet gjithmone me e kthy nje Task kur perdorim async
      kur e perdorim async duhet me perdor await ne rreshtat ku dojna me bo async code
@@ -52,7 +54,8 @@ public class WorkspaceRepository : IWorkspaceRepository
         {
             return null;
         }
-
+        
+        
         _context.Board.RemoveRange(workspaceModel.Boards);
         _context.Members.RemoveRange(workspaceModel.Members);
 

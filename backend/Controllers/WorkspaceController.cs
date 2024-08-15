@@ -18,12 +18,14 @@ namespace backend.Controllers
     {
         private readonly IWorkspaceRepository _workspaceRepo;
         private readonly IUserRepository _userRepo;
+        private readonly IMembersRepository _membersRepo;
         private readonly IMapper _mapper;
 
-        public WorkspaceController(IWorkspaceRepository workspaceRepo, IUserRepository userRepo, IMapper mapper)
+        public WorkspaceController(IWorkspaceRepository workspaceRepo, IUserRepository userRepo, IMembersRepository membersRepo, IMapper mapper)
         {
             _userRepo = userRepo;
             _workspaceRepo = workspaceRepo;
+            _membersRepo = membersRepo;
             _mapper = mapper;
         }
         
@@ -70,7 +72,7 @@ namespace backend.Controllers
                     return Ok(workspaceDtos);
                 }
 
-                return StatusCode(400, "You are not authorized!");
+                return StatusCode(401, "You are not authorized!");
 
             }
             catch (Exception e)
@@ -100,7 +102,7 @@ namespace backend.Controllers
                     return Ok(workspaceDtos);
                 }
 
-                return Unauthorized("You are not authorized");
+                return StatusCode(401, "You are not authorized!");
             }
             catch (Exception e)
             {
@@ -116,8 +118,8 @@ namespace backend.Controllers
             {
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
-                var userOwnsWorkspace = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
-                if (userOwnsWorkspace || userTokenRole == "Admin")
+                var isMember = await _membersRepo.IsAMember(userId, workspaceId);
+                if (isMember || userTokenRole == "Admin")
                 {
                     var workspace = await _workspaceRepo.GetWorkspaceByIdAsync(workspaceId);
                     if (workspace == null)
@@ -129,7 +131,7 @@ namespace backend.Controllers
                     return Ok(workspaceDto);
                 }
 
-                return Unauthorized("You are not authorized");
+                return StatusCode(401, "You are not authorized!");
 
 
             }
@@ -165,7 +167,7 @@ namespace backend.Controllers
                     var createdWorkspaceDto = _mapper.Map<WorkspaceDto>(createdWorkspace);
                     return CreatedAtAction(nameof(GetWorkspaceById), new { id = createdWorkspace.WorkspaceId }, createdWorkspaceDto);
                 }
-                return StatusCode(400, "You are not authorized!");
+                return StatusCode(401, "You are not authorized!");
                 
             }
             catch (Exception e)
@@ -199,7 +201,7 @@ namespace backend.Controllers
                     var updatedWorkspaceDto = _mapper.Map<WorkspaceDto>(workspaceModel);
                     return Ok(updatedWorkspaceDto);
                 }
-                return StatusCode(400, "You are not authorized!");
+                return StatusCode(401, "You are not authorized!");
                 
             }
             catch (Exception e)
@@ -221,7 +223,7 @@ namespace backend.Controllers
             {
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
-
+            
                 if (await _userRepo.UserOwnsWorkspace(userId, workspaceIdDto.WorkspaceId) || userTokenRole == "Admin") //If user owns workspace or is admin
                 {
                     var workspaceModel = await _workspaceRepo.DeleteWorkspaceAsync(workspaceIdDto.WorkspaceId);
@@ -233,7 +235,7 @@ namespace backend.Controllers
                     return Ok("Workspace Deleted!");  
                 }
 
-                return StatusCode(400, "You are not authorized!");
+                return StatusCode(401, "You are not authorized!");
 
             }
             catch (Exception e)
@@ -272,7 +274,7 @@ namespace backend.Controllers
                     return Ok("Workspaces Deleted!");
                 }
 
-                return StatusCode(400, "You are not authorized!");
+                return StatusCode(401, "You are not authorized!");
 
             }
             catch (Exception e)

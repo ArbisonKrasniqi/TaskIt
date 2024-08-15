@@ -1,17 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Threading.Tasks;
-using backend.Data;
-using backend.DTOs;
 using backend.DTOs.Task;
 using backend.Interfaces;
 using backend.Mappers;
 using Microsoft.AspNetCore.Mvc;
-using backend.Models;
 using backend.DTOs.List;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.AspNetCore.Authorization;
 namespace backend.Controllers;
 
 
@@ -22,14 +14,18 @@ public class  TaskController : ControllerBase{
 
     private readonly IListRepository _listRepo;
     private readonly ITaskRepository _taskRepo;
+    private readonly IBoardRepository _boardRepo;
+    private readonly IMembersRepository _membersRepo;
 
-    public TaskController(ITaskRepository taskRepo, IListRepository listRepo){
+    public TaskController(ITaskRepository taskRepo, IListRepository listRepo, IBoardRepository boardRepo, IMembersRepository membersRepo){
         _listRepo = listRepo;
         _taskRepo = taskRepo;
-
+        _boardRepo = boardRepo;
+        _membersRepo = membersRepo;
     }
 
-  
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(Policy = "AdminOnly")]
     [HttpGet("GetAllTasks")]
     public async Task<IActionResult> GetAllTasks(){
         try{
@@ -46,109 +42,205 @@ public class  TaskController : ControllerBase{
         }
     }
     
-
+    [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpGet("GetTaskById")]
-    public async Task<IActionResult> GetTaskById (int TaskId){
+    public async Task<IActionResult> GetTaskById (int taskId){
         try{
-            var tasks = await _taskRepo.GetTaskByIdAsync(TaskId);
-
-            if(tasks == null){
+            var task = await _taskRepo.GetTaskByIdAsync(taskId);
+            var list = await _listRepo.GetListByIdAsync(task.ListId);
+            if(task == null){
                 return NotFound("Task not found");
             }
-            return Ok(tasks.ToTaskDto());
+            if (!await _listRepo.ListExists(list.ListId))
+            {
+                return StatusCode(404, "List Not Found");
+            }
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+            var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+            var board = await _boardRepo.GetBoardByIdAsync(list.BoardId);
+            if (!await _boardRepo.BoardExists(board.BoardId))
+            {
+                return NotFound("Board Not Found");
+            }
+            var workspaceId = board.WorkspaceId;
+            var isMember = await _membersRepo.IsAMember(userId, workspaceId);
+            if (isMember || userTokenRole == "Admin")
+            {
+                return Ok(task.ToTaskDto());
+            }
+            return StatusCode(401, "You are not authorized!");
         }catch(Exception e){
             return StatusCode(500, "Internal Server Error");
         }
 
     }
-
+    [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpPut("UpdateTask")]
     public async Task<IActionResult> UpdateTask (UpdateTaskRequestDTO taskDto){
         if(!ModelState.IsValid){
             return BadRequest(ModelState);
         }
         try{
-
-            var taskModel = await _taskRepo.UpdateTaskAsync(taskDto);
-
-            if(taskModel == null){
-                return NotFound("Task not found");
+           
+            var list = await _listRepo.GetListByIdAsync(taskDto.ListId);
+            if (!await _listRepo.ListExists(list.ListId))
+            {
+                return StatusCode(404, "List Not Found");
             }
-            return Ok(taskModel.ToTaskDto());
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+            var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+            var board = await _boardRepo.GetBoardByIdAsync(list.BoardId);
+            if (!await _boardRepo.BoardExists(board.BoardId))
+            {
+                return NotFound("Board Not Found");
+            }
+            var workspaceId = board.WorkspaceId;
+            var isMember = await _membersRepo.IsAMember(userId, workspaceId);
+            if (isMember || userTokenRole == "Admin")
+            {
+                var taskModel = await _taskRepo.UpdateTaskAsync(taskDto);
 
+                if (taskModel == null)
+                {
+                    return NotFound("Task not found");
+                }
+
+                return Ok(taskModel.ToTaskDto());
+            }
+            return StatusCode(401, "You are not authorized!");
         }catch(Exception e){
             return StatusCode(500, "Internal Server Error!");
         }
         
     }
-
+    [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpDelete("DeleteTask")]
     public async Task<IActionResult> DeleteTask (int taskId){
         if(!ModelState.IsValid){
             return BadRequest(ModelState);
         }
         try{
-            var taskModel = await _taskRepo.DeleteTaskAsync(taskId);
-            if(taskModel == null){
-                return NotFound("Task dose not exists");
-            }
-            return Ok("Task Deleted");
+                var task = await _taskRepo.GetTaskByIdAsync(taskId);
+                var list = await _listRepo.GetListByIdAsync(task.ListId);
+                if(task == null){
+                    return NotFound("Task not found");
+                }
+                if (!await _listRepo.ListExists(list.ListId))
+                {
+                    return StatusCode(404, "List Not Found");
+                }
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+                var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+                var board = await _boardRepo.GetBoardByIdAsync(list.BoardId);
+                if (!await _boardRepo.BoardExists(board.BoardId))
+                {
+                    return NotFound("Board Not Found");
+                }
+                var workspaceId = board.WorkspaceId;
+                var isMember = await _membersRepo.IsAMember(userId, workspaceId);
+                if (isMember || userTokenRole == "Admin")
+                {
+                    var taskModel = await _taskRepo.DeleteTaskAsync(taskId);
+                    if (taskModel == null)
+                    {
+                        return NotFound("Task dose not exists");
+                    }
 
-
+                    return Ok("Task Deleted");
+                }
+                return StatusCode(401, "You are not authorized!");
         }catch(Exception e){
             return StatusCode(500, "Internal Server Error ");
         }
 
     }
 
-
-
     // relationship task and list 1-many
+    [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpPost("CreateTask")]
     public async Task<IActionResult> CreateTask (CreateTaskRequestDTO taskDto){
         if(!ModelState.IsValid){
             return BadRequest(ModelState);
         }
 
-        try{
-            if(!await _listRepo.ListExists(taskDto.ListId)){
-                return BadRequest("List did not exist");
-                
+        try
+        {
+            var list = await _listRepo.GetListByIdAsync(taskDto.ListId);
+            if (list == null)
+            {
+                return NotFound("List not found!");
             }
-            var taskModel = taskDto.ToTaskFromCreate();
-            await _taskRepo.CreateTaskAsync(taskModel);
-            return CreatedAtAction(nameof(GetTaskById), new { id = taskModel.TaskId}, taskModel.ToTaskDto());
 
+            var board = await _boardRepo.GetBoardByIdAsync(list.BoardId);
+            if (board == null)
+            {
+                return NotFound("Board not found!");
+            }
+
+            var workspaceId = board.WorkspaceId;
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+            var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+            var isMember = await _membersRepo.IsAMember(userId, workspaceId);
+
+            if (isMember || userTokenRole == "Admin")
+            {
+                if (!await _listRepo.ListExists(taskDto.ListId))
+                {
+                    return BadRequest("List did not exist");
+
+                }
+
+                var taskModel = taskDto.ToTaskFromCreate();
+                await _taskRepo.CreateTaskAsync(taskModel);
+                return CreatedAtAction(nameof(GetTaskById), new { id = taskModel.TaskId }, taskModel.ToTaskDto());
+            }
+            return StatusCode(401, "You are not authorized!");
         }catch(Exception e){
             return StatusCode(500, e.Message);
         }
 
     }
-
+    [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpGet ("GetTaskByListId")]
 
-    public async Task<IActionResult> GetTaskByListId (int listId){
+    public async Task<IActionResult> GetTasksByListId (int listId){
         try{
+            
             if (!await _listRepo.ListExists(listId))
             {
                 return NotFound("List Not Found");
             }
-            
-            var tasks = await _taskRepo.GetTaskByListId(listId);
 
-            if (tasks.Count == 0)
+            var list = await _listRepo.GetListByIdAsync(listId);
+            var board = await _boardRepo.GetBoardByIdAsync(list.BoardId);
+            if (!await _boardRepo.BoardExists(board.BoardId))
             {
-                return BadRequest("Task Not Found");
+                return NotFound("Board not found!");
             }
 
-            return Ok(tasks);
+            var workspaceId = board.WorkspaceId;
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+            var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+            var isMember = await _membersRepo.IsAMember(userId, workspaceId);
 
+            if (isMember || userTokenRole == "Admin")
+            {
+                var tasks = await _taskRepo.GetTaskByListId(listId);
+
+                if (tasks.Count == 0)
+                {
+                    return BadRequest("There are no Tasks!");
+                }
+
+                return Ok(tasks);
+            }
+            return StatusCode(401, "You are not authorized!");
         }catch(Exception e){
             return StatusCode(500, "Internal Server Error!");
         }
 
     }
-
+    [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpDelete("DeleteTaskByListId")]
 
     public async Task<IActionResult> DeleteTaskByListId (ListIdDTO listIdDTO){
@@ -163,14 +255,31 @@ public class  TaskController : ControllerBase{
 
 
         try{
-
-            var taskModel = await _taskRepo.DeleteTaskByListIdAsync(listIdDTO.ListId);
-
-            if(taskModel.Count == 0){
-                return NotFound ("Task not found");
+            var list = await _listRepo.GetListByIdAsync(listIdDTO.ListId);
+            var board = await _boardRepo.GetBoardByIdAsync(list.BoardId);
+            if (!await _boardRepo.BoardExists(board.BoardId))
+            {
+                return NotFound("Board not found!");
             }
-            return Ok("Task Deleted");
 
+            var workspaceId = board.WorkspaceId;
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+            var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+            var isMember = await _membersRepo.IsAMember(userId, workspaceId);
+            if (isMember || userTokenRole == "Admin")
+            {
+
+                var taskModel = await _taskRepo.DeleteTaskByListIdAsync(listIdDTO.ListId);
+
+                if (taskModel.Count == 0)
+                {
+                    return NotFound("Task not found");
+                }
+
+                return Ok("Task Deleted");
+
+            }
+            return StatusCode(401, "You are not authorized!");
         }catch(Exception e){
             return StatusCode(404, "Internal Server Error!");
         }
