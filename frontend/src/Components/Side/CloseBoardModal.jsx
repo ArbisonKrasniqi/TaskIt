@@ -2,26 +2,16 @@ import React, {useEffect, useState} from 'react';
 import { postData } from '../../Services/FetchService';
 
 
-const CloseBoardModal = ({open, boardTitle ,onClose, role, boardId, userId, onBoardClosed}) =>{
+const CloseBoardModal = ({open, boardTitle ,onClose, role, boardId, onBoardClosed}) =>{
   
 
-    const [action, setAction] = useState("Leave"); 
+
     const [modalContent, setModalContent] =useState(" ");
     const [clicked, setClicked] = useState(false);
 
-        useEffect(()=>{
-            if(role=="Owner"){
-                setAction("Close");
-            }
-            else{
-                setAction("Leave");
-            }
-        }, [role]);
-
     
-        const handleClickH2 = (prop1) =>{
+        const handleClickH2 = () =>{
             setClicked(true);
-                if(prop1==="Close"){
                    setModalContent( 
                     <div>
                    <span className='text-gray-900'>
@@ -31,16 +21,8 @@ const CloseBoardModal = ({open, boardTitle ,onClose, role, boardId, userId, onBo
                 <button className='text-gray-900 bg-red-700 w-48 m-2 rounded' onClick={handleClose}>Close Board</button>
                     </div>
             );
-            
-                } else {
-                    setModalContent(
-                    <span className='text-gray-900'>
-                        Are you sure you want to leave this board?
-                        <button className='text-gray-900 bg-red-700 w-48 m-2 rounded' onClick={handleClose}>Leave Board</button>
-                    </span>
-                    );
-                }
         };
+        
         const handleClose = () => {
             onBoardClosed(boardId);
             setClicked(false);
@@ -53,7 +35,7 @@ const CloseBoardModal = ({open, boardTitle ,onClose, role, boardId, userId, onBo
     return(
         <div className="fixed inset-0 z-50 flex items-center justify-start p-4 ml-60 "  onClick={(e) => {
             if (e.target.className.includes('modal-overlay')) {
-                e.stopPropagation(); // Prevent modal from closing on backdrop click
+                e.stopPropagation();//e parandalon mbylljen e modalit kur klikohet mbrapa ne sfond
             }
         }}>
             <div className="bg-white border border-gray-300 rounded-lg shadow-lg w-60">
@@ -70,9 +52,9 @@ const CloseBoardModal = ({open, boardTitle ,onClose, role, boardId, userId, onBo
                 ) : ( // i ndajna qe me mujt mu perdor funksioni handle close tek butoni close(leave)
                     <h2
                         className="p-2 m-1 cursor-pointer text-gray-700 hover:bg-gray-300"
-                        onClick={() => handleClickH2(action)}
+                        onClick={handleClickH2}
                     >
-                        {`${action} board`}
+                        {'close board'}
                     </h2>
                 )}
             </div>

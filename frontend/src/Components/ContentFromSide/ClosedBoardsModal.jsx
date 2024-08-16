@@ -9,8 +9,9 @@ import { MainContext } from '../../Pages/MainContext.jsx';
 
 
 const ClosedBoardsModal = ({ open, onClose }) => {
-    const { WorkspaceId, boards, setBoards } = useContext(WorkspaceContext);
     const mainContext = useContext(MainContext);
+    const [WorkspaceId, setWorkspaceId]=useState(mainContext.workspaceId);
+    const {boards, setBoards } = useContext(WorkspaceContext);
     const [closedBoards, setClosedBoards] = useState([]);
 
 

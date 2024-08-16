@@ -37,8 +37,6 @@ export async function postData(apiEndpoint, data) {
     throw error;
   }
 }
-
-
 export async function deleteData(endpoint, params) {
   let url = endpoint;
   if (params && Object.keys(params).length > 0) {
@@ -47,7 +45,7 @@ export async function deleteData(endpoint, params) {
   }
 
   try {
-    const response = await axios.delete(url, {
+    const response = await api.delete(url, {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -60,12 +58,23 @@ export async function deleteData(endpoint, params) {
   }
 }
 
-
 export async function putData(apiEndpoint, data) {
   try {
     const response = await api.put(apiEndpoint, data);
     return response;
   } catch (error) {
+    throw error;
+  }
+}
+
+export async function getDataWithIds(apiEndpoint, id1, id2) {
+  try {
+    // Construct the query string with two IDs
+    const queryString = new URLSearchParams({ id1, id2 }).toString();
+    const response = await api.get(`${apiEndpoint}?${queryString}`);
+    return response.data; // Return response.data to get the data directly
+  } catch (error) {
+    console.error('Error fetching data with IDs:', error);
     throw error;
   }
 }

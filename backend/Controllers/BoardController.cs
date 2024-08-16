@@ -197,7 +197,7 @@ namespace backend.Controllers
                 
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
-
+                Console.WriteLine($"UserId from Claims: {userId}");
                 var board = await _boardRepo.GetBoardByIdAsync(boardIdDto.BoardId);
 
                 if (board == null) return NotFound("Board does not exists!");
@@ -207,9 +207,15 @@ namespace backend.Controllers
                 //vetem owner mundet me delete board
                 var ownsWorkspace = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
 
+            
                 if (ownsWorkspace || userTokenRole == "Admin")
                 {
                     var boardModel = await _boardRepo.DeleteBoardAsync(boardIdDto.BoardId);
+                    if (boardModel == null)
+                    {
+                        return NotFound("Board not found!");
+                    }
+
                     return Ok("Board Deleted!");
                 }
                 return StatusCode(401, "You are not authorized!");
@@ -354,6 +360,37 @@ namespace backend.Controllers
             }
         }
 
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [HttpGet("GetUnclosedBoards")]
+        public async Task<IActionResult> GetUnClosedBoards(int workspaceId)
+        {
+            try
+            {
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+                var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+                var isMember = await _membersRepo.IsAMember(userId, workspaceId);
+
+                if (isMember || userTokenRole == "Admin")
+                {
+                    var unclosedBoards = await _boardRepo.GetUnclosedBoardsAsync(workspaceId);
+
+                    if (unclosedBoards.Count == 0)
+                    {
+                        return Ok(new List<BoardDto>());
+                    }
+
+
+                    var closedBoardsDto = _mapper.Map<IEnumerable<BoardDto>>(unclosedBoards);
+
+                    return Ok(closedBoardsDto);
+                }
+                return StatusCode(401, "You are not authorized!");
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, "Internal Server Error!" + e.Message);
+            }
+        }
 
     }
 }

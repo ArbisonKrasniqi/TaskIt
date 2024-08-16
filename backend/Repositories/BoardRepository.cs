@@ -26,7 +26,7 @@ namespace backend.Repositories
         public async Task<List<Board>> GetAllBoardsAsync()
         {
             return await _context.Board
-                .Include(b => b.Lists).Where(b=> !b.IsClosed).ToListAsync();
+                .Include(b => b.Lists).ToListAsync();
         }
         
         //GetByIdAsync --> Gets the board that has the given Id
@@ -40,7 +40,8 @@ namespace backend.Repositories
         public async Task<List<Board>> GetBoardsByWorkspaceIdAsync(int workspaceId)
         {
             return await _context.Board.
-                Include(b => b.Lists).Where(b => b.WorkspaceId == workspaceId && !b.IsClosed).ToListAsync();
+                Include(b => b.Lists)
+                .Where(b => b.WorkspaceId == workspaceId).ToListAsync();
         }
         
         //CreateAsync -->Adds a new board with the given attributes
@@ -79,12 +80,15 @@ namespace backend.Repositories
 
             if (boardModel == null)
                 return null;
+           
             var starredBoard = await _context.StarredBoard.FirstOrDefaultAsync(x => x.BoardId == id);
-            
-            if (starredBoard == null)
-                return null;
-            
-            _context.StarredBoard.Remove(starredBoard);
+
+            if (starredBoard != null)
+            {
+                _context.StarredBoard.Remove(starredBoard);
+            }
+
+
             _context.List.RemoveRange(boardModel.Lists);
             _context.Board.Remove(boardModel);
             await _context.SaveChangesAsync();
@@ -176,6 +180,17 @@ namespace backend.Repositories
             
             
             return closedBoards;
+        }
+
+        //Get unclosed boards
+        public async Task<List<Board>> GetUnclosedBoardsAsync(int workspaceId)
+        {
+            var unclosedBoards = await (from b in _context.Board
+                join w in _context.Workspace
+                    on b.WorkspaceId equals w.WorkspaceId
+                where !b.IsClosed && w.WorkspaceId==workspaceId
+                select b).ToListAsync();
+            return unclosedBoards;
         }
 
         public async Task<bool> BoardInWorkspace(int boardId, int workspaceId)

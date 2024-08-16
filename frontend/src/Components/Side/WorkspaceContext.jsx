@@ -1,5 +1,5 @@
 import React, {createContext, useContext , useState, useEffect} from 'react';
-import { getDataWithId, deleteData, postData } from '../../Services/FetchService';
+import { getDataWithId, deleteData, postData, getDataWithIds } from '../../Services/FetchService';
 import myImage from './background.jpg';
 import { MainContext } from '../../Pages/MainContext';
 
@@ -9,76 +9,100 @@ export const WorkspaceContext = createContext();
 export const WorkspaceProvider = ({ children }) => {
     const mainContext = useContext(MainContext);
     const [WorkspaceId, setWorkspaceId] = useState(mainContext.workspaceId);
+    const [userInfo, setUserInfo] = useState(mainContext.userInfo);
+    
     const [open, setOpen] = useState(true);
     const [workspace, setWorkspace] = useState(null);
     const [workspaces, setWorkspaces] = useState([]);
     const [boards, setBoards] = useState([]);
+    const [starredBoards, setStarredBoards]=useState([]);
     const [selectedSort, setSelectedSort] = useState('Alphabetically');
     const [openModal, setOpenModal] = useState(false);
     const [hoveredIndex, setHoveredIndex] = useState(null);
+    const [hoveredSIndex, setHoveredSIndex] = useState(null);
     const [hoveredBoardIndex, setHoveredBoardIndex] =useState(null);
+    const [hoveredBoardSIndex, setHoveredBoardSIndex] =useState(null);
     const [hover, setHover] = useState(false);
     const [openSortModal, setOpenSortModal] = useState(false);
     const [selectedBoardTitle, setSelectedBoardTitle] = useState("");
     const [openCloseModal, setOpenCloseModal] = useState(false);
-    const [roli, setRoli] = useState("Owner");
     const [openClosedBoardsModal, setOpenClosedBoardsModal] = useState(false);
     const [showLimitModal, setShowLimitModal] = useState(false);
-    const boardCount = boards.length;
+    const boardCount = boards.length+starredBoards.length;
    
     const [members, setMembers] = useState([]);
+    const [roli, setRoli]=useState("Member");
+    
 
     useEffect(() => {
+
         const getWorkspace = async () => {
             try {
                 const workspaceResponse = await getDataWithId('http://localhost:5157/backend/workspace/GetWorkspaceById?workspaceId', WorkspaceId);
                 const workspaceData = workspaceResponse.data;
                 console.log('Workspace data: ', workspaceData);
                 setWorkspace(workspaceData);
+
             } catch (error) {
                 console.error(error.message);
             }
         };
         getWorkspace();
         console.log("Workspace fetched", workspace);
-    }, [WorkspaceId]);
+        
+    }, [WorkspaceId]);//userid
 
+    const userId = mainContext.userInfo.userId;
+
+    useEffect(()=>{
+        const ownerId = workspace? workspace.ownerId : '';
+ 
+
+    if (userId === ownerId) {
+        setRoli("Owner");
+    } else {
+        setRoli("Member");
+    }
+    console.log("OwnerId: ",ownerId," UserId:" ,userId);
+    console.log("Roli ", roli);
+}, [workspace, userId]);
+ 
     
 const workspaceTitle = workspace ? workspace.title : 'Workspace';
     useEffect(() => {
         const getBoards = async () => {
             try {
-                const response = await getDataWithId('http://localhost:5157/backend/board/GetBoardsByWorkspaceId?workspaceId', WorkspaceId);
-                const data = response.data;
-                console.log('Fetched data: ', data);
-                if (data && Array.isArray(data) && data.length > 0) {
-                    let sortType = localStorage.getItem('selectedSort') || 'Alphabetically';
-                    let sortedBoards = [];
-                    if (sortType === 'Alphabetically') {
-                        sortedBoards = sortAlphabetically(data);
-                    } else {
-                        sortedBoards = data; // Sepse i merr te sortume by recent nga databaza
-                    }
-                    const starredBoards = JSON.parse(localStorage.getItem('starredBoards')) || [];
-                    sortedBoards.forEach(board => {
-                        board.starred = starredBoards.includes(board.boardId);
-                    });
-                    sortedBoards = moveStarredBoardsToTop(sortedBoards);
-                    setBoards(sortedBoards);
-                    setSelectedSort(sortType);
-                    
-                } else {
-                    console.error('Data is null, not an array, or empty:', data);
-                    setBoards([]); // Trajtohen si te dhëna të zbrazëta
+                const boardsResponse = await getDataWithId('http://localhost:5157/backend/board/GetBoardsByWorkspaceId?workspaceId', WorkspaceId);
+                const allBoards = boardsResponse.data;
+            
+                const starredResponse = await getDataWithId('http://localhost:5157/backend/starredBoard/GetStarredBoardsByWorkspaceId?workspaceId', WorkspaceId);
+                const starredBoards = starredResponse.data;
+
+                const starredBoardsIds = new Set(starredBoards.map(board=>board.boardId));
+
+                const nonStarred = allBoards.filter(board=> !starredBoardsIds.has(board.boardId));
+                const starred = allBoards.filter(board=>starredBoardsIds.has(board.boardId));
+
+
+                let sortedNonStarred = nonStarred;
+                if (selectedSort === 'Alphabetically') {
+                    sortedNonStarred = sortAlphabetically(nonStarred);
                 }
+
+                    setBoards(sortedNonStarred);
+                    setStarredBoards(starred);
             } catch (error) {
                 console.error(error.message);
-                setBoards([]); // Në rast që ndodh ndonjë gabim
+                setBoards([]);
+                setStarredBoards([]);
             }
         };
         getBoards();
-        console.log("Boards fetched:", boards);
-    },[WorkspaceId]);
+        console.log("Starred boards: ",starredBoards);
+        console.log("All boards",boards);
+    }, [WorkspaceId, userId, selectedSort]);
+
+
 
 
     useEffect(() => {
@@ -130,7 +154,7 @@ const workspaceTitle = workspace ? workspace.title : 'Workspace';
            
             
             setBoards((prevBoards) => prevBoards.filter((b)=> b.boardId !== boardId));
-            
+            setStarredBoards((prevStarredBoards) => prevStarredBoards.filter((b) => b.boardId !== boardId));
             // const closedBoardData = response.data;
             // setClosedBoards((prevClosedBoards)=> [...prevClosedBoards, closedBoardData]);
         }
@@ -147,10 +171,6 @@ const workspaceTitle = workspace ? workspace.title : 'Workspace';
       setWorkspaces((prevWorkspaces) => [...prevWorkspaces, newWorkspace]);
   }
 
-    const moveStarredBoardsToTop = (boards) => {
-        return boards.sort((a, b) => b.starred - a.starred);
-    };
-
     const sortAlphabetically = (boards) => {
         return boards.slice().sort((a, b) => a.title.localeCompare(b.title));
     };
@@ -162,52 +182,54 @@ const workspaceTitle = workspace ? workspace.title : 'Workspace';
 
     const handleSortChange = async (sortType) => {
         setSelectedSort(sortType);
-        localStorage.setItem('selectedSort', sortType);
-        let sortedBoards = [];
+        let sortedBoards = boards;
         if (sortType === 'Alphabetically') {
             sortedBoards = sortAlphabetically(boards);
         } else {
             sortedBoards = await sortByRecent();
         }
-        sortedBoards = moveStarredBoardsToTop(sortedBoards);
         setBoards(sortedBoards);
     };
-
     const handleStarBoard = async (board) => {
-        const isStarred = board.starred;
+        const isStarred = starredBoards.some(b => b.boardId === board.boardId);
         const data = {
             BoardId: board.boardId,
-            UserId: mainContext.userInfo.userId,
+            UserId: userId,
+            WorkspaceId: WorkspaceId,
         };
         try {
-            if (isStarred) { // Pra starred=true, atëherë bëje unstar
-                const dataUnstar = await deleteData('http://localhost:5157/backend/starredBoard/UnstarBoard', data);
-                console.log(dataUnstar.data);
-                // REMOVE FROM LOCALSTORAGE
-                let starredBoards = JSON.parse(localStorage.getItem('starredBoards')) || [];
-                starredBoards = starredBoards.filter(id => id !== board.boardId);
-                localStorage.setItem('starredBoards', JSON.stringify(starredBoards));
-            } else { // DMTH starred=false, atëherë bëje star
-                const dataResponse = await postData('http://localhost:5157/backend/starredBoard/StarBoard', data);
-                console.log(dataResponse.data);
-                // ADD TO LOCAL STORAGE
-                let starredBoards = JSON.parse(localStorage.getItem('starredBoards')) || [];
-                starredBoards.push(board.boardId);
-                localStorage.setItem('starredBoards', JSON.stringify(starredBoards));
-            }
+            if (isStarred) {
     
-            setBoards(prevBoards => {
-                const updatedBoards = prevBoards.map(b =>
-                    b.boardId === board.boardId ? { ...b, starred: !isStarred } : b
-                );
-                console.log('Updated Boards:', updatedBoards);
-                return moveStarredBoardsToTop(updatedBoards);
-            });
+                    // Unstar the board
+                    await deleteData('http://localhost:5157/backend/starredBoard/UnstarBoard', data);
+                } else {
+                    // Star the board
+                    await postData('http://localhost:5157/backend/starredBoard/StarBoard', data);
+                }
+                
+                // Re-fetch boards and starred boards
+                const boardsResponse = await getDataWithId('http://localhost:5157/backend/board/GetBoardsByWorkspaceId?workspaceId', WorkspaceId);
+                const allBoards = boardsResponse.data;
+        
+                const starredResponse = await getDataWithId('http://localhost:5157/backend/starredBoard/GetStarredBoardsByWorkspaceId?workspaceId', WorkspaceId);
+                const updatedStarredBoards = starredResponse.data;
+        
+                const starredBoardsIds = new Set(updatedStarredBoards.map(board => board.boardId));
+        
+                const nonStarred = allBoards.filter(board => !starredBoardsIds.has(board.boardId));
+                const starred = allBoards.filter(board => starredBoardsIds.has(board.boardId));
+        
+                let sortedNonStarred = nonStarred;
+                if (selectedSort === 'Alphabetically') {
+                    sortedNonStarred = sortAlphabetically(nonStarred);
+                }
+        
+                setStarredBoards(starred);
+                setBoards(sortedNonStarred);
         } catch (error) {
             console.error("Error starring/unstarring the board:", error.message);
         }
     };
-    
     const getBackgroundImageUrl = (board) => {
         // const background = backgrounds.find(b=>b.backgroundId === board.backgroundId);
         // return background? background.imageUrl : '';
@@ -235,12 +257,15 @@ const workspaceTitle = workspace ? workspace.title : 'Workspace';
             openModal,
             setHoveredIndex,
             hoveredIndex,
+            hoveredSIndex,
+            setHoveredSIndex,
             setSelectedBoardTitle,
             selectedBoardTitle,
             roli,
             hoveredBoardIndex,
             setHoveredBoardIndex,
-            moveStarredBoardsToTop,
+            hoveredBoardSIndex,
+            setHoveredBoardSIndex,
             sortAlphabetically,
             sortByRecent,
             handleSortChange,
@@ -260,7 +285,7 @@ const workspaceTitle = workspace ? workspace.title : 'Workspace';
             setUpdateWorkspaceModal,
             handleWorkspaceUpdate,
             handleCreateBoard,
-            starredBoards: boards.filter(board => board.starred),
+            starredBoards,
         }}>
             {children}
         </WorkspaceContext.Provider>

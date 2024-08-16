@@ -49,7 +49,7 @@ namespace backend.Controllers
                     var starredModel = _mapper.Map<StarredBoard>(starredBoardDto);
 
                     var starredBoard =
-                        await _starredBoardRepo.StarBoardAsync(starredModel.UserId, starredModel.BoardId);
+                        await _starredBoardRepo.StarBoardAsync(starredModel.UserId, starredModel.BoardId, starredModel.WorkspaceId);
 
                     if (starredBoard == null)
                     {
@@ -177,7 +177,7 @@ namespace backend.Controllers
 
                     var unstarredBoard =
                         await _starredBoardRepo.UnStarBoardAsync(unstarredBoardModel.UserId,
-                            unstarredBoardModel.BoardId);
+                            unstarredBoardModel.BoardId, unstarredBoardModel.WorkspaceId);
                     if (unstarredBoard == null)
                     {
                         return NotFound("Board Not Found or Not Starred!");

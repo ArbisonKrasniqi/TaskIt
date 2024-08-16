@@ -20,7 +20,7 @@
      }
  
      //STAR BOARD
-     public async Task<StarredBoard?> StarBoardAsync(string userId, int boardId)
+     public async Task<StarredBoard?> StarBoardAsync(string userId, int boardId, int workspaceId)
      {
 
          if (!await _userRepo.UserExists(userId))
@@ -42,7 +42,8 @@
          var starredBoard = new StarredBoard
          {
              BoardId = boardId,
-             UserId = userId
+             UserId = userId,
+             WorkspaceId = workspaceId
          };
          
          await _context.StarredBoard.AddAsync(starredBoard);
@@ -52,7 +53,7 @@
      }
  
      //UNSTAR BOARD
-     public async Task<StarredBoard?> UnStarBoardAsync(string userId, int boardId)
+     public async Task<StarredBoard?> UnStarBoardAsync(string userId, int boardId, int workspaceId)
      {
          
          if (!await _userRepo.UserExists(userId))
@@ -69,7 +70,7 @@
              throw new Exception("This Board hasn't been starred before!");
          }
 
-         var starredBoard = await _context.StarredBoard.FirstOrDefaultAsync(x => x.BoardId == boardId && x.UserId == userId);
+         var starredBoard = await _context.StarredBoard.FirstOrDefaultAsync(x => x.BoardId == boardId && x.UserId == userId && x.WorkspaceId==workspaceId);
          if (starredBoard == null)
          {
              return null;

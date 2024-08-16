@@ -20,7 +20,7 @@ const Boards = () =>{
         boardCount, setOpenClosedBoardsModal, boards, handleCreateBoard, openModal, 
         setOpenModal, setOpenCloseModal, handleStarBoard, handleSortChange, setOpenSortModal,
          openSortModal, selectedSort, getBackgroundImageUrl,hoveredBoardIndex, 
-         setHoveredBoardIndex } = useContext(WorkspaceContext);
+         setHoveredBoardIndex, hoveredBoardSIndex, setHoveredBoardSIndex, roli, starredBoards } = useContext(WorkspaceContext);
 
   
 
@@ -72,7 +72,39 @@ return (
             <CreateBoardModal open={openModal} onClose={()=> setOpenModal(false)} onBoardCreated={handleCreateBoard}>
             </CreateBoardModal>
 
-            {boards.length===0? (
+
+             {
+              starredBoards.map((board, index)=>(
+                
+            <li key={index} onMouseEnter={()=> setHoveredBoardSIndex(index)}
+            onMouseLeave={() => setHoveredBoardSIndex(null)}
+            style={{  width: '300px', 
+                      height: '150px',}}
+            className={`flex justify-normal text-white text-lg font-semibold items-center mt-3 cursor-pointer border
+            border-solid border-gray-700 ${hoveredBoardSIndex===index ? ` bg-gray-400 opacity-50`: ''} `}>
+
+            <div className="relative w-full h-full" style={{ 
+                  backgroundImage: `url(${getBackgroundImageUrl(board)})`, 
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }}>
+              <h2 className="ml-3">{board.title}</h2>
+
+
+              <button
+                className="absolute right-2 top-2 text-white font-bold text-3xl transition ease-in-out duration-300"
+                style={{textShadow: '0 0 10px rgba(255, 255, 255, 0.6), 0 0 20px rgba(255, 255, 255, 0.4)'}}
+                onClick={()=>handleStarBoard(board)}>
+                <MdOutlineStarPurple500 /></button>
+
+
+            </div>
+
+
+          </li>
+          ))}
+
+            {boards.length===0 && starredBoards.length===0 ? (
             <li className="mt-10"> <span>No boards found</span> </li>
             ) : (
             boards.map((board, index)=>(
@@ -96,9 +128,9 @@ return (
                   className="absolute right-2 top-2 text-white font-bold text-3xl transition ease-in-out duration-300"
                   style={{textShadow: '0 0 10px rgba(255, 255, 255, 0.6), 0 0 20px rgba(255, 255, 255, 0.4)'}}
                   onClick={()=>handleStarBoard(board)}
-                  >{(board.starred) ?
-                  <MdOutlineStarPurple500 />: (hoveredBoardIndex===index ) ?
-                  <MdOutlineStarOutline /> : ''}</button>
+                  >
+                  {(hoveredBoardIndex===index ) ?
+                  <MdOutlineStarPurple500 /> : <MdOutlineStarOutline /> }</button>
 
 
               </div>
@@ -109,11 +141,13 @@ return (
             }
           </ul>
         </div>
-        <button
+        {roli==="Owner" && (  
+          <button
           className="flex justify-center text-black font-sans text-center font-semibold bg-blue-600 items-center border border-solid border-blue-700 rounded-lg  mt-10 hover:bg-blue-500 w-[200px] h-[40px]"
           onClick={()=> setOpenClosedBoardsModal(prev => !prev)}
           > View Closed Boards</button>
-
+)}
+      
         <ClosedBoardsModal open={openClosedBoardsModal} onClose={()=> {setOpenClosedBoardsModal(false);
           setOpenCloseModal(false);}}></ClosedBoardsModal>
       </div>
