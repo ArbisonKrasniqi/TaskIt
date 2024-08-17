@@ -3,18 +3,19 @@ import { TaskModalsContext } from './TaskModal'
 import { MdOutlineEdit } from "react-icons/md";
 
 function LabelsModal() {
-    const { toggleLabelsModal } = useContext(TaskModalsContext);
+    const { toggleLabelsModal, toggleCreateLabelModal, toggleEditLabelModal } = useContext(TaskModalsContext);
     const [searchLabel, setSearchLabel] = useState("");
+    
     const labels = [
         { id: 1, name: "Completed", color: "green", background: "bg-green-800 bg-opacity-80" },
         { id: 2, name: "", color: "yellow", background: "bg-yellow-400 bg-opacity-70"},
         { id: 3, name: "STUCK", color: "red", background: "bg-red-600"}
     ];
-
     const filterLabels = labels.filter( label =>
         label.name.toLowerCase().includes(searchLabel.toLowerCase()) ||
         label.color.toLowerCase().includes(searchLabel.toLowerCase())
     );
+
 
     return (
         <div className="absolute  inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
@@ -50,14 +51,16 @@ function LabelsModal() {
                                     {labels.name}
                                 </span>
                                 <button
-                                    className="ml-auto text-xl text-gray-500 rounded-xs w-8 h-8 flex justify-center items-center hover:bg-gray-800">
+                                    className="ml-auto text-xl text-gray-500 rounded-xs w-8 h-8 flex justify-center items-center hover:bg-gray-800"
+                                    onClick={() => toggleEditLabelModal(labels)}>
                                     <MdOutlineEdit/>
                                 </button>
                             </div>
                         ))}
                     </div>
                 )}
-                <button className='w-full h-8 rounded-sm bg-gray-600 bg-opacity-25 text-gray-400 font-semibold hover:bg-opacity-50'>Create a new label</button>
+                <button className='w-full h-8 rounded-sm bg-gray-600 bg-opacity-25 text-gray-400 font-semibold hover:bg-opacity-50'
+                    onClick={toggleCreateLabelModal}>Create a new label</button>
             </div>
         </div>
     );

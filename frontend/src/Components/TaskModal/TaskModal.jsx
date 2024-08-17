@@ -15,6 +15,9 @@ import TaskActivityLog from './TaskActivityLog'
 import Checklist from './Checklist';
 import MembersModal from './MembersModal';
 import LabelsModal from './LabelsModal';
+import ChecklistModal from './ChecklistModal';
+import CreateLabelModal from './CreateLabelModal';
+import EditLabelModal from './EditLabelModal';
 
 export const TaskModalsContext = createContext();
 
@@ -22,20 +25,60 @@ const TaskModal = () => {
 
     const [isMembersModalOpen, setIsMembersModalOpen] = useState(false);
     const [isLabelModalOpen, setIsLabelModalOpen] = useState(false);
+    const [isChecklistModalOpen, setIsChecklistModalOpen] = useState(false);
+    const [isCreateLabelModalOpen, setIsCreateLabelModalOpen] = useState(false);
+    const [isEditLabelModalOpen, setIsEditLabelModalOpen] = useState(false);
+    const [selectedLabel, setSelectedLabel] = useState(null);
 
     const toggleMembersModal = () => {
         setIsMembersModalOpen(!isMembersModalOpen);
     };
 
     const toggleLabelsModal = () => {
-        setIsLabelModalOpen(!isLabelModalOpen);
+        if (!isLabelModalOpen) {
+            setIsLabelModalOpen(true);
+            setIsCreateLabelModalOpen(false);
+            setIsEditLabelModalOpen(false);
+        } else {
+            setIsLabelModalOpen(false);
+        }
     };
+
+    const toggleChecklistModal = () => {
+        setIsChecklistModalOpen(!isChecklistModalOpen);
+    };
+
+    const toggleCreateLabelModal = () => {
+        if (!isCreateLabelModalOpen) {
+            setIsLabelModalOpen(false);
+            setIsCreateLabelModalOpen(true);
+        } else {
+            setIsCreateLabelModalOpen(false);
+        }
+    };
+
+    const toggleEditLabelModal = (label) => {
+        if (!isEditLabelModalOpen) {
+            setSelectedLabel(label);
+            setIsLabelModalOpen(false);
+            setIsEditLabelModalOpen(true);
+        } else {
+            setIsEditLabelModalOpen(false);
+        }
+    }
 
     const values = {
         isMembersModalOpen,
         toggleMembersModal,
         isLabelModalOpen,
-        toggleLabelsModal
+        toggleLabelsModal,
+        isChecklistModalOpen,
+        toggleChecklistModal,
+        isCreateLabelModalOpen,
+        toggleCreateLabelModal,
+        isEditLabelModalOpen,
+        toggleEditLabelModal,
+        selectedLabel
     };
 
     return (
@@ -130,7 +173,8 @@ const TaskModal = () => {
                                         onClick={toggleLabelsModal}>
                                         <CgTag className="mx-2 rotate-[135deg] text-lg"/> Labels
                                     </button>
-                                    <button className="flex justify-start items-center bg-gray-600 bg-opacity-30 rounded-sm h-8 my-1 hover:bg-opacity-80">
+                                    <button className="flex justify-start items-center bg-gray-600 bg-opacity-30 rounded-sm h-8 my-1 hover:bg-opacity-80"
+                                        onClick={toggleChecklistModal}>
                                         <IoMdCheckboxOutline className="mx-2 text-lg"/> Checklist
                                     </button>
                                     <button className="flex justify-start items-center bg-gray-600 bg-opacity-30 rounded-sm h-8 my-1 hover:bg-opacity-80">
@@ -155,6 +199,9 @@ const TaskModal = () => {
                     </div>
                     {isMembersModalOpen && <MembersModal />}
                     {isLabelModalOpen && <LabelsModal/>}
+                    {isChecklistModalOpen && <ChecklistModal/>}
+                    {isCreateLabelModalOpen && <CreateLabelModal/>}
+                    {isEditLabelModalOpen && <EditLabelModal/>}
                     
                 </div>
             </div>
