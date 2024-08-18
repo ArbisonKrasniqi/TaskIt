@@ -59,9 +59,32 @@ public class MembersController: ControllerBase
         }
         
     }
+
     [Authorize(AuthenticationSchemes = "Bearer")]
-    [HttpGet("getAllMembers")]
-    public async Task<IActionResult> GetAllMembers(int workspaceId)
+    [Authorize(Policy = "AdminOnly")]
+    [HttpGet("GetAllMembers")]
+    public async Task<IActionResult> GetAllMembers()
+    {
+        try
+        {
+            var members = await _membersRepo.GetAllMembersAsync();
+            if (members.Count == 0)
+            {
+                return Ok(new List<MemberDto>());
+            }
+
+            var membersDtos = _mapper.Map<List<MemberDto>>(members);
+            return Ok(membersDtos);
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, "Internal server error!"+e.Message);
+        }
+    }
+
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    [HttpGet("getAllMembersByWorkspace")]
+    public async Task<IActionResult> GetAllMembersByWorkspace(int workspaceId)
     {
         try
         { 
@@ -75,7 +98,7 @@ public class MembersController: ControllerBase
             if (isMember || userTokenRole == "Admin")
             {
 
-                var members = await _membersRepo.GetAllMembersAsync(workspaceId);
+                var members = await _membersRepo.GetAllMembersByWorkspaceAsync(workspaceId);
 
                 if (members.Count() == 0) return Ok(new List<MemberDto>());
 
@@ -131,4 +154,57 @@ public class MembersController: ControllerBase
             return StatusCode(500, "Internal server error: "+ e.Message);  
         }
     }
+
+    [HttpDelete("DeleteMember")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(Policy = "AdminOnly")]
+    public async Task<IActionResult> DeleteMember([FromQuery] MemberIdDto memberIdDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        try
+        {
+            var memberModel = await _membersRepo.DeleteMemberById(memberIdDto.MemberId);
+            if (memberModel == null)
+            {
+                return NotFound("Member not found!");
+            }
+            return Ok("Member Deleted!");
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, "Internal server error"+e.Message);
+        }
+    }
+
+    [HttpPut("UpdateMember")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(Policy = "AdminOnly")]
+    public async Task<IActionResult> UpdateMember(UpdateMemberDto updateMemberDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        try
+        {
+            var memberModel = await _membersRepo.UpdateMemberAsync(updateMemberDto);
+            if (memberModel == null)
+            {
+                return NotFound("Workspace not found!");
+            }
+
+            var updatedMemberDto = _mapper.Map<MemberDto>(memberModel);
+            return Ok(updateMemberDto);
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, "Internal server error"+e.Message);
+        }
+    }
+
 }

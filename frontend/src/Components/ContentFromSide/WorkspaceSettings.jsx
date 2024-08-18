@@ -54,7 +54,7 @@ const WorkspaceSettings = () =>{
         }
     };
     return(
-    <div className="h-full" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
+    <div className="h-screen" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
  <SideMenusHeader/>
     <div className="font-semibold font-sans text-gray-400 ml-20 mt-10">
     <h1 className="text-3xl">

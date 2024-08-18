@@ -100,4 +100,16 @@ public class TaskRepository : ITaskRepository{
 
         return false;
     }
+
+    public async Task<List<Tasks>> GetTasksByWorkspaceIdAsync(int workspaceId)
+    {
+        var boards = await _context.Board.Where(b => b.WorkspaceId == workspaceId).ToListAsync();
+        var boardIds = boards.Select(b => b.BoardId).ToList();
+
+        var lists = await _context.List.Where(l => boardIds.Contains(l.BoardId)).ToListAsync();
+        var listIds = lists.Select(l => l.ListId).ToList();
+
+        var tasks = await _context.Tasks.Where(t => listIds.Contains(t.ListId)).ToListAsync();
+        return tasks;
+    }
 }

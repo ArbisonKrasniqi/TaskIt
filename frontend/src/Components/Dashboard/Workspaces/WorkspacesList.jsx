@@ -33,8 +33,8 @@ const WorkspacesList = () => {
         <WorkspacesContext.Provider value={contextValue}>
 
             <WorkspacesTable/> 
-            {/*User table dhe krejt femijet e tij kan me pas qasje ne krejt ato qe jon ne contextValue */
-            /* Ne fillim WorkspacesErrorModal nuk shfaqet sepse showWorkspacesErrorModal eshte false */
+            {/*workspaces table dhe krejt femijet e tij kan me pas qasje ne krejt ato qe jon ne contextValue */
+            /* Ne fillim WorkspacesErrorModal nuk shfaqet sepse showWorkspacesErrorModal default value e ka false */
             }
             {showWorkspacesErrorModal && <WorkspacesErrorModal/>}
 

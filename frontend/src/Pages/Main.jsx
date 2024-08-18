@@ -13,6 +13,9 @@ import { useState } from "react";
 import List from '../Components/List/List';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
+import Table from '../Components/ContentFromSide/Table.jsx';
+import Calendar from '../Components/ContentFromSide/Calendar.jsx';
+import LoadingModal from '../Components/Modal/LoadingModal.jsx';
 
 const Main = () => {
     const {opened, workspaceId, boardId, taskId} = useParams();
@@ -67,7 +70,9 @@ const Main = () => {
                             {opened === 'boards' && <Boards />}
                             {opened === 'workspaceSettings' && <WorkspaceSettings/>}
                             {opened === 'workspaces' && <Workspaces/>}
-                          
+                            {opened === 'table' && <Table/>}
+                            {opened === 'calendar' && <Calendar/>}
+                            {opened === 'loadingModal' && <LoadingModal/>}
                             {/* {opened === 'members' && <Members />} */}
                         </div>
                     </div>

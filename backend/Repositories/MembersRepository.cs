@@ -14,6 +14,13 @@ public class MembersRepository : IMembersRepository
     {
         _context = context;
     }
+    
+    //GETALL
+    public async Task<List<Members?>> GetAllMembersAsync()
+    {
+        return await _context.Members.ToListAsync();
+    }
+
 //ADD MEMBERS
     public async Task AddMemberAsync(AddMemberDto addMemberDto)
     {
@@ -53,7 +60,7 @@ public class MembersRepository : IMembersRepository
         await _context.SaveChangesAsync();
     }
 //Get all members of a workspace
-    public async Task<List<Members>> GetAllMembersAsync(int workspaceId)
+    public async Task<List<Members>> GetAllMembersByWorkspaceAsync(int workspaceId)
     {
         var workspace = await _context.Workspace
             .Include(w => w.Members)
@@ -105,6 +112,34 @@ public class MembersRepository : IMembersRepository
         return await _context.Members.AnyAsync(s => s.UserId == userId && s.WorkspaceId == workspaceId);
     }
 
+    //DELETE BY ID
+    public async Task<Members?> DeleteMemberById(int id)
+    {
+        var memberModel = await _context.Members.FirstOrDefaultAsync(m => m.MemberId == id);
+        if (memberModel == null)
+        {
+            return null;
+        }
+
+        _context.Members.Remove(memberModel);
+        await _context.SaveChangesAsync();
+        return memberModel;
+    }
+    
+    //UPDATE
+    public async Task<Members?> UpdateMemberAsync(UpdateMemberDto memberDto)
+    {
+        var existingMember = await _context.Members.FirstOrDefaultAsync(m => m.MemberId == memberDto.MemberId);
+        if (existingMember == null)
+        {
+            throw new Exception("Member not found");
+        }
+        existingMember.UserId = memberDto.UserId;
+        existingMember.DateJoined = memberDto.DateJoined;
+        existingMember.WorkspaceId = memberDto.WorkspaceId;
+        await _context.SaveChangesAsync();
+        return existingMember;
+    }
 
 }
 

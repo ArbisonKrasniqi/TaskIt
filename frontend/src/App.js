@@ -7,14 +7,19 @@ import Boards from './Components/ContentFromSide/Boards.jsx';
 import TaskModal from './Components/TaskModal/TaskModal.jsx';
 import SignUpPage from './Pages/SignUpPage.jsx';
 
+import React, { Suspense, lazy } from 'react';
+import LoadingModal from './Components/Modal/LoadingModal.jsx';
 
-function App() {
-
-
+const App = () => {
+  //const Main = lazy(() => import('./Pages/Main.jsx'));
+  const Main = lazy(() => new Promise(resolve => {
+     setTimeout(() => resolve(import('./Pages/Main.jsx')), 3000); // 3-second delay
+   }));
 
   return (
    <> 
       <BrowserRouter>
+      <Suspense fallback={<LoadingModal />}>
         <Routes>
           <Route path="/main" element={<Main/>}/>
           <Route path="/:opened/:workspaceId?/:boardId?/:taskId?" element={<Main/>}/>
@@ -25,6 +30,7 @@ function App() {
           <Route path="/board/:id" element={<Boards/>} />
           <Route path="/task" element={<TaskModal/>}/>
         </Routes>
+        </Suspense>
       </BrowserRouter>
 
     </>

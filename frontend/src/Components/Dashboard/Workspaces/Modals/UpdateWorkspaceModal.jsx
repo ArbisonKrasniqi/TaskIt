@@ -29,7 +29,7 @@ const UpdateWorkspaceModal= (props) => {
             };
 
             const response = await putData('/backend/workspace/UpdateWorkspace', data);
-            console.log(response);
+            console.log(response.data);
             const updatedWorkspaces = workspacesContext.workspaces.map(workspace => {
                 if(workspace.workspaceId === updateContext.workspaceId){
                     return {

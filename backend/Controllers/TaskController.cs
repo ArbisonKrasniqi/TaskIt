@@ -1,3 +1,5 @@
+using System.Linq; 
+using System.Threading.Tasks;
 using backend.DTOs.Task;
 using backend.Interfaces;
 using backend.Mappers;
@@ -72,7 +74,28 @@ public class  TaskController : ControllerBase{
         }catch(Exception e){
             return StatusCode(500, "Internal Server Error");
         }
-
+    }
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    [HttpGet("GetTasksByWorkspaceId")]
+    public async Task<IActionResult> GetTasksByWorkspaceId(int workspaceId)
+    {
+        try
+        {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+            var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+            var isMember = await _membersRepo.IsAMember(userId, workspaceId);
+            if (isMember || userTokenRole == "Admin")
+            {
+                var tasks = await _taskRepo.GetTasksByWorkspaceIdAsync(workspaceId); // Await here
+                var taskDto = tasks.Select(x => x.ToTaskDto()).ToList(); // Now you can use Select
+                return Ok(taskDto);
+            }
+            return StatusCode(401, "You are not authorized!");
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, "Internal Server Error");
+        }
     }
     [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpPut("UpdateTask")]

@@ -1,7 +1,5 @@
 
-import { useEffect, useState, useCallback  } from "react";
-import { GoPencil } from "react-icons/go";
-import { IoPersonAddOutline } from "react-icons/io5";
+import { useState } from "react";
 import { CiSearch } from "react-icons/ci";
 import SortModal from "../Side/SortModal.jsx";
 import CreateBoardModal from "../Side/CreateBoardModal.jsx";
@@ -22,13 +20,25 @@ const Boards = () =>{
          openSortModal, selectedSort, getBackgroundImageUrl,hoveredBoardIndex, 
          setHoveredBoardIndex, hoveredBoardSIndex, setHoveredBoardSIndex, roli, starredBoards } = useContext(WorkspaceContext);
 
-  
+         const [searchTerm, setSearchTerm] = useState('');
+         // per me handle ndryshimet ne search input
+         const handleSearchChange = (event) => {
+          setSearchTerm(event.target.value);
+      };
+      const filteredBoards = boards.filter(board =>
+        board.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const filteredStarredBoards = starredBoards.filter(board =>
+        board.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
 
     if (workspace == null) {
         return <div>Loading...</div>;
     }
 return (
-    <div className={`duration-100 min-h-screen`} style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
+    <div className="h-screen" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
       <SideMenusHeader />
       <div className="font-semibold font-sans text-gray-400 flex justify-normal mt-10 flex-col ml-20 mr-20 flex-wrap">
         <h2 className="text-2xl ">Boards {boardCount}/10</h2>
@@ -49,8 +59,12 @@ return (
             <label htmlFor="searchBoard">Search</label>
             <div className="bg-transparent border border-solid border-gray-500 flex flex-row mt-2 rounded-md ">
               <CiSearch className="mt-3 ml-1 font-bold" />
-              <input type="search" id="searchBoard" name="searchBoard" placeholder="Search boards..."
-                className="p-2 border-none bg-transparent focus:outline-none"></input>
+              <input type="search" id="searchBoard" name="searchBoard" 
+              placeholder="Search boards..."
+              className="p-2 border-none bg-transparent focus:outline-none"
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
             </div>
           </div>
 
@@ -74,7 +88,7 @@ return (
 
 
              {
-              starredBoards.map((board, index)=>(
+              filteredStarredBoards.map((board, index)=>(
                 
             <li key={index} onMouseEnter={()=> setHoveredBoardSIndex(index)}
             onMouseLeave={() => setHoveredBoardSIndex(null)}
@@ -104,10 +118,10 @@ return (
           </li>
           ))}
 
-            {boards.length===0 && starredBoards.length===0 ? (
+            {filteredBoards.length===0 && filteredStarredBoards.length===0 ? (
             <li className="mt-10"> <span>No boards found</span> </li>
             ) : (
-            boards.map((board, index)=>(
+              filteredBoards.map((board, index)=>(
 
             <li key={index} onMouseEnter={()=> setHoveredBoardIndex(index)}
               onMouseLeave={() => setHoveredBoardIndex(null)}
