@@ -28,6 +28,7 @@ export const WorkspaceProvider = ({ children }) => {
     const [openCloseModal, setOpenCloseModal] = useState(false);
     const [openClosedBoardsModal, setOpenClosedBoardsModal] = useState(false);
     const [showLimitModal, setShowLimitModal] = useState(false);
+    const [showDeleteWorkspaceModal, setShowDeleteWorkspaceModal]= useState(false);
     const boardCount = boards.length+starredBoards.length;
    
     const [members, setMembers] = useState([]);
@@ -236,6 +237,32 @@ const workspaceTitle = workspace ? workspace.title : 'Workspace';
         return myImage;
     };
 
+
+    
+    const handleDeleteWorkspace = async(workspaceId) =>{
+        console.log('Deleting workspace with Id: ', workspaceId);
+        try{
+            const response = await deleteData('http://localhost:5157/backend/workspace/DeleteWorkspace', { workspaceId: workspaceId });
+            console.log('Deleting workspace response:', response);
+          window.location.href = '/workspaces';
+        }
+        catch(error){
+            console.error('Error deleting workspace:', error.message);
+        }
+
+     };
+     const handleLeaveWorkspace = async(workspaceId, userId)=>{
+        console.log('Leaving workspace with Id: ',workspaceId);
+        try{
+            const response = await deleteData('http://localhost:5157/backend/Members/RemoveMember', {UserId: userId, WorkspaceId: workspaceId});
+            console.log('Leaving workspace response:', response);
+            window.location.href = '/workspaces';
+        }
+        catch(error){
+            console.error('Error deleting workspace:', error.message);
+        }
+     };
+
     return (
         <WorkspaceContext.Provider value={{
             WorkspaceId,
@@ -286,6 +313,11 @@ const workspaceTitle = workspace ? workspace.title : 'Workspace';
             handleWorkspaceUpdate,
             handleCreateBoard,
             starredBoards,
+            handleDeleteWorkspace,
+            showDeleteWorkspaceModal,
+            setShowDeleteWorkspaceModal,
+            userId,
+            handleLeaveWorkspace,
         }}>
             {children}
         </WorkspaceContext.Provider>

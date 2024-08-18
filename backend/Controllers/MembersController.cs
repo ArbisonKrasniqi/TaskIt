@@ -94,7 +94,7 @@ public class MembersController: ControllerBase
 
     [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpDelete("RemoveMember")]
-    public async Task<IActionResult> RemoveMember([FromBody] RemoveMemberDto removeMemberDto)
+    public async Task<IActionResult> RemoveMember([FromQuery] RemoveMemberDto removeMemberDto)
     {
         if (!ModelState.IsValid)
         {
@@ -113,8 +113,8 @@ public class MembersController: ControllerBase
             }
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
-            var ownsWorkspace = await _userRepo.UserOwnsWorkspace(userId, removeMemberDto.WorkspaceId);
-            if (ownsWorkspace || userTokenRole == "Admin")
+             var isMember = await _membersRepo.IsAMember(userId, removeMemberDto.WorkspaceId);
+            if (isMember || userTokenRole == "Admin")
             {
                 var result = await _membersRepo.RemoveMemberAsync(removeMemberDto.WorkspaceId, removeMemberDto.UserId);
                 if (result == null)

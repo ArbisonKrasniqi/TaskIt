@@ -65,6 +65,9 @@ const Main = () => {
                         {/* Conditional rendering based on the value of `opened` */}
                         <div className='w-full flex-grow h-full p-0'>
                             {opened === 'boards' && <Boards />}
+                            {opened === 'workspaceSettings' && <WorkspaceSettings/>}
+                            {opened === 'workspaces' && <Workspaces/>}
+                          
                             {/* {opened === 'members' && <Members />} */}
                         </div>
                     </div>

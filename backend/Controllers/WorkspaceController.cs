@@ -212,7 +212,7 @@ namespace backend.Controllers
 
         [HttpDelete("DeleteWorkspace")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        public async Task<IActionResult> DeleteWorkspace(WorkspaceIdDto workspaceIdDto)
+        public async Task<IActionResult> DeleteWorkspace([FromQuery] WorkspaceIdDto workspaceIdDto)
         {
             if (!ModelState.IsValid)
             {

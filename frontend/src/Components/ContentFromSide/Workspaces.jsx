@@ -1,21 +1,18 @@
-import SideMenusHeader from "./SideMenusHeader.jsx";
-
 import { useContext, useEffect, useState } from "react";
 import { getDataWithId } from "../../Services/FetchService.jsx";
 import { CiViewBoard } from "react-icons/ci";
 import { IoPersonOutline } from "react-icons/io5";
 import { IoIosSettings } from "react-icons/io";
-
+import { WorkspaceContext } from "../Side/WorkspaceContext.jsx";
 const Workspaces = () =>{
-//const {USERID} = useContext(WorkspaceContext);
-const USERID = "96dd1b34-b03b-4255-ab26-1f29f0675755";
+const {userId} = useContext(WorkspaceContext);
 const [OwnedWorkspaces, setOwnedWorkspaces] = useState([]);  
 const [MemberWorkspaces, setMemberWorkspaces] = useState([]);  
 
 useEffect(()=>{
     const getOwnedWorkspaces = async ()=>{
         try{
-            const response = await getDataWithId('http://localhost:5157/backend/workspace/GetWorkspacesByOwnerId?ownerId', USERID);
+            const response = await getDataWithId('http://localhost:5157/backend/workspace/GetWorkspacesByOwnerId?ownerId', userId);
             const data = response.data;
 
 
@@ -26,7 +23,7 @@ useEffect(()=>{
                 console.error("Data is null, not an array or empty ",data);
                 setOwnedWorkspaces([]); // trajtojm si te dhena te zbrazeta
             }
-
+   
         } catch(error){
             console.error(error.message);
             setOwnedWorkspaces([]);
@@ -35,7 +32,7 @@ useEffect(()=>{
 
     const getMemberWorkspaces = async ()=>{
         try{
-            const responseMember = await  getDataWithId('http://localhost:5157/backend/workspace/GetWorkspacesByMemberId?memberId', USERID);
+            const responseMember = await  getDataWithId('http://localhost:5157/backend/workspace/GetWorkspacesByMemberId?memberId', userId);
             const dataMember = responseMember.data;
 
             if(dataMember && Array.isArray(dataMember) && dataMember.length>0){
@@ -56,7 +53,7 @@ useEffect(()=>{
     getMemberWorkspaces();
     console.log("Owned Workspaces fetched ", OwnedWorkspaces);
     console.log("Member Workspaces fetched ", MemberWorkspaces);
-}, [USERID]);
+}, [userId]);
 
 
 
@@ -141,7 +138,7 @@ return(
             <CiViewBoard/> Boards
             </button>
             <button className="flex flex-row items-center border border-gray-400 hover:bg-gray-600 mb-0 gap-x-0.5 px-1 rounded-md mt-2" >
-            <IoPersonOutline/> Members   
+            <IoPersonOutline/> Members ({workspace.members.length})  
             </button>
             <button className="flex flex-row items-center border border-gray-400 hover:bg-gray-600 mb-0 gap-x-0.5 px-1 rounded-md mt-2">
             <IoIosSettings/> Settings

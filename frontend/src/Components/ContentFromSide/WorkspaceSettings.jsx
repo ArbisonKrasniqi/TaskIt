@@ -2,13 +2,17 @@ import SideMenusHeader from "./SideMenusHeader";
 import { WorkspaceContext } from '../Side/WorkspaceContext';
 import { useContext, useState } from "react";
 import { putData,deleteData } from "../../Services/FetchService";
+import { useNavigate } from 'react-router-dom';
+import DeleteWorkspaceModal from "./DeleteWorkspaceModal";
 const WorkspaceSettings = () =>{
 
-    const { workspace, setWorkspace } = useContext(WorkspaceContext);
+    const { workspace, setWorkspace, roli, setShowDeleteWorkspaceModal, showDeleteWorkspaceModal } = useContext(WorkspaceContext);
     const [isEditing, setIsEditing] = useState(false);
     const[description, setDescription] =useState('');
     const[errorMessage, setErrorMessage] = useState('');
+    const navigate = useNavigate();
 
+   // const roli = "Member";
     if (workspace == null) {
         return <div>Loading...</div>;
     }
@@ -49,20 +53,8 @@ const WorkspaceSettings = () =>{
             console.log('Error response data: ', error.response?.data || error.message);
         }
     };
-     const handleDeleteWorkspace = async(workspaceId) =>{
-        console.log('Deleting workspace with Id: ', workspaceId);
-        try{
-            const response = await deleteData('http://localhost:5157/backend/workspace/DeleteWorkspace', { workspaceId: workspaceId });
-            console.log('Deleting workspace response:', response);
-
-        }
-        catch(error){
-            console.error('Error deleting workspace:', error.message);
-        }
-
-     };
-return(
-    <div className={`duration-100 h-full`} style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
+    return(
+    <div className="h-full" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
  <SideMenusHeader/>
     <div className="font-semibold font-sans text-gray-400 ml-20 mt-10">
     <h1 className="text-3xl">
@@ -96,19 +88,33 @@ return(
     </div>
     <hr className="w-full border-gray-400"></hr>
     <div className="mt-10 ml-10">
-        
-    <button className="p-1 text-red-700 border-none font-serif font-bold text-xl hover:text-red-600">Delete this workspace?</button>
-
-    </div>
-    </div>
-
-
-
-);
-
-
-
-
-
+    {roli === "Owner" ? (
+                    <>
+                        <button
+                            className="p-1 text-red-700 border-none font-serif font-bold text-xl hover:text-red-600"
+                            onClick={() => setShowDeleteWorkspaceModal(prev => !prev)}
+                        >
+                            Delete this workspace?
+                        </button>
+                        {showDeleteWorkspaceModal && (
+                            <DeleteWorkspaceModal onClose={() => setShowDeleteWorkspaceModal(false)} roli={roli} />
+                        )}
+                    </>
+                ) : (
+                    <>
+                        <button
+                            className="p-1 text-red-700 border-none font-serif font-bold text-xl hover:text-red-600"
+                            onClick={() => setShowDeleteWorkspaceModal(prev => !prev)}
+                        >
+                            Leave this workspace?
+                        </button>
+                        {showDeleteWorkspaceModal && (
+                            <DeleteWorkspaceModal onClose={() => setShowDeleteWorkspaceModal(false)} roli={roli} />
+                        )}
+                    </>
+                )}
+            </div>
+        </div>
+    );
 }
 export default WorkspaceSettings
