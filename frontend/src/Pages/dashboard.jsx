@@ -5,6 +5,7 @@ import WorkspacesList from "../Components/Dashboard/Workspaces/WorkspacesList";
 import BoardsList from "../Components/Dashboard/Boards/BoardsList.jsx"
 import { checkAndRefreshToken, getAccessToken, getRefreshToken, isTokenExpiring, refreshTokens, validateAdmin} from '../Services/TokenService.jsx';
 import { jwtDecode } from 'jwt-decode';
+import WithAuth from "../Services/WithAuth.jsx";
 
 const Dashboard = () => {
 
@@ -12,24 +13,23 @@ const Dashboard = () => {
 
     useEffect(() => {
         const validateUser = async () => {
-          if (await !checkAndRefreshToken()) {
-            console.info("You are not logged in");
+          if (!checkAndRefreshToken()) {
             navigate('/login');
+            return;
           }
-          const isAdmin = validateAdmin();
-          if (!isAdmin) {
-              console.info("You are not an administrator.");
-              navigate('/login');
-              return;
-          }
+
+          if (!validateAdmin()) {
+            console.info("You are not an administrator.");
+            navigate('/login');
+            return;
         }
+      }
         
         validateUser();
         const interval = setInterval(validateUser, 5 * 1000);
         return () => clearInterval(interval);
     }, []);
 
-    console.log("Is admin: "+validateAdmin());
     return (<div className="w-[100%] h-[100%] p-0 m-0 bg-gray-800">
         <UserList/>
         
@@ -40,4 +40,4 @@ const Dashboard = () => {
 );
 }
 
-export default Dashboard
+export default WithAuth(Dashboard);

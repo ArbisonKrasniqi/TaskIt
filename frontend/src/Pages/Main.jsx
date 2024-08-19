@@ -13,6 +13,7 @@ import { useState } from "react";
 import List from '../Components/List/List';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
+import WithAuth from "../Services/WithAuth.jsx";
 
 const Main = () => {
     const {opened, workspaceId, boardId, taskId} = useParams();
@@ -73,4 +74,4 @@ const Main = () => {
         </MainContext.Provider>
     );
 }
-export default Main
+export default WithAuth(Main);
