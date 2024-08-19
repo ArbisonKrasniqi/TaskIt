@@ -30,7 +30,7 @@ const Table = () =>{
     }, [WorkspaceId]);
 
     return(
-        <div className="h-screen" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
+        <div className="min-h-screen h-full" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
          <div className="font-semibold font-sans text-gray-400 flex justify-normal flex-col">
          <h2 className="text-2xl mt-5 ml-5">Table</h2>
          <table className="table-auto w-full text-left text-gray-400 mt-10">

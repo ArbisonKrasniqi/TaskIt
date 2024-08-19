@@ -4,11 +4,12 @@ import { CiViewBoard } from "react-icons/ci";
 import { IoPersonOutline } from "react-icons/io5";
 import { IoIosSettings } from "react-icons/io";
 import { WorkspaceContext } from "../Side/WorkspaceContext.jsx";
+import { useNavigate } from "react-router-dom";
 const Workspaces = () =>{
 const {userId} = useContext(WorkspaceContext);
 const [OwnedWorkspaces, setOwnedWorkspaces] = useState([]);  
 const [MemberWorkspaces, setMemberWorkspaces] = useState([]);  
-
+const navigate = useNavigate();
 useEffect(()=>{
     const getOwnedWorkspaces = async ()=>{
         try{
@@ -58,7 +59,7 @@ useEffect(()=>{
 
 
 return(
-<div className={`h-screen`} style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
+<div className="min-h-screen h-full" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
 <div className="font-semibold font-sans text-gray-400 flex justify-normal  flex-col ml-20 mr-20 flex-wrap">
   <h2 className="text-2xl mt-20">Your Workspaces</h2>
 
@@ -89,13 +90,16 @@ return(
           </div>
 
           <div className="flex flex-wrap flex-row justify-end gap-4">
-            <button className="flex flex-row items-center border border-gray-400 hover:bg-gray-600 mb-0 gap-x-0.5 px-1 rounded-md mt-2">
+            <button onClick={() => navigate(`/boards/${workspace.workspaceId}`)}
+            className="flex flex-row items-center border border-gray-400 hover:bg-gray-600 mb-0 gap-x-0.5 px-1 rounded-md mt-2">
             <CiViewBoard/> Boards
             </button>
-            <button className="flex flex-row items-center border border-gray-400 hover:bg-gray-600 mb-0 gap-x-0.5 px-1 rounded-md mt-2" >
+            <button onClick={() => navigate(`/members/${workspace.workspaceId}`)}
+            className="flex flex-row items-center border border-gray-400 hover:bg-gray-600 mb-0 gap-x-0.5 px-1 rounded-md mt-2" >
             <IoPersonOutline/> Members ({workspace.members.length}) 
             </button>
-            <button className="flex flex-row items-center border border-gray-400 hover:bg-gray-600 mb-0 gap-x-0.5 px-1 rounded-md mt-2">
+            <button onClick={() => navigate(`/workspaceSettings/${workspace.workspaceId}`)}
+            className="flex flex-row items-center border border-gray-400 hover:bg-gray-600 mb-0 gap-x-0.5 px-1 rounded-md mt-2">
             <IoIosSettings/> Settings
             </button>
           </div>
@@ -134,13 +138,16 @@ return(
           </div>
 
           <div className="flex flex-wrap flex-row justify-end gap-4">
-            <button className="flex flex-row items-center border border-gray-400 hover:bg-gray-600 mb-0 gap-x-0.5 px-1 rounded-md mt-2">
+            <button onClick={() => navigate(`/boards/${workspace.workspaceId}`)}
+            className="flex flex-row items-center border border-gray-400 hover:bg-gray-600 mb-0 gap-x-0.5 px-1 rounded-md mt-2">
             <CiViewBoard/> Boards
             </button>
-            <button className="flex flex-row items-center border border-gray-400 hover:bg-gray-600 mb-0 gap-x-0.5 px-1 rounded-md mt-2" >
+            <button onClick={() => navigate(`/members/${workspace.workspaceId}`)}
+            className="flex flex-row items-center border border-gray-400 hover:bg-gray-600 mb-0 gap-x-0.5 px-1 rounded-md mt-2" >
             <IoPersonOutline/> Members ({workspace.members.length})  
             </button>
-            <button className="flex flex-row items-center border border-gray-400 hover:bg-gray-600 mb-0 gap-x-0.5 px-1 rounded-md mt-2">
+            <button onClick={() => navigate(`/workspaceSettings/${workspace.workspaceId}`)}
+            className="flex flex-row items-center border border-gray-400 hover:bg-gray-600 mb-0 gap-x-0.5 px-1 rounded-md mt-2">
             <IoIosSettings/> Settings
             </button>
           </div>

@@ -127,4 +127,17 @@ public class InviteRepository : IInviteRepository
         return true;
     }
 
+    //UPDATE INVITE
+    public async Task<Invite?> UpdateInviteAsync(UpdateInviteAdminDto updateDto)
+    {
+        var existingInvite = await _context.Invite.FirstOrDefaultAsync(i => i.InviteId == updateDto.InviteId);
+        if (existingInvite == null) return null;
+
+        existingInvite.InviterId = updateDto.InviterId;
+        existingInvite.InviteeId = updateDto.InviteeId;
+        existingInvite.WorkspaceId = updateDto.WorkspaceId;
+        existingInvite.InviteStatus = updateDto.InviteStatus;
+        await _context.SaveChangesAsync();
+        return existingInvite;
+    }
 }

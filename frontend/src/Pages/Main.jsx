@@ -16,6 +16,7 @@ import { jwtDecode } from 'jwt-decode';
 import Table from '../Components/ContentFromSide/Table.jsx';
 import Calendar from '../Components/ContentFromSide/Calendar.jsx';
 import LoadingModal from '../Components/Modal/LoadingModal.jsx';
+import Members from '../Components/ContentFromSide/Members.jsx';
 
 const Main = () => {
     const {opened, workspaceId, boardId, taskId} = useParams();
@@ -63,7 +64,7 @@ const Main = () => {
                     {/* Container for Sidebar and Boards */}
                     <div className="flex flex-grow h-full p-0">
                         {/* Sidebar on the left */}
-                        <Sidebar />
+                        {opened !== 'workspaces' && <Sidebar />}
 
                         {/* Conditional rendering based on the value of `opened` */}
                         <div className='w-full flex-grow h-full p-0'>
@@ -73,7 +74,7 @@ const Main = () => {
                             {opened === 'table' && <Table/>}
                             {opened === 'calendar' && <Calendar/>}
                             {opened === 'loadingModal' && <LoadingModal/>}
-                            {/* {opened === 'members' && <Members />} */}
+                            {opened === 'members' && <Members />}
                         </div>
                     </div>
                 </div>

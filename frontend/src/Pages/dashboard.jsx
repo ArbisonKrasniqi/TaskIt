@@ -6,6 +6,7 @@ import BoardsList from "../Components/Dashboard/Boards/BoardsList.jsx"
 import { checkAndRefreshToken, getAccessToken, getRefreshToken, isTokenExpiring, refreshTokens, validateAdmin} from '../Services/TokenService.jsx';
 import { jwtDecode } from 'jwt-decode';
 import MembersList from "../Components/Dashboard/Members/MembersList.jsx"
+import InvitesList from "../Components/Dashboard/Invites/InvitesList.jsx";
 
 const Dashboard = () => {
 
@@ -39,6 +40,7 @@ const Dashboard = () => {
         <BoardsList/>
 
         <MembersList/>
+        <InvitesList/>
     </div>
 );
 }

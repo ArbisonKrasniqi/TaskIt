@@ -8,7 +8,7 @@ export const WorkspaceContext = createContext();
 
 export const WorkspaceProvider = ({ children }) => {
     const mainContext = useContext(MainContext);
-    const [WorkspaceId, setWorkspaceId] = useState(mainContext.workspaceId);
+   // const [WorkspaceId, setWorkspaceId] = useState(mainContext.workspaceId);
     const [userInfo, setUserInfo] = useState(mainContext.userInfo);
     
     const [open, setOpen] = useState(true);
@@ -34,7 +34,8 @@ export const WorkspaceProvider = ({ children }) => {
     const [members, setMembers] = useState([]);
     const [roli, setRoli]=useState("Member");
     
-
+    const userId = mainContext.userInfo.userId;
+    const WorkspaceId = mainContext.workspaceId;
     useEffect(() => {
 
         const getWorkspace = async () => {
@@ -51,22 +52,19 @@ export const WorkspaceProvider = ({ children }) => {
         getWorkspace();
         console.log("Workspace fetched", workspace);
         
-    }, [WorkspaceId]);//userid
+    }, [WorkspaceId, userId]);//userid
 
-    const userId = mainContext.userInfo.userId;
-
+ 
     useEffect(()=>{
         const ownerId = workspace? workspace.ownerId : '';
- 
-
-    if (userId === ownerId) {
+        if (userId === ownerId) {
         setRoli("Owner");
     } else {
         setRoli("Member");
     }
     console.log("OwnerId: ",ownerId," UserId:" ,userId);
     console.log("Roli ", roli);
-}, [workspace, userId]);
+}, [WorkspaceId, userId, workspace]);
  
     
 const workspaceTitle = workspace ? workspace.title : 'Workspace';
@@ -123,7 +121,7 @@ const workspaceTitle = workspace ? workspace.title : 'Workspace';
         };
         getMembers();
         console.log('Members fetched: ',members);
-    },[]);
+    },[WorkspaceId, workspace, userId]);
 
     const handleCreateBoard = (newBoard) => {
         setBoards((prevBoards) => [...prevBoards, newBoard]);

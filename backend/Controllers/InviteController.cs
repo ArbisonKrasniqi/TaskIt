@@ -253,8 +253,8 @@ namespace backend.Controllers
         }
 
         [Authorize(AuthenticationSchemes = "Bearer")]
-        [HttpPut("UpdateInvite")]
-        public async Task<IActionResult> UpdateInvite(UpdateInviteDto updateDto)
+        [HttpPut("UpdateInviteStatus")]
+        public async Task<IActionResult> UpdateInviteStatus(UpdateInviteDto updateDto)
         {
             if (!ModelState.IsValid)
             {
@@ -269,7 +269,7 @@ namespace backend.Controllers
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
                 var inviterId = invite.InviterId;
                 var inviteeId = invite.InviteeId;
-                if (userId == inviteeId || userId == inviteeId || userTokenRole == "Admin")
+                if (userId == inviteeId || userId == inviterId || userTokenRole == "Admin")
                 {
 
                     var inviteUpdate = await _inviteRepo.UpdateInviteStatusAsync(updateDto);
@@ -320,7 +320,29 @@ namespace backend.Controllers
             }
         }
 
+      
+        [Authorize(Policy = "AdminOnly")]
+        [HttpPut(template:"UpdateInvite")]
+        public async Task<IActionResult> UpdateInvite(UpdateInviteAdminDto updateDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
+            try
+            {
+                var invite = await _inviteRepo.UpdateInviteAsync(updateDto);
+                if (invite == null) return NotFound("Invite not found!");
+
+                var inviteDto = _mapper.Map<InviteDto>(invite);
+                return Ok(inviteDto);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, "Internal Server Error!"+e.Message);
+            }
+        }
     }
 }
 
