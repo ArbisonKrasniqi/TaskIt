@@ -64,35 +64,40 @@ export const isTokenExpiring = (expiryTime) => {
 }
 
 export const checkAndRefreshToken = async () => {
-    const accessToken = getAccessToken();
-    const refreshToken = getRefreshToken();
+    var accessToken = getAccessToken();
+    var refreshToken = getRefreshToken();
 
     if (!refreshToken) {
-        console.info("You are not logged in");
+        console.info("You are not logged in.");
         return false;
-    }
-
-    if (accessToken && refreshToken) {
+    } else if (accessToken && refreshToken) {
         const decodedToken = jwtDecode(accessToken);
-        const expiryTime = decodedToken.exp;
-
-        if (isTokenExpiring(expiryTime)) {
+        const expiryTime = decodedToken.exp;    
+        if(isTokenExpiring(expiryTime)) {
             var refreshResult = await refreshTokens();
             if (refreshResult) {
-                console.info("Tokens successfully refreshed because they almost expired");
+                console.info("Tokens refreshed before expiry");
+                accessToken = getAccessToken();
+                refreshToken = getRefreshToken();  
                 return true;
             } else {
-                console.info("Refresh token invalid! PLease log in!");
+                console.info("You have been logged out.");
                 return false;
             }
         }
     } else if (!accessToken && refreshToken) {
         var refreshResult = await refreshTokens();
         if (refreshResult) {
-            console.info("Token successfully refreshed because it expired");
+            console.info("Tokens refreshed after expiry");
+            accessToken = getAccessToken();
+            refreshToken = getRefreshToken();
+            return true;
         } else {
-            console.info("Refresh token invalid! PLease log in!");
+            console.info("Couldnt refresh tokens");
             return false;
         }
+    } else {
+        console.info("There has been an error please log in again!");
+        return false;
     }
 }

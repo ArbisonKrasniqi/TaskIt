@@ -17,6 +17,7 @@ import Table from '../Components/ContentFromSide/Table.jsx';
 import Calendar from '../Components/ContentFromSide/Calendar.jsx';
 import LoadingModal from '../Components/Modal/LoadingModal.jsx';
 import Members from '../Components/ContentFromSide/Members.jsx';
+import WithAuth from "../Services/WithAuth.jsx";
 
 const Main = () => {
     const {opened, workspaceId, boardId, taskId} = useParams();
@@ -82,4 +83,4 @@ const Main = () => {
         </MainContext.Provider>
     );
 }
-export default Main
+export default WithAuth(Main);
