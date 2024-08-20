@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using backend.DTOs.Invite.Input;
 using backend.DTOs.Invite.Output;
+using backend.DTOs.Workspace;
 using backend.Interfaces;
 using backend.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -320,7 +321,7 @@ namespace backend.Controllers
             }
         }
 
-      
+        [Authorize(AuthenticationSchemes = "Bearer")]
         [Authorize(Policy = "AdminOnly")]
         [HttpPut(template:"UpdateInvite")]
         public async Task<IActionResult> UpdateInvite(UpdateInviteAdminDto updateDto)
@@ -337,6 +338,38 @@ namespace backend.Controllers
 
                 var inviteDto = _mapper.Map<InviteDto>(invite);
                 return Ok(inviteDto);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, "Internal Server Error!"+e.Message);
+            }
+        }
+
+        [HttpDelete("DeleteAllInvitesByWorkspaceId")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<IActionResult> DeleteByWorkspace([FromQuery] WorkspaceIdDto workspaceIdDto)
+        {
+            if  (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!await _workspaceRepo.WorkspaceExists(workspaceIdDto.WorkspaceId))
+            {
+                return StatusCode(404, "Workspace Not Found!");
+            }
+
+            try
+            {
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+                var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+                var ownsWorkspace = await _userRepo.UserOwnsWorkspace(userId, workspaceIdDto.WorkspaceId);
+                if (ownsWorkspace || userTokenRole == "Admin")
+                {
+                    var invitesModel = await _inviteRepo.DeleteInvitesByWorkspaceIdAsync(workspaceIdDto.WorkspaceId);
+                    if (invitesModel.Count == 0) return NotFound("Invites not found!");
+
+                    return Ok("Invites deleted!");
+                }
+                return StatusCode(401, "You are not authorized!");
             }
             catch (Exception e)
             {

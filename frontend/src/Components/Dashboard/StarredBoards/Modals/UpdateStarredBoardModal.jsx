@@ -1,14 +1,14 @@
 import React, { useState , useContext } from 'react';
 import { putData } from '../../../../Services/FetchService';
-import { UpdateContext } from '../MembersTable';
-import {MembersContext} from "../MembersList";
+import { UpdateContext } from '../StarredBoardsTable';
+import {StarredBoardsContext} from "../StarredBoardsList";
 import CustomButton from '../../Buttons/CustomButton';
-const UpdateMemberModal = (props)=>{
+const UpdateStarredBoardModal = (props)=>{
     const updateContext = useContext(UpdateContext);
-    const membersContext = useContext(MembersContext);
-
+    const starredBoardsContext = useContext(StarredBoardsContext);
+    
+    const [boardId, setBoardId]= useState(updateContext.boardId);
     const [userId, setUserId]= useState(updateContext.userId);
-    const [dateJoined, setDateJoined]= useState(updateContext.dateJoined);
     const [workspaceId, setWorkspaceId]= useState(updateContext.workspaceId);
 
     const handleSubmit = async (e) => {
@@ -17,33 +17,32 @@ const UpdateMemberModal = (props)=>{
     
         try{
             const data = {
-                memberId: updateContext.memberId, //nuk mundet mu ndryshu id
+                starredBoardId: updateContext.starredBoardId,
+                boardId: boardId,
                 //te dhenat e tjera i ndryshojme
                 userId: userId,
-                dateJoined: dateJoined,
-                workspaceId: workspaceId
             };
-            const response = await putData('http://localhost:5157/backend/Members/UpdateMember', data);
+            const response = await putData('http://localhost:5157/backend/starredBoard/UpdateStarredBoard', data);
             console.log(response.data);
-            const updatedMembers = membersContext.members.map(member => {
-                if(member.memberId ===updateContext.memberId){
+            const updatedStarredBoards = starredBoardsContext.starredBoards.map(starredBoard => {
+                if(starredBoard.starredBoardId ===updateContext.starredBoardId){
                     return{
-                        ...member,
+                        ...starredBoard,
+                        boardId: boardId,
                         userId: userId,
-                        dateJoined: dateJoined,
                         workspaceId: workspaceId
                     };
                 }else{
-                    return member; 
+                    return starredBoard; 
                 }
             });
 
-            membersContext.setMembers(updatedMembers);
+            starredBoardsContext.setStarredBoardS(updatedStarredBoards);
             props.setShowUpdateInfoModal(false);
         }catch(error){
-            membersContext.setErrorMessage(error.message);
-            membersContext.setShowMembersErrorModal(true);
-            membersContext.getMembers();
+            starredBoardsContext.setErrorMessage(error.message);
+            starredBoardsContext.setShowStarredBoardsErrorModal(true);
+            starredBoardsContext.getStarredBoards();
             props.setShowUpdateInfoModal(false);
         }
     }
@@ -58,16 +57,7 @@ const UpdateMemberModal = (props)=>{
                        id="userId"
                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"></input>
             </div>
-            <div className="grid md:grid-cols-2 md:gap-6">
-                <div className="mb-6">
-                    <label htmlFor="default-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Workspace Id</label>
-                    <input value={workspaceId}
-                           onChange={(e) => setWorkspaceId(e.target.value)}
-                           type="text"
-                           id="workspaceId"
-                           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"></input>
-                </div>
-            </div>
+           
             <div className="flex justify-around">
                 {/*Nese shtypet butoni close, atehere mbyll modal duke vendosur vleren false*/}
                 <CustomButton onClick={() => props.setShowUpdateInfoModal(false)} type="button" text="Close" color="longRed"/>
@@ -78,4 +68,4 @@ const UpdateMemberModal = (props)=>{
 );
 
 }
-export default UpdateMemberModal
+export default UpdateStarredBoardModal

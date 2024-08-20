@@ -228,7 +228,7 @@ namespace backend.Controllers
         
         [Authorize(AuthenticationSchemes = "Bearer")]
         [HttpDelete(template:"DeleteBoardsByWorkpaceID")]
-        public async Task<IActionResult> DeleteByWorkspace(WorkspaceIdDto workspaceIdDto)
+        public async Task<IActionResult> DeleteByWorkspace([FromQuery] WorkspaceIdDto workspaceIdDto)
         {
             if (!await _workspaceRepo.WorkspaceExists(workspaceIdDto.WorkspaceId))
             {
@@ -250,7 +250,7 @@ namespace backend.Controllers
 
                     if (boardModel.Count == 0)
                     {
-                        return NotFound("Boards Not Founded!");
+                        return NotFound("Boards Not Found!");
                     }
 
                     return Ok("Boards Deleted!");

@@ -19,7 +19,6 @@ const UpdateInviteModal = (props)=>{
         try{
             const data = {
                 inviteId: updateContext.inviteId, //nuk mundet mu ndryshu id
-                dateSent: updateContext.dateSent,
                 //te dhenat e tjera i ndryshojme
                 workspaceId: workspaceId,
                 inviterId: inviterId,
@@ -55,16 +54,8 @@ const UpdateInviteModal = (props)=>{
     
     return(   <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center z-50 bg-gray-900 bg-opacity-50">
         <form onSubmit={handleSubmit} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 text-gray-400 p-8 rounded-lg shadow-md w-1/3 h-auto">
-            <div className="mb-6">
-                <label htmlFor="default-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Workspace Id</label>
-                <input value={workspaceId}
-                       onChange={(e) => setWorkspaceId(e.target.value)}
-                       type="text"
-                       id="workspaceId"
-                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"></input>
-            </div>
             <div className="grid md:grid-cols-2 md:gap-6">
-                <div className="mb-6">
+                <div className="mb-6 col-span-2">
                     <label htmlFor="default-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Inviter Id</label>
                     <input value={inviterId}
                            onChange={(e) => setInviterId(e.target.value)}
@@ -72,16 +63,16 @@ const UpdateInviteModal = (props)=>{
                            id="inviterId"
                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"></input>
                 </div>
-                <div className="grid md:grid-cols-2 md:gap-6">
-                <div className="mb-6">
-                    <label htmlFor="default-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Invitee Id</label>
+        
+                 <div className="mb-6 col-span-2">
+                     <label htmlFor="default-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Invitee Id</label>
                     <input value={inviteeId}
                            onChange={(e) => setInviteeId(e.target.value)}
                            type="text"
                            id="inviteeId"
                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"></input>
-                </div>
-                </div>
+    </div>
+
                 <div className="mb-6">
                     <label htmlFor="default-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Invite Status</label>
                     <input value={inviteStatus}

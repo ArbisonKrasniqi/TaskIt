@@ -1,5 +1,6 @@
 ﻿using backend.Data;
- using backend.Interfaces;
+using backend.DTOs.StarredBoard;
+using backend.Interfaces;
  using backend.Models;
  using Microsoft.EntityFrameworkCore;
  
@@ -9,14 +10,14 @@
  {
      private readonly ApplicationDBContext _context;
      private readonly IUserRepository _userRepo;
-     private readonly IBoardRepository _boardRepo;
+
  
  
-     public StarredBoardRepository(ApplicationDBContext context, IUserRepository userRepo, IBoardRepository boardRepo)
+     public StarredBoardRepository(ApplicationDBContext context, IUserRepository userRepo)
      {
          _context = context;
          _userRepo = userRepo;
-         _boardRepo = boardRepo;
+       
      }
  
      //STAR BOARD
@@ -27,11 +28,7 @@
          {
              throw new Exception("User not found!");
          }
-
-         if (!await _boardRepo.BoardExists(boardId))
-         {
-             throw new Exception("Board not found!");
-         }
+       
          if (await IsBoardStarredAsync(userId, boardId))
          {
              throw new ("This Board has already been starred by this user!");
@@ -59,11 +56,6 @@
          if (!await _userRepo.UserExists(userId))
          {
              throw new Exception("User not found!");
-         }
-
-         if (!await _boardRepo.BoardExists(boardId))
-         {
-             throw new Exception("Board not found!");
          }
          if (!(await IsBoardStarredAsync(userId, boardId)))
          {
@@ -106,7 +98,48 @@
          return await _context.StarredBoard.AnyAsync(x => x.BoardId == boardId && x.UserId == userId);
      }
      
-     
- 
- 
+    //DELETE STARRED BOARD BY BOARD ID
+    public async Task<StarredBoard?> DeleteStarredBoardByBoardIdAsync(int id)
+    {
+        var starredModel = _context.StarredBoard.FirstOrDefault(b => b.BoardId == id);
+        if (starredModel == null) return null;
+        _context.StarredBoard.Remove(starredModel);
+        await _context.SaveChangesAsync();
+        return starredModel;
+
+    }
+//DELETE STARRED BOARD BY ID
+    public async Task<StarredBoard?> DeleteStarredBoardByIdAsync(int id)
+    {
+        var starredModel = _context.StarredBoard.FirstOrDefault(s => s.StarredBoardId == id);
+        if (starredModel == null) return null;
+
+        _context.StarredBoard.Remove(starredModel);
+        await _context.SaveChangesAsync();
+        return starredModel;
+    }
+
+    //GET ALL STARRED BOARDS
+    public async Task<List<StarredBoard?>> GetAllStarredBoardsAsync()
+    {
+        return await _context.StarredBoard.ToListAsync();
+    }
+
+    //UPDATE
+    public async Task<StarredBoard?> UpdateStarredBoardAsync(UpdateStarredBoardDto starredBoardDto)
+    {
+        var existingStarred =
+            await _context.StarredBoard.FirstOrDefaultAsync(s => s.StarredBoardId == starredBoardDto.StarredBoardId);
+        if (existingStarred == null)
+        {
+            throw new Exception("Starred board not found!");
+        }
+
+        existingStarred.StarredBoardId = starredBoardDto.StarredBoardId;
+        existingStarred.BoardId = starredBoardDto.BoardId;
+        existingStarred.UserId = starredBoardDto.UserId;
+
+        await _context.SaveChangesAsync();
+        return existingStarred;
+    }
  }

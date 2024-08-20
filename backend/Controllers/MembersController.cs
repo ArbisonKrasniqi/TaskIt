@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using backend.DTOs.Members;
 using backend.DTOs.Members.Output;
+using backend.DTOs.Workspace;
 using backend.Interfaces;
 
 using Microsoft.AspNetCore.Authorization;
@@ -199,7 +200,7 @@ public class MembersController: ControllerBase
             }
 
             var updatedMemberDto = _mapper.Map<MemberDto>(memberModel);
-            return Ok(updateMemberDto);
+            return Ok(updatedMemberDto);
         }
         catch (Exception e)
         {
@@ -207,4 +208,36 @@ public class MembersController: ControllerBase
         }
     }
 
+    [HttpDelete("DeleteAllMembersByWorkspaceId")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    public async Task<IActionResult> DeleteByWorkspace([FromQuery] WorkspaceIdDto workspaceIdDto)
+    {
+        
+        if  (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        if (!await _workspaceRepo.WorkspaceExists(workspaceIdDto.WorkspaceId))
+        {
+            return StatusCode(404, "Workspace Not Found!");
+        }
+
+        try
+        {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+            var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+            var ownsWorkspace = await _userRepo.UserOwnsWorkspace(userId, workspaceIdDto.WorkspaceId);
+            if (ownsWorkspace || userTokenRole == "Admin")
+            {
+                var membersModel = await _membersRepo.DeleteMembersByWorkspaceIdAsync(workspaceIdDto.WorkspaceId);
+                if (membersModel.Count == 0) return NotFound("Members not found!");
+
+                return Ok("Members deleted!");
+        }
+            return StatusCode(401, "You are not authorized!");
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, "Internal Server Error!"+e.Message);
+        }
+    }
 }

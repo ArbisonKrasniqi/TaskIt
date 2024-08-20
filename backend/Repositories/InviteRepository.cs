@@ -140,4 +140,14 @@ public class InviteRepository : IInviteRepository
         await _context.SaveChangesAsync();
         return existingInvite;
     }
+    
+    //DELETE INVITES BY WORKSPACEID
+    public async Task<List<Invite>> DeleteInvitesByWorkspaceIdAsync(int workspaceId)
+    {
+        var invites = await _context.Invite.Where(i => i.WorkspaceId == workspaceId).ToListAsync();
+        
+        _context.Invite.RemoveRange(invites);
+        await _context.SaveChangesAsync();
+        return invites;
+    }
 }

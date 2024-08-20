@@ -9,6 +9,7 @@ import MembersList from "../Components/Dashboard/Members/MembersList.jsx"
 import InvitesList from "../Components/Dashboard/Invites/InvitesList.jsx";
 import WithAuth from "../Services/WithAuth.jsx";
 import BackgroundsList from "../Components/Dashboard/Backgrounds/BackgroundsList.jsx";
+import StarredBoardsList from "../Components/Dashboard/StarredBoards/StarredBoardsList.jsx";
 
 const Dashboard = () => {
 
@@ -43,6 +44,7 @@ const Dashboard = () => {
         <MembersList/>
         <InvitesList/>
         <BackgroundsList/>
+        <StarredBoardsList/>
     </div>
 );
 }

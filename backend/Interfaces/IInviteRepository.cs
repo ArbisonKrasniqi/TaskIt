@@ -15,4 +15,5 @@ public interface IInviteRepository
     Task<Invite?> UpdateInviteStatusAsync(UpdateInviteDto updateInviteDto);
     Task<bool> DeleteInviteAsync(int inviteId);
     Task<Invite?> UpdateInviteAsync(UpdateInviteAdminDto updateDto);
+    Task<List<Invite>> DeleteInvitesByWorkspaceIdAsync(int workspaceId);
 }

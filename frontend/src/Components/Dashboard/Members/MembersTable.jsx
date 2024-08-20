@@ -42,7 +42,7 @@ const MembersTable = () =>{
            <th className="px-6 py-3" >ID</th>
            <th className="px-6 py-3" >User Id</th>
            <th className="px-6 py-3" >Date Joined</th>
-          {/*  <th className="px-6 py-3" >User</th>     */}
+
            <th className="px-6 py-3" >Workspace Id</th>       
            <th className="px-6 py-3" >Actions</th>
         </tr>     

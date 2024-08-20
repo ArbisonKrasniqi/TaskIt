@@ -125,7 +125,16 @@ public class MembersRepository : IMembersRepository
         await _context.SaveChangesAsync();
         return memberModel;
     }
-    
+    //DELETE MEMBERS BY WORKSPACE ID
+    public async Task<List<Members>> DeleteMembersByWorkspaceIdAsync(int workspaceId)
+    {
+        var members = await _context.Members.Where(m => m.WorkspaceId == workspaceId).ToListAsync();
+        
+        _context.Members.RemoveRange(members);
+        await _context.SaveChangesAsync();
+        return members;
+    }
+
     //UPDATE
     public async Task<Members?> UpdateMemberAsync(UpdateMemberDto memberDto)
     {
@@ -135,7 +144,6 @@ public class MembersRepository : IMembersRepository
             throw new Exception("Member not found");
         }
         existingMember.UserId = memberDto.UserId;
-        existingMember.DateJoined = memberDto.DateJoined;
         existingMember.WorkspaceId = memberDto.WorkspaceId;
         await _context.SaveChangesAsync();
         return existingMember;
