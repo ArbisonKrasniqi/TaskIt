@@ -3,8 +3,8 @@ import { WorkspaceContext } from "../Side/WorkspaceContext"
 
 
 
-const DeleteWorkspaceModal = ({onClose}, roli) => {
-    const {handleDeleteWorkspace,WorkspaceId, userId, handleLeaveWorkspace} = useContext(WorkspaceContext);
+const DeleteWorkspaceModal = ({onClose}) => {
+    const {handleDeleteWorkspace,WorkspaceId, userId, handleLeaveWorkspace, roli} = useContext(WorkspaceContext);
 
     return(
         <div className="fixed z-30 inset-0 flex justify-center items-center transition-colors bg-black/20">

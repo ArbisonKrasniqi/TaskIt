@@ -5,7 +5,7 @@ import { MainContext } from '../../Pages/MainContext';
 const CreateBoardModal = ({ open, onClose, onBoardCreated, children }) => {
     const mainContext = useContext(MainContext);
     const [boardTitle, setBoardTitle] = useState('');
-    const [backgroundId, setBackgroundId] = useState(2);
+    const [backgroundId, setBackgroundId] = useState(1);
     const [workspaceId, setWorkspaceId] = useState(mainContext.workspaceId);
     const [clicked, setClicked] = useState(false);
     const [backgrounds, setBackgrounds] = useState([]);

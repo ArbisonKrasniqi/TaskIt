@@ -17,6 +17,6 @@ public interface ITaskRepository{
     Task<List<Tasks>> DeleteTaskByListIdAsync (int ListId);
     Task<List<Tasks>> GetTaskByListId (int ListId);
     Task<bool> TaskInList(int taskId, int listId);
-    Task<List<Tasks>> GetTasksByWorkspaceIdAsync(int workspaceId);
+    Task<List<TaskInfoDto>> GetTasksByWorkspaceIdAsync(int workspaceId);
 
 }

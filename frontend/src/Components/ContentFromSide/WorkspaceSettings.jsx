@@ -29,7 +29,7 @@ const WorkspaceSettings = () =>{
     }
 
     const  handleSaveClick = async () =>{
-        if(description<10 || description>280){
+        if(description.length<10 || description.length>280){
             setErrorMessage('Workspace description must be between 10 and 280 characters.');
             return;
         }
@@ -69,7 +69,7 @@ const WorkspaceSettings = () =>{
                 </div>
         ): (
             <div>
-            <input 
+            <textarea 
                 type="text" 
                 value={description} 
                 onChange={handleInputChange}
@@ -97,7 +97,7 @@ const WorkspaceSettings = () =>{
                             Delete this workspace?
                         </button>
                         {showDeleteWorkspaceModal && (
-                            <DeleteWorkspaceModal onClose={() => setShowDeleteWorkspaceModal(false)} roli={roli} />
+                            <DeleteWorkspaceModal onClose={() => setShowDeleteWorkspaceModal(false)} />
                         )}
                     </>
                 ) : (
@@ -109,7 +109,7 @@ const WorkspaceSettings = () =>{
                             Leave this workspace?
                         </button>
                         {showDeleteWorkspaceModal && (
-                            <DeleteWorkspaceModal onClose={() => setShowDeleteWorkspaceModal(false)} roli={roli} />
+                            <DeleteWorkspaceModal onClose={() => setShowDeleteWorkspaceModal(false)}/>
                         )}
                     </>
                 )}

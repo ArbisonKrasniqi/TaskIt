@@ -3,9 +3,10 @@ import { GoPencil } from "react-icons/go";
 import { IoPersonAddOutline } from "react-icons/io5";
 import { WorkspaceContext } from '../Side/WorkspaceContext';
 import UpdateWorkspaceModal from "./UpdateWorkspaceModal.jsx";
+import InviteModal from './InviteModal.jsx';
 const SideMenusHeader = () => {
 
-    const {workspace, setUpdateWorkspaceModal,updateWorkspaceModal,handleWorkspaceUpdate} = useContext(WorkspaceContext);
+    const {workspace, setUpdateWorkspaceModal,updateWorkspaceModal,handleWorkspaceUpdate, isInviteModalOpen, openInviteModal, closeInviteModal} = useContext(WorkspaceContext);
     
     // Ensure workspace is not null or undefined
     if (!workspace) {
@@ -28,9 +29,15 @@ const SideMenusHeader = () => {
             </button>
             <UpdateWorkspaceModal open={updateWorkspaceModal} onClose={()=>setUpdateWorkspaceModal(false)} workspace={workspace} onWorkspaceUpdated={handleWorkspaceUpdate}></UpdateWorkspaceModal>
             </div>
-            <button className="flex justify-center text-black font-sans font-semibold text-center bg-blue-500 p-3 border border-solid border-blue-700 rounded-lg  mt-10 hover:bg-blue-400">
+
+            <button 
+            className="flex justify-center text-black font-sans font-semibold text-center bg-blue-500 p-3 border border-solid border-blue-700 rounded-lg  mt-10 hover:bg-blue-400"
+            onClick={openInviteModal}
+            >
             <IoPersonAddOutline className="mr-1 mt-1 font-bold" />
-            Invite workspace members</button>
+            Invite workspace members
+            </button>
+            <InviteModal isOpen={isInviteModalOpen} onClose={closeInviteModal} />
         </div>
         <hr className="w-full border-gray-400 mt-3"></hr>
 </div>

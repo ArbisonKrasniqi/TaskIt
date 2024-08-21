@@ -75,6 +75,7 @@ public class  TaskController : ControllerBase{
             return StatusCode(500, "Internal Server Error");
         }
     }
+    
     [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpGet("GetTasksByWorkspaceId")]
     public async Task<IActionResult> GetTasksByWorkspaceId(int workspaceId)
@@ -87,8 +88,7 @@ public class  TaskController : ControllerBase{
             if (isMember || userTokenRole == "Admin")
             {
                 var tasks = await _taskRepo.GetTasksByWorkspaceIdAsync(workspaceId); // Await here
-                var taskDto = tasks.Select(x => x.ToTaskDto()).ToList(); // Now you can use Select
-                return Ok(taskDto);
+                 return Ok(tasks);
             }
             return StatusCode(401, "You are not authorized!");
         }

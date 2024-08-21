@@ -30,10 +30,10 @@ export const WorkspaceProvider = ({ children }) => {
     const [showLimitModal, setShowLimitModal] = useState(false);
     const [showDeleteWorkspaceModal, setShowDeleteWorkspaceModal]= useState(false);
     const boardCount = boards.length+starredBoards.length;
-   
+    const [tasks, setTasks] = useState([]);
     const [members, setMembers] = useState([]);
     const [roli, setRoli]=useState("Member");
-    
+    const [isInviteModalOpen, setIsInviteModalOpen]= useState(false);
     const userId = mainContext.userInfo.userId;
     const WorkspaceId = mainContext.workspaceId;
     useEffect(() => {
@@ -261,6 +261,29 @@ const workspaceTitle = workspace ? workspace.title : 'Workspace';
         }
      };
 
+     const getTasks =async ()=>{
+
+        try{
+            const tasksResponse = await getDataWithId('http://localhost:5157/backend/task/GetTasksByWorkspaceId?workspaceId', WorkspaceId);
+            const tasksData = tasksResponse.data;
+            console.log("Tasks data: ",tasksData);
+            setTasks(tasksData);
+        }catch (error) {
+            console.error(error.message);
+        }
+    };
+
+
+    useEffect(()=>{
+            getTasks();
+            console.log("Workspace id ",WorkspaceId);
+            console.log("Tasks fetched: ",tasks);
+        }, [WorkspaceId]);
+    
+
+        const openInviteModal = () => setIsInviteModalOpen(true);
+        const closeInviteModal = () => setIsInviteModalOpen(false);
+
     return (
         <WorkspaceContext.Provider value={{
             WorkspaceId,
@@ -316,6 +339,12 @@ const workspaceTitle = workspace ? workspace.title : 'Workspace';
             setShowDeleteWorkspaceModal,
             userId,
             handleLeaveWorkspace,
+            tasks,
+            setTasks,
+            getTasks,
+            openInviteModal,
+            closeInviteModal,
+            isInviteModalOpen,
         }}>
             {children}
         </WorkspaceContext.Provider>
