@@ -10,7 +10,9 @@ public static class TaskMappers{
             TaskID = taskModel.TaskId,
             Title = taskModel.Title,
             Description = taskModel.Description,
-            ListId = taskModel.ListId
+            ListId = taskModel.ListId,
+            DueDate = taskModel.DueDate,
+            DateAdded = taskModel.DateAdded
         };
     }
 

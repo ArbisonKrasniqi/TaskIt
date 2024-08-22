@@ -160,7 +160,7 @@ namespace backend.Controllers
         //DELETE
         [HttpDelete("UnstarBoard")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        public async Task<IActionResult> UnStarBoard([FromQuery] UnStarBoardRequestDto unStarBoardDto)
+        public async Task<IActionResult> UnStarBoard(UnStarBoardRequestDto unStarBoardDto)
         {
             if (!ModelState.IsValid)
             {

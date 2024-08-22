@@ -19,4 +19,5 @@ public class TaskDto{
     [Range(0, int.MaxValue, ErrorMessage = "List Id can not be negative!")]
     public int ListId { get; set; }
     public DateTime DueDate { get; set; }
+    public DateTime DateAdded { get; set; }
 }

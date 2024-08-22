@@ -117,7 +117,7 @@ public class MembersController: ControllerBase
 
     [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpDelete("RemoveMember")]
-    public async Task<IActionResult> RemoveMember([FromQuery] RemoveMemberDto removeMemberDto)
+    public async Task<IActionResult> RemoveMember(RemoveMemberDto removeMemberDto)
     {
         if (!ModelState.IsValid)
         {
@@ -158,7 +158,7 @@ public class MembersController: ControllerBase
     [HttpDelete("DeleteMember")]
     [Authorize(AuthenticationSchemes = "Bearer")]
     [Authorize(Policy = "AdminOnly")]
-    public async Task<IActionResult> DeleteMember([FromQuery] MemberIdDto memberIdDto)
+    public async Task<IActionResult> DeleteMember(MemberIdDto memberIdDto)
     {
         if (!ModelState.IsValid)
         {

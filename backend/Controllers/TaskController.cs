@@ -138,12 +138,12 @@ public class  TaskController : ControllerBase{
     }
     [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpDelete("DeleteTask")]
-    public async Task<IActionResult> DeleteTask (int taskId){
+    public async Task<IActionResult> DeleteTask (TaskIdDTO taskIdDto){
         if(!ModelState.IsValid){
             return BadRequest(ModelState);
         }
         try{
-                var task = await _taskRepo.GetTaskByIdAsync(taskId);
+                var task = await _taskRepo.GetTaskByIdAsync(taskIdDto.TaskId);
                 var list = await _listRepo.GetListByIdAsync(task.ListId);
                 if(task == null){
                     return NotFound("Task not found");
@@ -163,7 +163,7 @@ public class  TaskController : ControllerBase{
                 var isMember = await _membersRepo.IsAMember(userId, workspaceId);
                 if (isMember || userTokenRole == "Admin")
                 {
-                    var taskModel = await _taskRepo.DeleteTaskAsync(taskId);
+                    var taskModel = await _taskRepo.DeleteTaskAsync(taskIdDto.TaskId);
                     if (taskModel == null)
                     {
                         return NotFound("Task dose not exists");

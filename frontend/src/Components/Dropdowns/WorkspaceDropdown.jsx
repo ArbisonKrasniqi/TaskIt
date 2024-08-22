@@ -14,6 +14,7 @@ const WorkspaceDropdown = (props) => {
     const getWorkspaces = async () => {
       try {
         if (mainContext.userInfo.userId) { // Check if userId is available
+          console.log("attemptin to get workspaces with user id "+mainContext.userInfo.userId);
           const response = await getDataWithId('http://localhost:5157/backend/workspace/GetWorkspacesByMemberId?memberId', mainContext.userInfo.userId);
           const data = response.data;
 

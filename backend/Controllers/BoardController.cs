@@ -187,7 +187,7 @@ namespace backend.Controllers
         
         [Authorize(AuthenticationSchemes = "Bearer")]
         [HttpDelete("DeleteBoardByID")]
-        public async Task<IActionResult> DeleteBoard([FromQuery] BoardIdDto boardIdDto)
+        public async Task<IActionResult> DeleteBoard(BoardIdDto boardIdDto)
         {
             if  (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -200,7 +200,7 @@ namespace backend.Controllers
                 Console.WriteLine($"UserId from Claims: {userId}");
                 var board = await _boardRepo.GetBoardByIdAsync(boardIdDto.BoardId);
 
-                if (board == null) return NotFound("Board does not exists!");
+                if (board == null) return NotFound("Board does not exist!");
 
                 var workspaceId = board.WorkspaceId;    
                 

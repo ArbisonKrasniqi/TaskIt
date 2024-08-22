@@ -9,6 +9,8 @@ import MembersList from "../Components/Dashboard/Members/MembersList.jsx"
 import InvitesList from "../Components/Dashboard/Invites/InvitesList.jsx";
 import WithAuth from "../Services/WithAuth.jsx";
 import BackgroundsList from "../Components/Dashboard/Backgrounds/BackgroundsList.jsx";
+import ListsList from "../Components/Dashboard/Lists/ListsList.jsx";
+import TasksList from "../Components/Dashboard/Tasks/TasksList.jsx";
 
 const Dashboard = () => {
 
@@ -35,14 +37,13 @@ const Dashboard = () => {
 
     return (<div className="w-[100%] h-[100%] p-0 m-0 bg-gray-800">
         <UserList/>
-        
         <WorkspacesList/>
-
         <BoardsList/>
-
         <MembersList/>
         <InvitesList/>
         <BackgroundsList/>
+        <ListsList/>
+        <TasksList/>
     </div>
 );
 }

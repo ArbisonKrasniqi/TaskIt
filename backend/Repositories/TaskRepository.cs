@@ -43,7 +43,7 @@ public class TaskRepository : ITaskRepository{
 
         existingTask.Title = taskModel.Title;
         existingTask.Description = taskModel.Description;
-        existingTask.DateAdded = taskModel.DateAdded;
+        existingTask.DateAdded = existingTask.DateAdded;
         existingTask.DueDate = taskModel.DueDate;
         existingTask.ListId = taskModel.ListId;
 

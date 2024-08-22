@@ -166,7 +166,7 @@ namespace backend.Controllers
         //DELETE BY ID
         [HttpDelete]
         [Route("DeleteBackgroundByID")]
-        public async Task<IActionResult> DeleteBoardById([FromQuery] BackgroundIdDto backgroundIdDto)
+        public async Task<IActionResult> DeleteBoardById(BackgroundIdDto backgroundIdDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
