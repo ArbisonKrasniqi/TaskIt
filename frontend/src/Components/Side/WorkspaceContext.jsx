@@ -52,7 +52,7 @@ export const WorkspaceProvider = ({ children }) => {
         getWorkspace();
         console.log("Workspace fetched", workspace);
         
-    }, [WorkspaceId, userId]);//userid
+    }, [WorkspaceId]);
 
  
     useEffect(()=>{
@@ -107,7 +107,7 @@ const workspaceTitle = workspace ? workspace.title : 'Workspace';
     useEffect(() => {
         const getMembers = async () => {
             try {
-                const response = await getDataWithId('http://localhost:5157/backend/Members/getAllMembers?workspaceId', WorkspaceId);
+                const response = await getDataWithId('http://localhost:5157/backend/Members/getAllMembersByWorkspace?workspaceId', WorkspaceId);
                 const data = response.data;
                 if (data && Array.isArray(data) && data.length>0) {
                     setMembers(data);

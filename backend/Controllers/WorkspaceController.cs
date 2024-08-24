@@ -111,16 +111,11 @@ namespace backend.Controllers
         }
 
         [HttpGet("GetWorkspaceById")]
-        [Authorize(AuthenticationSchemes = "Bearer")]
+        
         public async Task<IActionResult> GetWorkspaceById(int workspaceId)
         {
             try
             {
-                var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
-                var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
-                var isMember = await _membersRepo.IsAMember(userId, workspaceId);
-                if (isMember || userTokenRole == "Admin")
-                {
                     var workspace = await _workspaceRepo.GetWorkspaceByIdAsync(workspaceId);
                     if (workspace == null)
                     {
@@ -129,11 +124,6 @@ namespace backend.Controllers
 
                     var workspaceDto = _mapper.Map<WorkspaceDto>(workspace);
                     return Ok(workspaceDto);
-                }
-
-                return StatusCode(401, "You are not authorized!");
-
-
             }
             catch (Exception e)
             {
@@ -189,8 +179,8 @@ namespace backend.Controllers
             {
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
-
-                if (userId == updateDto.OwnerId || userTokenRole == "Admin")
+                var isMember = await _userRepo.UserIsMember(userId, updateDto.WorkspaceId);
+                if (isMember || userTokenRole == "Admin")
                 {
                     var workspaceModel = await _workspaceRepo.UpdateWorkspaceAsync(updateDto);
                     if (workspaceModel == null)

@@ -61,23 +61,36 @@ public class InviteRepository : IInviteRepository
     }
 
     //InviteExists
-    public async Task<bool> InviteExistsAsync(string inviterId, string inviteeId, int workspaceId)
+    public async Task<bool> InviteExistsAsync(Invite invite)
     {
         return await _context.Invite.AnyAsync(i =>
-            i.InviterId == inviterId && i.InviteeId == inviteeId && i.WorkspaceId == workspaceId);
+            i.InviterId == invite.InviterId && i.InviteeId == invite.InviteeId 
+                                            && i.WorkspaceId == invite.WorkspaceId
+                                            && i.InviteStatus== invite.InviteStatus);
     }
     
     //AddInviteAsync
     public async Task<Invite> AddInviteAsync(Invite invite)
     {    
-        var inviteExists = await InviteExistsAsync(invite.InviterId, invite.InviteeId, invite.WorkspaceId);
+        var inviteExists = await InviteExistsAsync(invite);
     
         if (inviteExists)
         {
-            // Handle the case where the invite already exists, maybe return null or throw an exception.
+            // Handle the case where the invite already exists
             throw new InvalidOperationException("Invite already exists.");
         }
 
+        var workspace = await _context.Workspace.Include(w => w.Members)
+            .FirstOrDefaultAsync(x => x.WorkspaceId == invite.WorkspaceId);
+        
+        if (workspace == null)
+        {
+            throw new ArgumentNullException("Workspace not found!");
+        }
+        if (workspace.Members.Count >= 10)
+        {
+            throw new InvalidOperationException("Cannot invite more members. Workspace has reached the member limit.");
+        }
         _context.Invite.Add(invite);
         await _context.SaveChangesAsync();
 
@@ -150,4 +163,13 @@ public class InviteRepository : IInviteRepository
         await _context.SaveChangesAsync();
         return invites;
     }
+    
+    //Pending invite exists 
+    // Check if an invite exists and is pending
+    public async Task<bool> PendingInviteExistsAsync(string inviterId, string inviteeId, int workspaceId)
+    {
+        return await _context.Invite.AnyAsync(i =>
+            i.InviterId == inviterId && i.InviteeId == inviteeId && i.WorkspaceId == workspaceId && i.InviteStatus == "Pending");
+    }
+
 }

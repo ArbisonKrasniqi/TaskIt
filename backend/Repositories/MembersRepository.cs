@@ -32,6 +32,11 @@ public class MembersRepository : IMembersRepository
             throw new ArgumentNullException( "Workspace not found!");
         }
 
+        var membersCount = workspace.Members.Count;
+        if (membersCount >= 10)
+        {
+            throw new InvalidOperationException("Cannot add more members. The workspace already has 10 members.");
+        }
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == addMemberDto.UserId);
         if (user == null)
         {

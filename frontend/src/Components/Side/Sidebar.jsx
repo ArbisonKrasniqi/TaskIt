@@ -1,4 +1,4 @@
-import { useEffect, useState,useContext } from "react";
+import { useState,useContext } from "react";
 import { SlArrowLeft } from "react-icons/sl";
 import { CiViewBoard } from "react-icons/ci";
 import { IoPersonOutline } from "react-icons/io5";
@@ -16,11 +16,14 @@ import { FiSquare } from "react-icons/fi";
 import { WorkspaceContext } from './WorkspaceContext';
 import LimitModal from "../ContentFromSide/LimitModal.jsx";
 import { MainContext } from "../../Pages/MainContext.jsx";
+import { useNavigate, useLocation } from 'react-router-dom';
 const Sidebar = () => {
 
 
 
     const mainContext = useContext(MainContext);
+    const navigate = useNavigate();
+    const location = useLocation();
     const { 
         workspace, open, setOpen, workspaceTitle, setHover, hover, openCloseModal,
         setOpenSortModal, setOpenCloseModal, openSortModal, setOpenModal, openModal, 
@@ -30,12 +33,12 @@ const Sidebar = () => {
         showLimitModal, setShowLimitModal, boardCount, roli, starredBoards } = useContext(WorkspaceContext);
 
         const [boardToClose, setBoardToClose] = useState(null);
-
+     
 const Menus = [
-    {title: "Boards", tag: "CiViewBoard"},
-    {title: "Members", tag: "IoPersonOutline"},
-    {title: "Workspace settings", tag: "IoIosSettings"},
-]
+    {title: "Boards", tag: "CiViewBoard", path: `/boards/${workspace?.workspaceId}`},
+    {title: "Members", tag: "IoPersonOutline", path: `/members/${workspace?.workspaceId}`},
+    {title: "Workspace settings", tag: "IoIosSettings", path: `/workspaceSettings/${workspace?.workspaceId}`},
+ ]
 const tagComponents = {
     CiViewBoard: <CiViewBoard/>,
     IoPersonOutline: <IoPersonOutline/>,
@@ -44,11 +47,13 @@ const tagComponents = {
     LuCalendarDays: <LuCalendarDays/>,
     };
 const WorkspaceViews = [
-    {title: "Table", tag: "PiTable"},
-    {title: "Calendar", tag: "LuCalendarDays"},
-]
+    {title: "Table", tag: "PiTable", path: `/table/${workspace?.workspaceId}`},
+    {title: "Calendar", tag: "LuCalendarDays", path: `/calendar/${workspace?.workspaceId}`},
+  ]
 
-
+  const handleMenuClick = (path) => {
+    navigate(path); 
+  };
 
     return(
         <div className="flex min-h-screen">
@@ -69,7 +74,9 @@ const WorkspaceViews = [
 
             <ul className="pt-4">
             {Menus.map((menu,index)=>(
-                <li key={index} className={`text-gray-400 text-l font-semibold flex items-center gap-x-4 cursor-pointer p-2 hover:bg-gray-500 ${!open && "scale-0"}`}>
+                <li key={index} 
+                className={`text-gray-400 text-l font-semibold flex items-center gap-x-4 cursor-pointer p-2 hover:bg-gray-500 ${location.pathname === menu.path ? 'bg-gray-600' : ''} ${!open && "scale-0"}`}
+                onClick={() => handleMenuClick(menu.path)}>
                 {tagComponents[menu.tag]}
                 <span>{menu.title}</span>
                 </li>
@@ -81,7 +88,9 @@ const WorkspaceViews = [
            
             <ul>
             {WorkspaceViews.map((views,index)=>(
-                <li key={index} className={`text-gray-400 text-l font-semibold flex items-center gap-x-4 cursor-pointer p-2 hover:bg-gray-500 ${!open && "scale-0"}`}>
+                <li key={index} 
+                className={`text-gray-400 text-l font-semibold flex items-center gap-x-4 cursor-pointer p-2 hover:bg-gray-500  ${location.pathname === views.path ? 'bg-gray-600' : ''} ${!open && "scale-0"}`}
+                onClick={() => handleMenuClick(views.path)}>
                 {tagComponents[views.tag]}
                 <span>{views.title}</span>
                 </li>
@@ -106,10 +115,7 @@ const WorkspaceViews = [
             </div>
 
             <ul>
-                {/* {starredBoards.length===0 ? (
-                     <li className={`text-gray-400 text-l font-semibold flex items-center gap-x-3 cursor-pointer p-2 ${!open && "scale-0"}`}>
-                     <span>No starred boards found</span>
-                 </li>   */}
+    
                 {
                     starredBoards.map((board, index) => (
                         <li key={index} 

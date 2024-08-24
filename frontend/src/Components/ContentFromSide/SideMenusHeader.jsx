@@ -31,11 +31,13 @@ const SideMenusHeader = () => {
             </div>
 
             <button 
-            className="flex justify-center text-black font-sans font-semibold text-center bg-blue-500 p-3 border border-solid border-blue-700 rounded-lg  mt-10 hover:bg-blue-400"
+            className="flex justify-center text-black font-sans font-semibold text-center bg-blue-500 p-3 border border-solid border-blue-700 rounded-lg  mt-10 hover:bg-blue-400 truncate sm:w-auto"
             onClick={openInviteModal}
             >
             <IoPersonAddOutline className="mr-1 mt-1 font-bold" />
-            Invite workspace members
+            <span className="hidden sm:inline">Invite workspace members</span>
+            <span className="inline sm:hidden"></span>
+         
             </button>
             <InviteModal isOpen={isInviteModalOpen} onClose={closeInviteModal} />
         </div>

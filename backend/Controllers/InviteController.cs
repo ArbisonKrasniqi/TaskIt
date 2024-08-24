@@ -17,13 +17,15 @@ namespace backend.Controllers
         private readonly IInviteRepository _inviteRepo;
         private readonly IWorkspaceRepository _workspaceRepo;
         private readonly IUserRepository _userRepo;
+        private readonly IMembersRepository _memberRepo;
         private readonly IMapper _mapper;
 
-        public InviteController(IInviteRepository inviteRepo, IWorkspaceRepository workspaceRepo, IUserRepository userRepo,IMapper mapper)
+        public InviteController(IInviteRepository inviteRepo, IWorkspaceRepository workspaceRepo, IUserRepository userRepo,IMembersRepository memberRepo, IMapper mapper)
         {
             _inviteRepo = inviteRepo;
             _workspaceRepo = workspaceRepo;
             _userRepo = userRepo;
+            _memberRepo = memberRepo;
             _mapper = mapper;
         }
 
@@ -134,8 +136,8 @@ namespace backend.Controllers
                 }
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
-                var ownsWorkspace = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
-                if (ownsWorkspace || userTokenRole == "Admin")
+                var isMember = await _memberRepo.IsAMember(userId, workspaceId);
+                if (isMember || userTokenRole == "Admin")
                 {
                     var invites = await _inviteRepo.GetInvitesByWorkspaceAsync(workspaceId);
                     if (invites.Count() == 0) return Ok(new List<InviteDto>());
@@ -223,9 +225,10 @@ namespace backend.Controllers
             }
 
             var workspace = await _workspaceRepo.GetWorkspaceByIdAsync(inviteDto.WorkspaceId);
-            if (workspace.OwnerId != inviteDto.InviterId)
+            
+            if (workspace.OwnerId == inviteDto.InviteeId)
             {
-                return BadRequest("Only the owner of workspace can invite others!");
+                return BadRequest("You can not invite the owner of the workspace");
             }
             
             if (workspace.Members.Any(member => member.UserId == inviteDto.InviteeId))
@@ -237,7 +240,8 @@ namespace backend.Controllers
             {
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
-                if (userId == inviteDto.InviterId || userTokenRole == "Admin")
+                var isMember = await _memberRepo.IsAMember(userId, inviteDto.WorkspaceId);
+                if (isMember && userId == inviteDto.InviterId || userTokenRole == "Admin")
                 {
                     var inviteModel = _mapper.Map<Invite>(inviteDto);
                     await _inviteRepo.AddInviteAsync(inviteModel);
@@ -376,6 +380,45 @@ namespace backend.Controllers
                 return StatusCode(500, "Internal Server Error!"+e.Message);
             }
         }
+
+        [HttpGet("Check-pending-invite")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<IActionResult> CheckPendingInviteExists([FromQuery]checkInviteDto checkInviteDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+               
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+                var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+                var isMember = await _memberRepo.IsAMember(userId, checkInviteDto.WorkspaceId);
+                if (isMember && userId == checkInviteDto.InviterId || userTokenRole == "Admin")
+                {
+
+                    bool pendingInviteExists = await _inviteRepo.PendingInviteExistsAsync(checkInviteDto.InviterId,
+                        checkInviteDto.InviteeId, checkInviteDto.WorkspaceId);
+                   
+                    if (pendingInviteExists)
+                    {
+                        return Ok(new { exists = true, message = "Pending invite exists." });
+                    }
+                    else
+                    {
+                        return Ok(new { exists = false, message = "No pending invite found." });
+                    }
+                }
+                return StatusCode(401, "You are not authorized!");
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, "Internal Server Error!"+e.Message);
+            }
+        }
+        
     }
 }
 
