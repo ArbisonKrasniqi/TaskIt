@@ -1,13 +1,24 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { GoPencil } from "react-icons/go";
 import { IoPersonAddOutline } from "react-icons/io5";
 import { WorkspaceContext } from '../Side/WorkspaceContext';
 import UpdateWorkspaceModal from "./UpdateWorkspaceModal.jsx";
 import InviteModal from './InviteModal.jsx';
+import MessageModal from './MessageModal.jsx';
 const SideMenusHeader = () => {
 
-    const {workspace, setUpdateWorkspaceModal,updateWorkspaceModal,handleWorkspaceUpdate, isInviteModalOpen, openInviteModal, closeInviteModal} = useContext(WorkspaceContext);
-    
+    const {workspace, setUpdateWorkspaceModal,updateWorkspaceModal,handleWorkspaceUpdate, 
+        isInviteModalOpen, openInviteModal, closeInviteModal} = useContext(WorkspaceContext);
+        const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+        const [message, setMessage] = useState('');
+
+        const handleInviteSent = () => {
+            setMessage('Invite sent successfully!');
+            setIsMessageModalOpen(true);
+            closeInviteModal();
+        };
+
+   
     // Ensure workspace is not null or undefined
     if (!workspace) {
         console.error('Workspace is null or undefined');
@@ -39,8 +50,21 @@ const SideMenusHeader = () => {
             <span className="inline sm:hidden"></span>
          
             </button>
-            <InviteModal isOpen={isInviteModalOpen} onClose={closeInviteModal} />
+            {isInviteModalOpen && (
+                    <InviteModal 
+                        isOpen={isInviteModalOpen} 
+                        onClose={closeInviteModal} 
+                        onInviteSent={handleInviteSent} 
+                    />
+                )}
+                <MessageModal 
+                    isOpen={isMessageModalOpen} 
+                    message={message} 
+                    duration={1000}
+                    onClose={() => setIsMessageModalOpen(false)} 
+                />
         </div>
+
         <hr className="w-full border-gray-400 mt-3"></hr>
 </div>
     );

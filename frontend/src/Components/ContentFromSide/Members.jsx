@@ -29,7 +29,7 @@ const Members = () => {
                             ) : (
                                 sentInvites.map((invite, index) => (
                                     <div key={invite.inviteId} className='flex items-start p-4 bg-gray-800 text-gray-400 rounded-lg hover:bg-gray-700 mb-2'>
-                                    <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-white bg-gradient-to-r from-orange-400 to-orange-600">
+                                    <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-sm text-white bg-gradient-to-r from-orange-400 to-orange-600">
                                         {getInitials(inviteeDetails[index]?.firstName, inviteeDetails[index]?.lastName)}
                                     </div>
                                     <div className="ml-4 flex-1">

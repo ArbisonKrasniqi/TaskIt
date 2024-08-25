@@ -3,7 +3,7 @@ import { WorkspaceContext } from "../Side/WorkspaceContext"
 
 
 
-const DeleteWorkspaceModal = ({onClose}) => {
+const DeleteWorkspaceModal = ({onClose, onDeleted}) => {
     const {handleDeleteWorkspace,WorkspaceId, userId, handleLeaveWorkspace, roli} = useContext(WorkspaceContext);
 
     return(
@@ -16,6 +16,7 @@ const DeleteWorkspaceModal = ({onClose}) => {
                     <button
                         onClick={() => {
                             handleDeleteWorkspace(WorkspaceId); 
+                            onDeleted();
                             onClose();
                         }}
                         className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors duration-300 ease-in-out mr-4"
@@ -37,6 +38,7 @@ const DeleteWorkspaceModal = ({onClose}) => {
                         <button
                             onClick={() => {
                                 handleLeaveWorkspace(WorkspaceId, userId); 
+                                onDeleted();
                                 onClose();
                             }}
                             className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors duration-300 ease-in-out mr-4"

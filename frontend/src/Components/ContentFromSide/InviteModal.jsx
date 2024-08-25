@@ -4,7 +4,7 @@ import { WorkspaceContext } from '../Side/WorkspaceContext';
 
 
 
-const InviteModal = ({ isOpen, onClose }) => {
+const InviteModal = ({ isOpen, onClose, onInviteSent  }) => {
    
     const {members,WorkspaceId, userId, getInitials, getSentInvites} = useContext(WorkspaceContext);
     const memberCount = members.length;
@@ -67,6 +67,7 @@ const InviteModal = ({ isOpen, onClose }) => {
             }
             setSelectedUsers([]);
             setErrorMessage('');
+            onInviteSent();
             onClose();
             getSentInvites();
         }catch (error) {
@@ -148,7 +149,7 @@ const handleSelectUser =async (user) => {
                                 className={`p-2 flex flex-row items-center gap-1 cursor-pointer hover:bg-gray-200 ${selectedUsers.some(selectedUser => selectedUser.id === user.id) ? 'bg-blue-200' : ''} ${members.some(member => member.userId === user.id) ? 'opacity-50 cursor-not-allowed' : ''}`}
                            
                             >
-                            <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white bg-gradient-to-r from-orange-400 to-orange-600">
+                            <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm text-white bg-gradient-to-r from-orange-400 to-orange-600">
                                         {getInitials(user.firstName, user.lastName)}
                                     </div>
                                     <div className="ml-2">
@@ -170,7 +171,7 @@ const handleSelectUser =async (user) => {
                             {selectedUsers.map(user => (
                                 <li key={user.id} className="p-2 flex justify-between items-center">
                                     <div className='flex flex-row items-center'>
-                                    <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white bg-gradient-to-r from-orange-400 to-orange-600">
+                                    <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm text-white bg-gradient-to-r from-orange-400 to-orange-600">
                                         {getInitials(user.firstName, user.lastName)}
                                     </div>
                                     <div className="ml-2">

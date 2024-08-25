@@ -287,6 +287,21 @@ const workspaceTitle = workspace ? workspace.title : 'Workspace';
             return `${firstName.charAt(0)}${lastName.charAt(0)}`;
         };
 
+        const getInitialsFromFullName = (fullName) => {
+            if (!fullName) {
+                return '';
+            }
+        
+            // Split the full name by spaces
+            const nameParts = fullName.trim().split(' ');
+       
+            const firstName = nameParts[0];
+            const lastName = nameParts[nameParts.length - 1];
+        
+            // Return the initials
+            return `${firstName.charAt(0).toUpperCase()}${lastName.charAt(0).toUpperCase()}`;
+        };
+        
         const openInviteModal = () => setIsInviteModalOpen(true);
         const closeInviteModal = () => setIsInviteModalOpen(false);
 
@@ -419,7 +434,8 @@ const workspaceTitle = workspace ? workspace.title : 'Workspace';
             inviteeDetails, 
             setInviteeDetails, 
             workspaceTitles, 
-            setWorkspaceTitles 
+            setWorkspaceTitles,
+            getInitialsFromFullName
         }}>
             {children}
         </WorkspaceContext.Provider>

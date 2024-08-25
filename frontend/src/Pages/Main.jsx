@@ -33,6 +33,7 @@ const Main = () => {
                 setUserInfo({
                     userId: decodedToken.Id,
                     email: decodedToken.Email,
+                    name: decodedToken.Name,
                     role: decodedToken.Role
                 });
             } else {

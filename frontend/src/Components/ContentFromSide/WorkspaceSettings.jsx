@@ -1,22 +1,34 @@
 import SideMenusHeader from "./SideMenusHeader";
 import { WorkspaceContext } from '../Side/WorkspaceContext';
 import { useContext, useState } from "react";
-import { putData,deleteData } from "../../Services/FetchService";
-import { useNavigate } from 'react-router-dom';
+import { putData } from "../../Services/FetchService";
 import DeleteWorkspaceModal from "./DeleteWorkspaceModal";
+import MessageModal from "./MessageModal";
 const WorkspaceSettings = () =>{
 
     const { workspace, setWorkspace, roli, setShowDeleteWorkspaceModal, showDeleteWorkspaceModal } = useContext(WorkspaceContext);
     const [isEditing, setIsEditing] = useState(false);
     const[description, setDescription] =useState('');
     const[errorMessage, setErrorMessage] = useState('');
-    const navigate = useNavigate();
+    const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+    const [message, setMessage] = useState('');
+    
 
    // const roli = "Member";
     if (workspace == null) {
         return <div>Loading...</div>;
     }
 
+    const handleDelete = () =>{
+        setMessage("Workspace deleted successfully!");
+        setIsMessageModalOpen(true);
+        setShowDeleteWorkspaceModal(false);
+    }
+    const handleLeave = () =>{
+        setMessage("Workspace left successfully!");
+        setIsMessageModalOpen(true);
+        setShowDeleteWorkspaceModal(false);
+    }
     
     const handleEditClick = () =>{
         setDescription(workspace.description || ''); 
@@ -100,7 +112,9 @@ const WorkspaceSettings = () =>{
                             Delete this workspace?
                         </button>
                         {showDeleteWorkspaceModal && (
-                            <DeleteWorkspaceModal onClose={() => setShowDeleteWorkspaceModal(false)} />
+                            <DeleteWorkspaceModal 
+                            onClose={() => setShowDeleteWorkspaceModal(false)}
+                            onDeleted={handleDelete} />
                         )}
                     </>
                 ) : (
@@ -112,10 +126,18 @@ const WorkspaceSettings = () =>{
                             Leave this workspace?
                         </button>
                         {showDeleteWorkspaceModal && (
-                            <DeleteWorkspaceModal onClose={() => setShowDeleteWorkspaceModal(false)}/>
+                            <DeleteWorkspaceModal 
+                            onClose={() => setShowDeleteWorkspaceModal(false)}
+                            onDeleted={handleLeave} />
                         )}
                     </>
                 )}
+                 <MessageModal 
+                    isOpen={isMessageModalOpen} 
+                    message={message} 
+                    duration={2000}
+                    onClose={() => setIsMessageModalOpen(false)} 
+                />
             </div>
            
         </div>
