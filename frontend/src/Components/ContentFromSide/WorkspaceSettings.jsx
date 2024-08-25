@@ -87,6 +87,9 @@ const WorkspaceSettings = () =>{
 
     </div>
     <hr className="w-full border-gray-400"></hr>
+    <h1 className="text-3xl mt-10 ml-20 mb-10 font-semibold font-sans text-gray-400">
+    Workspace Activity</h1>
+    <hr className="w-full border-gray-400"></hr>
     <div className="mt-10 ml-10">
     {roli === "Owner" ? (
                     <>
@@ -114,6 +117,7 @@ const WorkspaceSettings = () =>{
                     </>
                 )}
             </div>
+           
         </div>
     );
 }

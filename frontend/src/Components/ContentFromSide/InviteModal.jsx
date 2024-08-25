@@ -6,7 +6,7 @@ import { WorkspaceContext } from '../Side/WorkspaceContext';
 
 const InviteModal = ({ isOpen, onClose }) => {
    
-    const {members,WorkspaceId, userId, workspace} = useContext(WorkspaceContext);
+    const {members,WorkspaceId, userId, getInitials, getSentInvites} = useContext(WorkspaceContext);
     const memberCount = members.length;
 
     const [query, setQuery] = useState('');
@@ -14,10 +14,7 @@ const InviteModal = ({ isOpen, onClose }) => {
     const [selectedUsers, setSelectedUsers] = useState([]);
     const [errorMessage, setErrorMessage] = useState('');
     const [existingInvites, setExistingInvites] = useState([]);
-    const getInitials = (firstName, lastName) => {
-        return `${firstName.charAt(0)}${lastName.charAt(0)}`;
-    };
-    
+   
     
     useEffect(()=>{
         if(query.length>1){
@@ -67,17 +64,11 @@ const InviteModal = ({ isOpen, onClose }) => {
                 continue;
             }
             const response = await postData('http://localhost:5157/backend/invite/Invite', invite);
-
-            if (response.status === 200) {
-                console.log(`Invite sent to ${invite.inviteeId}`);
-            }else {
-            console.error(`Failed to send invite to ${invite.inviteeId}`);
-            }
             }
             setSelectedUsers([]);
             setErrorMessage('');
             onClose();
-            
+            getSentInvites();
         }catch (error) {
             console.error("Error sending invites: ", error);
             setErrorMessage("Failed to send invites. Please try again.");

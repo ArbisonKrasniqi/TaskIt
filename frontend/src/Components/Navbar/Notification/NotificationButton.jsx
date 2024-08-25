@@ -6,17 +6,12 @@ import { WorkspaceContext } from '../../Side/WorkspaceContext';
 import { useNavigate } from 'react-router-dom';
 const NotificationButton = (props) => {
     const dropdownContext = useContext(DropdownContext);
-    const { userId } = useContext(WorkspaceContext);
+    const { userId, workspaces, getInitials } = useContext(WorkspaceContext);
     const [invites, setInvites] = useState([]);
     const [inviterDetails, setInviterDetails] = useState([]);
     const [workspaceTitles, setWorkspaceTitles] = useState([]);
     const navigate = useNavigate();
-    const getInitials = (firstName, lastName) => {
-        if (!firstName || !lastName) {
-            return '';
-        }
-        return `${firstName.charAt(0)}${lastName.charAt(0)}`;
-    };
+   
     
     const getInvites = async () => {
         try {
@@ -44,10 +39,10 @@ const NotificationButton = (props) => {
     };
 
     useEffect(() => {
-        if (dropdownContext.NotificationDropdownIsOpen) {
+       
             getInvites();
-        }
-    }, [dropdownContext.NotificationDropdownIsOpen]);
+        
+    }, [userId, workspaces]);
 
     const handleInviteAction = async(inviteId, status,workspaceId)=>{
         try{

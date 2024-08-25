@@ -1,14 +1,10 @@
-﻿using System.Security.Claims;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using backend.Data;
-using backend.DTOs;
 using backend.DTOs.Workspace;
 using backend.Interfaces;
 using backend.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+
 
 namespace backend.Controllers
 {
@@ -17,15 +13,13 @@ namespace backend.Controllers
     public class WorkspaceController : ControllerBase
     {
         private readonly IWorkspaceRepository _workspaceRepo;
-        private readonly IUserRepository _userRepo;
-        private readonly IMembersRepository _membersRepo;
+        private readonly IUserRepository _userRepo; 
         private readonly IMapper _mapper;
 
-        public WorkspaceController(IWorkspaceRepository workspaceRepo, IUserRepository userRepo, IMembersRepository membersRepo, IMapper mapper)
+        public WorkspaceController(IWorkspaceRepository workspaceRepo, IUserRepository userRepo, IMapper mapper)
         {
             _userRepo = userRepo;
             _workspaceRepo = workspaceRepo;
-            _membersRepo = membersRepo;
             _mapper = mapper;
         }
         
@@ -179,6 +173,10 @@ namespace backend.Controllers
             {
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return NotFound("User Not Found!");
+                }
                 var isMember = await _userRepo.UserIsMember(userId, updateDto.WorkspaceId);
                 if (isMember || userTokenRole == "Admin")
                 {
@@ -213,6 +211,10 @@ namespace backend.Controllers
             {
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return NotFound("User Not Found!");
+                }
             
                 if (await _userRepo.UserOwnsWorkspace(userId, workspaceIdDto.WorkspaceId) || userTokenRole == "Admin") //If user owns workspace or is admin
                 {
@@ -247,16 +249,18 @@ namespace backend.Controllers
             {
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
-
-                if (!await _userRepo.UserExists(ownerIdDto.OwnerId))
+                if (string.IsNullOrEmpty(userId))
                 {
-                    return NotFound("User not found!");
+                    return NotFound("User Not Found!");
                 }
-
+                if (string.IsNullOrEmpty(ownerIdDto.OwnerId))
+                {
+                    return NotFound("User Not Found!");
+                }
                 if (userId == ownerIdDto.OwnerId || userTokenRole == "Admin")
                 {
                     var workspaceModels = await _workspaceRepo.DeleteWorkspacesByOwnerIdAsync(ownerIdDto.OwnerId);
-                    if (workspaceModels == null)
+                    if (workspaceModels.Count==0)
                     {
                         return NotFound("Workspaces not found!");
                     }

@@ -280,9 +280,75 @@ const workspaceTitle = workspace ? workspace.title : 'Workspace';
             console.log("Tasks fetched: ",tasks);
         }, [WorkspaceId]);
     
+        const getInitials = (firstName, lastName) => {
+            if (!firstName || !lastName) {
+                return '';
+            }
+            return `${firstName.charAt(0)}${lastName.charAt(0)}`;
+        };
 
         const openInviteModal = () => setIsInviteModalOpen(true);
         const closeInviteModal = () => setIsInviteModalOpen(false);
+
+        const [sentInvites, setSentInvites] = useState([]);
+        const [inviteeDetails, setInviteeDetails] = useState([]);
+        const [workspaceTitles, setWorkspaceTitles] = useState([]);
+    
+        const getSentInvites = async () => {
+            try {
+                const response = await getDataWithId('http://localhost:5157/backend/invite/GetInvitesByWorkspace?workspaceId', WorkspaceId);
+                const data = response.data;
+                console.log("Sent Invites fetched: ", data);
+    
+                const pendingInvites = data.filter(invite =>invite.inviteStatus === "Pending");
+                console.log("Pending invites: ",pendingInvites);
+                setSentInvites(pendingInvites);
+    
+                // Fetch inviter details for each invite
+                const invited = await Promise.all(pendingInvites.map(async invite => {
+                    const responseInvitee = await getDataWithId('http://localhost:5157/backend/user/adminUserID?userId', invite.inviteeId);
+                    return responseInvitee.data;
+                }));
+                const workspaceTitlesData = await Promise.all(pendingInvites.map(async invite => {
+                    const responseWorkspace = await getDataWithId('http://localhost:5157/backend/workspace/getWorkspaceById?workspaceId', invite.workspaceId);
+                    return responseWorkspace.data.title; // Assuming the workspace object has a 'title' field
+                }));
+    
+                setInviteeDetails(invited);
+                setWorkspaceTitles(workspaceTitlesData);
+            } catch (error) {
+                console.log("Error fetching invites: ", error.message);
+            }
+        };
+    
+        useEffect(() => {
+            getSentInvites();
+        }, [WorkspaceId, workspace]);
+    
+    
+        const handleDeleteInvite = async(inviteId) => {
+            console.log("Deleting invite with id: ", inviteId);
+            try{
+                const response = await deleteData(`http://localhost:5157/backend/invite/DeleteInviteById?InviteId=${inviteId}`);
+                console.log("Deleting invite response: ",response);
+                getSentInvites();
+            }
+            catch(error){
+                console.error("Error deleting invite ",error.message);
+            }
+        };
+
+
+
+
+
+
+
+
+
+
+
+
 
     return (
         <WorkspaceContext.Provider value={{
@@ -345,6 +411,15 @@ const workspaceTitle = workspace ? workspace.title : 'Workspace';
             openInviteModal,
             closeInviteModal,
             isInviteModalOpen,
+            getInitials,
+            handleDeleteInvite,
+            getSentInvites,
+            sentInvites, 
+            setSentInvites,
+            inviteeDetails, 
+            setInviteeDetails, 
+            workspaceTitles, 
+            setWorkspaceTitles 
         }}>
             {children}
         </WorkspaceContext.Provider>

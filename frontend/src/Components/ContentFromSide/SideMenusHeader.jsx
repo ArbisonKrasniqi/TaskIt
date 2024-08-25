@@ -24,7 +24,7 @@ const SideMenusHeader = () => {
             <h1 className={`origin-left mt-5 mb-5 font-sans text-gray-400 font-bold text-2xl duration-20 text-center`}>
                 {workspace.title}
             </h1>
-            <button onClick={()=>{setUpdateWorkspaceModal(prev => !prev);}}>
+            <button onClick={()=>setUpdateWorkspaceModal(prev => !prev)}>
             <GoPencil className=" text-gray-400 font-bold text-2xl duration-20 mt-5 mb-5 cursor-pointer hover:text-3xl"/>
             </button>
             <UpdateWorkspaceModal open={updateWorkspaceModal} onClose={()=>setUpdateWorkspaceModal(false)} workspace={workspace} onWorkspaceUpdated={handleWorkspaceUpdate}></UpdateWorkspaceModal>

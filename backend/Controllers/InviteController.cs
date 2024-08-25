@@ -136,6 +136,10 @@ namespace backend.Controllers
                 }
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return NotFound("User Not Found!");
+                }
                 var isMember = await _memberRepo.IsAMember(userId, workspaceId);
                 if (isMember || userTokenRole == "Admin")
                 {
@@ -225,7 +229,11 @@ namespace backend.Controllers
             }
 
             var workspace = await _workspaceRepo.GetWorkspaceByIdAsync(inviteDto.WorkspaceId);
-            
+            if (workspace == null)
+            {
+                return NotFound("Workspace Not Found!");
+            }
+
             if (workspace.OwnerId == inviteDto.InviteeId)
             {
                 return BadRequest("You can not invite the owner of the workspace");
@@ -240,6 +248,10 @@ namespace backend.Controllers
             {
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return NotFound("User Not Found!");
+                }
                 var isMember = await _memberRepo.IsAMember(userId, inviteDto.WorkspaceId);
                 if (isMember && userId == inviteDto.InviterId || userTokenRole == "Admin")
                 {
@@ -306,16 +318,24 @@ namespace backend.Controllers
 
                 if (invite == null) return BadRequest("Invite not found!");
                 
-                var inviterId = invite.InviterId;
+             
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
-                if (userId == inviterId || userTokenRole == "Admin")
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return NotFound("User Not Found!");
+                }
+                var isOwner = await _userRepo.UserOwnsWorkspace(userId, invite.WorkspaceId);
+                if (isOwner || userTokenRole == "Admin")
                 {
 
                     var inviteModel = await _inviteRepo.DeleteInviteAsync(inviteIdDto.InviteId);
-                    if (inviteModel == null) return NotFound("Invite Not Found!");
-
-                    return Ok("Invite Deleted!");
+                    if (inviteModel)
+                    {
+                        return Ok("Invite Deleted!");
+                    }
+                        
+                        return NotFound("Invite Not Found!");
                 }
                 return StatusCode(401, "You are not authorized!");
             }
@@ -365,6 +385,11 @@ namespace backend.Controllers
             {
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+                
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return NotFound("User Not Found!");
+                }
                 var ownsWorkspace = await _userRepo.UserOwnsWorkspace(userId, workspaceIdDto.WorkspaceId);
                 if (ownsWorkspace || userTokenRole == "Admin")
                 {
@@ -395,6 +420,11 @@ namespace backend.Controllers
                
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+                
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return NotFound("User Not Found!");
+                }
                 var isMember = await _memberRepo.IsAMember(userId, checkInviteDto.WorkspaceId);
                 if (isMember && userId == checkInviteDto.InviterId || userTokenRole == "Admin")
                 {

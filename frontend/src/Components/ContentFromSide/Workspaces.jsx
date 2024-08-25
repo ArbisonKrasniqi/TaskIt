@@ -6,7 +6,7 @@ import { IoIosSettings } from "react-icons/io";
 import { WorkspaceContext } from "../Side/WorkspaceContext.jsx";
 import { useNavigate } from "react-router-dom";
 const Workspaces = () =>{
-const {userId} = useContext(WorkspaceContext);
+const {userId, workspace} = useContext(WorkspaceContext);
 const [OwnedWorkspaces, setOwnedWorkspaces] = useState([]);  
 const [MemberWorkspaces, setMemberWorkspaces] = useState([]);
 const [searchTerm, setSearchTerm] = useState('');  
@@ -55,7 +55,7 @@ useEffect(()=>{
     getMemberWorkspaces();
     console.log("Owned Workspaces fetched ", OwnedWorkspaces);
     console.log("Member Workspaces fetched ", MemberWorkspaces);
-}, [userId]);
+}, [userId, workspace]);
 
 
 const filteredOwnedWorkspaces = OwnedWorkspaces.filter(workspace =>

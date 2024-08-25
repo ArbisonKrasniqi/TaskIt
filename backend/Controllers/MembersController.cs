@@ -46,6 +46,11 @@ public class MembersController: ControllerBase
             }
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+            
+            if (string.IsNullOrEmpty(userId))
+            {
+                return NotFound("User Not Found!");
+            }
             var ownsWorkspace = await _userRepo.UserOwnsWorkspace(userId, addMemberDto.WorkspaceId);
             if (ownsWorkspace || userTokenRole == "Admin")
             {
@@ -95,6 +100,11 @@ public class MembersController: ControllerBase
             }
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+            
+            if (string.IsNullOrEmpty(userId))
+            {
+                return NotFound("User Not Found!");
+            }
             var isMember = await _membersRepo.IsAMember(userId, workspaceId);
             if (isMember || userTokenRole == "Admin")
             {
@@ -137,15 +147,19 @@ public class MembersController: ControllerBase
             }
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+            
+            if (string.IsNullOrEmpty(userId))
+            {
+                return NotFound("User Not Found!");
+            }
              var isMember = await _membersRepo.IsAMember(userId, removeMemberDto.WorkspaceId);
             if (isMember || userTokenRole == "Admin")
             {
                 var result = await _membersRepo.RemoveMemberAsync(removeMemberDto.WorkspaceId, removeMemberDto.UserId);
                 if (result == null)
                 {
-                    return StatusCode(500, "User could not removed");
+                    return StatusCode(500, "User could not be removed");
                 }
-
                 return Ok("Member removed!");
             }
             return StatusCode(401, "You are not authorized!");
@@ -225,6 +239,10 @@ public class MembersController: ControllerBase
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return NotFound("User Not Found!");
+            }
             var ownsWorkspace = await _userRepo.UserOwnsWorkspace(userId, workspaceIdDto.WorkspaceId);
             if (ownsWorkspace || userTokenRole == "Admin")
             {

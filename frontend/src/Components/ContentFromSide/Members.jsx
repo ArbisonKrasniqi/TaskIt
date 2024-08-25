@@ -1,10 +1,12 @@
-import React,{ useContext } from "react";
+import React,{ useContext, useState, useEffect } from "react";
 import SideMenusHeader from "./SideMenusHeader";
 import { WorkspaceContext } from "../Side/WorkspaceContext";
+import { getDataWithId, deleteData } from "../../Services/FetchService";
 
 const Members = () => {
 
-    const { members } = useContext(WorkspaceContext);
+        const { members, getInitials, roli, sentInvites,inviteeDetails, workspaceTitles, handleDeleteInvite } = useContext(WorkspaceContext);
+  
 
     return(
         <div className="min-h-screen h-full" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
@@ -16,7 +18,46 @@ const Members = () => {
                     <div className='flex-wrap flex-col w-[290px] p-4 sm:my-[30px]'>
                         <button className=' text-blue-500 text-lg bg-blue-900 rounded-[7px]   text-start px-4 py-2 '>
                             Workspace members ({members.length}/10)
-                        </button>         
+                        </button> 
+
+                        {roli === "Owner" ? ( 
+                            <div className="border border-gray-400 mt-10 p-2 rounded-md">
+                          <h2 className="h-8 font-bold text-lg">Pending Invites</h2>
+                          <div className="mt-4">
+                            {sentInvites.length === 0 ? (
+                                <p>No pending invites.</p>
+                            ) : (
+                                sentInvites.map((invite, index) => (
+                                    <div key={invite.inviteId} className='flex items-start p-4 bg-gray-800 text-gray-400 rounded-lg hover:bg-gray-700 mb-2'>
+                                    <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-white bg-gradient-to-r from-orange-400 to-orange-600">
+                                        {getInitials(inviteeDetails[index]?.firstName, inviteeDetails[index]?.lastName)}
+                                    </div>
+                                    <div className="ml-4 flex-1">
+                                        <div className="text-sm font-medium text-gray-200">
+                                            {inviteeDetails[index]?.firstName} {inviteeDetails[index]?.lastName}
+                                        </div>
+                                        <div className="text-xs text-gray-400">
+                                            {inviteeDetails[index]?.email}
+                                        </div>
+                                        <p className="text-sm mt-2">
+                                           <strong>Workspace: </strong>  <span> {workspaceTitles[index]}</span>.
+                                        </p>
+                                        <button
+                                            className="bg-red-500 text-white px-4 py-2 rounded-md"
+                                            onClick={() => handleDeleteInvite(invite.inviteId)}
+                                        >
+                                            Delete Invite
+                                        </button>
+                                    </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                          </div> 
+                        )
+                          : <> </> 
+                        }
+                       
                     </div>
 
                     <div className='w-2/3 p-4'>

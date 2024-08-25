@@ -120,10 +120,13 @@ namespace backend.Controllers
             try
             {
 
-                var userID = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+                var idUser = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
-
-                if (userID == userId || userTokenRole == "Admin")
+                if (string.IsNullOrEmpty(idUser))
+                {
+                    return NotFound("User Not Found!");
+                }
+                if (idUser == userId || userTokenRole == "Admin")
                 {
                     var starredBoards = await _starredBoardRepo.GetStarredBoardsAsync(userId);
                     if (starredBoards.Count == 0)
@@ -153,6 +156,11 @@ namespace backend.Controllers
             {
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+                
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return NotFound("User Not Found!");
+                }
                 var isMember = await _membersRepo.IsAMember(userId, workspaceId);
                 if (isMember || userTokenRole == "Admin")
                 {
@@ -258,8 +266,18 @@ namespace backend.Controllers
             try
             {
                 var board = await _boardRepo.GetBoardByIdAsync(boardIdDto.BoardId);
+                if (board == null)
+                {
+                    return NotFound("Board Not Found!");
+                }
+
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+                
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return NotFound("User Not Found!");
+                }
                 var workspaceId = board.WorkspaceId;
                 var ownsWorkspace = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
                 if (ownsWorkspace || userTokenRole == "Admin")
@@ -321,7 +339,7 @@ namespace backend.Controllers
                 }
 
                 var updatedStarredBoardDto = _mapper.Map<StarredBoardDto>(starredmodel);
-                return Ok(updateStarredBoardDto);
+                return Ok(updatedStarredBoardDto);
             }
             catch (Exception e)
             {

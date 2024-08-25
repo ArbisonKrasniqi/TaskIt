@@ -58,6 +58,10 @@ namespace backend.Controllers
             {
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return NotFound("User Not Found!");
+                }
                 var isMember = await _membersRepo.IsAMember(userId, workspaceId);
                 
                 
@@ -70,8 +74,8 @@ namespace backend.Controllers
                 {
 
                     var boards = await _boardRepo.GetBoardsByWorkspaceIdAsync(workspaceId);
-
-                    if (boards.Count == 0)
+                    
+                    if (boards?.Count == 0)
                     {
                         return Ok(new List<BoardDto>()); // Return an empty list if no boards are found
                     }
@@ -101,6 +105,10 @@ namespace backend.Controllers
                     return NotFound("Board Not Found!");
 
                 var workspaceId = board.WorkspaceId;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return NotFound("User Not Found!");
+                }
                 var isMember = await _membersRepo.IsAMember(userId, workspaceId);
 
                 if (isMember || userTokenRole == "Admin")
@@ -136,6 +144,10 @@ namespace backend.Controllers
             {
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return NotFound("User Not Found!");
+                }
                 var isMember = await _membersRepo.IsAMember(userId, boardDto.WorkspaceId);
                 if (isMember || userTokenRole == "Admin")
                 {
@@ -165,6 +177,10 @@ namespace backend.Controllers
             {
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return NotFound("User Not Found!");
+                }
                 var isMember = await _membersRepo.IsAMember(userId, updateDto.WorkspaceId);
 
                 if (isMember || userTokenRole == "Admin")
@@ -203,6 +219,10 @@ namespace backend.Controllers
                 if (board == null) return NotFound("Board does not exists!");
 
                 var workspaceId = board.WorkspaceId;    
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return NotFound("User Not Found!");
+                }
                 
                 //vetem owner mundet me delete board
                 var ownsWorkspace = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
@@ -242,6 +262,10 @@ namespace backend.Controllers
             {
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return NotFound("User Not Found!");
+                }
                 var ownsWorkspace = await _userRepo.UserOwnsWorkspace(userId, workspaceIdDto.WorkspaceId);
                 //vetem owner mundet me delete board
                 if (ownsWorkspace || userTokenRole == "Admin")
@@ -275,7 +299,10 @@ namespace backend.Controllers
                 if (board == null) return NotFound("Board does not exists!");
 
                 var workspaceId = board.WorkspaceId;
-
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return NotFound("User Not Found!");
+                }
                 //vetem owner mundet me bo close
                 var ownsWorkspace = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
                 if (ownsWorkspace || userTokenRole == "Admin")
@@ -308,7 +335,10 @@ namespace backend.Controllers
                 if (board == null) return NotFound("Board does not exists!");
 
                 var workspaceId = board.WorkspaceId;
-
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return NotFound("User Not Found!");
+                }
                 //vetem owner mundet me reopen
                 var ownsWorkspace = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
                 if (ownsWorkspace || userTokenRole == "Admin")
@@ -336,6 +366,10 @@ namespace backend.Controllers
             {
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return NotFound("User Not Found!");
+                }
                 var isMember = await _membersRepo.IsAMember(userId, workspaceId);
 
                 if (isMember || userTokenRole == "Admin")
@@ -368,6 +402,10 @@ namespace backend.Controllers
             {
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return NotFound("User Not Found!");
+                }
                 var isMember = await _membersRepo.IsAMember(userId, workspaceId);
 
                 if (isMember || userTokenRole == "Admin")
