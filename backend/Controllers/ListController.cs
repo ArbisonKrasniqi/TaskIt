@@ -228,8 +228,8 @@ public class ListController : ControllerBase
                 {
                     return BadRequest("Lists Not Found");
                 }
-
-                return Ok(lists);
+                var listDto = lists.Select(l => l.ToListDto());
+                return Ok(listDto);
             }
             return StatusCode(401, "You are not authorized!");
         }

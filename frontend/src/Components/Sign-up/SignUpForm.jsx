@@ -97,18 +97,26 @@ const SignUpForm = () =>{
 
         try {
             const response = await postData('/backend/user/register', registerData);
-            console.log(response);
-        } catch (error) {
-            console.error("Signup failed: ", error.message);
-        }
 
-        try {
-            const loginResponse = await postData('/backend/user/login', loginData);
-            StoreTokens(loginResponse.data.accessToken, loginResponse.data.refreshToken);
-            setShowModalWelcome(true);
+            try {
+                const loginResponse = await postData('/backend/user/login', loginData);
+                StoreTokens(loginResponse.data.accessToken, loginResponse.data.refreshToken);
+                setShowModalWelcome(true);
+            } catch (error) {
+                console.error("Login failed: ", error.data);
+            }
+            
         } catch (error) {
+            if(error.response.data[1].description) {
+                setError(error.response.data[1].description);
+            } else {
+                setError("There has been an internal server error! Try again later");
+            }
+
             
         }
+
+        
     };
 
 

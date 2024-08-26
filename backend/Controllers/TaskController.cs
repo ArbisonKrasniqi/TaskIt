@@ -144,18 +144,19 @@ public class  TaskController : ControllerBase{
         }
         try{
                 var task = await _taskRepo.GetTaskByIdAsync(taskIdDto.TaskId);
-                var list = await _listRepo.GetListByIdAsync(task.ListId);
                 if(task == null){
                     return NotFound("Task not found");
                 }
-                if (!await _listRepo.ListExists(list.ListId))
+                
+                var list = await _listRepo.GetListByIdAsync(task.ListId);
+                if (list == null)
                 {
                     return StatusCode(404, "List Not Found");
                 }
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
                 var board = await _boardRepo.GetBoardByIdAsync(list.BoardId);
-                if (!await _boardRepo.BoardExists(board.BoardId))
+                if (board == null)
                 {
                     return NotFound("Board Not Found");
                 }
@@ -173,7 +174,7 @@ public class  TaskController : ControllerBase{
                 }
                 return StatusCode(401, "You are not authorized!");
         }catch(Exception e){
-            return StatusCode(500, "Internal Server Error ");
+            return StatusCode(500, "Internal Server Error "+e.Message);
         }
 
     }
@@ -252,7 +253,7 @@ public class  TaskController : ControllerBase{
 
                 if (tasks.Count == 0)
                 {
-                    return BadRequest("There are no Tasks!");
+                    return NotFound("There are no Tasks!");
                 }
 
                 return Ok(tasks);

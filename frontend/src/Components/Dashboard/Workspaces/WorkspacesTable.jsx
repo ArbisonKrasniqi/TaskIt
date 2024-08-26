@@ -1,84 +1,116 @@
-import React, {useContext, createContext} from 'react';
+import React, { useState, useContext, createContext } from 'react';
 import UpdateWorkspaceButton from "./Buttons/UpdateWorkspaceButton.jsx";
-import { WorkspacesContext} from './WorkspacesList.jsx';
+import { WorkspacesContext } from './WorkspacesList.jsx';
 import CustomButton from '../Buttons/CustomButton.jsx';
 import { deleteData } from '../../../Services/FetchService.jsx';
+import { useNavigate } from 'react-router-dom';
 
 export const UpdateContext = createContext();
 
 const WorkspacesTable = () => {
-
-    const workspacesContext = useContext(WorkspacesContext); //thirret konteksti qe me mujt me ju qas variablave/funksioneve
+    const navigate = useNavigate();
+    const workspacesContext = useContext(WorkspacesContext);
+    const [searchQuery, setSearchQuery] = useState('');
 
     const HandleWorkspaceDelete = (id) => {
-      async function deleteWorkspace(){
-          try{
-              const data = {
-                  workspaceId: id
-              };
-              const response = await deleteData('/backend/workspace/DeleteWorkspace', data);
-              console.log(response);
-              //e perdorim workspaceContext ku i kena krejt workspaces dhe e fshijna nga lista workspace-in qe e bonem delete
-              const updatedWorkspaces = workspacesContext.workspaces.filter(workspace => workspace.workspaceId !==id);
-              workspacesContext.setWorkspaces(updatedWorkspaces);
-          }
-          catch(error){
-              workspacesContext.setErrorMessage(error.message + id); //vendose messazhin
+        async function deleteWorkspace() {
+            try {
+                const data = { workspaceId: id };
+                const response = await deleteData('/backend/workspace/DeleteWorkspace', data);
+                console.log(response);
+                // Update workspaces after deletion
+                const updatedWorkspaces = (workspacesContext.workspaces || []).filter(workspace => workspace.workspaceId !== id);
+                workspacesContext.setWorkspaces(updatedWorkspaces);
+            } catch (error) {
+                workspacesContext.setErrorMessage(error.message + id);
+                workspacesContext.setShowWorkspacesErrorModal(true);
+                workspacesContext.getWorkspaces();
+            }
+        }
+        deleteWorkspace();
+    }
 
-              workspacesContext.setShowWorkspacesErrorModal(true); //shfaqe modalin e errorit
+    const handleWorkspaceRowClick = workspaceId => {
+        console.log(workspaceId);
+        navigate(`/dashboard/workspace/${workspaceId}`);
+    }
 
-              workspacesContext.getWorkspaces(); //bej fetch workspaces per me perditsu listen
-          }
-      }
-      deleteWorkspace();
-  }
+    const handleSearchChange = (event) => {
+        setSearchQuery(event.target.value.toLowerCase());
+    }
 
-return(
+    // Ensure workspacesContext.workspaces is always an array
+    const workspaces = workspacesContext.workspaces || [];
+    const filteredWorkspaces = workspaces.filter(workspace => {
+        const workspaceIdMatch = workspace.workspaceId.toString().toLowerCase().includes(searchQuery);
+        const titleMatch = workspace.title.toLowerCase().includes(searchQuery);
+        const descriptionMatch = workspace.description.toLowerCase().includes(searchQuery);
+        const ownerIdMatch = workspace.ownerId.toString().toLowerCase().includes(searchQuery);
+        
+        return workspaceIdMatch || titleMatch || descriptionMatch || ownerIdMatch;
+    });
 
-    <div className="overflow-x-auto">
-        <table className="w-full text-sm text-left rtl:text-right text-gray-500 dar:text-gray-400">
-        <thead className="text-sx text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-           <tr>
-            
-           <th className="px-6 py-3" >ID</th>
-           <th className="px-6 py-3" >Title</th>
-           <th className="px-6 py-3" >Description</th>
-           <th className="px-6 py-3" >Owner Id</th>    
-           <th className="px-6 py-3" >Actions</th>       
-        </tr>     
-        </thead>    
+    return (
+        <div className="overflow-x-auto">
+            {/* Search Bar */}
+            <div className="mb-4 pt-4 flex justify-center">
+                <input
+                    type="text"
+                    placeholder="Search for workspaces by ID, title, description, or owner ID"
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    className="p-2 border rounded w-[400px] bg-gray-700 text-white"
+                />
+            </div>
 
-        <tbody>
-
-    {/* 
-        Krijojm nga nje rresht per secilin Workspace me atributet perkatese
-        dhe krijojme butonin delete per te fshire ne baze te id te cilen e merr nga workspace ne rreshtin perkates
-        dhe butoni edit ku per secilin workspace krijohet kontekst i ri ne menyre qe me editu secilin ne menyre te veqante
-    */}
-
-      {workspacesContext.workspaces ? (workspacesContext.workspaces.map((workspace, index) => (
-        <tr key={index} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                  <td className="px-6 py-4">{workspace.workspaceId}</td>
-                  <td className="px-6 py-4">{workspace.title}</td>
-                  <td className="px-6 py-4">{workspace.description}</td>
-                  <td className="px-6 py-4">{workspace.ownerId}</td>
-                  <td className="px-6 py-4"> <UpdateContext.Provider value={workspace}> <UpdateWorkspaceButton/>  </UpdateContext.Provider> <CustomButton color="red" text="Delete" onClick={()=>{ HandleWorkspaceDelete(workspace.workspaceId)}}/> </td>
-        </tr>
-      ))): (
-
-        <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-              <td className="px-6 py-4"></td>
-              <td className="px-6 py-4"></td>
-              <td className="px-6 py-4"></td>
-              <td className="px-6 py-4"></td>
-        </tr>
-      )}
-
-        </tbody>
-        </table>
-    </div>
-);
+            <div className="relative overflow-x-auto max-h-[500px]">
+                <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                    <thead className="sticky top-0 text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                        <tr>
+                            <th className="px-6 py-3">Workspace ID</th>
+                            <th className="px-6 py-3">Title</th>
+                            <th className="px-6 py-3">Description</th>
+                            <th className="px-6 py-3">Owner ID</th>
+                            <th className="px-6 py-3">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {filteredWorkspaces.length > 0 ? (
+                            filteredWorkspaces.map((workspace, index) => (
+                                <tr
+                                    key={index}
+                                    className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 cursor-pointer"
+                                    onClick={() => handleWorkspaceRowClick(workspace.workspaceId)}
+                                >
+                                    <td className="px-6 py-4">{workspace.workspaceId}</td>
+                                    <td className="px-6 py-4">{workspace.title}</td>
+                                    <td className="px-6 py-4">{workspace.description}</td>
+                                    <td className="px-6 py-4">{workspace.ownerId}</td>
+                                    <td className="px-6 py-4">
+                                        <UpdateContext.Provider value={workspace}>
+                                            <UpdateWorkspaceButton onClick={(e) => e.stopPropagation()} />
+                                        </UpdateContext.Provider>
+                                        <CustomButton
+                                            color="red"
+                                            text="Delete"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                HandleWorkspaceDelete(workspace.workspaceId);
+                                            }}
+                                        />
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                <td className="px-6 py-4" colSpan={5}>No workspaces found</td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    );
 }
 
-
-export default WorkspacesTable
+export default WorkspacesTable;

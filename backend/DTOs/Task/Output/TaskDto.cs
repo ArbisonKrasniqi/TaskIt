@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 namespace backend.DTOs.Task;
 
 public class TaskDto{
-    public int TaskID { get; set; }
+    public int TaskId { get; set; }
     [Required]
     [MinLength(2, ErrorMessage = "Title must be at least 2 characters")]
     [MaxLength(280, ErrorMessage = "Title cannot be over 280 characters")]

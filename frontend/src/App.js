@@ -21,11 +21,10 @@ const App = () => {
       <BrowserRouter>
       <Suspense fallback={<LoadingModal />}>
         <Routes>
-          <Route path="/main" element={<Main/>}/>
-          <Route path="/:opened/:workspaceId?/:boardId?/:taskId?" element={<Main/>}/>
+          <Route path="/main/:opened/:workspaceId?/:boardId?/:taskId?" element={<Main/>}/>
           <Route path="/login" element={<Login/>}/>
           <Route path="/signup" element={<SignUpPage/>}/>
-          <Route path="/dashboard" element={<Dashboard/>}/>
+          <Route path="/dashboard/*" element={<Dashboard/>}/>
           <Route path="/preview" element={<Preview/>}/>
           <Route path="/board/:id" element={<Boards/>} />
           <Route path="/task" element={<TaskModal/>}/>

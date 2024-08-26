@@ -48,7 +48,7 @@ const UpdateTaskModal = (props) => {
             console.log(response.data);
 
             const updatedTasks = tasksContext.tasks.map(task => {
-                if (task.taskID === updateContext.taskID) {
+                if (task.taskId === updateContext.taskId) {
                     return {
                         ...task,
                         title: title,
