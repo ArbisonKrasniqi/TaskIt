@@ -1,40 +1,17 @@
 import React, { useContext, useEffect } from 'react';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import { DropdownContext } from '../Navbar/Navbar';
-import { getDataWithId } from '../../Services/FetchService';
 import { WorkspaceContext } from '../Side/WorkspaceContext';
-import { MainContext } from '../../Pages/MainContext';
+import { useNavigate } from 'react-router-dom';
 
 const WorkspaceDropdown = (props) => {
-  const { workspaces, setWorkspaces } = useContext(WorkspaceContext);
+  const navigate = useNavigate();
+  const { workspaces } = useContext(WorkspaceContext);
   const dropdownContext = useContext(DropdownContext);
-  const mainContext = useContext(MainContext);
 
-  useEffect(() => {
-    const getWorkspaces = async () => {
-      try {
-        if (mainContext.userInfo.userId) { // Check if userId is available
-          console.log("attemptin to get workspaces with user id "+mainContext.userInfo.userId);
-          const response = await getDataWithId('http://localhost:5157/backend/workspace/GetWorkspacesByMemberId?memberId', mainContext.userInfo.userId);
-          const data = response.data;
-
-          console.log('Fetched workspaces: ', data);
-
-          if (data && Array.isArray(data) && data.length > 0) {
-            setWorkspaces(data);
-          } else {
-            console.log('Data is null, not an array, or empty:', data);
-            setWorkspaces([]);
-          }
-        }
-      } catch (error) {
-        setWorkspaces([]);
-      }
-    };
-
-    getWorkspaces();
-  }, [mainContext.userInfo.userId]);
-
+  const handleWorkspaceClick = (workspaceId) => {
+      navigate(`/main/boards/${workspaceId}`);
+  }
   return (
     <div className={`relative ${props.width <= 880 && 'hidden'}`}>
       <button
@@ -51,6 +28,7 @@ const WorkspaceDropdown = (props) => {
               <button
                 key={workspace.workspaceId}
                 className='block w-full text-left px-4 py-2 bg-gray-800 text-gray-400 rounded-lg hover:bg-gray-700'
+                onClick={ () => {handleWorkspaceClick(workspace.workspaceId)}}
               >
                 {workspace.title}
               </button>

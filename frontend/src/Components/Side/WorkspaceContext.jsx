@@ -2,15 +2,14 @@ import React, {createContext, useContext , useState, useEffect} from 'react';
 import { getDataWithId, deleteData, postData, getDataWithIds } from '../../Services/FetchService';
 import myImage from './background.jpg';
 import { MainContext } from '../../Pages/MainContext';
-
+import { useNavigate } from 'react-router-dom';
 
 export const WorkspaceContext = createContext();
 
 export const WorkspaceProvider = ({ children }) => {
     const mainContext = useContext(MainContext);
-   // const [WorkspaceId, setWorkspaceId] = useState(mainContext.workspaceId);
-    const [userInfo, setUserInfo] = useState(mainContext.userInfo);
-    
+    const navigate = useNavigate();
+
     const [open, setOpen] = useState(true);
     const [workspace, setWorkspace] = useState(null);
     const [workspaces, setWorkspaces] = useState([]);
@@ -36,41 +35,71 @@ export const WorkspaceProvider = ({ children }) => {
     
     const userId = mainContext.userInfo.userId;
     const WorkspaceId = mainContext.workspaceId;
-    useEffect(() => {
 
+    useEffect(() => {
+        const getWorkspaces = async () => {
+            try {
+                if (userId) {
+                    const workspacesResponse = await getDataWithId('http://localhost:5157/backend/workspace/GetWorkspacesByMemberId?memberId', userId);
+                    const workspacesData = workspacesResponse.data;
+                    if (workspacesData && Array.isArray(workspacesData) && workspacesData.length > 0) {
+                        setWorkspaces(workspacesData);
+                    } else {
+                        setWorkspaces([]);
+                        console.log("There are no workspaces");
+                    }
+                }
+                //Waiting for userId
+            } catch (error) {
+                console.error("There has been an error fetching workspaces")
+                setWorkspaces([]);
+            }
+        };
+        getWorkspaces();
+        
+        // const interval = setInterval(getWorkspaces, 5 * 1000);
+        // return () => clearInterval(interval); //Get workspaces every 5 seconds
+    }, [userId, mainContext.userInfo.accessToken]);
+    useEffect(() => {
         const getWorkspace = async () => {
             try {
-                const workspaceResponse = await getDataWithId('http://localhost:5157/backend/workspace/GetWorkspaceById?workspaceId', WorkspaceId);
-                const workspaceData = workspaceResponse.data;
-                console.log('Workspace data: ', workspaceData);
-                setWorkspace(workspaceData);
-
+                if (WorkspaceId) {
+                    const workspaceResponse = await getDataWithId('http://localhost:5157/backend/workspace/GetWorkspaceById?workspaceId', WorkspaceId);
+                    const workspaceData = workspaceResponse.data;
+                    //console.log('Workspace data: ', workspaceData);
+                    setWorkspace(workspaceData);
+                }
             } catch (error) {
-                console.error(error.message);
+                console.log(error.response.data);
+                navigate('/main/workspaces'); //Nese ska qasje, shko tek workspaces
             }
         };
         getWorkspace();
-        console.log("Workspace fetched", workspace);
-        
-    }, [WorkspaceId, userId]);//userid
+
+        // const interval = setInterval(getWorkspace, 5 * 1000);
+        // return () => clearInterval(interval); //Get workspace every 5 seconds
+    }, [WorkspaceId, userId, mainContext.userInfo.accessToken]);//userid
 
  
     useEffect(()=>{
-        const ownerId = workspace? workspace.ownerId : '';
-        if (userId === ownerId) {
-        setRoli("Owner");
-    } else {
-        setRoli("Member");
-    }
-    console.log("OwnerId: ",ownerId," UserId:" ,userId);
-    console.log("Roli ", roli);
-}, [WorkspaceId, userId, workspace]);
+        if (workspace && WorkspaceId && userId) {
+            const ownerId = workspace.ownerId;
+            if (userId === ownerId) {
+                setRoli("Owner");
+                //console.log("Set as owner with id", ownerId);
+            } else {
+                setRoli("Member");
+                //console.log("Set as member with id", userId);
+            }
+        }
+    }, [WorkspaceId, userId, workspace, mainContext.userInfo.accessToken]);
  
     
-const workspaceTitle = workspace ? workspace.title : 'Workspace';
+    const workspaceTitle = workspace ? workspace.title : 'Workspace';
     useEffect(() => {
         const getBoards = async () => {
             try {
+                if (WorkspaceId && workspace && userId) {
                 const boardsResponse = await getDataWithId('http://localhost:5157/backend/board/GetBoardsByWorkspaceId?workspaceId', WorkspaceId);
                 const allBoards = boardsResponse.data;
             
@@ -82,24 +111,23 @@ const workspaceTitle = workspace ? workspace.title : 'Workspace';
                 const nonStarred = allBoards.filter(board=> !starredBoardsIds.has(board.boardId));
                 const starred = allBoards.filter(board=>starredBoardsIds.has(board.boardId));
 
-
                 let sortedNonStarred = nonStarred;
                 if (selectedSort === 'Alphabetically') {
                     sortedNonStarred = sortAlphabetically(nonStarred);
                 }
-
                     setBoards(sortedNonStarred);
                     setStarredBoards(starred);
-            } catch (error) {
-                console.error(error.message);
-                setBoards([]);
-                setStarredBoards([]);
-            }
+                }
+                } catch (error) {
+                    console.error(error.response.data);
+                    setBoards([]);
+                    setStarredBoards([]);
+                }
         };
         getBoards();
-        console.log("Starred boards: ",starredBoards);
-        console.log("All boards",boards);
-    }, [WorkspaceId, userId, selectedSort]);
+        // console.log("Starred boards: ",starredBoards);
+        // console.log("All boards",boards);
+    }, [WorkspaceId, userId, workspace, selectedSort, mainContext.userInfo.accessToken]);
 
 
 
@@ -107,21 +135,24 @@ const workspaceTitle = workspace ? workspace.title : 'Workspace';
     useEffect(() => {
         const getMembers = async () => {
             try {
-                const response = await getDataWithId('http://localhost:5157/backend/Members/getAllMembers?workspaceId', WorkspaceId);
-                const data = response.data;
-                if (data && Array.isArray(data) && data.length>0) {
-                    setMembers(data);
-                } else {
-                    console.log('Data is null, not as an array or empty: ',data);
+                if (workspace && WorkspaceId && userId) {
+                    const response = await getDataWithId('/backend/Members/getAllMembersByWorkspace?workspaceId', WorkspaceId);
+                    const data = response.data;
+                    if (data && Array.isArray(data) && data.length>0) {
+                        setMembers(data);
+                    } else {
+                        console.log("There are no members");
+                    }
                 }
+                //Loading
             } catch (error) {
                 console.error(error.message);
                 setMembers([]);
             }
         };
         getMembers();
-        console.log('Members fetched: ',members);
-    },[WorkspaceId, workspace, userId]);
+        //console.log('Members fetched: ',members);
+    },[WorkspaceId, workspace, userId, mainContext.userInfo.accessToken]);
 
     const handleCreateBoard = (newBoard) => {
         setBoards((prevBoards) => [...prevBoards, newBoard]);
@@ -242,7 +273,7 @@ const workspaceTitle = workspace ? workspace.title : 'Workspace';
         try{
             const response = await deleteData('http://localhost:5157/backend/workspace/DeleteWorkspace', { workspaceId: workspaceId });
             console.log('Deleting workspace response:', response);
-          window.location.href = '/workspaces';
+            navigate('/main/workspaces');
         }
         catch(error){
             console.error('Error deleting workspace:', error.message);
@@ -254,7 +285,7 @@ const workspaceTitle = workspace ? workspace.title : 'Workspace';
         try{
             const response = await deleteData('http://localhost:5157/backend/Members/RemoveMember', {UserId: userId, WorkspaceId: workspaceId});
             console.log('Leaving workspace response:', response);
-            window.location.href = '/workspaces';
+            navigate(`/main/workspaces`);
         }
         catch(error){
             console.error('Error deleting workspace:', error.message);

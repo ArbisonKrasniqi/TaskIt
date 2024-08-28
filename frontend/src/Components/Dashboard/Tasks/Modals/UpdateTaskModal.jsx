@@ -37,7 +37,7 @@ const UpdateTaskModal = (props) => {
             const formattedDueDate = formatDate(dueDate);
 
             const data = {
-                taskId: updateContext.taskID,
+                taskId: updateContext.taskId,
                 title: title,
                 description: description,
                 dueDate: formattedDueDate,

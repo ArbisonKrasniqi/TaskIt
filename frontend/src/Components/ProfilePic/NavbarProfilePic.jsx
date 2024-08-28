@@ -1,9 +1,17 @@
 import React, { useContext } from 'react'
 import { DropdownContext } from '../Navbar/Navbar';
+import { useNavigate } from 'react-router-dom';
 
 const NavbarProfilePic = () => {
 
+    const navigate = useNavigate();
     const dropdownContext = useContext(DropdownContext);
+
+    const handleSignOutClick = () => {
+      document.cookie = "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+      document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+      navigate(`/login`);
+    }
 
     return(
         <div className="relative">
@@ -29,7 +37,8 @@ const NavbarProfilePic = () => {
               <button className="block w-full text-left px-4 py-2 bg-gray-800 text-gray-400 rounded-lg hover:bg-gray-700">
                 Settings
               </button>
-              <button className="block w-full text-left px-4 py-2 bg-gray-800 text-gray-400 rounded-lg hover:bg-gray-700">
+              <button className="block w-full text-left px-4 py-2 bg-gray-800 text-gray-400 rounded-lg hover:bg-gray-700"
+                      onClick={() => {handleSignOutClick()}}>
                 Logout
               </button>
             </div>

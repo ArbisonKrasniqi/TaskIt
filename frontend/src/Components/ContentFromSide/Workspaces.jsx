@@ -5,56 +5,34 @@ import { IoPersonOutline } from "react-icons/io5";
 import { IoIosSettings } from "react-icons/io";
 import { WorkspaceContext } from "../Side/WorkspaceContext.jsx";
 import { useNavigate } from "react-router-dom";
+
+
 const Workspaces = () =>{
-const {userId} = useContext(WorkspaceContext);
-const [OwnedWorkspaces, setOwnedWorkspaces] = useState([]);  
-const [MemberWorkspaces, setMemberWorkspaces] = useState([]);  
-const navigate = useNavigate();
-useEffect(()=>{
-    const getOwnedWorkspaces = async ()=>{
-        try{
-            const response = await getDataWithId('http://localhost:5157/backend/workspace/GetWorkspacesByOwnerId?ownerId', userId);
-            const data = response.data;
+    const { userId, workspaces } = useContext(WorkspaceContext);
+    const [OwnedWorkspaces, setOwnedWorkspaces] = useState([]);  
+    const [MemberWorkspaces, setMemberWorkspaces] = useState([]);  
+    const navigate = useNavigate();
 
-
-            if(data && Array.isArray(data) && data.length>0){
-                setOwnedWorkspaces(data);
+    useEffect(()=>{
+    try {
+        if (userId, workspaces) {
+            const divideWorkspaces = () => {
+                const ownedWorkspaces = workspaces.filter(workspace => workspace.ownerId === userId);
+                const memberWorkspaces = workspaces.filter(workspace => workspace.ownerId !== userId);
+        
+                setOwnedWorkspaces(ownedWorkspaces);
+                setMemberWorkspaces(memberWorkspaces);
+                //console.log("Owned Workspaces fetched ", OwnedWorkspaces);
+                //console.log("Member Workspaces fetched ", MemberWorkspaces);
             }
-            else{
-                console.error("Data is null, not an array or empty ",data);
-                setOwnedWorkspaces([]); // trajtojm si te dhena te zbrazeta
-            }
-   
-        } catch(error){
-            console.error(error.message);
-            setOwnedWorkspaces([]);
+            divideWorkspaces();
+            
         }
-    };
-
-    const getMemberWorkspaces = async ()=>{
-        try{
-            const responseMember = await  getDataWithId('http://localhost:5157/backend/workspace/GetWorkspacesByMemberId?memberId', userId);
-            const dataMember = responseMember.data;
-
-            if(dataMember && Array.isArray(dataMember) && dataMember.length>0){
-                setMemberWorkspaces(dataMember);
-            }
-            else{
-                console.error("Data is null, not an array or empty ",dataMember);
-                setMemberWorkspaces([]);
-            }
-        }
-        catch(error){
-            console.error(error.message);
-            setMemberWorkspaces([]);
-        }
-    };
-
-    getOwnedWorkspaces();
-    getMemberWorkspaces();
-    console.log("Owned Workspaces fetched ", OwnedWorkspaces);
-    console.log("Member Workspaces fetched ", MemberWorkspaces);
-}, [userId]);
+        //waiting on userid or workspaces
+    } catch (error) {
+        console.error(error.response.data);
+    }
+    }, [userId, workspaces]);
 
 
 
@@ -90,15 +68,15 @@ return(
           </div>
 
           <div className="flex flex-wrap flex-row justify-end gap-4">
-            <button onClick={() => navigate(`/boards/${workspace.workspaceId}`)}
+            <button onClick={() => navigate(`/main/boards/${workspace.workspaceId}`)}
             className="flex flex-row items-center border border-gray-400 hover:bg-gray-600 mb-0 gap-x-0.5 px-1 rounded-md mt-2">
             <CiViewBoard/> Boards
             </button>
-            <button onClick={() => navigate(`/members/${workspace.workspaceId}`)}
+            <button onClick={() => navigate(`/main/members/${workspace.workspaceId}`)}
             className="flex flex-row items-center border border-gray-400 hover:bg-gray-600 mb-0 gap-x-0.5 px-1 rounded-md mt-2" >
             <IoPersonOutline/> Members ({workspace.members.length}) 
             </button>
-            <button onClick={() => navigate(`/workspaceSettings/${workspace.workspaceId}`)}
+            <button onClick={() => navigate(`/main/workspaceSettings/${workspace.workspaceId}`)}
             className="flex flex-row items-center border border-gray-400 hover:bg-gray-600 mb-0 gap-x-0.5 px-1 rounded-md mt-2">
             <IoIosSettings/> Settings
             </button>
@@ -138,15 +116,15 @@ return(
           </div>
 
           <div className="flex flex-wrap flex-row justify-end gap-4">
-            <button onClick={() => navigate(`/boards/${workspace.workspaceId}`)}
+            <button onClick={() => navigate(`/main/boards/${workspace.workspaceId}`)}
             className="flex flex-row items-center border border-gray-400 hover:bg-gray-600 mb-0 gap-x-0.5 px-1 rounded-md mt-2">
             <CiViewBoard/> Boards
             </button>
-            <button onClick={() => navigate(`/members/${workspace.workspaceId}`)}
+            <button onClick={() => navigate(`/main/members/${workspace.workspaceId}`)}
             className="flex flex-row items-center border border-gray-400 hover:bg-gray-600 mb-0 gap-x-0.5 px-1 rounded-md mt-2" >
             <IoPersonOutline/> Members ({workspace.members.length})  
             </button>
-            <button onClick={() => navigate(`/workspaceSettings/${workspace.workspaceId}`)}
+            <button onClick={() => navigate(`/main/workspaceSettings/${workspace.workspaceId}`)}
             className="flex flex-row items-center border border-gray-400 hover:bg-gray-600 mb-0 gap-x-0.5 px-1 rounded-md mt-2">
             <IoIosSettings/> Settings
             </button>

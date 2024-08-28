@@ -19,22 +19,29 @@ const Dashboard = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const validateUser = async () => {
-          if (!checkAndRefreshToken()) {
-            navigate('/login');
-            return;
-          }
-
-          if (!validateAdmin()) {
-            console.info("You are not an administrator.");
-            navigate('/login');
-            return;
+      const validateUser = async () => {
+          try {
+            if (!checkAndRefreshToken()) {
+              navigate('/login');
+              return;
+            }
+  
+            if (!validateAdmin()) {
+              console.info("You are not an administrator.");
+              navigate('/main/workspaces');
+              return;
+            } 
+        } catch (error) {
+          console.log("Token error. Log in again.");
+          document.cookie = "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+          document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+          navigate('/login');
         }
       }
         
-        validateUser();
-        const interval = setInterval(validateUser, 5 * 1000);
-        return () => clearInterval(interval);
+      validateUser();
+      const interval = setInterval(validateUser, 5 * 1000);
+      return () => clearInterval(interval);
     }, []);
 
 

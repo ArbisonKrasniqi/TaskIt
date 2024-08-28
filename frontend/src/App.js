@@ -11,11 +11,6 @@ import React, { Suspense, lazy } from 'react';
 import LoadingModal from './Components/Modal/LoadingModal.jsx';
 
 const App = () => {
-  //const Main = lazy(() => import('./Pages/Main.jsx'));
-  const Main = lazy(() => new Promise(resolve => {
-     setTimeout(() => resolve(import('./Pages/Main.jsx')), 3000); // 3-second delay
-   }));
-
   return (
    <> 
       <BrowserRouter>

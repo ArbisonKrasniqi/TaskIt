@@ -4,8 +4,12 @@ import ErrorMessage from '../Sign-up/ErrorMessage.jsx';
 import Button from '../Sign-up/Button.jsx';
 import { StoreTokens } from '../../Services/TokenService.jsx';
 import { postData } from '../../Services/FetchService.jsx';
+import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 
 const LogInForm =  () =>{
+
+    const navigate = useNavigate();
     const [formData,setFormData] = useState({
         email:'',
         password:'',
@@ -28,8 +32,15 @@ const LogInForm =  () =>{
         try {
             const response = await postData('/backend/user/login', formData);
             StoreTokens(response.data.accessToken, response.data.refreshToken);
+            const decodedToken = jwtDecode(response.data.accessToken);
+            const role = decodedToken.Role;
+            if (role === "Admin") {
+                navigate(`/dashboard`);
+            } else {
+                navigate(`/main/workspaces`);
+            }
         } catch (error) {
-            console.error("Login failed: ", error);
+            console.error("Login failed please try again");
         }
         validateForm();
 
@@ -52,10 +63,9 @@ const LogInForm =  () =>{
         return true;
     };
 
-    const handleClick = () => {
-        //Navigate user to main page
-    };
-    
+    const handleSignUpClick = () => {
+        navigate('/signup');
+    }
 
     return(
         <div className='container mx-auto mt-20 h-[1000px]'>
@@ -97,8 +107,8 @@ const LogInForm =  () =>{
 
                 <div className='w-full lg:w-5/12 flex flex-col items-center justify-center p-12 bg-no-repeat bg-cover bg-center' style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
                     <h1 className='text-white text-3xl mb-3 font-sans font-bold'>Dont have an account?</h1>
-                    <p className='text-white mt-5 font-sans' onClick={handleClick}>Sign up below to start organizing your projects and collaborating with your team</p>
-                    <button type='submit' className='bg-white text-gray-700 px-4 py-2 mt-20 border border-solid border-gray-700 rounded-md w-[50%]  hover:border hover:border-solid hover:border-black hover:text-black font-bold'>Sign Up</button>
+                    <p className='text-white mt-5 font-sans' >Sign up below to start organizing your projects and collaborating with your team</p>
+                    <button onClick={handleSignUpClick} className='bg-white text-gray-700 px-4 py-2 mt-20 border border-solid border-gray-700 rounded-md w-[50%]  hover:border hover:border-solid hover:border-black hover:text-black font-bold'>Sign Up</button>
 
                 </div>
 
