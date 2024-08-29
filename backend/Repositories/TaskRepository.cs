@@ -112,4 +112,9 @@ public class TaskRepository : ITaskRepository{
         var tasks = await _context.Tasks.Where(t => listIds.Contains(t.ListId)).ToListAsync();
         return tasks;
     }
+
+    public async Task<bool> TaskExists(int taskId)
+    {
+        return await _context.Tasks.AnyAsync(t => t.TaskId == taskId);
+    }
 }
