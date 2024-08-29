@@ -5,6 +5,7 @@ using backend.DTOs.Background.Output;
 using backend.DTOs.User.Input;
 using backend.Interfaces;
 using backend.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers
@@ -25,12 +26,15 @@ namespace backend.Controllers
         }
 
         //GET ALL
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Policy = "AdminOnly")]
         [HttpGet(template: "GetAllBackgrounds")]
         public async Task<IActionResult> GetAllBackgrounds()
         {
             try
             {
                 var backgrounds = await _backgroundRepo.GetAllBackgroundsAsync();
+                
 
                 if (backgrounds.Count() == 0)
                     return Ok(new List<BackgroundDto>()); //Kthe list te zbrazet
@@ -46,6 +50,7 @@ namespace backend.Controllers
         }
 
         //GET BY ID
+        [Authorize(AuthenticationSchemes = "Bearer")]
         [HttpGet("GetBackgroundByID")]
         public async Task<IActionResult> GetBackgroundById(int id)
         {
@@ -66,6 +71,8 @@ namespace backend.Controllers
         }
 
         //GET BY CreatorID
+        
+        [Authorize(AuthenticationSchemes = "Bearer")]
         [HttpGet("GetBackgroundsByCreatorId")]
         public async Task<IActionResult> GetBackgroundsByCreatorId(string craetorId)
         {
@@ -91,6 +98,7 @@ namespace backend.Controllers
         }
         
         //GET ACTIVE BACKGROUNDS
+        [Authorize(AuthenticationSchemes = "Bearer")]
         [HttpGet("GetActiveBackgrounds")]
         public async Task<IActionResult> GetActiveBackgrounds()
         {
@@ -112,6 +120,8 @@ namespace backend.Controllers
 
 
         //CREATE
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Policy = "AdminOnly")]
         [HttpPost("CreateBackground")]
         public async Task<IActionResult> CreateBackground(CreateBackgroundDto backgroundDto)
         {
@@ -127,9 +137,29 @@ namespace backend.Controllers
                 return BadRequest("User Not Found");
             }
 
+            if (backgroundDto.ImageFile == null || backgroundDto.ImageFile.Length == 0)
+            {
+                return BadRequest("No file uploaded!");
+            }
+
             try
             {
-                var backgroundModel = _mapper.Map<Background>(backgroundDto);
+                
+                byte[] imageData;
+                using (var memoryStream = new MemoryStream())
+                {
+                    await backgroundDto.ImageFile.CopyToAsync(memoryStream);
+                    imageData = memoryStream.ToArray();
+                }
+                
+                
+                var backgroundModel = new Background
+                {
+                    CreatorId = backgroundDto.CreatorId,
+                    Title = backgroundDto.Title,
+                    ImageData = imageData
+                };
+
                 await _backgroundRepo.CreateBackgroundAsync(backgroundModel);
                 return CreatedAtAction(nameof(GetBackgroundById), new {id = backgroundModel.BackgroundId}, _mapper.Map<BackgroundDto>(backgroundModel));
             }
@@ -140,19 +170,25 @@ namespace backend.Controllers
         }
 
         //UPDATE
-        [HttpPut]
-        [Route("UpdateBackground")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Policy = "AdminOnly")]
+        [HttpPut("UpdateBackground")]
         public async Task<IActionResult> UpdateBackgroundById(UpdateBackgroundDto updateDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            if (updateDto.ImageFile == null || updateDto.ImageFile.Length == 0)
+            {
+                return BadRequest("No file uploaded!");
+            }
+            
             try
             {
                 var background = await _backgroundRepo.UpdateBackgroundByIdAsync(updateDto);
 
                 if (background == null)
-                    return NotFound("Board Not Found");
+                    return NotFound("Background Not Found");
 
                 var backgroundDto = _mapper.Map<BackgroundDto>(background);
                 return Ok(backgroundDto);
@@ -164,9 +200,10 @@ namespace backend.Controllers
         }
 
         //DELETE BY ID
-        [HttpDelete]
-        [Route("DeleteBackgroundByID")]
-        public async Task<IActionResult> DeleteBoardById(BackgroundIdDto backgroundIdDto)
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Policy = "AdminOnly")]
+        [HttpDelete("DeleteBackgroundByID")]
+        public async Task<IActionResult> DeleteBoardById([FromQuery] BackgroundIdDto backgroundIdDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -187,6 +224,8 @@ namespace backend.Controllers
         }
 
         //DELETE BY CreatorID
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Policy = "AdminOnly")]
         [HttpDelete("DeleteBackgroundsByCreatorId")]
         public async Task<IActionResult> DeleteBackgroundsByCreatorId(UserIdDTO userIdDto)
         {
@@ -203,7 +242,7 @@ namespace backend.Controllers
                 if (backgroundModel.Count == 0)
                     return NotFound("Backgrounds Not Founded!");
 
-                return Ok("Boards Deleted!");
+                return Ok("Backgrounds Deleted!");
             }
             catch (Exception e)
             {

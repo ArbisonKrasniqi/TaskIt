@@ -53,7 +53,7 @@ function MembersModal() {
 
                 {filteredCardMembers.length > 0 && (
                     <div className="mb-4">
-                        <h3 className="text-xs font-semibold text-gray-400 mb-2">Card Members:</h3>
+                        <h3 className="text-xs font-semibold text-gray-400 mb-2">Task Members:</h3>
                         {filteredCardMembers.map(member => (
                             <div key={member.id} className="flex items-center p-2 hover:bg-gray-800 rounded-md mb-2">
                                 <img src={member.avatar} alt={member.name} className="w-8 h-8 rounded-full mr-3" />
@@ -71,7 +71,7 @@ function MembersModal() {
 
                 {filteredBoardMembers.length > 0 && (
                     <div>
-                        <h3 className="text-xs font-semibold text-gray-400 mb-2">Board Members:</h3>
+                        <h3 className="text-xs font-semibold text-gray-400 mb-2">Workspace Members:</h3>
                         {filteredBoardMembers.map(member => (
                             <div
                                 key={member.id}

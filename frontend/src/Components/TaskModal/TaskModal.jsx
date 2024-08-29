@@ -182,19 +182,7 @@ const TaskModal = () => {
                                     </button>
                                 </div>
                             </div>
-                            <div>
-                                <span className="text-xs mx-3">Actions</span>
-                                <div className="flex flex-col text-sm font-bold m-2 p-1">
-                                    <button className="flex justify-start items-center bg-gray-600 bg-opacity-30 rounded-sm h-8 my-1 hover:bg-opacity-80">
-                                        <IoMdArrowForward className="mx-2 text-lg"/> 
-                                        Move
-                                    </button>
-                                    <button className="flex justify-start items-center bg-gray-600 bg-opacity-30 rounded-sm h-8 my-1 hover:bg-opacity-80">
-                                        <LuArchive className="mx-2 text-lg"/> 
-                                        Archive
-                                    </button>
-                                </div>
-                            </div>
+                            
                         </div>
                     </div>
                     {isMembersModalOpen && <MembersModal />}
