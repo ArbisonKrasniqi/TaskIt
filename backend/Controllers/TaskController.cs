@@ -49,21 +49,24 @@ public class  TaskController : ControllerBase{
     public async Task<IActionResult> GetTaskById (int taskId){
         try{
             var task = await _taskRepo.GetTaskByIdAsync(taskId);
-            var list = await _listRepo.GetListByIdAsync(task.ListId);
             if(task == null){
                 return NotFound("Task not found");
             }
-            if (!await _listRepo.ListExists(list.ListId))
+            var list = await _listRepo.GetListByIdAsync(task.ListId);
+            if (list == null)
             {
-                return StatusCode(404, "List Not Found");
+                return NotFound("Parent list not found");
             }
+            
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+            
             var board = await _boardRepo.GetBoardByIdAsync(list.BoardId);
-            if (!await _boardRepo.BoardExists(board.BoardId))
+            if (board == null)
             {
                 return NotFound("Board Not Found");
             }
+            
             var workspaceId = board.WorkspaceId;
             var isMember = await _membersRepo.IsAMember(userId, workspaceId);
             if (isMember || userTokenRole == "Admin")
@@ -83,18 +86,21 @@ public class  TaskController : ControllerBase{
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return NotFound("User Not Found!");
+            }
             var isMember = await _membersRepo.IsAMember(userId, workspaceId);
             if (isMember || userTokenRole == "Admin")
             {
                 var tasks = await _taskRepo.GetTasksByWorkspaceIdAsync(workspaceId); // Await here
-                var taskDto = tasks.Select(x => x.ToTaskDto()).ToList(); // Now you can use Select
-                return Ok(taskDto);
+                return Ok(tasks);
             }
             return StatusCode(401, "You are not authorized!");
         }
         catch (Exception e)
         {
-            return StatusCode(500, "Internal Server Error");
+            return StatusCode(500, "Internal Server Error"+e.Message);
         }
     }
     [Authorize(AuthenticationSchemes = "Bearer")]
@@ -104,25 +110,31 @@ public class  TaskController : ControllerBase{
             return BadRequest(ModelState);
         }
         try{
+            var task = await _taskRepo.GetTaskByIdAsync(taskDto.TaskId);
+            if(task == null){
+                return NotFound("Task not found");
+            }
            
             var list = await _listRepo.GetListByIdAsync(taskDto.ListId);
-            if (!await _listRepo.ListExists(list.ListId))
+            if (list == null)
             {
                 return StatusCode(404, "List Not Found");
             }
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+            
             var board = await _boardRepo.GetBoardByIdAsync(list.BoardId);
-            if (!await _boardRepo.BoardExists(board.BoardId))
+            if (board == null)
             {
                 return NotFound("Board Not Found");
             }
+            
             var workspaceId = board.WorkspaceId;
             var isMember = await _membersRepo.IsAMember(userId, workspaceId);
+            
             if (isMember || userTokenRole == "Admin")
             {
                 var taskModel = await _taskRepo.UpdateTaskAsync(taskDto);
-
                 if (taskModel == null)
                 {
                     return NotFound("Task not found");
@@ -138,32 +150,37 @@ public class  TaskController : ControllerBase{
     }
     [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpDelete("DeleteTask")]
-    public async Task<IActionResult> DeleteTask (int taskId){
+    public async Task<IActionResult> DeleteTask (TaskIdDTO taskIdDto){
         if(!ModelState.IsValid){
             return BadRequest(ModelState);
         }
         try{
-                var task = await _taskRepo.GetTaskByIdAsync(taskId);
-                var list = await _listRepo.GetListByIdAsync(task.ListId);
+                var task = await _taskRepo.GetTaskByIdAsync(taskIdDto.TaskId);
                 if(task == null){
                     return NotFound("Task not found");
                 }
-                if (!await _listRepo.ListExists(list.ListId))
+                
+                var list = await _listRepo.GetListByIdAsync(task.ListId);
+                if (list == null)
                 {
                     return StatusCode(404, "List Not Found");
                 }
+                
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+                
                 var board = await _boardRepo.GetBoardByIdAsync(list.BoardId);
-                if (!await _boardRepo.BoardExists(board.BoardId))
+                if (board == null)
                 {
                     return NotFound("Board Not Found");
                 }
+                
                 var workspaceId = board.WorkspaceId;
                 var isMember = await _membersRepo.IsAMember(userId, workspaceId);
+                
                 if (isMember || userTokenRole == "Admin")
                 {
-                    var taskModel = await _taskRepo.DeleteTaskAsync(taskId);
+                    var taskModel = await _taskRepo.DeleteTaskAsync(taskIdDto.TaskId);
                     if (taskModel == null)
                     {
                         return NotFound("Task dose not exists");
@@ -173,7 +190,7 @@ public class  TaskController : ControllerBase{
                 }
                 return StatusCode(401, "You are not authorized!");
         }catch(Exception e){
-            return StatusCode(500, "Internal Server Error ");
+            return StatusCode(500, "Internal Server Error "+e.Message);
         }
 
     }
@@ -228,15 +245,13 @@ public class  TaskController : ControllerBase{
 
     public async Task<IActionResult> GetTasksByListId (int listId){
         try{
-            
-            if (!await _listRepo.ListExists(listId))
-            {
-                return NotFound("List Not Found");
-            }
-
             var list = await _listRepo.GetListByIdAsync(listId);
+            if (list == null)
+            {
+                return NotFound("List does not exist!");
+            }
             var board = await _boardRepo.GetBoardByIdAsync(list.BoardId);
-            if (!await _boardRepo.BoardExists(board.BoardId))
+            if (board == null)
             {
                 return NotFound("Board not found!");
             }
@@ -252,7 +267,7 @@ public class  TaskController : ControllerBase{
 
                 if (tasks.Count == 0)
                 {
-                    return BadRequest("There are no Tasks!");
+                    return NotFound("There are no Tasks!");
                 }
 
                 return Ok(tasks);
@@ -267,20 +282,19 @@ public class  TaskController : ControllerBase{
     [HttpDelete("DeleteTaskByListId")]
 
     public async Task<IActionResult> DeleteTaskByListId (ListIdDTO listIdDTO){
-
-        if(!await _listRepo.ListExists(listIdDTO.ListId)){
-            return StatusCode(404, "List Not Found");
-        }
-
         if(!ModelState.IsValid){
             return BadRequest(ModelState);
         }
-
-
+        
         try{
             var list = await _listRepo.GetListByIdAsync(listIdDTO.ListId);
+            if (list == null)
+            {
+                return NotFound("List not found");
+            }
+            
             var board = await _boardRepo.GetBoardByIdAsync(list.BoardId);
-            if (!await _boardRepo.BoardExists(board.BoardId))
+            if (board == null)
             {
                 return NotFound("Board not found!");
             }

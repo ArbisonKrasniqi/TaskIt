@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getAccessToken, getRefreshToken, refreshTokens } from './TokenService';
 import { useNavigate } from 'react-router-dom';
+import LoadingModal from '../Components/Modal/LoadingModal';
 
 const WithAuth = (WrappedComponent) => {
   // The outer function is the HOC factory, which returns the actual component
@@ -10,12 +11,9 @@ const WithAuth = (WrappedComponent) => {
 
     useEffect(() => {
       const checkAuth = async () => {
-        let accessToken = getAccessToken();
-        if (accessToken) {
-          setIsAuthenticated(true);
-        } else {
-          if (getRefreshToken() && await refreshTokens()) {
-            accessToken = getAccessToken();
+        let refreshToken = getRefreshToken();
+        if (refreshToken && await refreshTokens()) {
+          const accessToken = getAccessToken();
             if (accessToken) {
               setIsAuthenticated(true);
               console.info("VALIDATED");
@@ -23,18 +21,16 @@ const WithAuth = (WrappedComponent) => {
               console.info("NOT VALIDATED");
               navigate('/login');
             }
-          } else {
-            console.log("NOT LOGGED IN");
-            navigate('/login');
-          }
+        } else {
+          console.log("NOT LOGGED IN");
+          navigate('/login');
         }
-      };
-
+      }
       checkAuth();
     }, [navigate]);
 
     if (!isAuthenticated) {
-      return <div>Loading...</div>; // Or a custom loader
+      return <LoadingModal/>
     }
 
     return <WrappedComponent {...props} />;

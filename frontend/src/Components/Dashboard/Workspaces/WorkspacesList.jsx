@@ -1,12 +1,13 @@
 import { useState, useEffect, createContext } from "react";
-import {getData} from '../../../Services/FetchService.jsx';
+import {getData, getDataWithId} from '../../../Services/FetchService.jsx';
 import WorkspacesTable from './WorkspacesTable.jsx';
 import WorkspacesErrorModal from './Modals/WorkspacesErrorModal.jsx';
+import { useParams } from "react-router-dom";
 
 export const WorkspacesContext = createContext();
 
-const WorkspacesList = () => {
-
+const WorkspacesList = () => { 
+    const { userId } = useParams();
     const [workspaces, setWorkspaces] = useState(null); //lista e workspaces nga API
     const [showWorkspacesErrorModal, setShowWorkspacesErrorModal] = useState(false); //vleren fillestare false se ska asnje error ne fillim
     const [errorMessage, setErrorMessage] = useState("There has been a server error!"); //perdoret per te vendosur vlera te ndryshme ne showWorkspacesErrorModal
@@ -14,15 +15,20 @@ const WorkspacesList = () => {
 
     const getWorkspaces = async () => {
         try{
-            const data = await getData('/backend/workspace/GetAllWorkspaces');
-            setWorkspaces(data.data);
+            if (userId) {
+                const workspacesWithUserId = await getDataWithId('/backend/workspace/GetWorkspacesByMemberId?memberId', userId);
+                setWorkspaces(workspacesWithUserId.data);
+            } else {
+                const allWorkspaces = await getData('/backend/workspace/GetAllWorkspaces');
+                setWorkspaces(allWorkspaces.data);
+            }
         }catch(error){
             setErrorMessage(error.message);
             setShowWorkspacesErrorModal(true); //shfaqe WorkspaceErrorModalin
         }
     };
 
-    useEffect(()=> {getWorkspaces();}, []);
+    useEffect(()=> {getWorkspaces();}, [userId]);
 
 
     const contextValue = {workspaces, setWorkspaces, getWorkspaces, showWorkspacesErrorModal, setShowWorkspacesErrorModal, errorMessage, setErrorMessage};
@@ -44,4 +50,4 @@ const WorkspacesList = () => {
 
 
 
-export default WorkspacesList
+export default WorkspacesList;

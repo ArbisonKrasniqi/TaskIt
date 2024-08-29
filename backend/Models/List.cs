@@ -17,5 +17,6 @@ public class List
     [Range(0, int.MaxValue, ErrorMessage = "Board Id can not be negative!")]
     
     public int BoardId { get; set; }
-    public List<Task>? Tasks { get; set; }
+
+    public List<Tasks> Tasks { get; set; } = new List<Tasks>();
 }

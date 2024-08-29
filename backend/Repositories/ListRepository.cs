@@ -9,19 +9,25 @@ namespace backend.Repositories;
 public class ListRepository : IListRepository
 {
     private readonly ApplicationDBContext _context;
-    public ListRepository(ApplicationDBContext context)
+    private readonly ITaskRepository _taskRepo;
+    public ListRepository(ApplicationDBContext context, ITaskRepository taskRepo)
     {
         _context = context;
+        _taskRepo = taskRepo;
     }
 
     public async Task<List<List>> GetAllListsAsync()
     {
-        return await _context.List.ToListAsync();
+        return await _context.List
+            .Include(l=>l.Tasks)
+            .ToListAsync();
     }
 
     public async Task<List?> GetListByIdAsync(int ListId)
     {
-        return await _context.List.FindAsync(ListId);
+        return await _context.List
+            .Include(l=>l.Tasks)
+            .FirstOrDefaultAsync(t=>t.ListId==ListId);
     }
 
     public async Task<List?> CreateListAsync(List listModel)
@@ -54,6 +60,8 @@ public class ListRepository : IListRepository
         {
             return null;
         }
+
+        await _taskRepo.DeleteTaskByListIdAsync(ListId);
         _context.List.Remove(listModel);
         await _context.SaveChangesAsync();
         return listModel;
@@ -69,14 +77,23 @@ public class ListRepository : IListRepository
     
     public async Task<List<List>> GetListByBoardId(int BoardId)
     {
-        return await _context.List.Where(b => b.BoardId == BoardId).ToListAsync();
+        return await _context.List
+            .Include(l=>l.Tasks)
+            .Where(b => b.BoardId == BoardId).ToListAsync();
     }
     
     public async Task<List<List>> DeleteListsByBoardIdAsync(int BoardId)
     {
-        var lists = await _context.List.Where(l => l.BoardId == BoardId).ToListAsync();
+        var lists = await _context.List
+            .Include(l=>l.Tasks)
+            .Where(l => l.BoardId == BoardId).ToListAsync();
 
         if (lists.Count == 0) return null;
+
+        foreach (var list in lists)
+        {
+            await _taskRepo.DeleteTaskByListIdAsync(list.ListId);
+        }
         
         _context.List.RemoveRange(lists);
         await _context.SaveChangesAsync();

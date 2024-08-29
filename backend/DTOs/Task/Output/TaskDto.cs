@@ -4,7 +4,7 @@ using backend.DTOs.Checklist.Output;
 namespace backend.DTOs.Task;
 
 public class TaskDto{
-    public int TaskID { get; set; }
+    public int TaskId { get; set; }
     [Required]
     [MinLength(2, ErrorMessage = "Title must be at least 2 characters")]
     [MaxLength(280, ErrorMessage = "Title cannot be over 280 characters")]
@@ -23,4 +23,5 @@ public class TaskDto{
     public List<ChecklistDTO> Checklists { get; set; }
     
     
+    public DateTime DateAdded { get; set; }
 }

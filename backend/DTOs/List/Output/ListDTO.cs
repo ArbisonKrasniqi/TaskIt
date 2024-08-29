@@ -14,4 +14,6 @@ public class ListDTO
     [Range(0, int.MaxValue, ErrorMessage = "Board Id can not be negative!")]
     public int BoardId { get; set; }
     public List<TaskDto> Tasks { get; set; }
+    
+    public DateTime DateCreated { get; set; }
 }

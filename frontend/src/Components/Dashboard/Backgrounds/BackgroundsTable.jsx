@@ -38,7 +38,7 @@ const BackgroundsTable = () => {
                         <th className='px-6 py-3'>Background ID</th>
                         <th className='px-6 py-3'>Creator ID</th>
                         <th className='px-6 py-3'>Title</th>
-                        <th className='px-6 py-3'>Image Url</th>
+                        <th className='px-6 py-3'>Image</th>
                         <th className='px-6 py-3'>Date Created</th>
                         <th className='px-6 py-3'>Is Active</th>
                         <th className='px-6 py-3'>Actions</th>
@@ -50,7 +50,10 @@ const BackgroundsTable = () => {
                             <td className='px-6 py-4'>{background.backgroundId}</td>
                             <td className='px-6 py-4'>{background.creatorId}</td>
                             <td className='px-6 py-4'>{background.title}</td>
-                            <td className='px-6 py-4'>{background.imageUrl}</td>
+                            <td className='px-6 py-4 w-[200px] h-auto'><img 
+                                src={`data:image/jpeg;base64,${background.imageDataBase64}`} 
+                                alt="Background" 
+                            /></td>
                             <td className='px-6 py-4'>{background.dateCreated}</td>
                             <td className='px-6 py-4'>{(background.isActive === true) ? ("true") : ("false")}</td>
 

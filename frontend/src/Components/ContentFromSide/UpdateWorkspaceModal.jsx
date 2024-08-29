@@ -99,7 +99,7 @@ if(!open)return null;
                 <br></br>
                 <p className="w-full origin-left font-sans text-gray-500 font-semibold text-l">Description</p>
                 <br></br>
-                <input
+                <textarea
                     type="text"
                     name="workspaceDescription"
                     id="workspaceDescription"

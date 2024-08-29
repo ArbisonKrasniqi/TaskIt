@@ -30,12 +30,14 @@ namespace backend.Controllers;
         
         //ITokenRepo to implement refresh tokens
         private readonly ITokenRepository _tokenRepo;
-        public UserController(UserManager<User> userManager, SignInManager<User> signInManager, ITokenService tokenService, ITokenRepository tokenRepo)
+        private readonly IUserRepository _userRepo;
+        public UserController(UserManager<User> userManager, SignInManager<User> signInManager, ITokenService tokenService, ITokenRepository tokenRepo, IUserRepository userRepo)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _tokenService = tokenService;
             _tokenRepo = tokenRepo;
+            _userRepo = userRepo;
         }
         
         
@@ -165,8 +167,8 @@ namespace backend.Controllers;
         
         
         [HttpGet("adminAllUsers")]
-        [Authorize(AuthenticationSchemes = "Bearer")]
-        [Authorize(Policy = "AdminOnly")]
+        //[Authorize(AuthenticationSchemes = "Bearer")]
+        //[Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> GetAllUsers()
         {
             try
@@ -226,7 +228,7 @@ namespace backend.Controllers;
         
         [HttpGet("adminUserID")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        [Authorize(Policy = "AdminOnly")]
+       // [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> GetUserById(string userId)
         {
             if (!ModelState.IsValid) return BadRequest("Id cannot be empty");
@@ -512,4 +514,13 @@ namespace backend.Controllers;
             }
             
         }
+        
+        //SEARCH
+        [HttpGet("search")]
+        public async Task<ActionResult<List<SearchUserDto>>> SearchUsers([FromQuery] string query)
+        {
+            var result = await _userRepo.SearchUsersAsync(query);
+            return Ok(result);
+        }
+        
     }

@@ -37,18 +37,34 @@ export async function postData(apiEndpoint, data) {
     throw error;
   }
 }
-export async function deleteData(endpoint, params) {
-  let url = endpoint;
-  if (params && Object.keys(params).length > 0) {
-    const queryString = new URLSearchParams(params).toString();
-    url = `${endpoint}?${queryString}`;
-  }
+// export async function deleteData(endpoint, params) {
+//   let url = endpoint;
+//   if (params && Object.keys(params).length > 0) {
+//     const queryString = new URLSearchParams(params).toString();
+//     url = `${endpoint}?${queryString}`;
+//   }
 
+//   try {
+//     const response = await api.delete(url, {
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//     });
+
+//     return response.data; // Axios automatically parses JSON responses
+//   } catch (error) {
+//     console.error('Error:', error);
+//     throw error;
+//   }
+// }
+
+export async function deleteData(endpoint, data) {
   try {
-    const response = await api.delete(url, {
+    const response = await api.delete(endpoint, {
       headers: {
         'Content-Type': 'application/json',
       },
+      data: data, // Pass the DTO in the body
     });
 
     return response.data; // Axios automatically parses JSON responses

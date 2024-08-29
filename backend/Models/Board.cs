@@ -15,7 +15,7 @@ namespace backend.Models
         public string Title { get; set; } = string.Empty;
         public DateTime DateCreated { get; set; } = DateTime.Now;
         public int? BackgroundId { get; set; }
-        public int? WorkspaceId { get; set; }
+        public int WorkspaceId { get; set; }
         public List<List>? Lists { get; set; }
         public bool IsClosed { get; set; } = false;
     }

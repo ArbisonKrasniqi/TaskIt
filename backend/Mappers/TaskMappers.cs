@@ -7,10 +7,12 @@ public static class TaskMappers{
 
     public static TaskDto ToTaskDto (this Tasks taskModel){
         return new TaskDto{
-            TaskID = taskModel.TaskId,
+            TaskId = taskModel.TaskId,
             Title = taskModel.Title,
             Description = taskModel.Description,
-            ListId = taskModel.ListId
+            ListId = taskModel.ListId,
+            DueDate = taskModel.DueDate,
+            DateAdded = taskModel.DateAdded
         };
     }
 

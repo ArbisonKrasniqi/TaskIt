@@ -11,7 +11,8 @@ public static class ListMapper
         {
             ListId = listModel.ListId,
             Title = listModel.Title, 
-            BoardId = listModel.BoardId
+            BoardId = listModel.BoardId,
+            DateCreated = listModel.DateCreated
         };
     }
     
