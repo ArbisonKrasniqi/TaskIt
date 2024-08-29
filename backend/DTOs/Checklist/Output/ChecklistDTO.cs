@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using backend.DTOs.ChecklistItem.Output;
 
 namespace backend.DTOs.Checklist.Output;
 
@@ -13,4 +14,5 @@ public class ChecklistDTO
     [Required]
     [Range(0,int.MaxValue,ErrorMessage = "TaskId can not be negative")]
     public int? TaskId { get; set; }
+    public List<ChecklistItemDTO> ChecklistItems { get; set; }
 }

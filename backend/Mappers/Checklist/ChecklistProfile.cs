@@ -8,10 +8,13 @@ public class ChecklistProfile : Profile
 {
     public ChecklistProfile()
     {
-        CreateMap<ChecklistDTO, Models.Checklist>();
+        CreateMap<Models.Checklist, ChecklistDTO>().ForMember(dest=> dest.ChecklistItems,
+            opt=>opt.MapFrom(src=>src.ChecklistItems));
         
         CreateMap<CreateChecklistDTO, Models.Checklist>();
         CreateMap<UpdateChecklistDTO, Models.Checklist>();
+
+        CreateMap<Models.ChecklistItem, ChecklistProfile>();
     }
     
 }

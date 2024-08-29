@@ -59,7 +59,7 @@ public class ChecklistRepository : IChecklistRepository
             return null;
         }
         
-        //we need to do the removal of checklist items as well when we work on that
+        _context.ChecklistItem.RemoveRange(checklistModel.ChecklistItems);
         _context.Checklist.Remove(checklistModel);
         await _context.SaveChangesAsync();
         return checklistModel;

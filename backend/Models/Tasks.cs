@@ -27,6 +27,7 @@ namespace backend.Models
         [Required]
         [Range(0, int.MaxValue, ErrorMessage = "List Id can not be negative!")]
         public int ListId { get; set;}
+        public List<Checklist>? Checklists { get; set; }
     }
 
     

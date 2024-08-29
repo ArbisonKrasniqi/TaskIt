@@ -11,7 +11,7 @@ public interface IChecklistRepository
     Task<Checklist> CreateChecklistAsync(Checklist checklist);
     Task<Checklist?> UpdateChecklistAsync(UpdateChecklistDTO checklistDto);
     Task<Checklist?> DeleteChecklistAsync(int checklistId);
-    Task<List<Checklist>?> GetChecklistByTaskIdAsync(int checklistId);
+    Task<List<Checklist>?> GetChecklistByTaskIdAsync(int taskId);
     Task<List<Checklist>> DeleteChecklistByTaskIdAsync(int taskId);
     Task<bool> ChecklistExists(int checklistId);
     Task<bool> ChecklistInTask(int checklistId, int taskId);

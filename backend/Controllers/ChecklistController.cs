@@ -5,6 +5,7 @@ using backend.DTOs.Checklist.Output;
 using backend.Interfaces;
 using backend.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
@@ -62,24 +63,38 @@ public class ChecklistController : ControllerBase
     {
         try
         {
-            var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
-            var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
             var checklist = await _checklistRepo.GetChecklistByIdAsync(checklistId);
-
-            if (checklist == null)
+            if (checklist ==null)
             {
                 return NotFound("Checklist not found");
             }
-
-            var taskId = checklist.TaskId;
-            var isMember = await _membersRepo.IsAMember(userId, taskId);
-
-            if (isMember || userTokenRole == "Admin")
+            var task = await _taskRepo.GetTaskByIdAsync(checklist.TaskId);
+            if (!await _taskRepo.TaskExists(checklistId))
             {
-                var checklistDTO = _mapper.Map<ChecklistDTO>(checklist);
-                return Ok(checklistDTO);
+                return NotFound("Task not found");
             }
 
+            var list = await _listRepo.GetListByIdAsync(task.ListId);
+            if (!await _listRepo.ListExists(task.ListId))
+            {
+                return NotFound("List not found");
+            }
+
+            var board = await _boardRepo.GetBoardByIdAsync(list.BoardId);
+            if (!await _boardRepo.BoardExists(list.BoardId))
+            {
+                return NotFound("Board not found");
+            }
+
+            var workspaceId = board.WorkspaceId;
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+            var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+            var isMember = await _membersRepo.IsAMember(userId, workspaceId);
+            if (isMember || userTokenRole == "Admin")
+            {
+                var checklistDto = _mapper.Map<ChecklistDTO>(checklist);
+                return Ok(checklistDto);
+            }
             return StatusCode(401, "You arent authorized");
         }
         catch (Exception e)
@@ -96,14 +111,26 @@ public class ChecklistController : ControllerBase
         {
             return BadRequest(ModelState);
         }
-
-        if (!await _taskRepo.TaskExists(checklistDto.TaskId))
-        {
-            return BadRequest("Task not found");
-        }
-        
         try
         {
+            var task = await _taskRepo.GetTaskByIdAsync(checklistDto.TaskId);
+            if (!await _taskRepo.TaskExists(checklistDto.TaskId))
+            {
+                return BadRequest("Task not found");
+            }
+
+            var list = await _listRepo.GetListByIdAsync(task.ListId);
+            if (!await _listRepo.ListExists(task.ListId))
+            {
+                return BadRequest("List not found");
+            }
+
+            var board = await _boardRepo.GetBoardByIdAsync(list.BoardId);
+            if (!await _boardRepo.BoardExists(list.BoardId))
+            {
+                return BadRequest("Board not found");
+            }
+            
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
             var isMember = await _membersRepo.IsAMember(userId, checklistDto.TaskId);
@@ -174,7 +201,60 @@ public class ChecklistController : ControllerBase
             return StatusCode(500, "Internal Server Errror!");
         }
     }
-    // delete chechklist missing
+    
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    [HttpDelete("DeleteChecklist")]
+    public async Task<IActionResult> DeleteChecklist(ChecklistIdDTO checklistIdDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        try
+        {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+            var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+
+            var checklist = await _checklistRepo.GetChecklistByIdAsync(checklistIdDto.ChecklistId);
+            if (checklist == null)
+            {
+                return NotFound("Checklist not found");
+            }
+
+            var task = await _taskRepo.GetTaskByIdAsync(checklist.TaskId);
+            if (task == null)
+            {
+                return NotFound("Task not found");
+            }
+
+            var list = await _listRepo.GetListByIdAsync(task.ListId);
+            if (list == null)
+            {
+                return NotFound("List not found");
+            }
+
+            var board = await _boardRepo.GetBoardByIdAsync(list.BoardId);
+            if (board == null)
+            {
+                return NotFound("Board not found");
+            }
+
+            var workspace = board.WorkspaceId;
+            var isMember = await _membersRepo.IsAMember(userId, workspace);
+            if (isMember || userTokenRole == "Admin")
+            {
+                var checklistModel = await _checklistRepo.DeleteChecklistAsync(checklistIdDto.ChecklistId);
+                return Ok("Checklist deleted");
+            }
+            return StatusCode(401, "You are not authorized!");
+
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, "Internal Server Errror!");
+        }
+    }
 
     [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpGet("GetChecklistByTaskId")]
@@ -229,11 +309,6 @@ public class ChecklistController : ControllerBase
     [HttpDelete(template: "DeleteChecklistByTaskId")]
     public async Task<IActionResult> DeleteChecklistByTaskId(TaskIdDTO taskIdDto)
     {
-        if (!await _taskRepo.TaskExists(taskIdDto.TaskId))
-        {
-            return StatusCode(404, "Task Not Found");
-        }
-
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
@@ -242,14 +317,19 @@ public class ChecklistController : ControllerBase
         try
         {
             var task = await _taskRepo.GetTaskByIdAsync(taskIdDto.TaskId);
+            if (task == null)
+            {
+                return NotFound("Task not found");
+            }
+            
             var list = await _listRepo.GetListByIdAsync(task.ListId);
-            if (!await _listRepo.ListExists(list.ListId))
+            if (list == null)
             {
                 return NotFound("List not found");
             }
 
             var board = await _boardRepo.GetBoardByIdAsync(list.BoardId);
-            if (!await _boardRepo.BoardExists(board.BoardId))
+            if (board == null)
             {
                 return NotFound("Board not found ");
             }
