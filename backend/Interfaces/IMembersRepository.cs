@@ -14,5 +14,6 @@ public interface IMembersRepository
     Task<bool> IsAMember(string userId, int? workspaceId);
     Task<Members?> DeleteMemberById(int id);
     Task<Members?> UpdateMemberAsync(UpdateMemberDto memberDto);
+    Task<List<Members>> DeleteMembersByWorkspaceIdAsync(int workspaceId);
 
 }

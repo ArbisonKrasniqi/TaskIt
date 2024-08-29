@@ -13,6 +13,7 @@ import TasksList from "../Components/Dashboard/Tasks/TasksList.jsx";
 import { Route, Routes } from 'react-router-dom';
 import WorkspaceTable from "../Components/Dashboard/WorkspaceTable.jsx";
 import DashboardSideBar from "../Components/Dashboard/DashboardSidebar.jsx";
+import StarredBoardsList from "../Components/Dashboard/StarredBoards/StarredBoardsList.jsx";
 
 const Dashboard = () => {
 

@@ -1,11 +1,9 @@
-﻿using backend.Data;
-using backend.DTOs.Board.Input;
+﻿using backend.DTOs.Board.Input;
 using backend.DTOs.List;
 using backend.Interfaces;
 using backend.Mappers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 namespace backend.Controllers;
 
 [Route("backend/list")]
@@ -42,22 +40,22 @@ public class ListController : ControllerBase
         }
         catch (Exception e)
         {
-            return StatusCode(500,"Internal Server Error!");
+            return StatusCode(500,"Internal Server Error!"+e.Message);
         }
     }
     
     [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpGet("GetListById")]
-    public async Task<IActionResult> GetById(int ListId)
+    public async Task<IActionResult> GetById(int listId)
     {
         try{
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
 
-        var list = await _listRepo.GetListByIdAsync(ListId);
+        var list = await _listRepo.GetListByIdAsync(listId);
         if (list == null)
         {
-            return NotFound("List Not Found");
+            return NotFound("List Not Found!");
         }
 
         if (!await _boardRepo.BoardExists(list.BoardId))
@@ -65,7 +63,16 @@ public class ListController : ControllerBase
             return StatusCode(404, "Board Not Found");
         }
         var board = await _boardRepo.GetBoardByIdAsync(list.BoardId);
+        if (board == null)
+        {
+            return NotFound("Board Not Found!");
+        }
+
         var workspaceId = board.WorkspaceId;
+        if (string.IsNullOrEmpty(userId))
+        {
+            return NotFound("User Not Found!");
+        }
 
         var isMember = await _membersRepo.IsAMember(userId, workspaceId);
 
@@ -77,7 +84,7 @@ public class ListController : ControllerBase
       
         }catch (Exception e)
         {
-            return StatusCode(500, "Internal server error");
+            return StatusCode(500, "Internal server error"+e.Message);
         }
     }
 
@@ -100,7 +107,16 @@ public class ListController : ControllerBase
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
 
                 var board = await _boardRepo.GetBoardByIdAsync(updateListDto.BoardId);
+                if (board == null)
+                {
+                    return NotFound("Board Not Found!");
+                }
+
                 var workspaceId = board.WorkspaceId;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return NotFound("User Not Found!");
+                }
                 var isMember = await _membersRepo.IsAMember(userId, workspaceId);
 
                 if (isMember || userTokenRole == "Admin")
@@ -119,7 +135,7 @@ public class ListController : ControllerBase
             }
             catch (Exception e)
             {
-                return StatusCode(500, "Internal Server Errror!");
+                return StatusCode(500, "Internal Server Error!"+e.Message);
             }
         }
   
@@ -143,19 +159,26 @@ public class ListController : ControllerBase
             {
                 return NotFound("List Not Found");
             }
-
-            if (!await _boardRepo.BoardExists(list.BoardId))
-            {
-                return StatusCode(404, "Board Not Found");
-            }
             var board = await _boardRepo.GetBoardByIdAsync(list.BoardId);
+            if (board == null)
+            {
+                return NotFound("Board Not Found!");
+            }
             var workspaceId = board.WorkspaceId;
-
+            if (string.IsNullOrEmpty(userId))
+            {
+                return NotFound("User Not Found!");
+            }
             var isMember = await _membersRepo.IsAMember(userId, workspaceId);
 
             if (isMember || userTokenRole == "Admin")
             {
                 var listModel = await _listRepo.DeleteListAsync(listIdDto.ListId);
+
+                if (listModel == null)
+                {
+                    return NotFound("List Not Found!");
+                }
 
                 return Ok("List Deleted");
             }
@@ -163,7 +186,7 @@ public class ListController : ControllerBase
         }
         catch (Exception e)
         {
-            return StatusCode(500, "Internal Server Errror!");
+            return StatusCode(500, "Internal Server Error!"+e.Message);
         }
     }
     
@@ -187,7 +210,15 @@ public class ListController : ControllerBase
                 return BadRequest("Board not found!");
             }
             var board = await _boardRepo.GetBoardByIdAsync(listDto.BoardId);
+            if (board == null)
+            {
+                return NotFound("Board Not Found!");
+            }
             var workspaceId = board.WorkspaceId;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return NotFound("User Not Found!");
+            }
             var isMember = await _membersRepo.IsAMember(userId, workspaceId);
 
             if (isMember || userTokenRole == "Admin")
@@ -200,29 +231,37 @@ public class ListController : ControllerBase
         }
         catch (Exception e)
         {
-            return StatusCode(500, "Internal Server Errror!");
+            return StatusCode(500, "Internal Server Error!"+e.Message);
         }
     }
     [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpGet("GetListByBoardId")]
-    public async Task<IActionResult> GetListByBoardId(int BoardId)
+    public async Task<IActionResult> GetListByBoardId(int boardId)
     {
         try
         {
-            if (!await _boardRepo.BoardExists(BoardId))
+            if (!await _boardRepo.BoardExists(boardId))
             {
                 return NotFound("Board Not Found");
             }
 
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
-            var board = await _boardRepo.GetBoardByIdAsync(BoardId);
+            var board = await _boardRepo.GetBoardByIdAsync(boardId);
+            if (board == null)
+            {
+                return NotFound("Board Not Found!");
+            }
+            if (string.IsNullOrEmpty(userId))
+            {
+                return NotFound("User Not Found!");
+            }
             var workspaceId = board.WorkspaceId;
             var isMember = await _membersRepo.IsAMember(userId, workspaceId);
 
             if (isMember || userTokenRole == "Admin")
             {
-                var lists = await _listRepo.GetListByBoardId(BoardId);
+                var lists = await _listRepo.GetListByBoardId(boardId);
 
                 if (lists.Count == 0)
                 {
@@ -235,7 +274,7 @@ public class ListController : ControllerBase
         }
         catch (Exception e)
         {
-            return StatusCode(500, "Internal Server Errror!");
+            return StatusCode(500, "Internal Server Error!"+e.Message);
         }
     }
     [Authorize(AuthenticationSchemes = "Bearer")]
@@ -257,7 +296,16 @@ public class ListController : ControllerBase
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
             var board = await _boardRepo.GetBoardByIdAsync(boardIdDto.BoardId);
+            if (board == null)
+            {
+                return NotFound("Board Not Found!");
+            }
             var workspaceId = board.WorkspaceId;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return NotFound("User Not Found!");
+            }
+
             var isMember = await _membersRepo.IsAMember(userId, workspaceId);
 
             if (isMember || userTokenRole == "Admin")
@@ -275,7 +323,7 @@ public class ListController : ControllerBase
         }
         catch (Exception e)
         {
-            return StatusCode(500, "Internal Server Error!");
+            return StatusCode(500, "Internal Server Error!"+e.Message);
         }
     }
     

@@ -12,8 +12,10 @@ using Microsoft.OpenApi.Models;
 using backend.Mappers;
 using backend.Mappers.Background;
 using backend.Mappers.Board;
+using backend.Mappers.Invite;
 using backend.Mappers.Member;
 using backend.Mappers.StarredBoard;
+using backend.Mappers.User;
 using backend.Mappers.Workspace;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -144,7 +146,8 @@ builder.Services.AddAutoMapper(typeof(WorkspaceProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(BackgroundProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(MemberProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(StarredBoardProfile).Assembly);
-
+builder.Services.AddAutoMapper(typeof(InviteProfile).Assembly);
+builder.Services.AddAutoMapper(typeof(UserProfile).Assembly);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

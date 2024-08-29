@@ -29,10 +29,10 @@ export const WorkspaceProvider = ({ children }) => {
     const [showLimitModal, setShowLimitModal] = useState(false);
     const [showDeleteWorkspaceModal, setShowDeleteWorkspaceModal]= useState(false);
     const boardCount = boards.length+starredBoards.length;
-   
+    const [tasks, setTasks] = useState([]);
     const [members, setMembers] = useState([]);
     const [roli, setRoli]=useState("Member");
-    
+    const [isInviteModalOpen, setIsInviteModalOpen]= useState(false);
     const userId = mainContext.userInfo.userId;
     const WorkspaceId = mainContext.workspaceId;
 
@@ -292,6 +292,110 @@ export const WorkspaceProvider = ({ children }) => {
         }
      };
 
+     const getTasks =async ()=>{
+
+        try{
+            const tasksResponse = await getDataWithId('http://localhost:5157/backend/task/GetTasksByWorkspaceId?workspaceId', WorkspaceId);
+            const tasksData = tasksResponse.data;
+            console.log("Tasks data: ",tasksData);
+            setTasks(tasksData);
+        }catch (error) {
+            console.error(error.message);
+        }
+    };
+
+
+    useEffect(()=>{
+            getTasks();
+            console.log("Workspace id ",WorkspaceId);
+            console.log("Tasks fetched: ",tasks);
+        }, [WorkspaceId]);
+    
+        const getInitials = (firstName, lastName) => {
+            if (!firstName || !lastName) {
+                return '';
+            }
+            return `${firstName.charAt(0)}${lastName.charAt(0)}`;
+        };
+
+        const getInitialsFromFullName = (fullName) => {
+            if (!fullName) {
+                return '';
+            }
+        
+            // Split the full name by spaces
+            const nameParts = fullName.trim().split(' ');
+       
+            const firstName = nameParts[0];
+            const lastName = nameParts[nameParts.length - 1];
+        
+            // Return the initials
+            return `${firstName.charAt(0).toUpperCase()}${lastName.charAt(0).toUpperCase()}`;
+        };
+        
+        const openInviteModal = () => setIsInviteModalOpen(true);
+        const closeInviteModal = () => setIsInviteModalOpen(false);
+
+        const [sentInvites, setSentInvites] = useState([]);
+        const [inviteeDetails, setInviteeDetails] = useState([]);
+        const [workspaceTitles, setWorkspaceTitles] = useState([]);
+    
+        const getSentInvites = async () => {
+            try {
+                const response = await getDataWithId('http://localhost:5157/backend/invite/GetInvitesByWorkspace?workspaceId', WorkspaceId);
+                const data = response.data;
+                console.log("Sent Invites fetched: ", data);
+    
+                const pendingInvites = data.filter(invite =>invite.inviteStatus === "Pending");
+                console.log("Pending invites: ",pendingInvites);
+                setSentInvites(pendingInvites);
+    
+                // Fetch inviter details for each invite
+                const invited = await Promise.all(pendingInvites.map(async invite => {
+                    const responseInvitee = await getDataWithId('http://localhost:5157/backend/user/adminUserID?userId', invite.inviteeId);
+                    return responseInvitee.data;
+                }));
+                const workspaceTitlesData = await Promise.all(pendingInvites.map(async invite => {
+                    const responseWorkspace = await getDataWithId('http://localhost:5157/backend/workspace/getWorkspaceById?workspaceId', invite.workspaceId);
+                    return responseWorkspace.data.title; // Assuming the workspace object has a 'title' field
+                }));
+    
+                setInviteeDetails(invited);
+                setWorkspaceTitles(workspaceTitlesData);
+            } catch (error) {
+                console.log("Error fetching invites: ", error.message);
+            }
+        };
+    
+        useEffect(() => {
+            getSentInvites();
+        }, [WorkspaceId, workspace]);
+    
+    
+        const handleDeleteInvite = async(inviteId) => {
+            console.log("Deleting invite with id: ", inviteId);
+            try{
+                const response = await deleteData(`http://localhost:5157/backend/invite/DeleteInviteById?InviteId=${inviteId}`);
+                console.log("Deleting invite response: ",response);
+                getSentInvites();
+            }
+            catch(error){
+                console.error("Error deleting invite ",error.message);
+            }
+        };
+
+
+
+
+
+
+
+
+
+
+
+
+
     return (
         <WorkspaceContext.Provider value={{
             WorkspaceId,
@@ -347,6 +451,22 @@ export const WorkspaceProvider = ({ children }) => {
             setShowDeleteWorkspaceModal,
             userId,
             handleLeaveWorkspace,
+            tasks,
+            setTasks,
+            getTasks,
+            openInviteModal,
+            closeInviteModal,
+            isInviteModalOpen,
+            getInitials,
+            handleDeleteInvite,
+            getSentInvites,
+            sentInvites, 
+            setSentInvites,
+            inviteeDetails, 
+            setInviteeDetails, 
+            workspaceTitles, 
+            setWorkspaceTitles,
+            getInitialsFromFullName
         }}>
             {children}
         </WorkspaceContext.Provider>

@@ -35,30 +35,53 @@ const Workspaces = () =>{
     }, [userId, workspaces]);
 
 
+const filteredOwnedWorkspaces = OwnedWorkspaces.filter(workspace =>
+    workspace.title.toLowerCase().includes(searchTerm.toLowerCase())
+);
+const filteredMemberWorkspaces = MemberWorkspaces.filter(workspace =>
+    workspace.title.toLowerCase().includes(searchTerm.toLowerCase())
+);
 
 return(
 <div className="min-h-screen h-full" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
 <div className="font-semibold font-sans text-gray-400 flex justify-normal  flex-col ml-20 mr-20 flex-wrap">
   <h2 className="text-2xl mt-20">Your Workspaces</h2>
 
+  <div className="flex flex-col mt-5">
+                    <label htmlFor="searchWorkspace">Search</label>
+                    <div className="bg-transparent border border-solid border-gray-500 flex flex-row mt-2 rounded-md w-full md:w-2/3 lg:w-1/4 xl:w-1/4">
+                        <input 
+                            type="search" 
+                            id="searchWorkspace" 
+                            name="searchWorkspace" 
+                            placeholder="Search workspaces..."
+                            className="p-2 border-none bg-transparent focus:outline-none w-full text-sm md:text-base" 
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                </div>
+
+
   <div className="font-semibold font-sans text-gray-400 flex justify-normal mt-10 flex-col ml-10 ">
     <h2 className="text-xl mb-3">Your owned workspaces</h2>
     
     <ul>
-    {OwnedWorkspaces.length === 0 ? (
+    {filteredOwnedWorkspaces.length === 0 ? (
           <li className='text-gray-400 text-l font-semibold flex items-center gap-x-3 cursor-pointer p-2'>
-          <span>No orkspaces found</span>
+          <span>No workspaces found</span>
       </li>
 
 
     ) : (
     
-        OwnedWorkspaces.map(workspace =>(
+        filteredOwnedWorkspaces.map(workspace =>(
             
             <li key={workspace.workspaceId}>
                 <div className="flex flex-row justify-between">
                     
-            <div className="flex gap-x-3 items-center mt-2 mb-2 justify-start">
+            <div className="flex gap-x-3 items-center mt-2 mb-2 justify-start0"
+            onClick={() => navigate(`/boards/${workspace.workspaceId}`)}>
            
            <button className='w-10 h-10 text-black bg-gradient-to-r from-blue-400 to-indigo-500 font-bold text-xl rounded-lg text-center px-3 items-center dark:bg-blue-600 dark:focus:ring-blue-800 '>
             {workspace.title? workspace.title.charAt(0): ''}
@@ -94,21 +117,23 @@ return(
 
 
         <ul>
-        {MemberWorkspaces.length === 0 ? (
+        {filteredMemberWorkspaces.length === 0 ? (
           <li className='text-gray-400 text-l font-semibold flex items-center gap-x-3 cursor-pointer p-2'>
           <span>No workspaces found</span>
       </li>
 
 
     ) : (
-            MemberWorkspaces.map(workspace=>(
+        filteredMemberWorkspaces.map(workspace=>(
 
                 <li key={workspace.workspaceId}>
                 <div className="flex flex-row justify-between">
                     
-            <div className="flex gap-x-3 items-center mt-2 mb-2 justify-start">
+            <div className="flex gap-x-3 items-center mt-2 mb-2 justify-start"
+            onClick={() => navigate(`/boards/${workspace.workspaceId}`)}>
            
-           <button className='w-10 h-10 text-black bg-gradient-to-r from-blue-400 to-indigo-500 font-bold text-xl rounded-lg text-center px-3 items-center dark:bg-blue-600 dark:focus:ring-blue-800 '>
+           <button 
+           className='w-10 h-10 text-black bg-gradient-to-r from-blue-400 to-indigo-500 font-bold text-xl rounded-lg text-center px-3 items-center dark:bg-blue-600 dark:focus:ring-blue-800 '>
             {workspace.title? workspace.title.charAt(0): ''}
             </button>
            
