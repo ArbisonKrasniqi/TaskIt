@@ -86,18 +86,21 @@ public class  TaskController : ControllerBase{
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return NotFound("User Not Found!");
+            }
             var isMember = await _membersRepo.IsAMember(userId, workspaceId);
             if (isMember || userTokenRole == "Admin")
             {
                 var tasks = await _taskRepo.GetTasksByWorkspaceIdAsync(workspaceId); // Await here
-                var taskDto = tasks.Select(x => x.ToTaskDto()).ToList(); // Now you can use Select
-                return Ok(taskDto);
+                return Ok(tasks);
             }
             return StatusCode(401, "You are not authorized!");
         }
         catch (Exception e)
         {
-            return StatusCode(500, "Internal Server Error");
+            return StatusCode(500, "Internal Server Error"+e.Message);
         }
     }
     [Authorize(AuthenticationSchemes = "Bearer")]
