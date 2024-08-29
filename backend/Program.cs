@@ -123,6 +123,7 @@ builder.Services.AddScoped<IBackgroundRepository, BackgroundRepository>();
 builder.Services.AddScoped<IStarredBoardRepository, StarredBoardRepository>();
 builder.Services.AddScoped<IInviteRepository, InviteRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+builder.Services.AddScoped<ILabelRepository, LabelRepository>();
 // CORS configuration
 builder.Services.AddCors(options =>
 {
