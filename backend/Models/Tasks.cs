@@ -29,6 +29,7 @@ namespace backend.Models
         public int ListId { get; set;}
 
         public List<TaskMember> TaskMembers { get; set; }
+        public List<Checklist>? Checklists { get; set; }
     }
 
     

@@ -22,7 +22,7 @@ const BackgroundsList = () => {
         }
     };
     
-    useEffect(() => { getBackgrounds(); }, [backgrounds]);
+    useEffect(() => { getBackgrounds(); }, []);
 
     const contextValue = {
         backgrounds,

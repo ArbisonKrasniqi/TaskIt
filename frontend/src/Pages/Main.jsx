@@ -1,4 +1,3 @@
-// Main.jsx
 import React, { createContext, useEffect } from 'react';
 import Navbar from '../Components/Navbar/Navbar';
 import Sidebar from '../Components/Side/Sidebar';
@@ -10,7 +9,6 @@ import { MainContext } from './MainContext.jsx';
 import { getAccessToken, checkAndRefreshToken } from '../Services/TokenService.jsx';
 import { useParams } from 'react-router-dom';
 import { useState } from "react"; 
-import List from '../Components/List/List';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import Table from '../Components/ContentFromSide/Table.jsx';
@@ -26,24 +24,32 @@ const Main = () => {
     const [userInfo, setUserInfo] = useState({});
     useEffect(() => {
         const updateUserInfoToken = async () => {
-            const accessToken = getAccessToken();
-            
-            if (accessToken) {
-                const decodedToken = jwtDecode(accessToken);
-                setUserInfo({
-                    userId: decodedToken.Id,
-                    email: decodedToken.Email,
-                    role: decodedToken.Role
-                });
-            } else {
-                navigate('/login'); //If no access token exists
-                console.info("Trying to move to login");
-            }
-
-            if (await !checkAndRefreshToken()){ //If invalid refresh
+            try {
+                if (await !checkAndRefreshToken()){ //If invalid refresh
+                    navigate('/login');
+                    return;
+                }
+                const accessToken = getAccessToken();
+                
+                if (accessToken) {
+                    const decodedToken = jwtDecode(accessToken);
+                    setUserInfo({
+                        userId: decodedToken.Id,
+                        email: decodedToken.Email,
+                        role: decodedToken.Role,
+                        accessToken: decodedToken
+                    });
+                } else {
+                    navigate('/login'); //If no access token exists
+                    return;
+                }
+            } catch (error) {
+                console.log("There has been an error, please log in again.");
+                document.cookie = "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+                document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
                 navigate('/login');
-                console.info("trying to move to login idk");
             }
+            
         }
         updateUserInfoToken();
         

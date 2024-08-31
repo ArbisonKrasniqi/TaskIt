@@ -5,9 +5,11 @@ import ErrorMessage from './ErrorMessage.jsx';
 import ModalWelcome from '../Modal/modalWelcome.jsx';
 import { postData } from '../../Services/FetchService.jsx';
 import { StoreTokens } from '../../Services/TokenService.jsx';
-
+import { useNavigate } from 'react-router-dom';
 
 const SignUpForm = () =>{
+    
+    const navigate = useNavigate();
     const [showModalWelcome, setShowModalWelcome]= useState(false);
 
     //Qiky modal perdoret nese ka signup por ska mujt me sign in.
@@ -96,18 +98,16 @@ const SignUpForm = () =>{
         };
 
         try {
-            const response = await postData('/backend/user/register', registerData);
-            console.log(response);
-        } catch (error) {
-            console.error("Signup failed: ", error.message);
-        }
-
-        try {
-            const loginResponse = await postData('/backend/user/login', loginData);
-            StoreTokens(loginResponse.data.accessToken, loginResponse.data.refreshToken);
-            setShowModalWelcome(true);
-        } catch (error) {
-            
+                await postData('/backend/user/register', registerData);
+                const loginResponse = await postData('/backend/user/login', loginData);
+                StoreTokens(loginResponse.data.accessToken, loginResponse.data.refreshToken);
+                setShowModalWelcome(true);
+            } catch (error) {
+            if (error.response.data[1].description) {
+                setError(error.response.data[1].description);
+            } else {
+                setError("There has been an internal server error! Try again later");
+            }            
         }
     };
 
@@ -180,14 +180,7 @@ const SignUpForm = () =>{
                     {showModalWelcome &&(
                         <ModalWelcome 
                         signedUpUserName={formData.name} 
-                        redirectTo="/" //the current path is for demo
-                        />
-                    )}
-
-                    {showModalSuccess &&(
-                        <ModalWelcome 
-                        signedUpUserName={formData.name} 
-                        redirectTo="/login" //the current path is for demo
+                        redirectTo="/main/workspaces" //the current path is for demo
                         />
                     )}
                     </div>

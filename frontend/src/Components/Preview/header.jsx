@@ -3,20 +3,20 @@ const Preview = () =>{
   
         
  return(
-    <nav class=" dark:bg-gray-900 min-h-screen">
-        <div class="flex items-center  mx-auto px-4 py-2.5 ">
+    <nav className=" dark:bg-gray-900 min-h-screen">
+        <div className="flex items-center  mx-auto px-4 py-2.5 ">
             <h1 style={{textAlign: 'left', padding: 30, color: '#134946', fontSize: '40px', fontWeight: 'bold'}}>Taskit</h1>
 
-            <div class="flex justify-start items-start mx-auto px-4 py-2.5">
-                <ul class="flex flex-col font-medium p-4 mt-4 border rounded-lg  md:flex-row md:mt-0 md:text-sm  md:border-0  md:space-x-8 ">
+            <div className="flex justify-start items-start mx-auto px-4 py-2.5">
+                <ul className="flex flex-col font-medium p-4 mt-4 border rounded-lg  md:flex-row md:mt-0 md:text-sm  md:border-0  md:space-x-8 ">
                     <li>
-                        <a href="#" class="block py-2 px-3 text-white rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0  md:p-0 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Resources</a>
+                        <a href="#" className="block py-2 px-3 text-white rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0  md:p-0 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Resources</a>
                     </li>
                     <li>
-                        <a href="#" class="block py-2 px-3 text-white rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0  md:p-0 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">About Us</a>
+                        <a href="#" className="block py-2 px-3 text-white rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0  md:p-0 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">About Us</a>
                     </li>
                     <li>
-                        <a href="#" class="block py-2 px-3 text-white rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0  md:p-0 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Contact Us</a>
+                        <a href="#" className="block py-2 px-3 text-white rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0  md:p-0 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Contact Us</a>
                     </li>
                 </ul>
             </div>
