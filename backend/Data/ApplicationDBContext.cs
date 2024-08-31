@@ -23,6 +23,8 @@ public class ApplicationDBContext : IdentityDbContext<User>
     public DbSet<Background> Background { get; set; }
     public DbSet<StarredBoard> StarredBoard { get; set; }
     public DbSet<Invite> Invite { get; set; }
+    public DbSet<TaskMember> TaskMember { get; set; }
+
 
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     //User roles

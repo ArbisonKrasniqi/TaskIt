@@ -14,8 +14,8 @@ namespace backend.Models
         [MaxLength(20, ErrorMessage = "Title cannot be over 280 characters")]
         public string Title { get; set; } = string.Empty;
         public DateTime DateCreated { get; set; } = DateTime.Now;
-        public int? BackgroundId { get; set; }
-        public int? WorkspaceId { get; set; }
+        public int BackgroundId { get; set; }
+        public int WorkspaceId { get; set; }
         public List<List>? Lists { get; set; }
         public bool IsClosed { get; set; } = false;
     }

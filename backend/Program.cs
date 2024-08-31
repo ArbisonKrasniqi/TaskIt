@@ -14,6 +14,7 @@ using backend.Mappers.Background;
 using backend.Mappers.Board;
 using backend.Mappers.Member;
 using backend.Mappers.StarredBoard;
+using backend.Mappers.TaskMember;
 using backend.Mappers.Workspace;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -122,6 +123,8 @@ builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddScoped<IBackgroundRepository, BackgroundRepository>();
 builder.Services.AddScoped<IStarredBoardRepository, StarredBoardRepository>();
 builder.Services.AddScoped<IInviteRepository, InviteRepository>();
+builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+builder.Services.AddScoped<ITaskMemberRepository, TaskMemberRepository>();
 // CORS configuration
 builder.Services.AddCors(options =>
 {
@@ -142,6 +145,7 @@ builder.Services.AddAutoMapper(typeof(WorkspaceProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(BackgroundProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(MemberProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(StarredBoardProfile).Assembly);
+builder.Services.AddAutoMapper(typeof(TaskMemberProfile));
 
 var app = builder.Build();
 

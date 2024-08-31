@@ -18,5 +18,6 @@ public interface ITaskRepository{
     Task<List<Tasks>> GetTaskByListId (int ListId);
     Task<bool> TaskInList(int taskId, int listId);
     Task<List<Tasks>> GetTasksByWorkspaceIdAsync(int workspaceId);
+    Task<bool> TaskExists(int taskId);
 
 }
