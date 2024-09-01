@@ -8,10 +8,12 @@ import { useNavigate } from "react-router-dom";
 
 
 const Workspaces = () =>{
-    const { userId, workspaces } = useContext(WorkspaceContext);
+    const { userId, workspaces, searchTerm, setSearchTerm } = useContext(WorkspaceContext);
     const [OwnedWorkspaces, setOwnedWorkspaces] = useState([]);  
     const [MemberWorkspaces, setMemberWorkspaces] = useState([]);  
     const navigate = useNavigate();
+    const [filteredOwnedWorkspaces, setFilteredOwnedWorkspaces] = useState([]);
+    const [filteredMemberWorkspaces, setFilteredMemberWorkspaces] = useState([]);
 
     useEffect(()=>{
     try {
@@ -35,12 +37,21 @@ const Workspaces = () =>{
     }, [userId, workspaces]);
 
 
-const filteredOwnedWorkspaces = OwnedWorkspaces.filter(workspace =>
-    workspace.title.toLowerCase().includes(searchTerm.toLowerCase())
-);
-const filteredMemberWorkspaces = MemberWorkspaces.filter(workspace =>
-    workspace.title.toLowerCase().includes(searchTerm.toLowerCase())
-);
+    useEffect(() => {
+        try {
+            if (workspaces) {
+                setFilteredOwnedWorkspaces = OwnedWorkspaces.filter(workspace =>
+                    workspace.title.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+                setFilteredMemberWorkspaces = MemberWorkspaces.filter(workspace =>
+                  workspace.title.toLowerCase().includes(searchTerm.toLowerCase())  
+                );
+
+            }
+        } catch (error) {
+            console.log(error.response?.data);
+        }
+    },[workspaces])
 
 return(
 <div className="min-h-screen h-full" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>

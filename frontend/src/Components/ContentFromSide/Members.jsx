@@ -5,8 +5,9 @@ import { getDataWithId, deleteData } from "../../Services/FetchService";
 
 const Members = () => {
 
-        const { members, getInitials, roli, sentInvites,inviteeDetails, workspaceTitles, handleDeleteInvite } = useContext(WorkspaceContext);
-  
+        const { members, memberDetails, getInitials, roli, sentInvites,inviteeDetails, workspaceTitles, handleDeleteInvite, workspace, handleRemoveMember } = useContext(WorkspaceContext);
+        
+        
 
     return(
         <div className="min-h-screen h-full" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
@@ -87,17 +88,24 @@ const Members = () => {
                                 <tbody>
                                     {members.map((member, index) => (
                                         <>
-                                            <tr key={index} className='h-10'>
+                                            <tr key={member.memberId} className='h-14'>
                                                 <td className='w-10'>
-                                                    <img
-                                                        src="https://via.placeholder.com/40"
-                                                        alt="Profile"
-                                                        className="w-8 h-8 rounded-full"
-                                                    />
+                                                <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-sm text-white bg-gradient-to-r from-orange-400 to-orange-600">
+                                        {getInitials(memberDetails[index]?.firstName, memberDetails[index]?.lastName)}
+                                    </div>
                                                 </td>
-                                                <td className='pl-3'>{member.firstName} {member.lastName}</td>
-                                                <td>Role: "Admin"</td>
-                                                <td className='px-3 w-6'>Remove</td>
+                                                <td className='pl-3'>{memberDetails[index]?.firstName} { memberDetails[index]?.lastName}</td>
+                                                <td>Role: {(memberDetails[index]?.id === workspace.ownerId) ? "Owner" : "Member"}
+                                                </td>
+                                                <td>
+                                                <button
+                                                    className={(memberDetails[index]?.id === workspace.ownerId)? 'bg-gray-500 text-gray-300 cursor-not-allowed px-4 py-2 rounded-md' : 'bg-red-500 text-white px-4 py-2 rounded-md'}
+                                                    onClick={() => 
+                                                        memberDetails[index]?.id !== workspace.ownerId &&
+                                                        handleRemoveMember(memberDetails[index]?.id, workspace.workspaceId)}
+                                                    >Remove
+                                                </button>
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <td colSpan={4}>

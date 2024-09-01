@@ -86,10 +86,11 @@ export const WorkspaceProvider = ({ children }) => {
             const ownerId = workspace.ownerId;
             if (userId === ownerId) {
                 setRoli("Owner");
-                //console.log("Set as owner with id", ownerId);
+                console.log("Set as owner with id", ownerId);
+                console.log("WORKSPACE OWNER IS: "+workspace.ownerId)
             } else {
                 setRoli("Member");
-                //console.log("Set as member with id", userId);
+                console.log("Set as member with id", userId);
             }
         }
     }, [WorkspaceId, userId, workspace, mainContext.userInfo.accessToken]);
@@ -130,29 +131,51 @@ export const WorkspaceProvider = ({ children }) => {
     }, [WorkspaceId, userId, workspace, selectedSort, mainContext.userInfo.accessToken]);
 
 
+    const [memberDetails, setMemberDetails] = useState([]);
 
-
-    useEffect(() => {
         const getMembers = async () => {
             try {
-                if (workspace && WorkspaceId && userId) {
                     const response = await getDataWithId('/backend/Members/getAllMembersByWorkspace?workspaceId', WorkspaceId);
                     const data = response.data;
-                    if (data && Array.isArray(data) && data.length>0) {
-                        setMembers(data);
-                    } else {
-                        console.log("There are no members");
-                    }
-                }
-                //Loading
+                    setMembers(data);
+
+                    const memberDetail = await Promise.all(data.map(async member =>{
+                        const responseMemberDetail = await getDataWithId('http://localhost:5157/backend/user/adminUserID?userId', member.userId);                        
+                        return responseMemberDetail.data;
+                    }))
+                    setMemberDetails(memberDetail);
+                        
+                    
             } catch (error) {
-                console.error(error.message);
-                setMembers([]);
+                console.error("Error fetching members: ",error.message);
+
             }
         };
+
+    useEffect(() => {
         getMembers();
-        //console.log('Members fetched: ',members);
+        console.log('Members fetched: ',members);
+        console.log();
+        
     },[WorkspaceId, workspace, userId, mainContext.userInfo.accessToken]);
+
+
+    const handleRemoveMember = async(memberId, workspaceId) => {
+       const removeMemberDto = {
+        userId: memberId,
+        workspaceId: workspaceId
+       }
+       
+        try {
+            const response = await deleteData('http://localhost:5157/backend/Members/RemoveMember',removeMemberDto);
+            getMembers();
+            
+        } catch (error) {
+            console.error("Error removing member: ",error.message);
+        }
+        
+    }
+
 
     const handleCreateBoard = (newBoard) => {
         setBoards((prevBoards) => [...prevBoards, newBoard]);
@@ -366,6 +389,8 @@ export const WorkspaceProvider = ({ children }) => {
                 console.log("Error fetching invites: ", error.message);
             }
         };
+
+        
     
         useEffect(() => {
             getSentInvites();
@@ -466,7 +491,10 @@ export const WorkspaceProvider = ({ children }) => {
             setInviteeDetails, 
             workspaceTitles, 
             setWorkspaceTitles,
-            getInitialsFromFullName
+            getInitialsFromFullName,
+            memberDetails,
+            setMemberDetails,
+            handleRemoveMember
         }}>
             {children}
         </WorkspaceContext.Provider>
