@@ -43,7 +43,7 @@ public class TaskRepository : ITaskRepository{
 
         existingTask.Title = taskModel.Title;
         existingTask.Description = taskModel.Description;
-        existingTask.DateAdded = taskModel.DateAdded;
+        existingTask.DateAdded = existingTask.DateAdded;
         existingTask.DueDate = taskModel.DueDate;
         existingTask.ListId = taskModel.ListId;
 
@@ -101,15 +101,26 @@ public class TaskRepository : ITaskRepository{
         return false;
     }
 
-    public async Task<List<Tasks>> GetTasksByWorkspaceIdAsync(int workspaceId)
+    public async Task<List<TaskInfoDto>> GetTasksByWorkspaceIdAsync(int workspaceId)
     {
-        var boards = await _context.Board.Where(b => b.WorkspaceId == workspaceId).ToListAsync();
-        var boardIds = boards.Select(b => b.BoardId).ToList();
-
-        var lists = await _context.List.Where(l => boardIds.Contains(l.BoardId)).ToListAsync();
-        var listIds = lists.Select(l => l.ListId).ToList();
-
-        var tasks = await _context.Tasks.Where(t => listIds.Contains(t.ListId)).ToListAsync();
+        var tasks = await (from workspace in _context.Workspace
+            join board in _context.Board on workspace.WorkspaceId equals board.WorkspaceId
+            join list in _context.List on board.BoardId equals list.BoardId
+            join task in _context.Tasks on list.ListId equals task.ListId
+            where workspace.WorkspaceId == workspaceId
+            select new TaskInfoDto
+            {
+                TaskTitle = task.Title,
+                ListTitle = list.Title,
+                BoardTitle = board.Title,
+                DueDate = task.DueDate
+            }).ToListAsync();
+        
         return tasks;
+    }
+
+    public async Task<bool> TaskExists(int taskId)
+    {
+        return await _context.Tasks.AnyAsync(t => t.TaskId == taskId);
     }
 }

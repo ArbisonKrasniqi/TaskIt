@@ -14,12 +14,14 @@ namespace backend.Repositories
     public class BoardRepository : IBoardRepository
     {
         private readonly ApplicationDBContext _context;
-     
+        private readonly IStarredBoardRepository _starredRepo;
+        private readonly IListRepository _listRepo;
         
-        public BoardRepository(ApplicationDBContext context)
+        public BoardRepository(ApplicationDBContext context, IStarredBoardRepository starredRepo,IListRepository listRepo)
         {
             _context=context;
-       
+            _starredRepo = starredRepo;
+            _listRepo = listRepo;
         }
         
         //GetAllAsync --> Gets all boards that exists
@@ -80,16 +82,10 @@ namespace backend.Repositories
 
             if (boardModel == null)
                 return null;
-           
-            var starredBoard = await _context.StarredBoard.FirstOrDefaultAsync(x => x.BoardId == id);
 
-            if (starredBoard != null)
-            {
-                _context.StarredBoard.Remove(starredBoard);
-            }
-
-
-            _context.List.RemoveRange(boardModel.Lists);
+            await _listRepo.DeleteListsByBoardIdAsync(id);
+            await _starredRepo.DeleteStarredBoardByIdAsync(id);
+            
             _context.Board.Remove(boardModel);
             await _context.SaveChangesAsync();
             return boardModel;
@@ -104,8 +100,10 @@ namespace backend.Repositories
                 .ToListAsync();
 
             foreach (var board in boards)
-            {
-                _context.List.RemoveRange(board.Lists);
+            {     
+                await _listRepo.DeleteListsByBoardIdAsync(board.BoardId);
+                await _starredRepo.DeleteStarredBoardByIdAsync(board.BoardId);
+            
             }
             _context.Board.RemoveRange(boards);
             await _context.SaveChangesAsync();

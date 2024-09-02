@@ -8,10 +8,13 @@
     import Searchbar from '../Searchbar/Searchbar';
     import NotificationButton from './Notification/NotificationButton';
     import NavbarProfilePic from '../ProfilePic/NavbarProfilePic';
+    import { useNavigate } from 'react-router-dom';
 
     export const DropdownContext = createContext();
 
     const Navbar = () => {
+
+        const navigate = useNavigate();
 
         const [WorkspaceDropdownIsOpen, setWorkspaceDropdownIsOpen] = useState(false);
         const [RecentDropdownIsOpen, setRecentDropdownIsOpen] = useState(false);
@@ -243,7 +246,8 @@
                 
                 <DropdownContext.Provider value={values}>
                     <div className='flex items-center'>
-                        <h1 className='text-xl font-bold text-gray-400 rounded hover:bg-gray-700 mx-4 p-2 cursor-pointer'>TaskIt</h1>
+                        <h1 className='text-xl font-bold text-gray-400 rounded hover:bg-gray-700 mx-4 p-2 cursor-pointer'
+                            onClick={() => {navigate('/main/workspaces')}}>TaskIt</h1>
 
                         <div>
                         <WorkspaceDropdown

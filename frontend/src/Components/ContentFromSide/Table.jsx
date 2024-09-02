@@ -1,6 +1,6 @@
 import {useContext, useEffect, useState} from 'react';
 import { WorkspaceContext } from '../Side/WorkspaceContext';
-import { getDataWithId } from '../../Services/FetchService';
+
 const Table = () =>{
 
     const formatDate = (dateString) => {
@@ -8,26 +8,9 @@ const Table = () =>{
         // Format date to 'MM/DD/YYYY' or any other format you prefer
         return date.toLocaleDateString('en-US');
     };
-    const {WorkspaceId} = useContext(WorkspaceContext);
-    const [tasks, setTasks] = useState([]);
-    
-    useEffect(()=>{
-    const getTasks =async ()=>{
+    const {tasks} = useContext(WorkspaceContext);
 
-        try{
-            const tasksResponse = await getDataWithId('http://localhost:5157/backend/task/GetTasksByWorkspaceId?workspaceId', WorkspaceId);
-            const tasksData = tasksResponse.data;
-            console.log("Tasks data: ",tasksData);
-            setTasks(tasksData);
-        }catch (error) {
-            console.error(error.message);
-        }
-    };
-   
-        getTasks();
-        console.log("Workspace id ",WorkspaceId);
-        console.log("Tasks fetched: ",tasks);
-    }, [WorkspaceId]);
+    
 
     return(
         <div className="min-h-screen h-full" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
@@ -38,7 +21,7 @@ const Table = () =>{
                     <tr>
                         <th className="px-4 py-2">Task</th>
                         <th className="px-4 py-2">List</th>
-                        <th className="px-4 py-2">Description</th>
+                        <th className="px-4 py-2">Board</th>
                         <th className="px-4 py-2">Labels</th>
                         <th className="px-4 py-2">Members</th>
                         <th className="px-4 py-2">Due Date</th>
@@ -52,12 +35,15 @@ const Table = () =>{
                     <th className="px-4 py-2"></th>
                     <th className="px-4 py-2"></th>
                     <th className="px-4 py-2"></th>
+                    <th className="px-4 py-2"></th>
                 </tr>
                 ) : tasks.map((task, index)=>(
-                    <tr key={index} className="hover:bg-gray-700">
-                    <td className="px-4 py-2">{task.title}</td>
-                    <td className="px-4 py-2"> </td>
-                    <td className="px-4 py-2">{task.description}</td>
+                    <tr key={index} className="hover:bg-gray-700 hover:cursor-pointer">
+                    <td className="px-4 py-2">{task.taskTitle}</td>
+                
+                    <td className="px-4 py-2">{task.listTitle}</td>
+                    <td className="px-4 py-2">{task.boardTitle}</td>
+                    
                     {/* <td className="px-4 py-2">
                         {task.labels.map(label => (
                             <span key={label} className="inline-block bg-blue-500 rounded-full px-3 py-1 text-sm font-semibold text-white mr-2">
@@ -73,7 +59,7 @@ const Table = () =>{
                         ))}
                     </td> */}
                     <td className="px-4 py-2"> </td>
-                    <td className="px-4 py-2"> </td>
+                    <th className="px-4 py-2"> </th>
                     <td className="px-4 py-2">{formatDate(task.dueDate)}</td>
                 </tr>
                 ))}

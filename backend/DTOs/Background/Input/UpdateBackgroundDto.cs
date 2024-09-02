@@ -9,7 +9,8 @@ namespace backend.DTOs.Background.Input
         [MinLength(2, ErrorMessage = "Title must be at least 2 characters")]
         [MaxLength(280, ErrorMessage = "Title cannot be over 280 characters")]
         public string Title { get; set; } = string.Empty;
-        public string ImageUrl { get; set; } = string.Empty;
+        [Required]
+        public IFormFile ImageFile { get; set; }
         public bool IsActive { get; set; } = true;
     }
 }

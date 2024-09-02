@@ -19,11 +19,15 @@ public class ApplicationDBContext : IdentityDbContext<User>
     public DbSet<Board> Board { get; set; }
     public DbSet<List> List { get; set; }
     public DbSet<Tasks> Tasks { get; set; }
+    public DbSet<Checklist> Checklist { get; set; }
+    public DbSet<ChecklistItem> ChecklistItem { get; set; }
     public DbSet<Members> Members { get; set; }
     public DbSet<Background> Background { get; set; }
     public DbSet<StarredBoard> StarredBoard { get; set; }
     public DbSet<Invite> Invite { get; set; }
     public DbSet<Label> Label { get; set; }
+
+    public DbSet<Comment> Comment { get; set; }
 
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     //User roles

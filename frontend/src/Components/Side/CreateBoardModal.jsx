@@ -5,32 +5,32 @@ import { MainContext } from '../../Pages/MainContext';
 const CreateBoardModal = ({ open, onClose, onBoardCreated, children }) => {
     const mainContext = useContext(MainContext);
     const [boardTitle, setBoardTitle] = useState('');
-    const [backgroundId, setBackgroundId] = useState(2);
+    const [backgroundId, setBackgroundId] = useState(1);
     const [workspaceId, setWorkspaceId] = useState(mainContext.workspaceId);
     const [clicked, setClicked] = useState(false);
     const [backgrounds, setBackgrounds] = useState([]);
     const [errorMessage, setErrorMessage] = useState('');
 
 
-     useEffect(()=>{
-     const getBackgrounds = async () =>{
-         try{
-             const backgroundsResponse = await getData('http://localhost:5157/backend/background/GetAllBackgrounds');
-             const backgroundsData = backgroundsResponse.data;
-            console.log("Background fetched:",backgroundsData);
+    useEffect(()=>{
+    const getBackgrounds = async () =>{
+        try{
+            const backgroundsResponse = await getData('http://localhost:5157/backend/background/GetAllBackgrounds');
+            const backgroundsData = backgroundsResponse.data;
+            //console.log("Background fetched:",backgroundsData);
 
-             if (backgroundsData && Array.isArray(backgroundsData) && backgroundsData.length > 0) {
-                 setBackgrounds(backgroundsData);
-            }else {
-                console.error('Data is null, not an array, or empty:', backgroundsData);
-                 setBackgrounds([]); //trajtohen si te dhena te zbrazeta
-             }
-         }catch (error) {
-             console.error(error.message);
-         }
-     };
-     getBackgrounds();
- }, []);
+            if (backgroundsData && Array.isArray(backgroundsData) && backgroundsData.length > 0) {
+                setBackgrounds(backgroundsData);
+            } else {
+                console.error("There are no backgrounds");
+                setBackgrounds([]); //trajtohen si te dhena te zbrazeta
+            }
+        } catch (error) {
+            console.error(error.message);
+        }
+    };
+    getBackgrounds();
+    }, []);
 
 
 

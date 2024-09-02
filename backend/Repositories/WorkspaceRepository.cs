@@ -12,12 +12,17 @@ public class WorkspaceRepository : IWorkspaceRepository
 {
     private readonly ApplicationDBContext _context;
     private readonly IBoardRepository _boardRepo;
+    private readonly IMembersRepository _membersRepo;
+    private readonly IInviteRepository _inviteRepo;
+    
 
 //constructor
-    public WorkspaceRepository(ApplicationDBContext context)
+    public WorkspaceRepository(ApplicationDBContext context, IBoardRepository boardRepo,IMembersRepository membersRepo, IInviteRepository inviteRepo)
     {
         _context = context;
-      
+        _boardRepo = boardRepo;
+        _membersRepo = membersRepo;
+        _inviteRepo = inviteRepo;
     }
     /*Task a wrapper for an object duhet gjithmone me e kthy nje Task kur perdorim async
      kur e perdorim async duhet me perdor await ne rreshtat ku dojna me bo async code
@@ -56,9 +61,9 @@ public class WorkspaceRepository : IWorkspaceRepository
         }
         
         
-        _context.Board.RemoveRange(workspaceModel.Boards);
-        _context.Members.RemoveRange(workspaceModel.Members);
-
+        await _boardRepo.DeleteBoardsByWorkspaceIdAsync(id);
+        await _membersRepo.DeleteMembersByWorkspaceIdAsync(id);
+        await _inviteRepo.DeleteInvitesByWorkspaceIdAsync(id);
         _context.Workspace.Remove(workspaceModel);
         await _context.SaveChangesAsync();
         return workspaceModel;
@@ -74,8 +79,9 @@ public class WorkspaceRepository : IWorkspaceRepository
 
         foreach (var workspace in workspaces)
         {
-            _context.Board.RemoveRange(workspace.Boards);
-            _context.Members.RemoveRange(workspace.Members);
+            await _boardRepo.DeleteBoardsByWorkspaceIdAsync(workspace.WorkspaceId);
+            await _membersRepo.DeleteMembersByWorkspaceIdAsync(workspace.WorkspaceId);
+            await _inviteRepo.DeleteInvitesByWorkspaceIdAsync(workspace.WorkspaceId);
         }
 
         _context.Workspace.RemoveRange(workspaces);
@@ -111,7 +117,7 @@ public class WorkspaceRepository : IWorkspaceRepository
         return await _context.Workspace
             .Include(w => w.Boards)
             .Include(w => w.Members) // Përfshijmë anëtarët
-            .Where(w => w.Members.Any(m => m.UserId == memberId) && w.OwnerId != memberId)
+            .Where(w => w.Members.Any(m => m.UserId == memberId) || w.OwnerId == memberId)
             .ToListAsync();
     }
     

@@ -9,7 +9,7 @@ namespace backend.Mappers;
 public static class UserMappers
 {
     
-    public static GetUserDTO ToGetUserDTO(User user, string role)
+    public static GetUserDTO ToGetUserDTO(Models.User user, string role)
     {
         return new GetUserDTO
         {

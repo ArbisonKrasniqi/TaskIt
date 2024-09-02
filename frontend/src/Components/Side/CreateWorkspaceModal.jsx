@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { postData } from './../../Services/FetchService'
 import { MainContext } from '../../Pages/MainContext';
-
+import { WorkspaceContext } from './WorkspaceContext';
 const CreateWorkspaceModal = ({open, onClose, onWorkspaceCreated, children}) => {
   const mainContext = useContext(MainContext);
   const [workspaceTitle, setWorkspaceTitle] = useState('');
@@ -24,7 +24,7 @@ const CreateWorkspaceModal = ({open, onClose, onWorkspaceCreated, children}) => 
     };
 
     console.log('Creating workspace with data: ',newWorkspace);
-
+    onClose();
     try {
       const response = await postData('http://localhost:5157/backend/workspace/CreateWorkspace', newWorkspace);
       console.log('Workspace created successfully:', response.data);

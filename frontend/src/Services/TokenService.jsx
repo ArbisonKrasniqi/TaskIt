@@ -61,44 +61,90 @@ export const refreshTokens = async () => {
 export const isTokenExpiring = (expiryTime) => {
     const currentTime = Math.floor((Date.now()) / 1000);
     const timeUntilExpiry = expiryTime - currentTime;
-    return timeUntilExpiry < 30;
+    return timeUntilExpiry < 10;
 }
+
+// export const checkAndRefreshToken = async () => {
+//     var accessToken = getAccessToken();
+//     var refreshToken = getRefreshToken();
+
+//     if (!refreshToken) {
+//         console.info("You are not logged in.");
+//         return false;
+//     } else if (accessToken && refreshToken) {
+//         const decodedToken = jwtDecode(accessToken);
+//         const expiryTime = decodedToken.exp;    
+//         if(isTokenExpiring(expiryTime)) {
+//             var refreshResult = await refreshTokens();
+//             if (refreshResult) {
+//                 console.info("Tokens refreshed before expiry");
+//                 accessToken = getAccessToken();
+//                 refreshToken = getRefreshToken();  
+//                 return true;
+//             } else {
+//                 console.info("You have been logged out.");
+//                 return false;
+//             }
+//         }
+//     } else if (!accessToken && refreshToken) {
+//         var refreshResult = await refreshTokens();
+//         if (refreshResult) {
+//             console.info("Tokens refreshed after expiry");
+//             accessToken = getAccessToken();
+//             refreshToken = getRefreshToken();
+//             return true;
+//         } else {
+//             console.info("Couldnt refresh tokens");
+//             return false;
+//         }
+//     } else {
+//         console.info("There has been an error please log in again!");
+//         return false;
+//     }
+// }
 
 export const checkAndRefreshToken = async () => {
-    var accessToken = getAccessToken();
-    var refreshToken = getRefreshToken();
-
-    if (!refreshToken) {
-        console.info("You are not logged in.");
-        return false;
-    } else if (accessToken && refreshToken) {
-        const decodedToken = jwtDecode(accessToken);
-        const expiryTime = decodedToken.exp;    
-        if(isTokenExpiring(expiryTime)) {
-            var refreshResult = await refreshTokens();
-            if (refreshResult) {
-                console.info("Tokens refreshed before expiry");
-                accessToken = getAccessToken();
-                refreshToken = getRefreshToken();  
-                return true;
-            } else {
-                console.info("You have been logged out.");
-                return false;
-            }
-        }
-    } else if (!accessToken && refreshToken) {
-        var refreshResult = await refreshTokens();
-        if (refreshResult) {
-            console.info("Tokens refreshed after expiry");
-            accessToken = getAccessToken();
-            refreshToken = getRefreshToken();
-            return true;
-        } else {
-            console.info("Couldnt refresh tokens");
+    try {
+        var accessToken = getAccessToken();
+        var refreshToken = getRefreshToken();
+        if (!refreshToken) {
+            console.log("You are not logged in.");
             return false;
         }
-    } else {
-        console.info("There has been an error please log in again!");
+
+        if (accessToken) {
+            // Decode the token to verify its structure
+            const decodedToken = jwtDecode(accessToken);
+            const expiryTime = decodedToken.exp;
+
+            if (isTokenExpiring(expiryTime)) {
+                var refreshResult = await refreshTokens();
+                if (refreshResult) {
+                    //console.log("Tokens refreshed before expiry");
+                    accessToken = getAccessToken();
+                    refreshToken = getRefreshToken();
+                    return true;
+                } else {
+                    console.log("You have been logged out.");
+                    return false;
+                }
+            }
+        } else if (!accessToken && refreshToken) {
+            var refreshResult = await refreshTokens();
+            if (refreshResult) {
+                //console.log("Tokens refreshed after expiry");
+                accessToken = getAccessToken();
+                refreshToken = getRefreshToken();
+                return true;
+            } else {
+                console.log("Couldn't refresh tokens");
+                return false;
+            }
+        } else {
+            console.log("There has been an error. Please log in again!");
+            return false;
+        }
+    } catch (error) {
         return false;
     }
-}
+};

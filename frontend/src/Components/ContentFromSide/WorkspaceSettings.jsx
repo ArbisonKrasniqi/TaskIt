@@ -1,22 +1,34 @@
 import SideMenusHeader from "./SideMenusHeader";
 import { WorkspaceContext } from '../Side/WorkspaceContext';
 import { useContext, useState } from "react";
-import { putData,deleteData } from "../../Services/FetchService";
-import { useNavigate } from 'react-router-dom';
+import { putData } from "../../Services/FetchService";
 import DeleteWorkspaceModal from "./DeleteWorkspaceModal";
+import MessageModal from "./MessageModal";
 const WorkspaceSettings = () =>{
 
     const { workspace, setWorkspace, roli, setShowDeleteWorkspaceModal, showDeleteWorkspaceModal } = useContext(WorkspaceContext);
     const [isEditing, setIsEditing] = useState(false);
     const[description, setDescription] =useState('');
     const[errorMessage, setErrorMessage] = useState('');
-    const navigate = useNavigate();
+    const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+    const [message, setMessage] = useState('');
+    
 
    // const roli = "Member";
     if (workspace == null) {
         return <div>Loading...</div>;
     }
 
+    const handleDelete = () =>{
+        setMessage("Workspace deleted successfully!");
+        setIsMessageModalOpen(true);
+        setShowDeleteWorkspaceModal(false);
+    }
+    const handleLeave = () =>{
+        setMessage("Workspace left successfully!");
+        setIsMessageModalOpen(true);
+        setShowDeleteWorkspaceModal(false);
+    }
     
     const handleEditClick = () =>{
         setDescription(workspace.description || ''); 
@@ -29,7 +41,7 @@ const WorkspaceSettings = () =>{
     }
 
     const  handleSaveClick = async () =>{
-        if(description<10 || description>280){
+        if(description.length<10 || description.length>280){
             setErrorMessage('Workspace description must be between 10 and 280 characters.');
             return;
         }
@@ -69,7 +81,7 @@ const WorkspaceSettings = () =>{
                 </div>
         ): (
             <div>
-            <input 
+            <textarea 
                 type="text" 
                 value={description} 
                 onChange={handleInputChange}
@@ -87,6 +99,9 @@ const WorkspaceSettings = () =>{
 
     </div>
     <hr className="w-full border-gray-400"></hr>
+    <h1 className="text-3xl mt-10 ml-20 mb-10 font-semibold font-sans text-gray-400">
+    Workspace Activity</h1>
+    <hr className="w-full border-gray-400"></hr>
     <div className="mt-10 ml-10">
     {roli === "Owner" ? (
                     <>
@@ -97,7 +112,9 @@ const WorkspaceSettings = () =>{
                             Delete this workspace?
                         </button>
                         {showDeleteWorkspaceModal && (
-                            <DeleteWorkspaceModal onClose={() => setShowDeleteWorkspaceModal(false)} roli={roli} />
+                            <DeleteWorkspaceModal 
+                            onClose={() => setShowDeleteWorkspaceModal(false)}
+                            onDeleted={handleDelete} />
                         )}
                     </>
                 ) : (
@@ -109,11 +126,20 @@ const WorkspaceSettings = () =>{
                             Leave this workspace?
                         </button>
                         {showDeleteWorkspaceModal && (
-                            <DeleteWorkspaceModal onClose={() => setShowDeleteWorkspaceModal(false)} roli={roli} />
+                            <DeleteWorkspaceModal 
+                            onClose={() => setShowDeleteWorkspaceModal(false)}
+                            onDeleted={handleLeave} />
                         )}
                     </>
                 )}
+                 <MessageModal 
+                    isOpen={isMessageModalOpen} 
+                    message={message} 
+                    duration={2000}
+                    onClose={() => setIsMessageModalOpen(false)} 
+                />
             </div>
+           
         </div>
     );
 }

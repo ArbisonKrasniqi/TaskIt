@@ -14,6 +14,7 @@ const Preview = () =>{
    
         
  return(
+
         
     <nav className="min-h-screen">
     <div className="flex items-center justify-between mx-auto px-4 py-2.5">
@@ -24,6 +25,8 @@ const Preview = () =>{
         <a href="aboutus.jsx" className="py-2 px-3  hover:bg-black-100 rounded md:hover:bg-transparent md:border-0 dark:text-gray-400 md:dark:hover:text-black dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent ">About Us</a>
         <a href="#" className="py-2 px-3  hover:bg-black-100 rounded md:hover:bg-transparent md:border-0 dark:text-gray-400 md:dark:hover:text-black dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Contact Us</a>
       </div>
+
+   
 
       {/* Desktop Login Button */}
       <div className="hidden md:flex">
