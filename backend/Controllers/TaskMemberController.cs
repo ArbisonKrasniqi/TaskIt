@@ -201,6 +201,12 @@ public class TaskMemberController : ControllerBase
             {
                 return NotFound("The User is not a member of this workspace!");
             }
+
+            var memberAddedAlreadyATaskMember = await _taskMemberRepo.IsATaskMember(addTaskMemberDto.UserId, addTaskMemberDto.TaskId);
+            if (memberAddedAlreadyATaskMember)
+            {
+                return BadRequest("User is already a member in this task!");
+            }
             
             if (isMember || userTokenRole == "Admin")
             {
@@ -339,10 +345,12 @@ public class TaskMemberController : ControllerBase
             {
                 if (isTaskMember)
                 {
-                    var result = await _taskMemberRepo.RemoveTaskMemberAsync(removeTaskMemberDto.TaskId, removeTaskMemberDto.UserId);
+                    await _taskMemberRepo.RemoveTaskMemberAsync(removeTaskMemberDto.TaskId, removeTaskMemberDto.UserId);
 
                     return Ok("Member removed from Task");
                 }
+
+                return BadRequest("User is not a Task member!");
             }
 
             return StatusCode(401, "You are not authorized!");
