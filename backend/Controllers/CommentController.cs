@@ -21,8 +21,9 @@ public class CommentController : ControllerBase
     private readonly IWorkspaceRepository _workspaceRepo;
     private readonly IMembersRepository _membersRepo;
     private readonly UserManager<User> _userManager;
+    private readonly IUserRepository _userRepo;
     
-    public CommentController(ICommentRepository commentRepo, ITaskRepository taskRepo, IListRepository listRepo, IBoardRepository boardRepo, IWorkspaceRepository workspaceRepo, IMembersRepository membersRepo, UserManager<User> userManager)
+    public CommentController(ICommentRepository commentRepo, ITaskRepository taskRepo, IListRepository listRepo, IBoardRepository boardRepo, IWorkspaceRepository workspaceRepo, IMembersRepository membersRepo, UserManager<User> userManager, IUserRepository userRepo)
     {
         _commentRepo = commentRepo;
         _taskRepo = taskRepo;
@@ -31,6 +32,7 @@ public class CommentController : ControllerBase
         _workspaceRepo = workspaceRepo;
         _membersRepo = membersRepo;
         _userManager = userManager;
+        _userRepo = userRepo;
     }
 
     [Authorize(AuthenticationSchemes = "Bearer")]
@@ -45,9 +47,8 @@ public class CommentController : ControllerBase
             {
                 return NotFound("No comments found");
             }
-
-            var commentsDto = comments.Select(c => c.toCommentDto());
-            return Ok(commentsDto);
+            
+            return Ok(comments);
         }
         catch (Exception e)
         {
@@ -95,9 +96,15 @@ public class CommentController : ControllerBase
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
 
             var isMember = await _membersRepo.IsAMember(userId, workspace.WorkspaceId);
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspace.WorkspaceId);
+            if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+            {
+                return StatusCode(403, "The board is closed");
+            }
+            
             if (isMember || userTokenRole == "Admin")
             {
-                return Ok(comment.toCommentDto());
+                return Ok(comment);
             }
 
             return StatusCode(401, "You are not authorized");
@@ -130,18 +137,24 @@ public class CommentController : ControllerBase
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
 
             var isMember = await _membersRepo.IsAMember(userId, workspace.WorkspaceId);
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspace.WorkspaceId);
+            if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+            {
+                return StatusCode(403, "The board is closed");
+            }
+            
             if (isMember || userTokenRole == "Admin")
             {
                 var comments = await _commentRepo.GetCommentsByTaskIdAsync(taskId);
                 if (comments == null) return NotFound("No comments");
-                
-                var commentsDto = comments.Select(c => c.toCommentDto());
-                return Ok(commentsDto);
+
+
+                return Ok(comments);
             }
 
             return StatusCode(401, "You are not authorized");
         }
-        catch (Exception e)
+        catch (Exception e) 
         {
             return StatusCode(500, "Internal server error");
         }
@@ -158,7 +171,7 @@ public class CommentController : ControllerBase
             var userTokenId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
 
-            if (userTokenId == userId || userTokenRole == "Admin")
+            if (userTokenId == userId)
             {
                 var user = await _userManager.FindByIdAsync(userId);
                 if (user == null) return NotFound("User not found");
@@ -166,10 +179,20 @@ public class CommentController : ControllerBase
                 var comments = await _commentRepo.GetCommentsByUserIdAsync(userId);
                 if (comments == null) return NotFound("No comments");
 
-                return Ok(comments.Select(c => c.toCommentDto()));
+                return Ok(comments);
             }
 
-        return StatusCode(401, "You are not authorized");
+            if (userTokenRole == "Admin")
+            {
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null) return NotFound("User not found");
+
+                var comments = await _commentRepo.GetCommentsByUserIdAdminAsync(userId);
+                if (comments == null) return NotFound("No comments");
+                return Ok(comments);
+            }
+            
+            return StatusCode(401, "You are not authorized");
         }
         catch (Exception e)
         {
@@ -216,6 +239,13 @@ public class CommentController : ControllerBase
             }
 
             var isMember = await _membersRepo.IsAMember(userId, workspace.WorkspaceId);
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspace.WorkspaceId);
+            if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+            {
+                return StatusCode(403, "The board is closed");
+            }
+
+            
             if (isMember || userTokenRole == "Admin")
             {
                 var commentModel = commentRequestDto.ToCommentFromCreate(userId);
@@ -260,10 +290,17 @@ public class CommentController : ControllerBase
             var workspace = await _workspaceRepo.GetWorkspaceByIdAsync(board.WorkspaceId);
             if (workspace == null) return NotFound("Workspace not found");
             
+            
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
 
             var isMember = await _membersRepo.IsAMember(userId, workspace.WorkspaceId);
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspace.WorkspaceId);
+            if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+            {
+                return StatusCode(403, "The board is closed");
+            }
+            
             if (isMember || userTokenRole == "Admin")
             {
                 var commentModel = await _commentRepo.DeleteCommentAsync(commentIdDto.CommentId);
@@ -313,7 +350,12 @@ public class CommentController : ControllerBase
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
             
             var isMember = await _membersRepo.IsAMember(userId, workspace.WorkspaceId);
-
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspace.WorkspaceId);
+            if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+            {
+                return StatusCode(403, "The board is closed");
+            }
+            
             if (isMember || userTokenRole == "Admin")
             {
                 var commentModel = await _commentRepo.UpdateCommentAsync(updateCommentDto);

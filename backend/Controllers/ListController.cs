@@ -4,6 +4,8 @@ using backend.Interfaces;
 using backend.Mappers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Client;
+
 namespace backend.Controllers;
 
 [Route("backend/list")]
@@ -14,12 +16,14 @@ public class ListController : ControllerBase
     private readonly IListRepository _listRepo;
     private readonly IBoardRepository _boardRepo;
     private readonly IMembersRepository _membersRepo;
+    private readonly IUserRepository _userRepo;
 
-    public ListController(IListRepository listRepo , IBoardRepository boardRepo, IMembersRepository membersRepo)
+    public ListController(IListRepository listRepo , IBoardRepository boardRepo, IMembersRepository membersRepo, IUserRepository userRepo)
     {
         _listRepo = listRepo;
         _boardRepo = boardRepo;
         _membersRepo = membersRepo;
+        _userRepo = userRepo;
     }
     [Authorize(AuthenticationSchemes = "Bearer")]
     [Authorize(Policy = "AdminOnly")]
@@ -58,23 +62,22 @@ public class ListController : ControllerBase
             return NotFound("List Not Found!");
         }
 
-        if (!await _boardRepo.BoardExists(list.BoardId))
-        {
-            return StatusCode(404, "Board Not Found");
-        }
+
         var board = await _boardRepo.GetBoardByIdAsync(list.BoardId);
         if (board == null)
         {
             return NotFound("Board Not Found!");
         }
 
+
         var workspaceId = board.WorkspaceId;
-        if (string.IsNullOrEmpty(userId))
-        {
-            return NotFound("User Not Found!");
-        }
 
         var isMember = await _membersRepo.IsAMember(userId, workspaceId);
+        var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
+        if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+        {
+            return StatusCode(403, "The board is closed");
+        }
 
         if (isMember || userTokenRole == "Admin") 
         {
@@ -97,10 +100,6 @@ public class ListController : ControllerBase
         {
             return BadRequest(ModelState);
         }
-        if (!await _boardRepo.BoardExists(updateListDto.BoardId))
-        {
-            return StatusCode(404, "Board Not Found");
-        }
             try
             {
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
@@ -113,12 +112,13 @@ public class ListController : ControllerBase
                 }
 
                 var workspaceId = board.WorkspaceId;
-                if (string.IsNullOrEmpty(userId))
-                {
-                    return NotFound("User Not Found!");
-                }
                 var isMember = await _membersRepo.IsAMember(userId, workspaceId);
-
+                var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
+                if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+                {
+                    return StatusCode(403, "The board is closed");
+                }
+                
                 if (isMember || userTokenRole == "Admin")
                 {
                     var listModel = await _listRepo.UpdateListAsync(updateListDto);
@@ -170,7 +170,11 @@ public class ListController : ControllerBase
                 return NotFound("User Not Found!");
             }
             var isMember = await _membersRepo.IsAMember(userId, workspaceId);
-
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
+            if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+            {
+                return StatusCode(403, "The board is closed");
+            }
             if (isMember || userTokenRole == "Admin")
             {
                 var listModel = await _listRepo.DeleteListAsync(listIdDto.ListId);
@@ -215,11 +219,13 @@ public class ListController : ControllerBase
                 return NotFound("Board Not Found!");
             }
             var workspaceId = board.WorkspaceId;
-            if (string.IsNullOrEmpty(userId))
-            {
-                return NotFound("User Not Found!");
-            }
+            
             var isMember = await _membersRepo.IsAMember(userId, workspaceId);
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
+            if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+            {
+                return StatusCode(403, "The board is closed");
+            }
 
             if (isMember || userTokenRole == "Admin")
             {
@@ -252,12 +258,14 @@ public class ListController : ControllerBase
             {
                 return NotFound("Board Not Found!");
             }
-            if (string.IsNullOrEmpty(userId))
-            {
-                return NotFound("User Not Found!");
-            }
+
             var workspaceId = board.WorkspaceId;
             var isMember = await _membersRepo.IsAMember(userId, workspaceId);
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
+            if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+            {
+                return StatusCode(403, "The board is closed");
+            }
 
             if (isMember || userTokenRole == "Admin")
             {
@@ -301,12 +309,13 @@ public class ListController : ControllerBase
                 return NotFound("Board Not Found!");
             }
             var workspaceId = board.WorkspaceId;
-            if (string.IsNullOrEmpty(userId))
-            {
-                return NotFound("User Not Found!");
-            }
-
+            
             var isMember = await _membersRepo.IsAMember(userId, workspaceId);
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
+            if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+            {
+                return StatusCode(403, "The board is closed");
+            }
 
             if (isMember || userTokenRole == "Admin")
             {

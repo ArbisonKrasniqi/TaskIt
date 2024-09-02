@@ -27,7 +27,7 @@ namespace backend.Controllers
 
         //GET ALL
         [Authorize(AuthenticationSchemes = "Bearer")]
-        [Authorize(Policy = "AdminOnly")]
+        //[Authorize(Policy = "AdminOnly")]
         [HttpGet(template: "GetAllBackgrounds")]
         public async Task<IActionResult> GetAllBackgrounds()
         {

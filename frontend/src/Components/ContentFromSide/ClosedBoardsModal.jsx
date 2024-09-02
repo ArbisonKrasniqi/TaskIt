@@ -35,7 +35,6 @@ const ClosedBoardsModal = ({ open, onClose }) => {
         try{
             const board = {
                 boardId: boardId,
-                userId: mainContext.userInfo.userId,
             };
             const response = await postData('http://localhost:5157/backend/board/Reopen', board);
             console.log("Board reopened: ",response.data);

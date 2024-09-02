@@ -71,8 +71,8 @@ namespace backend.Controllers
 
             try
             {
-                var board = await _boardRepo.BoardExists(starredBoardDto.BoardId);
-                if (!board)
+                var board = await _boardRepo.GetBoardByIdAsync(starredBoardDto.BoardId);
+                if (board == null)
                 {
                     return NotFound("Board not found!");
                 }
@@ -80,6 +80,12 @@ namespace backend.Controllers
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
                 var isMember = await _membersRepo.IsAMember(starredBoardDto.UserId, starredBoardDto.WorkspaceId);
+                var isOwner = await _userRepo.UserOwnsWorkspace(userId, board.WorkspaceId);
+                if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+                {
+                    return StatusCode(403, "The board is closed");
+                }
+                
 
                 if (isMember || userId == starredBoardDto.UserId || userTokenRole == "Admin")
                 {
@@ -122,10 +128,7 @@ namespace backend.Controllers
 
                 var idUser = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
-                if (string.IsNullOrEmpty(idUser))
-                {
-                    return NotFound("User Not Found!");
-                }
+
                 if (idUser == userId || userTokenRole == "Admin")
                 {
                     var starredBoards = await _starredBoardRepo.GetStarredBoardsAsync(userId);

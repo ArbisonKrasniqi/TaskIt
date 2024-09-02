@@ -21,9 +21,11 @@ public class ChecklistController : ControllerBase
     private readonly IBoardRepository _boardRepo;
     private readonly IMembersRepository _membersRepo;
     private readonly IMapper _mapper;
+    private readonly IUserRepository _userRepo;
+    private readonly IWorkspaceRepository _workspaceRepo;
 
     public ChecklistController(IChecklistRepository checklistRepo, ITaskRepository taskRepo,
-        IListRepository listRepo,IBoardRepository boardRepo, IMembersRepository membersRepo,IMapper mapper)
+        IListRepository listRepo,IBoardRepository boardRepo, IMembersRepository membersRepo,IMapper mapper, IUserRepository userRepo, IWorkspaceRepository workspaceRepo)
     {
         _checklistRepo = checklistRepo;
         _taskRepo = taskRepo;
@@ -31,6 +33,8 @@ public class ChecklistController : ControllerBase
         _boardRepo = boardRepo;
         _membersRepo = membersRepo;
         _mapper = mapper;
+        _userRepo = userRepo;
+        _workspaceRepo = workspaceRepo;
     }
 
     [Authorize(AuthenticationSchemes = "Bearer")]
@@ -64,32 +68,44 @@ public class ChecklistController : ControllerBase
         try
         {
             var checklist = await _checklistRepo.GetChecklistByIdAsync(checklistId);
-            if (checklist ==null)
+            if (checklist == null)
             {
                 return NotFound("Checklist not found");
             }
             var task = await _taskRepo.GetTaskByIdAsync(checklist.TaskId);
-            if (!await _taskRepo.TaskExists(checklistId))
+            if (task == null)
             {
                 return NotFound("Task not found");
             }
 
             var list = await _listRepo.GetListByIdAsync(task.ListId);
-            if (!await _listRepo.ListExists(task.ListId))
+            if (list == null)
             {
                 return NotFound("List not found");
             }
 
             var board = await _boardRepo.GetBoardByIdAsync(list.BoardId);
-            if (!await _boardRepo.BoardExists(list.BoardId))
+            if (board == null)
             {
                 return NotFound("Board not found");
             }
 
+            var workspace = await _workspaceRepo.GetWorkspaceByIdAsync(board.WorkspaceId);
+            if (workspace == null)
+            {
+                return NotFound("Workspace not found");
+            }
             var workspaceId = board.WorkspaceId;
+            
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+            
             var isMember = await _membersRepo.IsAMember(userId, workspaceId);
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspace.WorkspaceId);
+            if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+            {
+                return StatusCode(403, "The board is closed");
+            }
             if (isMember || userTokenRole == "Admin")
             {
                 var checklistDto = _mapper.Map<ChecklistDTO>(checklist);
@@ -114,26 +130,39 @@ public class ChecklistController : ControllerBase
         try
         {
             var task = await _taskRepo.GetTaskByIdAsync(checklistDto.TaskId);
-            if (!await _taskRepo.TaskExists(checklistDto.TaskId))
+            if (task == null)
             {
                 return BadRequest("Task not found");
             }
 
             var list = await _listRepo.GetListByIdAsync(task.ListId);
-            if (!await _listRepo.ListExists(task.ListId))
+            if (list == null)
             {
                 return BadRequest("List not found");
             }
 
             var board = await _boardRepo.GetBoardByIdAsync(list.BoardId);
-            if (!await _boardRepo.BoardExists(list.BoardId))
+            if (board == null)
             {
                 return BadRequest("Board not found");
             }
             
+            var workspace = await _workspaceRepo.GetWorkspaceByIdAsync(board.WorkspaceId);
+            if (workspace == null)
+            {
+                return NotFound("Workspace not found");
+            }
+            
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+            
             var isMember = await _membersRepo.IsAMember(userId, checklistDto.TaskId);
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspace.WorkspaceId);
+            if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+            {
+                return StatusCode(403, "The board is closed");
+            }
+            
             if (isMember || userTokenRole == "Admin")
             {
                 var checklistModel = _mapper.Map<Checklist>(checklistDto);
@@ -160,26 +189,39 @@ public class ChecklistController : ControllerBase
         try
         {
             var task = await _taskRepo.GetTaskByIdAsync(checklist.TaskId);
-            if (!await _taskRepo.TaskExists(task.TaskId))
+            if (task == null)
             {
                 return NotFound("Task Not Found");
             }
 
             var list = await _listRepo.GetListByIdAsync(task.ListId);
-            if (!await _listRepo.ListExists(list.ListId))
+            if (list == null)
             {
                 return NotFound("List not found");
             }
             var board = await _boardRepo.GetBoardByIdAsync(list.BoardId);
-            if (!await _boardRepo.BoardExists(board.BoardId))
+            if (board == null)
             {
                 return NotFound("Board Not Found");
             }
             
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+
+            var workspace = await _workspaceRepo.GetWorkspaceByIdAsync(board.WorkspaceId);
+            if (workspace == null)
+            {
+                return NotFound("Workspace not found");
+            }
             var workspaceId = board.WorkspaceId;
+            
+            
             var isMember = await _membersRepo.IsAMember(userId, workspaceId);
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspace.WorkspaceId);
+            if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+            {
+                return StatusCode(403, "The board is closed");
+            }
             if (isMember || userTokenRole == "Admin")
             {
                 var checklistModel = await _checklistRepo.UpdateChecklistAsync(checklist);
@@ -240,8 +282,18 @@ public class ChecklistController : ControllerBase
                 return NotFound("Board not found");
             }
 
-            var workspace = board.WorkspaceId;
-            var isMember = await _membersRepo.IsAMember(userId, workspace);
+            var workspace = await _workspaceRepo.GetWorkspaceByIdAsync(board.WorkspaceId);
+            if (workspace == null)
+            {
+                return NotFound("Workspace not found");
+            }
+            var isMember = await _membersRepo.IsAMember(userId, workspace.WorkspaceId);
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspace.WorkspaceId);
+            if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+            {
+                return StatusCode(403, "The board is closed");
+            }
+            
             if (isMember || userTokenRole == "Admin")
             {
                 var checklistModel = await _checklistRepo.DeleteChecklistAsync(checklistIdDto.ChecklistId);
@@ -263,26 +315,38 @@ public class ChecklistController : ControllerBase
         try
         {
             var task = await _taskRepo.GetTaskByIdAsync(taskId);
-            if (!await _taskRepo.TaskExists(task.TaskId))
+            if (task == null)
             {
                 return NotFound("Task Not Found");
             }
 
             var list = await _listRepo.GetListByIdAsync(task.ListId);
-            if (!await _listRepo.ListExists(list.ListId))
+            if (list == null)
             {
                 return NotFound("List not found");
             }
             var board = await _boardRepo.GetBoardByIdAsync(list.BoardId);
-            if (!await _boardRepo.BoardExists(board.BoardId))
+            if (board == null)
             {
                 return NotFound("Board Not Found");
+            }
+
+            var workspace = await _workspaceRepo.GetWorkspaceByIdAsync(board.WorkspaceId);
+            if (workspace == null)
+            {
+                return NotFound("Workspace not found");
             }
             
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
             var workspaceId = board.WorkspaceId;
             var isMember = await _membersRepo.IsAMember(userId, workspaceId);
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspace.WorkspaceId);
+            if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+            {
+                return StatusCode(403, "The board is closed");
+            }
+            
             if (isMember || userTokenRole == "Admin")
             {
                 var checklists = await _checklistRepo.GetChecklistByTaskIdAsync(taskId);
@@ -333,10 +397,23 @@ public class ChecklistController : ControllerBase
             {
                 return NotFound("Board not found ");
             }
-            var workspaceId = board.WorkspaceId;
+
+            var workspace = await _workspaceRepo.GetWorkspaceByIdAsync(board.WorkspaceId);
+            if (workspace == null)
+            {
+                return NotFound("Workspace not found");
+            }
+            
+            var workspaceId = workspace.WorkspaceId;
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
             var isMember = await _membersRepo.IsAMember(userId, workspaceId);
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspace.WorkspaceId);
+            if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+            {
+                return StatusCode(403, "The board is closed");
+            }
+            
             if (isMember || userTokenRole == "Admin")
             {
                 var checklistModel = await _checklistRepo.DeleteChecklistByTaskIdAsync(taskIdDto.TaskId);

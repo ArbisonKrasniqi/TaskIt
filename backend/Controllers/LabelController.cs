@@ -23,8 +23,9 @@ public class LabelController : ControllerBase{
     private readonly IMapper _mapperRepo;
     private readonly IBoardRepository _boardRepo;
     private readonly IListRepository _listRepo;
+    private readonly IWorkspaceRepository _workspaceRepo;
 
-    public LabelController (ILabelRepository labelRepo, IUserRepository userRepo, IMembersRepository memberRepo, IMapper mapperRepo, IBoardRepository boardRepo, IListRepository listRepo){
+    public LabelController (ILabelRepository labelRepo, IUserRepository userRepo, IMembersRepository memberRepo, IMapper mapperRepo, IBoardRepository boardRepo, IListRepository listRepo, IWorkspaceRepository workspaceRepo){
        
         _labelRepo = labelRepo;
         _userRepo = userRepo;
@@ -32,12 +33,12 @@ public class LabelController : ControllerBase{
         _mapperRepo = mapperRepo;
         _boardRepo = boardRepo;
         _listRepo = listRepo;
+        _workspaceRepo = workspaceRepo;
     }
 
 
     [Authorize(AuthenticationSchemes = "Bearer")]
     [Authorize(Policy = "AdminOnly")]
-
     [HttpGet("GetAllLabels")]
     public async Task<IActionResult> GetAllLabels(){
         try{
@@ -56,25 +57,33 @@ public class LabelController : ControllerBase{
 
     [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpPost("CreateLabel")]
-
     public async Task<IActionResult> CreateLabel(CreateLabelRequestDTO labelDTO){
         if(!ModelState.IsValid){
             return BadRequest(ModelState);
         }
         try{
-            
-            if(!await _boardRepo.BoardExists(labelDTO.BoardId)){
-               
-                return NotFound("Board not found!");
+            var board = await _boardRepo.GetBoardByIdAsync(labelDTO.BoardId);
+            if (board == null)
+            {
+                return NotFound("Board not found");
             }
 
+            var workspace = await _workspaceRepo.GetWorkspaceByIdAsync(board.WorkspaceId);
+            if (workspace == null)
+            {
+                return NotFound("Workspace not found");
+            }
+            
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+            var isMember = await _memberRepo.IsAMember(userId, workspace.WorkspaceId);
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspace.WorkspaceId);
+            if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+            {
+                return StatusCode(403, "The board is closed");
+            }
 
-            var board = await _boardRepo.GetBoardByIdAsync(labelDTO.BoardId);
-            var workspaceId = board.WorkspaceId;
-            var isMember = await _memberRepo.IsAMember(userId, workspaceId);
-
+            
             if(isMember || userTokenRole == "Admin"){
                 
                 //maps the dto to the label model
@@ -88,14 +97,13 @@ public class LabelController : ControllerBase{
 
             return StatusCode(401, "You are not authorized!");
         }catch(Exception e){
-            return StatusCode(401, "You are not athorized!");
+            return StatusCode(500, "Internal server error");
         }
 
     }
 
     [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpGet("GetLabelById")]
-
     public async Task<IActionResult> GetLabelById (int labelId){
         try{
 
@@ -108,9 +116,16 @@ public class LabelController : ControllerBase{
                 return NotFound("Board not found");
             }
 
+            var workspace = await _workspaceRepo.GetWorkspaceByIdAsync(board.WorkspaceId);
+            if (workspace == null)
+            {
+                return NotFound("Workspace not found");
+            }
+            
+            
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
-            var isMember = await _memberRepo.IsAMember(userId, labelId);
+            var isMember = await _memberRepo.IsAMember(userId, workspace.WorkspaceId);
 
             if(isMember || userTokenRole == "Admin"){
                 var labelDto = _mapperRepo.Map<LabelDto>(label);
@@ -119,29 +134,57 @@ public class LabelController : ControllerBase{
 
             return StatusCode(401, "You are not authorized!");
         }catch(Exception e){
-            return StatusCode(500, "Internal server error!"+e.Message);
+            return StatusCode(500, "Internal server error!");
         }
     }
 
 
     [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpPut("UpdateLabel")]
-
     public async Task<IActionResult> UpdateLabel(UpdateLabelRequestDTO updateDto){
         if(!ModelState.IsValid){
             return BadRequest(ModelState);
         }
-        try{
+        try
+        {
 
-            if(!await _boardRepo.BoardExists(updateDto.BoardId)){
-                return NotFound("Board not found!");
+            var label = await _labelRepo.GetLabelByIdAsync(updateDto.LabelId);
+            if (label == null)
+            {
+                return NotFound("Label not found");
             }
 
+            var board = await _boardRepo.GetBoardByIdAsync(label.BoardId);
+            if (board == null)
+            {
+                return NotFound("Board not found");
+            }
+
+            var workspace = await _workspaceRepo.GetWorkspaceByIdAsync(board.WorkspaceId);
+            if (workspace == null)
+            {
+                return NotFound("Workspace not found");
+            }
+
+            
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
-            var isMember = await _memberRepo.IsAMember(userId, updateDto.LabelId);
-            if(isMember || userTokenRole == "Admin"){
 
+            var workspaceChanged = board.BoardId != updateDto.BoardId;
+            if (workspaceChanged && userTokenRole != "Admin")
+            {
+                return StatusCode(401, "You are not authorized");
+            }
+            
+            
+            var isMember = await _memberRepo.IsAMember(userId, workspace.WorkspaceId);
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspace.WorkspaceId);
+            if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+            {
+                return StatusCode(403, "The board is closed");
+            }
+            
+            if(isMember || userTokenRole == "Admin"){
                 var labelModel = await _labelRepo.UpdateLabelAsync(updateDto);
                 if(labelModel == null){
                     return NotFound("Label not found!");
@@ -153,11 +196,10 @@ public class LabelController : ControllerBase{
             }
             return StatusCode(401, "You are not authorized!");
         }catch(Exception e){
-            return StatusCode(500, "Internal server error: " + e.Message);
+            return StatusCode(500, "Internal server error");
         }
     }
-
-
+    
     [Authorize(AuthenticationSchemes = "Bearer")] 
     [HttpDelete("DeleteLabel")]
 
@@ -165,26 +207,50 @@ public class LabelController : ControllerBase{
         if(!ModelState.IsValid){
             return BadRequest(ModelState);
         }
-        try{
+        try
+        {
+            var label = await _labelRepo.GetLabelByIdAsync(labelIdDTO.LabelId);
+            if (label == null)
+            {
+                return NotFound("Label not found");
+            }
+
+            var board = await _boardRepo.GetBoardByIdAsync(label.BoardId);
+            if (board == null)
+            {
+                return NotFound("Board not found");
+            }
+
+            var workspace = await _workspaceRepo.GetWorkspaceByIdAsync(board.WorkspaceId);
+            if (workspace == null)
+            {
+                return NotFound("Workspace not found");
+            }
+            
             
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+            
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspace.WorkspaceId);
+            if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+            {
+                return StatusCode(403, "The board is closed");
+            }
         
-            if(await _userRepo.UserIsMember(userId, labelIdDTO.LabelId) || userTokenRole == "Admin"){
+            if(await _userRepo.UserIsMember(userId, workspace.WorkspaceId) || userTokenRole == "Admin"){
                 
-                var labelModel = await _labelRepo.GetLabelByIdAsync(labelIdDTO.LabelId);
+                var labelModel = await _labelRepo.DeleteLabelAsync(labelIdDTO.LabelId);
                 if(labelModel == null){
                     return NotFound("Label not found!");
                 }
 
                 return Ok("Label Deleted!");
-                
             }
 
             return StatusCode(401, "You are not authorized!");
 
         }catch(Exception e){
-            return StatusCode(500, "Internal server error: " + e.Message);
+            return StatusCode(500, "Internal server error");
         }
 
     }

@@ -175,9 +175,7 @@ export const WorkspaceProvider = ({ children }) => {
     const handleCloseBoard = async (boardId) => {
         try{
             const closedBoard = {
-                boardId: boardId,
-                userId: mainContext.userInfo.userId,
-                
+                boardId: boardId,                
             };
             const response = await postData('http://localhost:5157/backend/board/Close', closedBoard);
             console.log("Board closed ",response.data);
@@ -306,10 +304,12 @@ export const WorkspaceProvider = ({ children }) => {
 
 
     useEffect(()=>{
+        if (WorkspaceId) {
             getTasks();
             console.log("Workspace id ",WorkspaceId);
             console.log("Tasks fetched: ",tasks);
-        }, [WorkspaceId]);
+        }
+    }, [WorkspaceId]);
     
         const getInitials = (firstName, lastName) => {
             if (!firstName || !lastName) {
@@ -368,7 +368,10 @@ export const WorkspaceProvider = ({ children }) => {
         };
     
         useEffect(() => {
-            getSentInvites();
+            if (WorkspaceId) {
+                getSentInvites();
+            }
+            
         }, [WorkspaceId, workspace]);
     
     
