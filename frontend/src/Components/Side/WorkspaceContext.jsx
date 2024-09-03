@@ -2,7 +2,7 @@ import React, {createContext, useContext , useState, useEffect} from 'react';
 import { getDataWithId, deleteData, postData, getDataWithIds } from '../../Services/FetchService';
 import myImage from './background.jpg';
 import { MainContext } from '../../Pages/MainContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 export const WorkspaceContext = createContext();
 
@@ -35,6 +35,12 @@ export const WorkspaceProvider = ({ children }) => {
     const [isInviteModalOpen, setIsInviteModalOpen]= useState(false);
     const userId = mainContext.userInfo.userId;
     const WorkspaceId = mainContext.workspaceId;
+    const [board, setBoard] = useState(null);
+    const {boardId }= useParams();
+    // const boardId = mainContext.boardId;
+    const [lists, setLists] = useState([]); 
+    const [list, setList] = useState(null);
+    const{listId} = useParams();
 
     useEffect(() => {
         const getWorkspaces = async () => {
@@ -49,7 +55,7 @@ export const WorkspaceProvider = ({ children }) => {
                         console.log("There are no workspaces");
                     }
                 }
-                //Waiting for userId
+                //Waiting for userIdn
             } catch (error) {
                 console.error("There has been an error fetching workspaces")
                 setWorkspaces([]);
@@ -384,14 +390,65 @@ export const WorkspaceProvider = ({ children }) => {
             }
         };
 
+        useEffect(()=>{
+        
+            const getBoard = async () =>{
+                try {
+                    if(boardId){
+                        const boardResponse = await getDataWithId('/backend/board/GetBoardByID?id',boardId);
+                        const boardData = boardResponse.data;
+                        setBoard(boardData);
+                    }
+                    
+                } catch (error) {
+                    console.log(error.response.data);
+                    navigate('/main/workspaces');
+                }
+            };
+            getBoard();
+        },[boardId, userId, mainContext.userInfo.accessToken]);
 
+        const handleCreateList = (newList) =>{
+            setLists((prevLists) => [...prevLists, newList]);
+        };
 
+        useEffect(()=> {
+            const getLists = async () => {
+                try {
+                    if (boardId) {
+                        const listsResponse = await getDataWithId("/backend/list/GetListByBoardId?boardId",boardId);
+                        const listData = listsResponse.data;
+                        if (listData) {
+                            setLists(listData);
+                        } else {
+                            console.log("There are no lists");
+                        }
+                    }
+                } catch (error) {
+                    console.error("There has been an error fetching lists")
+                }
+            };
+            getLists();
+        },[boardId,mainContext.userInfo.accessToken]
 
+        );
 
-
-
-
-
+        useEffect(() =>{
+            const getList = async () => {
+                try {
+                    if(listId){
+                        const listResponse = await getDataWithId('http://localhost:5157/backend/list/GetListById',listId);
+                        const listData = listResponse.data;
+                        setList(listData);
+                    }
+                } catch (error) {
+                    console.log(error.response.data);
+                    navigate('/main/workspaces');
+                    
+                }
+            };
+            getList();
+        },[listId, userId ,mainContext.userInfo.accessToken]);
 
 
 
@@ -466,7 +523,13 @@ export const WorkspaceProvider = ({ children }) => {
             setInviteeDetails, 
             workspaceTitles, 
             setWorkspaceTitles,
-            getInitialsFromFullName
+            getInitialsFromFullName,
+            board,
+            lists,
+            setLists,
+            handleCreateList,
+            listId,
+            list
         }}>
             {children}
         </WorkspaceContext.Provider>

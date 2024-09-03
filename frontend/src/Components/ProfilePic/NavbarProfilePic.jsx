@@ -2,6 +2,7 @@ import React, { useContext } from 'react'
 import { DropdownContext } from '../Navbar/Navbar';
 import { MainContext } from '../../Pages/MainContext';
 import { WorkspaceContext } from '../Side/WorkspaceContext';
+import { useNavigate } from 'react-router-dom';
 const NavbarProfilePic = () => {
 
     const navigate = useNavigate();
