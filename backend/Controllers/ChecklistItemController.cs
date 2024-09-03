@@ -390,4 +390,29 @@ public class ChecklistItemController : ControllerBase
         }
     }
 
+    [HttpPut(template:"ChangeChecklistItemChecked")]
+    public async Task<IActionResult> ChangeChecklistItemChecked(int checklistItemId)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        try
+        {
+            if (checklistItemId <= 0)
+            {
+                return BadRequest("Wrong checklistItem Id");
+            }
+
+            var checklistItem = await _checklistItemRepo.ChangeChecklistItemChecked(checklistItemId);
+
+            return Ok("ChecklistItem changed to: "+checklistItem.Checked);
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, "Internal Server Error!"+e.Message);
+        }
+    }
+
 }

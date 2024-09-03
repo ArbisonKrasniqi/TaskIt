@@ -22,7 +22,6 @@ const App = () => {
           <Route path="/dashboard/*" element={<Dashboard/>}/>
           <Route path="/preview" element={<Preview/>}/>
           <Route path="/board/:id" element={<Boards/>} />
-          <Route path="/task" element={<TaskModal/>}/>
         </Routes>
         </Suspense>
       </BrowserRouter>

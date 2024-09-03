@@ -36,6 +36,8 @@ export const WorkspaceProvider = ({ children }) => {
     const userId = mainContext.userInfo.userId;
     const WorkspaceId = mainContext.workspaceId;
 
+    const [checklists, setChecklists] = useState([]);
+
     useEffect(() => {
         const getWorkspaces = async () => {
             try {
@@ -410,10 +412,41 @@ export const WorkspaceProvider = ({ children }) => {
         };
 
 
+        const taskId = 1;
+            const getChecklistsByTask = async () => {
+                
+                try {
+                    const response = await getDataWithId('http://localhost:5157/backend/checklist/GetChecklistByTaskId?taskId', taskId); //static for now
+                    const data = response.data;
+                    setChecklists(data);
+                    fetchChecklistItems(data);
+                    
+                } catch (error) {
+                    console.error("Error fetching checklists: ",error.message);
+                    
+                }
+            }
 
+            const [checklistItems, setChecklistItems] = useState([]);
 
+            const fetchChecklistItems = async (checklists) => {
+                const items = {};
+                for (const checklist of checklists) {
+                    
+                  try {
+                    const response = await getDataWithId('http://localhost:5157/backend/checklistItems/GetChecklistItemByChecklistId?checklistId', checklist.checklistId);
+                    items[checklist.checklistId] = response.data; // Store items by checklist ID
+                    
+                  } catch (error) {
+                    console.error(`Error fetching items for checklist ${checklist.id}: `, error.message);
+                  }
+                }
+                setChecklistItems(items);
+              };
 
-
+            useEffect(() => {
+            getChecklistsByTask();
+        },[WorkspaceId, userId, workspace, mainContext.userInfo.accessToken]);
 
 
 
@@ -494,7 +527,10 @@ export const WorkspaceProvider = ({ children }) => {
             getInitialsFromFullName,
             memberDetails,
             setMemberDetails,
-            handleRemoveMember
+            handleRemoveMember,
+            checklists,
+            checklistItems,
+            setChecklistItems
         }}>
             {children}
         </WorkspaceContext.Provider>
