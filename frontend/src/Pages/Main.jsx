@@ -17,6 +17,7 @@ import LoadingModal from '../Components/Modal/LoadingModal.jsx';
 import Members from '../Components/ContentFromSide/Members.jsx';
 import WithAuth from "../Services/WithAuth.jsx";
 import TaskModal from '../Components/TaskModal/TaskModal.jsx';
+import Board from '../Components/BoardContent/Board.jsx';
 
 const Main = () => {
     const {opened, workspaceId, boardId, taskId} = useParams();
@@ -77,6 +78,7 @@ const Main = () => {
                         {/* Conditional rendering based on the value of `opened` */}
                         <div className='w-full flex-grow h-full p-0'>
                             {opened === 'boards' && <Boards />}
+                            {opened === 'board' && <Board />}
                             {opened === 'workspaceSettings' && <WorkspaceSettings/>}
                             {opened === 'workspaces' && <Workspaces/>}
                             {opened === 'table' && <Table/>}
