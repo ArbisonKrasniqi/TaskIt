@@ -95,7 +95,7 @@ const UsersTable = () => {
                                     <td className="px-6 py-4">{user.role}</td>
                                     <td className="px-6 py-4">
                                         <CustomButton 
-                                            onClick={() => handleRowClick(user.Id)}
+                                            onClick={() => handleRowClick(user.id)}
                                             type="button"
                                             text="Open"
                                         />

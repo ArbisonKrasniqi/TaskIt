@@ -3,9 +3,11 @@ import { putData } from '../../../../Services/FetchService';
 import { UpdateContext } from '../InvitesTable';
 import {InvitesContext} from "../InvitesList";
 import CustomButton from '../../Buttons/CustomButton';
+import { DashboardContext } from '../../../../Pages/dashboard';
 const UpdateInviteModal = (props)=>{
     const updateContext = useContext(UpdateContext);
     const invitesContext = useContext(InvitesContext);
+    const dashboardContext = useContext(DashboardContext);
 
     const [workspaceId, setWorkspaceId]= useState(updateContext.workspaceId);
     const [inviterId, setInviterId]= useState(updateContext.inviterId);
@@ -44,8 +46,8 @@ const UpdateInviteModal = (props)=>{
             invitesContext.setInvites(updatedInvites);
             props.setShowUpdateInfoModal(false);
         }catch(error){
-            invitesContext.setErrorMessage(error.message);
-            invitesContext.setShowInvitesErrorModal(true);
+            dashboardContext.setDashboardErrorMessage(error.message);
+            dashboardContext.setShowDashboardErrorModal(true);
             invitesContext.getInvites();
             props.setShowUpdateInfoModal(false);
         }

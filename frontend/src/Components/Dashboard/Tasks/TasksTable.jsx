@@ -33,6 +33,11 @@ const TasksTable = () => {
         deleteTask();
     }
 
+    const handleTaskRowClick = taskId => {
+        console.log(taskId);
+        navigate(`/dashboard/task/${taskId}`);
+    }
+
     const handleSearchChange = (event) => {
         setSearchQuery(event.target.value.toLowerCase());
     }
@@ -106,6 +111,11 @@ const TasksTable = () => {
                                     <td className="px-6 py-4">{task.dueDate}</td>
                                     <td className="px-6 py-4">{task.dateAdded}</td>
                                     <td className="px-6 py-4">
+                                    <CustomButton 
+                                            onClick={() => handleTaskRowClick(task.taskId)}
+                                            type="button"
+                                            text="Open"
+                                        />
                                         <UpdateContext.Provider value={task}>
                                             <UpdateTaskButton/>
                                         </UpdateContext.Provider>

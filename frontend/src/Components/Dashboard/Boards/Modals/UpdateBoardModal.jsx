@@ -39,6 +39,7 @@ const UpdateBoardModal = (props) => {
                 if (board.boardId === data.boardId) {
                     return {
                         ...board,
+                        isClosed: isClosed,
                         title: title,
                         backgroundId: backgroundId,
                     };

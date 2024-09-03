@@ -3,9 +3,11 @@ import { putData } from '../../../../Services/FetchService';
 import { UpdateContext } from '../MembersTable';
 import {MembersContext} from "../MembersList";
 import CustomButton from '../../Buttons/CustomButton';
+import { DashboardContext } from '../../../../Pages/dashboard';
 const UpdateMemberModal = (props)=>{
     const updateContext = useContext(UpdateContext);
     const membersContext = useContext(MembersContext);
+    const dashboardContext = useContext(DashboardContext);
 
     const [userId, setUserId]= useState(updateContext.userId);
     const [dateJoined, setDateJoined]= useState(updateContext.dateJoined);
@@ -41,8 +43,8 @@ const UpdateMemberModal = (props)=>{
             membersContext.setMembers(updatedMembers);
             props.setShowUpdateInfoModal(false);
         }catch(error){
-            membersContext.setErrorMessage(error.message);
-            membersContext.setShowMembersErrorModal(true);
+            dashboardContext.setDashboardErrorMessage(error.message);
+            dashboardContext.setShowDashboardErrorModal(true);
             membersContext.getMembers();
             props.setShowUpdateInfoModal(false);
         }
