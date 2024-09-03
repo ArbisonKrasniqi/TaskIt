@@ -15,6 +15,7 @@ using backend.Mappers.Board;
 using backend.Mappers.Invite;
 using backend.Mappers.Member;
 using backend.Mappers.StarredBoard;
+using backend.Mappers.TaskMember;
 using backend.Mappers.User;
 using backend.Mappers.Workspace;
 
@@ -124,6 +125,7 @@ builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddScoped<IBackgroundRepository, BackgroundRepository>();
 builder.Services.AddScoped<IStarredBoardRepository, StarredBoardRepository>();
 builder.Services.AddScoped<IInviteRepository, InviteRepository>();
+builder.Services.AddScoped<ITaskMemberRepository, TaskMemberRepository>();
 builder.Services.AddScoped<IChecklistRepository, ChecklistRepository>();
 builder.Services.AddScoped<IChecklistItemRepository, ChecklistItemRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
@@ -148,6 +150,8 @@ builder.Services.AddAutoMapper(typeof(WorkspaceProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(BackgroundProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(MemberProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(StarredBoardProfile).Assembly);
+builder.Services.AddAutoMapper(typeof(TaskMemberProfile));
+
 builder.Services.AddAutoMapper(typeof(InviteProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(UserProfile).Assembly);
 var app = builder.Build();
