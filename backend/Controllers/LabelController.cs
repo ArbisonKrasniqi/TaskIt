@@ -4,6 +4,7 @@ using backend.Mappers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using AutoMapper;
+using backend.DTOs.Board.Input;
 using backend.DTOs.Task;
 using backend.Repositories;
 using backend.Models;
@@ -188,7 +189,127 @@ public class LabelController : ControllerBase{
         }
 
     }
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    [HttpGet("GetLabelsByBoardId")]
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    public async Task<IActionResult> GetLabelsByBoardId(BoardIdDto boardIdDto)
+    {
+        try
+        {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+            var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return NotFound("User Not Found!");
+            }
 
+            var board = await _boardRepo.GetBoardByIdAsync(boardIdDto.BoardId);
+            if (board == null)
+            {
+                return NotFound("Board Not Found!");
+            }
+
+            var workspaceId = board.WorkspaceId;
+            if (workspaceId == null)
+            {
+                return NotFound("Workspace Not Found!");
+            }
+
+            var isMember = await _memberRepo.IsAMember(userId,workspaceId);
+            if (isMember || userTokenRole == "Admin")
+            {
+                var labels = await _labelRepo.GetLabelsByBoardIdAsync(boardIdDto.BoardId); // Await here
+                return Ok(labels);
+            }
+            return StatusCode(401, "You are not authorized!");
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, "Internal Server Error"+e.Message);
+        }
+    }
+    
 
 
 }

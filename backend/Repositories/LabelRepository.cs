@@ -64,4 +64,23 @@ public class LabelRepository : ILabelRepository{
         await _context.SaveChangesAsync();
         return labelModel;
     }
+    
+    
+    ///GET LABELS BY WORKSPACE ID
+    
+    
+    public async Task<List<LabelInfoDto>> GetLabelsByBoardIdAsync(int boardId)
+    {
+        var tasks = await (from label in _context.Label
+            where label.BoardId == boardId
+            select new LabelInfoDto
+            {
+                LabelId = label.LabelId,
+                Name = label.Name,
+                Color = label.Color,
+                BoardId = label.BoardId
+            }).ToListAsync();
+        
+        return tasks;
+    }
 }

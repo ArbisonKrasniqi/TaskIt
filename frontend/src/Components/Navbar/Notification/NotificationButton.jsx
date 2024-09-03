@@ -55,7 +55,7 @@ const NotificationButton = (props) => {
             console.log("Invite status updated ",response.data);
             getInvites();
             if(status === "Accepted"){
-                navigate(`/boards/${workspaceId}`);
+                navigate(`/main/boards/${workspaceId}`);
             }
         }catch(error){
             console.error("Error updating invite status: ", error.message);

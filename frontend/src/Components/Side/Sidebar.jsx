@@ -35,9 +35,9 @@ const Sidebar = () => {
         const [boardToClose, setBoardToClose] = useState(null);
      
 const Menus = [
-    {title: "Boards", tag: "CiViewBoard", path: `/boards/${workspace?.workspaceId}`},
-    {title: "Members", tag: "IoPersonOutline", path: `/members/${workspace?.workspaceId}`},
-    {title: "Workspace settings", tag: "IoIosSettings", path: `/workspaceSettings/${workspace?.workspaceId}`},
+    {title: "Boards", tag: "CiViewBoard", path: `/main/boards/${workspace?.workspaceId}`},
+    {title: "Members", tag: "IoPersonOutline", path: `/main/members/${workspace?.workspaceId}`},
+    {title: "Workspace settings", tag: "IoIosSettings", path: `/main/workspaceSettings/${workspace?.workspaceId}`},
  ]
 const tagComponents = {
     CiViewBoard: <CiViewBoard/>,
@@ -47,8 +47,8 @@ const tagComponents = {
     LuCalendarDays: <LuCalendarDays/>,
     };
 const WorkspaceViews = [
-    {title: "Table", tag: "PiTable", path: `/table/${workspace?.workspaceId}`},
-    {title: "Calendar", tag: "LuCalendarDays", path: `/calendar/${workspace?.workspaceId}`},
+    {title: "Table", tag: "PiTable", path: `/main/table/${workspace?.workspaceId}`},
+    {title: "Calendar", tag: "LuCalendarDays", path: `/main/calendar/${workspace?.workspaceId}`},
   ]
 
   const handleMenuClick = (path) => {
