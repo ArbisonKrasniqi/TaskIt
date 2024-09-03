@@ -4,12 +4,14 @@ import CustomButton from '../Buttons/CustomButton';
 import { TasksContext } from './TasksList';
 import { deleteData } from '../../../Services/FetchService';
 import { useNavigate } from 'react-router-dom';
+import { DashboardContext } from '../../../Pages/dashboard';
 
 export const UpdateContext = createContext();
 
 const TasksTable = () => {
     const navigate = useNavigate();
     const tasksContext = useContext(TasksContext);
+    const dashboardContext = useContext(DashboardContext);
     const [searchQuery, setSearchQuery] = useState('');
 
     const HandleTaskDelete = (id) => {
@@ -23,8 +25,8 @@ const TasksTable = () => {
                 const updatedTasks = tasksContext.tasks.filter(task => task.taskId !== id);
                 tasksContext.setTasks(updatedTasks);
             } catch (error) {
-                tasksContext.setErrorMessage(error.message + id);
-                tasksContext.setShowTasksErrorModal(true);
+                dashboardContext.setDashboardErrorMessage(error.message + id);
+                dashboardContext.setShowDashboardErrorModal(true);
                 tasksContext.getTasks();
             }
         }
@@ -105,13 +107,12 @@ const TasksTable = () => {
                                     <td className="px-6 py-4">{task.dateAdded}</td>
                                     <td className="px-6 py-4">
                                         <UpdateContext.Provider value={task}>
-                                            <UpdateTaskButton onClick={(e) => e.stopPropagation()} />
+                                            <UpdateTaskButton/>
                                         </UpdateContext.Provider>
                                         <CustomButton
                                             color="red"
                                             text="Delete"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
+                                            onClick={() => {
                                                 HandleTaskDelete(task.taskId);
                                             }}
                                         />

@@ -3,11 +3,13 @@ import { MembersContext } from "./MembersList";
 import CustomButton from '../Buttons/CustomButton';
 import { deleteData } from '../../../Services/FetchService';
 import UpdateMemberButton from "./Buttons/UpdateMemberButton";
+import { DashboardContext } from '../../../Pages/dashboard';
 
 export const UpdateContext = createContext();
 
 const MembersTable = () => {
     const membersContext = useContext(MembersContext);
+    const dashboardContext = useContext(DashboardContext);
     const [searchQuery, setSearchQuery] = useState('');
 
     const formatDate = (dateStr) => {
@@ -24,8 +26,8 @@ const MembersTable = () => {
                 const updatedMembers = membersContext.members.filter(member => member.memberId !== id);
                 membersContext.setMembers(updatedMembers);
             } catch (error) {
-                membersContext.setErrorMessage(error.message + id);
-                membersContext.setShowMembersErrorModal(true);
+                dashboardContext.setDashboardErrorMessage(error.message + id);
+                dashboardContext.setShowDashboardErrorModal(true);
                 membersContext.getMembers();
             }
         }

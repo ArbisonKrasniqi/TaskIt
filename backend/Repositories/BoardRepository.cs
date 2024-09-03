@@ -69,7 +69,6 @@ namespace backend.Repositories
 
             existingBoard.Title = boardDto.Title;
             existingBoard.BackgroundId = boardDto.BackgroundId;
-            existingBoard.WorkspaceId = boardDto.WorkspaceId;
 
             await _context.SaveChangesAsync();
             return existingBoard;

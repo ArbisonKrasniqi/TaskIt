@@ -1,34 +1,33 @@
-import {useState, useEffect, createContext} from "react";
+import {useState, useEffect, useContext, createContext} from "react";
 import { getData } from "../../../Services/FetchService";
 import StarredBoardsTable from "./StarredBoardsTable";
-import StarredBoardsErrorModal from "./Modals/StarredBoardsErrorModal"
+import { DashboardContext } from "../../../Pages/dashboard";
+import DashboardErrorModal from "../DashboardErrorModal";
+
 export const StarredBoardsContext = createContext();
 
 const StarredBoardsList = () =>{
     const [StarredBoards, setStarredBoards] = useState([]);
-    const [showStarredBoardsErrorModal, setShowStarredBoardsErrorModal] =useState(false);
-    const [errorMessage, setErrorMessage] = useState("There has been a server error!");
-
+    const dashboardContext = useContext(DashboardContext);
     const getStarredBoards = async ()=>{
         try{
             const response = await getData('http://localhost:5157/backend/starredBoard/GetAllStarredBoards');
             setStarredBoards(response.data);
         }catch(error){
-            setErrorMessage(error.message);
-            setShowStarredBoardsErrorModal(true);
+            dashboardContext.setDashboardErrorMessage(error.message);
+            dashboardContext.setShowStarredBoardsErrorModal(true);
         }
     };
     useEffect(()=>{
         getStarredBoards();
     }, []);
 
-    const contextValue = {StarredBoards, setStarredBoards, getStarredBoards, 
-        showStarredBoardsErrorModal, setShowStarredBoardsErrorModal, errorMessage, setErrorMessage};
+    const contextValue = {StarredBoards, setStarredBoards, getStarredBoards};
 
         return(
             <StarredBoardsContext.Provider value={contextValue}>
                 <StarredBoardsTable/>
-                {showStarredBoardsErrorModal && <StarredBoardsErrorModal/>}
+                {dashboardContext.showDashboardErrorModal && <DashboardErrorModal/>}
             </StarredBoardsContext.Provider>
         );
 }

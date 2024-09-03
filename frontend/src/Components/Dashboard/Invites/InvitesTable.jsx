@@ -3,12 +3,14 @@ import UpdateInviteButton from './Buttons/UpdateInviteButton';
 import { InvitesContext } from './InvitesList';
 import CustomButton from "../Buttons/CustomButton";
 import { deleteData } from "../../../Services/FetchService";
+import { DashboardContext } from "../../../Pages/dashboard";
 
 export const UpdateContext = createContext();
 
 const InvitesTable = () => {
     const invitesContext = useContext(InvitesContext);
     const [searchQuery, setSearchQuery] = useState('');
+    const dashboardContext = useContext(DashboardContext);
 
     const formatDate = (dateStr) => {
         const date = new Date(dateStr);
@@ -24,8 +26,8 @@ const InvitesTable = () => {
                 const updatedInvites = invitesContext.invites.filter(invite => invite.inviteId !== id);
                 invitesContext.setInvites(updatedInvites);
             } catch (error) {
-                invitesContext.setErrorMessage(error.message + id);
-                invitesContext.setShowInvitesErrorModal(true);
+                dashboardContext.setDashboardErrorMessage(error.message + id);
+                dashboardContext.setShowDashboardErrorModal(true);
                 invitesContext.getInvites();
             }
         }

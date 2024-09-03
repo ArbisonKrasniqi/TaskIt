@@ -3,10 +3,12 @@ import { UpdateContext } from '../UsersTable';
 import { putData } from '../../../../Services/FetchService';
 import { UserContext } from '../UsersList';
 import CustomButton from '../../Buttons/CustomButton';
+import { DashboardContext } from '../../../../Pages/dashboard';
 
 const EditPasswordModal = (props) => {
     const updateContext = useContext(UpdateContext);
     const userContext = useContext(UserContext);
+    const dashboardContext = useContext(DashboardContext);
 
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -15,13 +17,13 @@ const EditPasswordModal = (props) => {
         e.preventDefault();
         // Handle form submission here
         if (newPassword.length === 0 || confirmPassword.length === 0) {
-            userContext.setErrorMessage("Both forms are required");
-            userContext.setShowUserErrorModal(true);
+            dashboardContext.setDashboardErrorMessage("Both forms are required");
+            dashboardContext.setShowDashboardErrorModal(true);
             return;
         }
         if (!(newPassword === confirmPassword)) {
-            userContext.setErrorMessage("Passwords do not equal each other!");
-            userContext.setShowUserErrorModal(true);
+            dashboardContext.setDashboardErrorMessage("Passwords do not equal each other!");
+            dashboardContext.setShowDashboardErrorModal(true);
             return;
         }
 
@@ -38,8 +40,8 @@ const EditPasswordModal = (props) => {
         } catch (error) {
             let messages = error.message.split(','); // Assuming messages are separated by commas
             let message = messages.join('');
-            userContext.setErrorMessage(message);
-            userContext.setShowUserErrorModal(true);
+            dashboardContext.setDashboardErrorMessage(message);
+            dashboardContext.setShowDashboardErrorModal(true);
         }
     }
 

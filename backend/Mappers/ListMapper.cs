@@ -30,8 +30,7 @@ public static class ListMapper
     {
         return new List
         {
-            Title = listDto.Title,
-            BoardId = listDto.BoardId
+            Title = listDto.Title
         };
     }
 }

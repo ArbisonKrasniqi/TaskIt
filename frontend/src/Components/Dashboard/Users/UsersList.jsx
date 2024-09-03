@@ -1,19 +1,16 @@
 import { useState, useEffect, createContext } from 'react';
 import { getData } from '../../../Services/FetchService.jsx';
 import UsersTable from './UsersTable.jsx';
-import UserErrorModal from './Modals/UserErrorModal.jsx';
-
+import DashboardErrorModal from '../DashboardErrorModal.jsx';
+import { useContext } from 'react';
+import { DashboardContext } from '../../../Pages/dashboard.jsx';
 
 export const UserContext = createContext();
 
 const UsersList = () => {
+    const dashboardContext = useContext(DashboardContext);
     //Ketu do te ruhet lista e usereve qe vjen nga API
     const [users, setUsers] = useState(null);
-
-    //showUserErrorModal e ka vleren false ne fillim sepse nuk ka asnje error
-    const [showUserErrorModal, setShowUserErrorModal] = useState(false);
-    //Error message do te perdoret per te vendosur vlera te ndryshme ne showUserErrorModal
-    const [errorMessage, setErrorMessage] = useState("There has been a server error!")
 
     //Funksioni getUsers thirret kur deshirohet te perditesohet lista e users duke bere fetch API
     const getUsers = async () => {
@@ -21,9 +18,9 @@ const UsersList = () => {
             const response = await getData('/backend/user/adminAllUsers');
             setUsers(response.data);
         } catch (error) {
-                    setErrorMessage(error.message);
+                    dashboardContext.setDashboardErrorMessage(error.message);
                     //Beje UserErrorModal te shfaqet
-                    setShowUserErrorModal(true);
+                    dashboardContext.setShowDashboardErrorModal(true);
         }
     };
     useEffect(() => {
@@ -32,7 +29,7 @@ const UsersList = () => {
 
     
 
-    const contextValue = { users, setUsers, getUsers, setShowUserErrorModal, showUserErrorModal, errorMessage, setErrorMessage};
+    const contextValue = { users, setUsers, getUsers};
     //Te gjithe femijet e komponentes UserTable do te kene qasje ne keto funksione dhe atribute
     
 
@@ -40,8 +37,8 @@ const UsersList = () => {
         <UserContext.Provider value={contextValue}>
 
             <UsersTable/>
-            {/*Fillimisht UserErrorModal nuk shfaqet sepse showUserErrorModal eshte false (false && _____ == false*/}
-            {showUserErrorModal && <UserErrorModal/>}
+            {/*Fillimisht DashboardErrorModal nuk shfaqet sepse showDashboardErrorModal eshte false (false && _____ == false*/}
+            {dashboardContext.showDashboardErrorModal && <DashboardErrorModal/>}
         </UserContext.Provider>
     );
 }

@@ -102,7 +102,7 @@ const Workspaces = () => {
                                 <li key={workspace.workspaceId}>
                                     <div className="flex flex-row justify-between">
                                         <div className="flex gap-x-3 items-center mt-2 mb-2 justify-start"
-                                            onClick={() => navigate(`main/boards/${workspace.workspaceId}`)}>
+                                            onClick={() => navigate(`/main/boards/${workspace.workspaceId}`)}>
                                             <button className='w-10 h-10 text-black bg-gradient-to-r from-blue-400 to-indigo-500 font-bold text-xl rounded-lg text-center px-3 items-center dark:bg-blue-600 dark:focus:ring-blue-800'>
                                                 {workspace.title ? workspace.title.charAt(0) : ''}
                                             </button>

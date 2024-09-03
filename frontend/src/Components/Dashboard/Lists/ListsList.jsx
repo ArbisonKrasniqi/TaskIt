@@ -1,16 +1,16 @@
-import { useState, useEffect, createContext } from "react";
+import { useState, useEffect, createContext, useContext } from "react";
 import { getData, getDataWithId } from "../../../Services/FetchService";
 import ListsTable from "./ListsTable";
-import ListsErrorModal from "./Modals/ListsErrorModal";
 import { useParams } from "react-router-dom";
+import { DashboardContext } from "../../../Pages/dashboard";
+import DashboardErrorModal from "../DashboardErrorModal";
 
 export const ListsContext = createContext();
 
 const ListsList = () => {
     const { boardId } = useParams(); 
     const [lists, setLists] = useState(null);
-    const [showListsErrorModal, setShowListsErrorModal] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("There has been a server error!");
+    const dashboardContext = useContext(DashboardContext);
 
     const getLists = async () => {
         try {
@@ -22,8 +22,8 @@ const ListsList = () => {
                 setLists(allLists.data);
             }
         } catch (error) {
-            setErrorMessage(error.message);
-            setShowListsErrorModal(true);
+            dashboardContext.setDashboardErrorMessage(error.message);
+            dashboardContext.setShowDashboardErrorModal(true);
         }        
     };
 
@@ -31,12 +31,12 @@ const ListsList = () => {
         getLists();
     }, [boardId]);
 
-    const contextValue = {lists, setLists, getLists, showListsErrorModal, setShowListsErrorModal, errorMessage, setErrorMessage};
+    const contextValue = {lists, setLists, getLists};
 
     return(
         <ListsContext.Provider value={contextValue}>
             <ListsTable/>
-            {showListsErrorModal && <ListsErrorModal/>}
+            {dashboardContext.showDashboardErrorModal && <DashboardErrorModal/>}
         </ListsContext.Provider>
     );
 }

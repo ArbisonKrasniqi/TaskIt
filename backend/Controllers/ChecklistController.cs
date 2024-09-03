@@ -297,14 +297,14 @@ public class ChecklistController : ControllerBase
             if (isMember || userTokenRole == "Admin")
             {
                 var checklistModel = await _checklistRepo.DeleteChecklistAsync(checklistIdDto.ChecklistId);
-                return Ok("Checklist deleted");
+                return Ok(checklistModel);
             }
             return StatusCode(401, "You are not authorized!");
 
         }
         catch (Exception e)
         {
-            return StatusCode(500, "Internal Server Errror!");
+            return StatusCode(500, "Internal Server Error!"+e.StackTrace);
         }
     }
 

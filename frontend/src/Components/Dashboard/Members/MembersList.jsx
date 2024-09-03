@@ -1,16 +1,17 @@
-import {useState, useEffect, createContext} from "react";
+import {useState, useEffect, createContext, useContext} from "react";
 import { getData, getDataWithId } from "../../../Services/FetchService";
 import MembersTable from "./MembersTable";
-import MembersErrorModal from "./Modals/MembersErrorModal"
 import { useParams } from "react-router-dom";
+import { DashboardContext } from "../../../Pages/dashboard";
+import DashboardErrorModal from "../DashboardErrorModal";
 
 export const MembersContext = createContext();
 
 const MembersList = () =>{
     const [members, setMembers] = useState([]);
-    const [showMembersErrorModal, setShowMembersErrorModal] =useState(false);
-    const [errorMessage, setErrorMessage] = useState("There has been a server error!");
     const { workspaceId } = useParams();
+
+    const dashboardContext = useContext(DashboardContext);
 
     const getMembers = async ()=>{
         try{
@@ -23,21 +24,20 @@ const MembersList = () =>{
             }
             
         }catch(error){
-            setErrorMessage(error.message);
-            setShowMembersErrorModal(true);
+            dashboardContext.setDashboardErrorMessage(error.message);
+            dashboardContext.setShowDashboardErrorModal(true);
         }
     };
     useEffect(()=>{
         getMembers();
     }, [workspaceId]);
 
-    const contextValue = {members, setMembers, getMembers, 
-        showMembersErrorModal, setShowMembersErrorModal, errorMessage, setErrorMessage};
+    const contextValue = {members, setMembers, getMembers};
 
         return(
             <MembersContext.Provider value={contextValue}>
                 <MembersTable/>
-                {showMembersErrorModal && <MembersErrorModal/>}
+                {dashboardContext.showDashboardErrorModal && <DashboardErrorModal/>}
             </MembersContext.Provider>
         );
 }

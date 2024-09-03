@@ -3,10 +3,13 @@ import { putData } from '../../../../Services/FetchService';
 import { UpdateContext } from '../StarredBoardsTable';
 import {StarredBoardsContext} from "../StarredBoardsList";
 import CustomButton from '../../Buttons/CustomButton';
+import { DashboardContext } from '../../../../Pages/dashboard';
+
 const UpdateStarredBoardModal = (props)=>{
     const updateContext = useContext(UpdateContext);
     const starredBoardsContext = useContext(StarredBoardsContext);
-    
+    const dashboardContext = useContext(DashboardContext);
+
     const [boardId, setBoardId]= useState(updateContext.boardId);
     const [userId, setUserId]= useState(updateContext.userId);
     const [workspaceId, setWorkspaceId]= useState(updateContext.workspaceId);
@@ -40,8 +43,8 @@ const UpdateStarredBoardModal = (props)=>{
             starredBoardsContext.setStarredBoardS(updatedStarredBoards);
             props.setShowUpdateInfoModal(false);
         }catch(error){
-            starredBoardsContext.setErrorMessage(error.message);
-            starredBoardsContext.setShowStarredBoardsErrorModal(true);
+            dashboardContext.setDashboardErrorMessage(error.message);
+            dashboardContext.setShowDashboardErrorModal(true);
             starredBoardsContext.getStarredBoards();
             props.setShowUpdateInfoModal(false);
         }

@@ -17,13 +17,15 @@ public class ListController : ControllerBase
     private readonly IBoardRepository _boardRepo;
     private readonly IMembersRepository _membersRepo;
     private readonly IUserRepository _userRepo;
+    private readonly IWorkspaceRepository _workspaceRepo;
 
-    public ListController(IListRepository listRepo , IBoardRepository boardRepo, IMembersRepository membersRepo, IUserRepository userRepo)
+    public ListController(IListRepository listRepo , IBoardRepository boardRepo, IMembersRepository membersRepo, IUserRepository userRepo, IWorkspaceRepository workspaceRepo)
     {
         _listRepo = listRepo;
         _boardRepo = boardRepo;
         _membersRepo = membersRepo;
         _userRepo = userRepo;
+        _workspaceRepo = workspaceRepo;
     }
     [Authorize(AuthenticationSchemes = "Bearer")]
     [Authorize(Policy = "AdminOnly")]
@@ -105,13 +107,25 @@ public class ListController : ControllerBase
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
 
-                var board = await _boardRepo.GetBoardByIdAsync(updateListDto.BoardId);
+                var list = await _listRepo.GetListByIdAsync(updateListDto.ListId);
+                if (list == null)
+                {
+                    return NotFound("List not found");
+                }
+                
+                var board = await _boardRepo.GetBoardByIdAsync(list.BoardId);
                 if (board == null)
                 {
                     return NotFound("Board Not Found!");
                 }
 
-                var workspaceId = board.WorkspaceId;
+                var workspace = await _workspaceRepo.GetWorkspaceByIdAsync(board.WorkspaceId);
+                if (workspace == null)
+                {
+                    return NotFound("Workspace not found");
+                }
+                
+                var workspaceId = workspace.WorkspaceId;
                 var isMember = await _membersRepo.IsAMember(userId, workspaceId);
                 var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
                 if (board.IsClosed && !isOwner && userTokenRole != "Admin")

@@ -203,25 +203,30 @@ namespace backend.Controllers
                     return NotFound("Background does not exist");
                 }
                 
-                var oldWorkspace = await _workspaceRepo.GetWorkspaceByIdAsync(board.WorkspaceId);
-                if (oldWorkspace == null)
+                var workspace = await _workspaceRepo.GetWorkspaceByIdAsync(board.WorkspaceId);
+                if (workspace == null)
                 {
                     return NotFound("Old workspace not found");
                 }
                 
-                var newWorkspace = await _workspaceRepo.GetWorkspaceByIdAsync(updateDto.WorkspaceId);
-                if (newWorkspace == null)
+                var isMember = await _membersRepo.IsAMember(userId, workspace.WorkspaceId);
+                var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspace.WorkspaceId);
+                if (updateDto.IsClosed != null)
                 {
-                    return NotFound("New workspace not found");
-                }
-
-                if (oldWorkspace != newWorkspace && userTokenRole != "Admin")
-                {
-                    return StatusCode(401, "You are not authorized");
+                    if (userTokenRole != "Admin" && !isOwner)
+                    {
+                        return StatusCode(401, "You are not authorized");
+                    }
+                    
                 }
                 
-                var isMember = await _membersRepo.IsAMember(userId, updateDto.WorkspaceId);
-
+                if (board.IsClosed != updateDto.IsClosed && (!isOwner && userTokenRole != "Admin"))
+                {
+                    if (updateDto.IsClosed != null)
+                    {
+                        return StatusCode(401, "You are not authorized");
+                    }
+                }
                 if (isMember || userTokenRole == "Admin")
                 {
                     var boardModel = await _boardRepo.UpdateBoardAsync(updateDto);

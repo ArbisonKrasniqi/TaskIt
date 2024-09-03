@@ -35,9 +35,9 @@ const Sidebar = () => {
         const [boardToClose, setBoardToClose] = useState(null);
      
 const Menus = [
-    {title: "Boards", tag: "CiViewBoard", path: `/boards/${workspace?.workspaceId}`},
-    {title: "Members", tag: "IoPersonOutline", path: `/members/${workspace?.workspaceId}`},
-    {title: "Workspace settings", tag: "IoIosSettings", path: `/workspaceSettings/${workspace?.workspaceId}`},
+    {title: "Boards", tag: "CiViewBoard", path: `/main/boards/${workspace?.workspaceId}`},
+    {title: "Members", tag: "IoPersonOutline", path: `/main/members/${workspace?.workspaceId}`},
+    {title: "Workspace settings", tag: "IoIosSettings", path: `/main/workspaceSettings/${workspace?.workspaceId}`},
  ]
 const tagComponents = {
     CiViewBoard: <CiViewBoard/>,

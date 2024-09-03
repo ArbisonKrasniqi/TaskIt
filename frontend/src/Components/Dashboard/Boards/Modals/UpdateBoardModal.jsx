@@ -2,19 +2,21 @@ import React, { useState, useContext, useEffect } from 'react';
 import { putData } from '../../../../Services/FetchService';
 import { BoardsContext } from '../BoardsList';
 import CustomButton from '../../Buttons/CustomButton';
+import { DashboardContext } from '../../../../Pages/dashboard';
 
 const UpdateBoardModal = (props) => {
     const boardsContext = useContext(BoardsContext);
     const boardToUpdate = boardsContext.boardToUpdate;
+    const dashboardContext = useContext(DashboardContext);
 
     const [title, setTitle] = useState(boardToUpdate.title);
     const [backgroundId, setBackgroundId] = useState(boardToUpdate.backgroundId);
-    const [workspaceId, setWorkspaceId] = useState(boardToUpdate.workspaceId);
+    const [isClosed, setIsClosed] = useState(boardToUpdate.isClosed);
 
     useEffect(() => {
         setTitle(boardToUpdate.title);
         setBackgroundId(boardToUpdate.backgroundId);
-        setWorkspaceId(boardToUpdate.workspaceId);
+        setIsClosed(boardToUpdate.isClosed);
     }, [boardToUpdate]);
 
     const handleSubmit = async (e) => {
@@ -24,9 +26,8 @@ const UpdateBoardModal = (props) => {
             const data = {
                 boardId: boardToUpdate.boardId,
                 title: title,
-                dateCreated: boardToUpdate.dateCreated,
                 backgroundId: backgroundId,
-                workspaceId: workspaceId
+                isClosed: isClosed
             };
 
             console.log('Sending data:', data);
@@ -40,7 +41,6 @@ const UpdateBoardModal = (props) => {
                         ...board,
                         title: title,
                         backgroundId: backgroundId,
-                        workspaceId: workspaceId
                     };
                 }
                 return board;
@@ -50,8 +50,8 @@ const UpdateBoardModal = (props) => {
             props.setShowUpdateInfoModal(false);
         } catch (error) {
             console.error('Error updating board:', error);
-            boardsContext.setErrorMessage(error.message);
-            boardsContext.setShowBoardsErrorModal(true);
+            dashboardContext.setDashboardErrorMessage(error.message);
+            dashboardContext.setShowDashboardErrorModal(true);
             boardsContext.getBoards();
             props.setShowUpdateInfoModal(false);
         }
@@ -78,16 +78,17 @@ const UpdateBoardModal = (props) => {
                                id='backgroundId'
                                className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500' />
                     </div>
-                    <div className="mb-6">
-                        <label htmlFor="workspaceId" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Workspace ID</label>
-                        <input value={workspaceId}
-                               onChange={(e) => setWorkspaceId(e.target.value)}
-                               readOnly
-                               type="text"
-                               id="workspaceId"
-                               className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500' />
-                    </div>
                 </div>
+                <div className="mb-6 flex items-center">
+                        <input 
+                            type="checkbox" 
+                            id="isClosed" 
+                            checked={isClosed} 
+                            onChange={(e) => setIsClosed(e.target.checked)} 
+                            className="mr-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-500 dark:focus:border-blue-500" 
+                        />
+                        <label htmlFor="isClosed" className="text-sm font-medium text-gray-900 dark:text-white">isClosed</label>
+                    </div>
 
                 <div className='flex justify-around'>
                     <CustomButton onClick={() => props.setShowUpdateInfoModal(false)} type="button" text="Close" color="longRed" />

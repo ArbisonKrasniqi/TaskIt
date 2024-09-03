@@ -15,7 +15,6 @@ public class UpdateLabelRequestDTO{
         [Required]
         [RegularExpression("^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$", ErrorMessage = "Invalid color code.")]
         public string? Color { get; set; }
-        public DateTime DateAdded { get; set; } = DateTime.Now;
 
         [Required]
     [Range(0, int.MaxValue, ErrorMessage = "Board Id can not be negative!")]
