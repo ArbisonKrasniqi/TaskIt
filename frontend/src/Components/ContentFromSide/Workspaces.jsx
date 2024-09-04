@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 
 const Workspaces = () =>{
-    const { userId, workspaces, searchTerm, setSearchTerm } = useContext(WorkspaceContext);
+    const { userId, workspaces} = useContext(WorkspaceContext);
     const [OwnedWorkspaces, setOwnedWorkspaces] = useState([]);  
     const [MemberWorkspaces, setMemberWorkspaces] = useState([]);  
     const [searchTerm, setSearchTerm] = useState('');
@@ -28,16 +28,16 @@ const Workspaces = () =>{
     useEffect(() => {
         try {
             if (workspaces) {
-                setFilteredOwnedWorkspaces = OwnedWorkspaces.filter(workspace =>
+                setFilteredOwnedWorkspaces(OwnedWorkspaces.filter(workspace =>
                     workspace.title.toLowerCase().includes(searchTerm.toLowerCase())
-                );
-                setFilteredMemberWorkspaces = MemberWorkspaces.filter(workspace =>
+                ));
+                setFilteredMemberWorkspaces(MemberWorkspaces.filter(workspace =>
                   workspace.title.toLowerCase().includes(searchTerm.toLowerCase())  
-                );
+                ));
 
             }
         } catch (error) {
-            console.log(error.response?.data);
+            console.log(error);
         }
     },[workspaces])
 
