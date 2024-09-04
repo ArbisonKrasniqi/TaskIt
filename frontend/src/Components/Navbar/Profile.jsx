@@ -12,16 +12,21 @@ const [userData, setUserData] = useState({
     lastName: '',
     email: '',
 });
-const [userPassword, setUserPassword] = useState('');
+
 const [modalMessage, setModalMessage] = useState('');
 const [isModalOpen, setIsModalOpen] = useState(false);
 const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+const [errorMessage, setErrorMessage]=useState('');
+
 const getUser = async ()=>{
     try{
         const responseUser = await getDataWithId('http://localhost:5157/backend/user/adminUserID?userId', userId);
-       setUserData(responseUser.data);
-       setUserPassword(responseUser.data.password);
-       console.log("PASSWORDI: ",responseUser.data);
+        setUserData({
+          id: responseUser.data.id,
+          firstName: responseUser.data.firstName,
+          lastName: responseUser.data.lastName,
+          email: responseUser.data.email,
+      });
     }catch(error){
         console.error("Error fetching user data ", error.response.data);
     }
@@ -41,6 +46,24 @@ const handleInputChange = (e) =>{
 
 const handleSubmit = async (e)=>{
     e.preventDefault();
+    setErrorMessage('');
+    var nameRegex = /^[a-zA-Z\s]{2,}$/;
+    if (!nameRegex.test(userData.firstName.trim())) {
+      setErrorMessage('Please enter a valid name.');
+        return;
+    }
+    var lastNameRegex = /^[a-zA-Z\s]{2,}$/;
+    if (!lastNameRegex.test(userData.lastName.trim())) {
+      setErrorMessage('Please enter a valid surname.');
+        return;
+    }
+
+    var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,4}$/;
+    if(!emailRegex.test(userData.email.trim())){
+      setErrorMessage('Please enter a valid email address.');
+        return;
+    }
+
     try{
         const updatedUserData = {
             id: userId,
@@ -92,7 +115,7 @@ return (
             className="mt-1 p-2 w-full bg-gray-700 text-white rounded"
           />
         </div>
-    
+        {errorMessage && <p className="text-red-500">{errorMessage}</p>}
         <button type="submit" 
         className="mt-4 p-2 bg-blue-500 text-white rounded">Update Profile</button>
       </form>

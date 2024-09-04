@@ -14,13 +14,26 @@ const PasswordModal = ({isOpen, onClose, user})=>{
         e.preventDefault();
         setErrorMessage('');
 
+        var passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*\W).{8,}$/;
+
+        if(!passwordRegex.test(newPassword)){
+       
+            if (newPassword.length < 8) {
+                setErrorMessage('Password must be at least 8 characters long.');
+            } else if (!/(?=.*[A-Z])/.test(newPassword)) {
+                setErrorMessage('Password must contain at least one uppercase letter.');
+            } else if (!/(?=.*\d)/.test(newPassword)) {
+               setErrorMessage('Password must contain at least one number.');
+            } else if (!/(?=.*\W)/.test(newPassword)) {
+                setErrorMessage('Password must contain at least one special character.');
+            }
+         
+            return false;
+        }
         if(newPassword!==confirmPassword){
             setErrorMessage('New passwords do not match!');
             return;
         }
-        // if(newPassword === oldPassword){
-        //     setError("You should use a different password ")
-        // }
         try{
           
             const updatePasswordData = {
@@ -36,7 +49,7 @@ const PasswordModal = ({isOpen, onClose, user})=>{
             setIsModalOpen(true);
         }catch (error) {
             console.error("Error changing password ",error.message)
-            setModalMessage('Failed to update password');
+            setModalMessage('Failed to update password',error.response.data);
             setIsModalOpen(true);
         }
     };
