@@ -58,8 +58,11 @@ public class ChecklistRepository : IChecklistRepository
         {
             return null;
         }
-        
-        _context.ChecklistItem.RemoveRange(checklistModel.ChecklistItems);
+
+        if (checklistModel.ChecklistItems != null)
+        {
+            _context.ChecklistItem.RemoveRange(checklistModel.ChecklistItems);
+        }
         _context.Checklist.Remove(checklistModel);
         await _context.SaveChangesAsync();
         return checklistModel;

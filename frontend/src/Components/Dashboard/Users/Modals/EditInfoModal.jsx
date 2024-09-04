@@ -3,12 +3,14 @@ import { UpdateContext } from '../UsersTable';
 import { UserContext } from '../UsersList';
 import { putData } from '../../../../Services/FetchService';
 import CustomButton from '../../Buttons/CustomButton';
+import { DashboardContext } from '../../../../Pages/dashboard';
 
 const EditInfoModal = (props) => {
 
     //Inicializo te dy kontekstet
     const updateContext = useContext(UpdateContext);
     const userContext = useContext(UserContext)
+    const dashboardContext = useContext(DashboardContext);
 
     //Perdorimi i useState per te mundur t'i ndryshojme te dhenat ne format e update-imit
     const [email, setEmail] = useState(updateContext.email);
@@ -62,8 +64,8 @@ const EditInfoModal = (props) => {
         } catch (error) {
 
             //Nese ka error, trego pse nuk mund te editohej.
-            userContext.setErrorMessage(error.message);
-            userContext.setShowUserErrorModal(true);
+            dashboardContext.setDashboardErrorMessage(error.message);
+            dashboardContext.setShowDashboardErrorModal(true);
             userContext.getUsers();
 
             //Pastaj mbyll modal.

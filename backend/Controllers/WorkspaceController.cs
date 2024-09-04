@@ -173,12 +173,15 @@ namespace backend.Controllers
             {
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
-                if (string.IsNullOrEmpty(userId))
+
+                var isOwner = await _userRepo.UserOwnsWorkspace(userId, updateDto.WorkspaceId);
+                var newOwnerIsMember = await _userRepo.UserIsMember(userId, updateDto.WorkspaceId);
+                
+                if (!newOwnerIsMember && (userTokenRole != "Admin" || !isOwner))
                 {
-                    return NotFound("User Not Found!");
+                    return StatusCode(401, "You are not authorized");
                 }
-                var isMember = await _userRepo.UserIsMember(userId, updateDto.WorkspaceId);
-                if (isMember || userTokenRole == "Admin")
+                if (isOwner || userTokenRole == "Admin")
                 {
                     var workspaceModel = await _workspaceRepo.UpdateWorkspaceAsync(updateDto);
                     if (workspaceModel == null)
@@ -249,13 +252,10 @@ namespace backend.Controllers
             {
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
-                if (string.IsNullOrEmpty(userId))
+                var ownerExists = await _userRepo.UserExists(ownerIdDto.OwnerId);
+                if (!ownerExists)
                 {
-                    return NotFound("User Not Found!");
-                }
-                if (string.IsNullOrEmpty(ownerIdDto.OwnerId))
-                {
-                    return NotFound("User Not Found!");
+                    return NotFound("Owner not found");
                 }
                 if (userId == ownerIdDto.OwnerId || userTokenRole == "Admin")
                 {

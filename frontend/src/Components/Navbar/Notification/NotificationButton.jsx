@@ -39,10 +39,10 @@ const NotificationButton = (props) => {
     };
 
     useEffect(() => {
-       
+        if (userId) {
             getInvites();
-        
-    }, [userId, workspaces]);
+        }
+    }, [userId]);
 
     const handleInviteAction = async(inviteId, status,workspaceId)=>{
         try{

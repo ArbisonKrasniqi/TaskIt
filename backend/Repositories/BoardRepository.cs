@@ -66,10 +66,13 @@ namespace backend.Repositories
             
             if (existingBoard == null)
                 return null;
-
+            
+            if (boardDto.IsClosed != null)
+            {
+                existingBoard.IsClosed = boardDto.IsClosed.GetValueOrDefault();;
+            }
             existingBoard.Title = boardDto.Title;
             existingBoard.BackgroundId = boardDto.BackgroundId;
-            existingBoard.WorkspaceId = boardDto.WorkspaceId;
 
             await _context.SaveChangesAsync();
             return existingBoard;

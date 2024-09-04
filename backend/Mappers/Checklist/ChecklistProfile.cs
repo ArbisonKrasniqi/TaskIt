@@ -13,8 +13,7 @@ public class ChecklistProfile : Profile
         
         CreateMap<CreateChecklistDTO, Models.Checklist>();
         CreateMap<UpdateChecklistDTO, Models.Checklist>();
-
-        CreateMap<Models.ChecklistItem, ChecklistProfile>();
+        
     }
     
 }

@@ -3,10 +3,12 @@ import { putData } from '../../../../Services/FetchService';
 import { UpdateContext } from '../WorkspacesTable';
 import { WorkspacesContext } from '../WorkspacesList';
 import CustomButton from '../../Buttons/CustomButton';
+import { DashboardContext } from '../../../../Pages/dashboard';
 const UpdateWorkspaceModal= (props) => {
 
     const updateContext = useContext(UpdateContext);
     const workspacesContext = useContext(WorkspacesContext);
+    const dashboardContext = useContext(DashboardContext);
 
     //perdorim useState qe me  mujt me i ndryshu te dhenat
     const [title, setTitle] = useState(updateContext.title);
@@ -50,8 +52,8 @@ const UpdateWorkspaceModal= (props) => {
             props.setShowUpdateInfoModal(false);
 
         }catch(error){
-            workspacesContext.setErrorMessage(error.message);
-            workspacesContext.setShowWorkspacesErrorModal(true);
+            dashboardContext.setDashboardErrorMessage(error.message);
+            dashboardContext.setShowDashboardErrorModal(true);
             workspacesContext.getWorkspaces();
 
             props.setShowUpdateInfoModal(false);

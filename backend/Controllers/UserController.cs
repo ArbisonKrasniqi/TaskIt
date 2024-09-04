@@ -299,7 +299,13 @@ namespace backend.Controllers;
         {
                 //Check if valid ModelState(DTO) and if the role is either Admin or User
                 if (!ModelState.IsValid) return BadRequest(ModelState);
-
+                
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+                var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+                if (userId != editUserDto.Id && userTokenRole != "Admin")
+                {
+                    return StatusCode(401, "You are not authorized");
+                }
                 try
                 {
                     var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
@@ -359,12 +365,18 @@ namespace backend.Controllers;
 
         [HttpPut("adminUpdatePassword")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-
         public async Task<IActionResult> UpdatePassword(EditUserPasswordDTO editUserPasswordDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest("Wrong Parameters");
 
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+            var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+            if (userId != editUserPasswordDto.Id && userTokenRole != "Admin")
+            {
+                return StatusCode(401, "You are not authorized");
+            }
+            
             try
             {
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;

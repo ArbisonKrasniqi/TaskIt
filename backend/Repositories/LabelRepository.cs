@@ -27,6 +27,11 @@ public class LabelRepository : ILabelRepository{
         return await _context.Label.FirstOrDefaultAsync(x => x.LabelId == labelId);
     }
 
+    public async Task<List<Label>> GetLabelsByBoardId(int boardId)
+    {
+        return await _context.Label.Where(label => label.BoardId == boardId).ToListAsync();
+    }
+
     //creates the Label
     public async Task<Label> CreateLabelAsync(Label labelModel){
          
@@ -45,7 +50,6 @@ public class LabelRepository : ILabelRepository{
 
         existingLabel.Name = labelModel.Name;
         existingLabel.Color = labelModel.Color;
-        existingLabel.DateAdded = labelModel.DateAdded;
         existingLabel.BoardId = labelModel.BoardId;
 
         await _context.SaveChangesAsync();

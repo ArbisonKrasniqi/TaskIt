@@ -11,6 +11,7 @@ import { MdOutlineStarOutline } from "react-icons/md";
 import { MdOutlineStarPurple500 } from "react-icons/md";
 import LimitModal from "./LimitModal.jsx";
 import SideMenusHeader from "./SideMenusHeader.jsx";
+import { useNavigate, useParams } from "react-router-dom";
 
 
 const Boards = () =>{
@@ -18,7 +19,7 @@ const Boards = () =>{
         boardCount, setOpenClosedBoardsModal, boards, handleCreateBoard, openModal, 
         setOpenModal, setOpenCloseModal, handleStarBoard, handleSortChange, setOpenSortModal,
          openSortModal, selectedSort, getBackgroundImageUrl,hoveredBoardIndex, 
-         setHoveredBoardIndex, hoveredBoardSIndex, setHoveredBoardSIndex, roli, starredBoards } = useContext(WorkspaceContext);
+         setHoveredBoardIndex, hoveredBoardSIndex, setHoveredBoardSIndex, roli, starredBoards, boardId, board} = useContext(WorkspaceContext);
 
          const [searchTerm, setSearchTerm] = useState('');
          // per me handle ndryshimet ne search input
@@ -33,6 +34,8 @@ const Boards = () =>{
         board.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const navigate = useNavigate();
+    const {workspaceId} = useParams();
 
     if (workspace == null) {
         return <div>Loading...</div>;
@@ -135,7 +138,7 @@ return (
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                   }}>
-                <h2 className="ml-3">{board.title}</h2>
+                <h2 key={board.boardId} onClick={() => navigate(`/main/board/${workspaceId}/${board.boardId}`)} className="ml-3">{board.title}</h2>
 
 
                 <button

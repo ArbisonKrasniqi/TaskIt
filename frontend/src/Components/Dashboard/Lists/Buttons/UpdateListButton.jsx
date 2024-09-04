@@ -5,7 +5,8 @@ import CustomButton from '../../Buttons/CustomButton';
 const UpdateListButton = () => {
     const [showUpdateInfoModal, setShowUpdateInfoModal] = useState(false);
 
-    const handleEditInfoClick = () => {
+    const handleEditInfoClick = (e) => {
+        e.stopPropagation();
         setShowUpdateInfoModal(true);
     }
 

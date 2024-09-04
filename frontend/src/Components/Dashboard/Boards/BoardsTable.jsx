@@ -3,11 +3,13 @@ import { BoardsContext } from './BoardsList';
 import CustomButton from '../Buttons/CustomButton.jsx';
 import { deleteData } from '../../../Services/FetchService';
 import { useNavigate } from 'react-router-dom';
+import { DashboardContext } from '../../../Pages/dashboard.jsx';
 
 const BoardsTable = () => {
     const navigate = useNavigate();
     const boardsContext = useContext(BoardsContext);
     const [searchQuery, setSearchQuery] = useState('');
+    const dashboardContext = useContext(DashboardContext);
 
     const handleBoardDelete = (id) => {
         async function deleteBoard() {
@@ -19,8 +21,8 @@ const BoardsTable = () => {
                 const updateBoards = (boardsContext.boards || []).filter(board => board.boardId !== id);
                 boardsContext.setBoards(updateBoards);
             } catch (error) {
-                boardsContext.setErrorMessage(error.message + id);
-                boardsContext.setShowBoardsErrorModal(true);
+                dashboardContext.setDashboardErrorMessage(error.message + id);
+                dashboardContext.setShowDashboardErrorModal(true);
                 boardsContext.getBoards();
             }
         }
@@ -75,6 +77,7 @@ const BoardsTable = () => {
                             <th className="px-6 py-3">Title</th>
                             <th className="px-6 py-3">Date Created</th>
                             <th className="px-6 py-3">Background ID</th>
+                            <th className="px-6 py-3">IsClosed</th>
                             <th className="px-6 py-3">Workspace ID</th>
                             <th className="px-6 py-3">Actions</th>
                         </tr>
@@ -84,21 +87,25 @@ const BoardsTable = () => {
                             filteredBoards.map((board, index) => (
                                 <tr
                                     key={index}
-                                    className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 cursor-pointer"
-                                    onClick={() => handleBoardRowClick(board.boardId)}
+                                    className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
                                 >
                                     <td className="px-6 py-4">{board.boardId}</td>
                                     <td className="px-6 py-4">{board.title}</td>
                                     <td className="px-6 py-4">{board.dateCreated}</td>
                                     <td className="px-6 py-4">{board.backgroundId}</td>
+                                    <td className="px-6 py-4">{board.isClosed+""}</td>
                                     <td className="px-6 py-4">{board.workspaceId}</td>
                                     <td className="px-6 py-4">
+                                    <CustomButton 
+                                            onClick={() => handleBoardRowClick(board.boardId)}
+                                            type="button"
+                                            text="Open"
+                                        />
                                         <CustomButton
                                             color="orange"
                                             type="button"
                                             text="Edit"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
+                                            onClick={() => {
                                                 handleBoardEdit(board);
                                             }}
                                         />
@@ -106,8 +113,7 @@ const BoardsTable = () => {
                                             color="red"
                                             type="button"
                                             text="Delete"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
+                                            onClick={() => {
                                                 handleBoardDelete(board.boardId);
                                             }}
                                         />

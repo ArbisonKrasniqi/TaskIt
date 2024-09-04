@@ -3,10 +3,12 @@ import { UserContext } from '../UsersList';
 import { useContext, useState } from 'react';
 import { putData } from '../../../../Services/FetchService';
 import CustomButton from '../../Buttons/CustomButton';
+import { DashboardContext } from '../../../../Pages/dashboard';
 
 const EditRoleModal = (props) => {
     const updateContext = useContext(UpdateContext);
     const userContext = useContext(UserContext);
+    const dashboardContext = useContext(DashboardContext);
 
     const [isAdmin, setIsAdmin] = useState(updateContext.role === "Admin");
 
@@ -40,8 +42,8 @@ const EditRoleModal = (props) => {
             userContext.setUsers(updatedUsers);
             props.setShowEditRoleModal(false);
         } catch (error) {
-            userContext.setErrorMessage(error.message);
-            userContext.setShowUserErrorModal(true);
+            dashboardContext.setDashboardErrorMessage(error.message);
+            dashboardContext.setShowDashboardErrorModal(true);
             userContext.getUsers();
 
             props.setShowEditRoleModal(false);

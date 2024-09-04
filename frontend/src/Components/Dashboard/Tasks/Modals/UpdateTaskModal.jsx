@@ -1,15 +1,16 @@
 import React, { useState, useContext } from 'react';
-//import DatePicker from 'react-datepicker';
-//import "react-datepicker/dist/react-datepicker.css"; // Import the styles
+// import DatePicker from 'react-datepicker';
+// import "react-datepicker/dist/react-datepicker.css"; // Import the styles
 import { putData } from '../../../../Services/FetchService';
 import { UpdateContext } from '../TasksTable';
 import { TasksContext } from '../TasksList';
 import CustomButton from '../../Buttons/CustomButton';
+import { DashboardContext } from '../../../../Pages/dashboard';
 
 const UpdateTaskModal = (props) => {
     const updateContext = useContext(UpdateContext);
     const tasksContext = useContext(TasksContext);
-
+    const dashboardContext = useContext(DashboardContext);
     // Initialize date
     const initialDueDate = updateContext.dueDate ? new Date(updateContext.dueDate) : new Date();
 
@@ -65,8 +66,8 @@ const UpdateTaskModal = (props) => {
             props.setShowUpdateInfoModal(false);
             
         } catch (error) {
-            tasksContext.setErrorMessage(error.message);
-            tasksContext.setShowTasksErrorModal(true);
+            dashboardContext.setDashboardErrorMessage(error.message);
+            dashboardContext.setShowDashboardErrorModal(true);
             tasksContext.getTasks();
 
             props.setShowUpdateInfoModal(false);

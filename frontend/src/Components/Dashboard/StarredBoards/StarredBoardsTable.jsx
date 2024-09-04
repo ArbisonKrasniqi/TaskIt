@@ -3,10 +3,12 @@ import {StarredBoardsContext} from "./StarredBoardsList"
 import CustomButton from '../Buttons/CustomButton';
 import { deleteData } from '../../../Services/FetchService';
 import UpdateStarredBoardButton from "./Buttons/UpdateStarredBoardButton";
+import { DashboardContext } from '../../../Pages/dashboard';
 
 export const UpdateContext = createContext();
 const StarredBoardsTable = () => {
-    const { StarredBoards, setStarredBoards, setErrorMessage, setShowStarredBoardsErrorModal, getStarredBoards } = useContext(StarredBoardsContext);
+    const { StarredBoards, setStarredBoards, getStarredBoards } = useContext(StarredBoardsContext);
+    const dashboardContext = useContext(DashboardContext);
 
     const HandleStarredBoardDelete = (id) => {
         async function deleteStarredBoard() {
@@ -20,8 +22,8 @@ const StarredBoardsTable = () => {
                 const updatedStarredBoards = StarredBoards.filter(starredBoard => starredBoard.starredBoardId !== id);
                 setStarredBoards(updatedStarredBoards);
             } catch (error) {
-                setErrorMessage(error.message + id);
-                setShowStarredBoardsErrorModal(true);
+                dashboardContext.setDashboardErrorMessage(error.message + id);
+                dashboardContext.setDashboardErrorModal(true);
                 getStarredBoards(); // për të përditësuar listën
             }
         }

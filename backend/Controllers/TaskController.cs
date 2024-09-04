@@ -18,12 +18,14 @@ public class  TaskController : ControllerBase{
     private readonly ITaskRepository _taskRepo;
     private readonly IBoardRepository _boardRepo;
     private readonly IMembersRepository _membersRepo;
+    private readonly IUserRepository _userRepo;
 
-    public TaskController(ITaskRepository taskRepo, IListRepository listRepo, IBoardRepository boardRepo, IMembersRepository membersRepo){
+    public TaskController(ITaskRepository taskRepo, IListRepository listRepo, IBoardRepository boardRepo, IMembersRepository membersRepo, IUserRepository userRepo){
         _listRepo = listRepo;
         _taskRepo = taskRepo;
         _boardRepo = boardRepo;
         _membersRepo = membersRepo;
+        _userRepo = userRepo;
     }
 
     [Authorize(AuthenticationSchemes = "Bearer")]
@@ -69,6 +71,12 @@ public class  TaskController : ControllerBase{
             
             var workspaceId = board.WorkspaceId;
             var isMember = await _membersRepo.IsAMember(userId, workspaceId);
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
+            if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+            {
+                return StatusCode(403, "The board is closed");
+            }
+            
             if (isMember || userTokenRole == "Admin")
             {
                 return Ok(task.ToTaskDto());
@@ -86,10 +94,7 @@ public class  TaskController : ControllerBase{
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
-            if (string.IsNullOrEmpty(userId))
-            {
-                return NotFound("User Not Found!");
-            }
+
             var isMember = await _membersRepo.IsAMember(userId, workspaceId);
             if (isMember || userTokenRole == "Admin")
             {
@@ -131,6 +136,11 @@ public class  TaskController : ControllerBase{
             
             var workspaceId = board.WorkspaceId;
             var isMember = await _membersRepo.IsAMember(userId, workspaceId);
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
+            if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+            {
+                return StatusCode(403, "The board is closed");
+            }
             
             if (isMember || userTokenRole == "Admin")
             {
@@ -177,6 +187,11 @@ public class  TaskController : ControllerBase{
                 
                 var workspaceId = board.WorkspaceId;
                 var isMember = await _membersRepo.IsAMember(userId, workspaceId);
+                var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
+                if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+                {
+                    return StatusCode(403, "The board is closed");
+                }
                 
                 if (isMember || userTokenRole == "Admin")
                 {
@@ -192,7 +207,6 @@ public class  TaskController : ControllerBase{
         }catch(Exception e){
             return StatusCode(500, "Internal Server Error "+e.Message);
         }
-
     }
 
     // relationship task and list 1-many
@@ -222,6 +236,12 @@ public class  TaskController : ControllerBase{
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
             var isMember = await _membersRepo.IsAMember(userId, workspaceId);
 
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
+            if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+            {
+                return StatusCode(403, "The board is closed");
+            }
+            
             if (isMember || userTokenRole == "Admin")
             {
                 if (!await _listRepo.ListExists(taskDto.ListId))
@@ -261,6 +281,12 @@ public class  TaskController : ControllerBase{
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
             var isMember = await _membersRepo.IsAMember(userId, workspaceId);
 
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
+            if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+            {
+                return StatusCode(403, "The board is closed");
+            }
+            
             if (isMember || userTokenRole == "Admin")
             {
                 var tasks = await _taskRepo.GetTaskByListId(listId);
@@ -303,6 +329,13 @@ public class  TaskController : ControllerBase{
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
             var isMember = await _membersRepo.IsAMember(userId, workspaceId);
+            
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
+            if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+            {
+                return StatusCode(403, "The board is closed");
+            }
+            
             if (isMember || userTokenRole == "Admin")
             {
 

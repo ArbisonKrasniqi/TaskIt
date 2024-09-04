@@ -17,4 +17,5 @@ public interface IChecklistItemRepository
 
     Task<bool> ChecklistItemExists(int checklistItemId);
     Task<bool> ChecklistItemInChecklist(int checklistItemId, int checklistId);
+    Task<ChecklistItem> ChangeChecklistItemChecked(int checklistItemId);
 }
