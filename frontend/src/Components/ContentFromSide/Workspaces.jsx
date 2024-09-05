@@ -7,8 +7,12 @@ import { WorkspaceContext } from "../Side/WorkspaceContext.jsx";
 import { useNavigate } from "react-router-dom";
 
 
+
+
 const Workspaces = () =>{
     const { userId, workspaces } = useContext(WorkspaceContext);
+    // qita searchTerm e shtova se ma qitke ni error
+    const [searchTerm, setSearchTerm] = useState('');
     const [OwnedWorkspaces, setOwnedWorkspaces] = useState([]);  
     const [MemberWorkspaces, setMemberWorkspaces] = useState([]);  
     const navigate = useNavigate();

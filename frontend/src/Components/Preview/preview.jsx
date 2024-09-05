@@ -1,34 +1,33 @@
 // import React from 'react';
 import React, { useState } from 'react';
 import mainimg from '../Preview/main.png';
+import { useNavigate } from 'react-router-dom';
+import AboutUs from '../Preview/aboutus.jsx';
 
 const Preview = () =>{
 
-    const [menuOpen, setMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
 
-    
-   
-        
- return(
+  const navigate = useNavigate();
+  
+
+  return(
 
         
     <nav className="min-h-screen">
     <div className="flex items-center justify-between mx-auto px-4 py-2.5">
-      <h1 style={{ textAlign: 'left', padding: 30, color: 'dark-blue', fontSize: '40px', fontWeight: 'bold' }}>Taskit</h1>
+      <h1 style={{ textAlign: 'left', padding: 30, color: 'dark-blue', fontSize: '40px', fontWeight: 'bold' }}>TaskIt</h1>
 
-      {/* Desktop Menu */}
+
       <div className="hidden md:flex md:space-x-8">
-        <a href="aboutus.jsx" className="py-2 px-3  hover:bg-black-100 rounded md:hover:bg-transparent md:border-0 dark:text-gray-400 md:dark:hover:text-black dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent ">About Us</a>
+        <button  onClick={() => navigate(`/AboutUs`)} className="py-2 px-3  hover:bg-black-100 rounded md:hover:bg-transparent md:border-0 dark:text-gray-400 md:dark:hover:text-black dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent ">About Us</button>
         <a href="#" className="py-2 px-3  hover:bg-black-100 rounded md:hover:bg-transparent md:border-0 dark:text-gray-400 md:dark:hover:text-black dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Contact Us</a>
       </div>
 
-   
-
-      {/* Desktop Login Button */}
       <div className="hidden md:flex">
         <button className="flex items-center justify-center px-5 py-3 rounded-md text-base font-medium text-center border border-transparent shadow-md" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
           <span className="text-white">Login</span>
@@ -49,7 +48,7 @@ const Preview = () =>{
     {menuOpen && (
       <div className="md:hidden  bg-gray-800 text-white">
         <ul className="flex flex-col items-start p-4 space-y-4 rounded-lg">
-          <li><a href="#" className="text-gray-400">About Us</a></li>
+          <li><button  onClick={() => navigate(`/AboutUs`)} className="text-gray-400 ">About Us</button></li>
           <li><a href="#" className="text-gray-400">Contact Us</a></li>
           <li>
             <button className="w-full py-3 px-5 text-center text-white rounded-md" style={{ backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>

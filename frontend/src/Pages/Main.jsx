@@ -18,6 +18,9 @@ import LoadingModal from '../Components/Modal/LoadingModal.jsx';
 import Members from '../Components/ContentFromSide/Members.jsx';
 import WithAuth from "../Services/WithAuth.jsx";
 
+// import Preview from '../Components/Preview/preview.jsx';
+import AboutUs from '../Components/Preview/aboutus.jsx';
+
 const Main = () => {
     const {opened, workspaceId, boardId, taskId} = useParams();
     const navigate = useNavigate();
@@ -83,6 +86,7 @@ const Main = () => {
                             {opened === 'calendar' && <Calendar/>}
                             {opened === 'loadingModal' && <LoadingModal/>}
                             {opened === 'members' && <Members />}
+                            {opened === 'aboutus' && <AboutUs/>}
                         </div>
                     </div>
                 </div>

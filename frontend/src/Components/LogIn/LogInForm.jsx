@@ -5,7 +5,9 @@ import Button from '../Sign-up/Button.jsx';
 import { StoreTokens } from '../../Services/TokenService.jsx';
 import { postData } from '../../Services/FetchService.jsx';
 import { useNavigate } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode';
+import jwtDecode from 'jwt-decode';
+// import { jwtDecode } from 'jwt-decode'; 
+// po e boj koment se nuk pom bon me kllapa e qishtu pomm punon 
 
 const LogInForm =  () =>{
 
