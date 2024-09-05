@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 
 const Workspaces = () =>{
-    const { userId, workspaces} = useContext(WorkspaceContext);
+    const workspaceContext = useContext(WorkspaceContext);
     const [OwnedWorkspaces, setOwnedWorkspaces] = useState([]);  
     const [MemberWorkspaces, setMemberWorkspaces] = useState([]);  
     const [searchTerm, setSearchTerm] = useState('');
@@ -16,18 +16,18 @@ const Workspaces = () =>{
     const [filteredMemberWorkspaces, setFilteredMemberWorkspaces] = useState([]);
 
     useEffect(() => {
-        if (userId && workspaces) {
-            const ownedWorkspaces = workspaces.filter(workspace => workspace.ownerId === userId);
-            const memberWorkspaces = workspaces.filter(workspace => workspace.ownerId !== userId);
-        
+        if (workspaceContext.userId && workspaceContext.workspaces) {
+            const ownedWorkspaces = workspaceContext.workspaces.filter(workspace => workspace.ownerId === workspaceContext.userId);
+            const memberWorkspaces = workspaceContext.workspaces.filter(workspace => workspace.ownerId !== workspaceContext.userId);
+    
             setOwnedWorkspaces(ownedWorkspaces);
             setMemberWorkspaces(memberWorkspaces);
         }
-    }, [userId, workspaces]);
+    }, [workspaceContext.userId, workspaceContext.workspaces]);
 
     useEffect(() => {
         try {
-            if (workspaces) {
+            if (OwnedWorkspaces, MemberWorkspaces) {
                 setFilteredOwnedWorkspaces(OwnedWorkspaces.filter(workspace =>
                     workspace.title.toLowerCase().includes(searchTerm.toLowerCase())
                 ));
@@ -39,7 +39,7 @@ const Workspaces = () =>{
         } catch (error) {
             console.log(error);
         }
-    },[workspaces])
+    },[OwnedWorkspaces, MemberWorkspaces])
 
     return (
         <div className="min-h-screen h-full" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>

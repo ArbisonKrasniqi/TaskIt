@@ -102,7 +102,7 @@ public class LabelController : ControllerBase{
     }
 
 
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    /*[Authorize(AuthenticationSchemes = "Bearer")]
     [HttpPost("CreateLabel")]
     public async Task<IActionResult> CreateLabel(CreateLabelRequestDTO labelDTO){
         if(!ModelState.IsValid){
@@ -146,8 +146,7 @@ public class LabelController : ControllerBase{
         }catch(Exception e){
             return StatusCode(500, "Internal server error");
         }
-
-    }
+    }*/
 
     [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpGet("GetLabelById")]
@@ -217,22 +216,6 @@ public class LabelController : ControllerBase{
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
 
-            var boardChanged = board.BoardId != updateDto.BoardId;
-            if (boardChanged && userTokenRole == "Admin")
-            {
-                var newBoard = await _boardRepo.GetBoardByIdAsync(updateDto.BoardId);
-                if (newBoard == null)
-                {
-                    return NotFound("New board not found");
-                }
-                return StatusCode(401, "You are not authorized");
-            }
-            if (boardChanged && userTokenRole != "Admin")
-            {
-                return StatusCode(401, "You are not authorized");
-            }
-
-
             var isMember = await _memberRepo.IsAMember(userId, workspace.WorkspaceId);
             var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspace.WorkspaceId);
             if (board.IsClosed && !isOwner && userTokenRole != "Admin")
@@ -256,7 +239,8 @@ public class LabelController : ControllerBase{
         }
     }
     
-    [Authorize(AuthenticationSchemes = "Bearer")] 
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(Policy = "AdminOnly")]
     [HttpDelete("DeleteLabel")]
 
     public async Task<IActionResult> DeleteLabel (LabelIdDTO labelIdDTO){

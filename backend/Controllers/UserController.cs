@@ -408,7 +408,7 @@ namespace backend.Controllers;
 
 
         [HttpPut("adminUpdateRole")]
-        [Authorize(AuthenticationSchemes = "Bearer")]
+        //[Authorize(AuthenticationSchemes = "Bearer")]
        // [Authorize(Policy = "AdminOnly")]
 
         public async Task<IActionResult> UpdateRole(EditRoleDTO editRoleDto)

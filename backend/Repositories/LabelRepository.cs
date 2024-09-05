@@ -49,8 +49,6 @@ public class LabelRepository : ILabelRepository{
         }
 
         existingLabel.Name = labelModel.Name;
-        existingLabel.Color = labelModel.Color;
-        existingLabel.BoardId = labelModel.BoardId;
 
         await _context.SaveChangesAsync();
         return existingLabel;
@@ -67,5 +65,32 @@ public class LabelRepository : ILabelRepository{
         _context.Label.Remove(labelModel);
         await _context.SaveChangesAsync();
         return labelModel;
+    }
+    
+    public async Task<List<Label>> FilterClosedBoardLabelsAsync(List<Label> labels)
+    {
+        var boardIds = labels.Select(l => l.BoardId)
+            .Distinct()
+            .ToList();
+        
+        var closedBoardIds = await _context.Board
+            .Where(b => boardIds.Contains(b.BoardId) && b.IsClosed)
+            .Select(b => b.BoardId)
+            .ToListAsync();
+
+        // Step 3: Filter labels to exclude those associated with closed boards
+        var filteredLabels = labels.Where(l => !closedBoardIds.Contains(l.BoardId))
+            .ToList();
+
+        return filteredLabels;
+    }
+
+    public async Task<List<Label>> GetLabelsByTaskId(int taskId)
+    {
+        var labels = await _context.TaskLabel
+            .Where(tl => tl.TaskId == taskId)
+            .Select(tl => tl.Label)
+            .ToListAsync();
+        return labels;
     }
 }

@@ -18,6 +18,7 @@ import ChecklistsList from "../Components/Dashboard/Checklists/ChecklistsList.js
 import ChecklistItemsList from "../Components/Dashboard/ChecklistItems/ChecklistItemsList.jsx";
 import TaskTable from "../Components/Dashboard/Tasks/TaskTable.jsx";
 import LabelsList from "../Components/Dashboard/Labels/LabelsList.jsx";
+import UserTable from "../Components/Dashboard/Users/UserTable.jsx";
 
 export const DashboardContext = createContext();
 
@@ -63,6 +64,7 @@ const Dashboard = () => {
         <div className="flex-1 ml-[15%] p-4 bg-gray-800">
           <Routes>
             <Route path="users/" element={<UserList/>}/>
+            <Route path="user/:userId" element={<UserTable/>}/>
             <Route path="workspaces/:userId?" element={<WorkspacesList/>}/>
             <Route path="workspace/:workspaceId" element={<WorkspaceTable/>}/>
             <Route path="boards/:workspaceId?" element={<BoardsList/>}/>
@@ -75,6 +77,7 @@ const Dashboard = () => {
             <Route path="task/:taskId?" element={<TaskTable/>}/>
             <Route path="checklists/:taskId?" element={<ChecklistsList/>}/>
             <Route path="checklistItems/:checklistId?" element={<ChecklistItemsList/>}/>
+            <Route path="backgrounds" element={<BackgroundsList/>}/>
           </Routes>
         </div>
       </div>

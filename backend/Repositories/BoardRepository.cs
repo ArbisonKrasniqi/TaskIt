@@ -16,12 +16,15 @@ namespace backend.Repositories
         private readonly ApplicationDBContext _context;
         private readonly IStarredBoardRepository _starredRepo;
         private readonly IListRepository _listRepo;
-        
-        public BoardRepository(ApplicationDBContext context, IStarredBoardRepository starredRepo,IListRepository listRepo)
+        private readonly ILabelRepository _labelRepo;
+
+        public BoardRepository(ApplicationDBContext context, IStarredBoardRepository starredRepo,
+            IListRepository listRepo, ILabelRepository labelRepo)
         {
             _context=context;
             _starredRepo = starredRepo;
             _listRepo = listRepo;
+            _labelRepo = labelRepo;
         }
         
         //GetAllAsync --> Gets all boards that exists
@@ -55,6 +58,51 @@ namespace backend.Repositories
                 throw new InvalidOperationException("Cannot create more than 10 boards in the same workspace.");
             }
             await _context.Board.AddAsync(boardModel);
+            await _context.SaveChangesAsync();
+            var boardId = boardModel.BoardId;
+            var label1 = new Label
+            {
+                Name = String.Empty,
+                Color = "#FF0000",
+                BoardId = boardId
+            };
+            var label2 = new Label
+            {
+                Name = String.Empty,
+                Color = "#00FF00",
+                BoardId = boardId
+            };
+            var label3 = new Label
+            {
+                Name = String.Empty,
+                Color = "#0000FF",
+                BoardId = boardId
+            };
+            var label4 = new Label
+            {
+                Name = String.Empty,
+                Color = "#FFFF00",
+                BoardId = boardId
+            };
+            var label5 = new Label
+            {
+                Name = String.Empty,
+                Color = "#00FFFF",
+                BoardId = boardId
+            };
+            var label6 = new Label
+            {
+                Name = String.Empty,
+                Color = "#FF00FF",
+                BoardId = boardId
+            };
+
+            await _context.Label.AddAsync(label1);
+            await _context.Label.AddAsync(label2);
+            await _context.Label.AddAsync(label3);
+            await _context.Label.AddAsync(label4);
+            await _context.Label.AddAsync(label5);
+            await _context.Label.AddAsync(label6);
             await _context.SaveChangesAsync();
             return boardModel;
         }

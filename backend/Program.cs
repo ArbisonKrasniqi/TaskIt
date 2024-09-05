@@ -16,6 +16,7 @@ using backend.Mappers.Invite;
 using backend.Mappers.Lista;
 using backend.Mappers.Member;
 using backend.Mappers.StarredBoard;
+using backend.Mappers.TaskLabel;
 using backend.Mappers.TaskMember;
 using backend.Mappers.TaskProfile;
 using backend.Mappers.User;
@@ -132,6 +133,7 @@ builder.Services.AddScoped<IChecklistRepository, ChecklistRepository>();
 builder.Services.AddScoped<IChecklistItemRepository, ChecklistItemRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<ILabelRepository, LabelRepository>();
+builder.Services.AddScoped<ITaskLabelRepository, TaskLabelRepository>();
 // CORS configuration
 builder.Services.AddCors(options =>
 {
@@ -157,6 +159,7 @@ builder.Services.AddAutoMapper(typeof(ListProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(TaskProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(InviteProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(UserProfile).Assembly);
+builder.Services.AddAutoMapper(typeof(TaskLabelProfile).Assembly);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -8,13 +8,11 @@ const UpdateBackgroundModal = (props) => {
     const backgroundToUpdate = backgroundsContext.backgroundToUpdate;
 
     const [title, setTitle] = useState(backgroundToUpdate.title);
-    const [imageUrl, setImageUrl] = useState(backgroundToUpdate.imageUrl);
     const [isActive, setIsActive] = useState(backgroundToUpdate.isActive);
     const [creatorId, setCreatorId] = useState(backgroundToUpdate.creatorId);
 
     useEffect(() => {
         setTitle(backgroundToUpdate.title);
-        setImageUrl(backgroundToUpdate.imageUrl);
         setIsActive(backgroundToUpdate.isActive);
     }, [backgroundToUpdate]);
 
@@ -26,7 +24,6 @@ const UpdateBackgroundModal = (props) => {
                 backgroundId: backgroundToUpdate.backgroundId,
                 creatorId: creatorId,
                 title: title,
-                imageUrl: imageUrl,
                 isActive: isActive,
                 dateCreated: backgroundToUpdate.dateCreated
             };
@@ -41,7 +38,6 @@ const UpdateBackgroundModal = (props) => {
                     return{
                         ...background,
                         title: title,
-                        imageUrl: imageUrl,
                         isActive: isActive,
                         creatorId: creatorId
                     };
@@ -49,7 +45,7 @@ const UpdateBackgroundModal = (props) => {
                 return background;
             });
 
-            backgroundsContext.setBackground(updatedBackgrounds);
+            backgroundsContext.setBackgrounds(updatedBackgrounds);
             props.setShowUpdateInfoModal(false);
         } catch (error) {
             console.log('Error updating background: ',error);
@@ -71,14 +67,6 @@ const UpdateBackgroundModal = (props) => {
                             type='text'
                             id='title'
                             className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500' />
-                    </div>
-                    <div className="mb-6">
-                        <label htmlFor="imageUrl" className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>Image Url</label>
-                        <input value={imageUrl}
-                               onChange={(e) => setImageUrl(e.target.value)}
-                               type="text"
-                               id='imageUrl'
-                               className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500' />
                     </div>
                     <div className="mb-6">
                         <label htmlFor="isActive" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Is Active</label>

@@ -12,5 +12,7 @@ public interface ILabelRepository{
     Task<Label?> CreateLabelAsync(Label labelModel);
     Task<Label?> UpdateLabelAsync(UpdateLabelRequestDTO labelDto);
     Task<Label?> DeleteLabelAsync(int labelId);
-    
+    Task<List<Label>> FilterClosedBoardLabelsAsync(List<Label> labels);
+    Task<List<Label>> GetLabelsByTaskId(int taskId);
+
 }

@@ -6,6 +6,8 @@ using backend.Mappers;
 using Microsoft.AspNetCore.Mvc;
 using backend.DTOs.List;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Data.SqlClient.DataClassification;
+
 namespace backend.Controllers;
 
 
@@ -19,13 +21,15 @@ public class  TaskController : ControllerBase{
     private readonly IBoardRepository _boardRepo;
     private readonly IMembersRepository _membersRepo;
     private readonly IUserRepository _userRepo;
-
-    public TaskController(ITaskRepository taskRepo, IListRepository listRepo, IBoardRepository boardRepo, IMembersRepository membersRepo, IUserRepository userRepo){
+    private readonly ILabelRepository _labelRepo;
+    
+    public TaskController(ITaskRepository taskRepo, IListRepository listRepo, IBoardRepository boardRepo, IMembersRepository membersRepo, IUserRepository userRepo, ILabelRepository labelRepo){
         _listRepo = listRepo;
         _taskRepo = taskRepo;
         _boardRepo = boardRepo;
         _membersRepo = membersRepo;
         _userRepo = userRepo;
+        _labelRepo = labelRepo;
     }
 
     [Authorize(AuthenticationSchemes = "Bearer")]
@@ -38,8 +42,21 @@ public class  TaskController : ControllerBase{
                 return NotFound("No tasks found");
             }
 
-            var taskDto = tasks.Select(x => x.ToTaskDto());
-            return Ok(taskDto);
+            var taskDtos = new List<TaskDto>();
+
+            foreach (var task in tasks)
+            {
+                // Get the labels for the current task
+                var labels = await _labelRepo.GetLabelsByTaskId(task.TaskId);
+
+                // Convert the task to a DTO and add the labels
+                var taskDto = task.ToTaskDto(labels);
+
+                // Add the DTO to the list
+                taskDtos.Add(taskDto);
+            }
+
+            return Ok(taskDtos);
 
         }catch(Exception e){
             return StatusCode(500, e.Message);
@@ -79,7 +96,8 @@ public class  TaskController : ControllerBase{
             
             if (isMember || userTokenRole == "Admin")
             {
-                return Ok(task.ToTaskDto());
+                var taskLabels = await _labelRepo.GetLabelsByTaskId(task.TaskId);
+                return Ok(task.ToTaskDtoLabels(taskLabels));
             }
             return StatusCode(401, "You are not authorized!");
         }catch(Exception e){
@@ -99,7 +117,23 @@ public class  TaskController : ControllerBase{
             if (isMember || userTokenRole == "Admin")
             {
                 var tasks = await _taskRepo.GetTasksByWorkspaceIdAsync(workspaceId); // Await here
-                return Ok(tasks);
+                
+                var taskDtos = new List<TaskInfoDto2>();
+
+                foreach (var task in tasks)
+                {
+                    // Get the labels for the current task
+                    var labels = await _labelRepo.GetLabelsByTaskId(task.TaskId);
+
+                    // Convert the task to a DTO and add the labels
+                    var taskDto = task.toTaskInfoDto2(labels);
+
+                    // Add the DTO to the list
+                    taskDtos.Add(taskDto);
+                }
+
+                return Ok(taskDtos);
+                
             }
             return StatusCode(401, "You are not authorized!");
         }
@@ -149,8 +183,10 @@ public class  TaskController : ControllerBase{
                 {
                     return NotFound("Task not found");
                 }
+                
 
-                return Ok(taskModel.ToTaskDto());
+                var taskLabels = await _labelRepo.GetLabelsByTaskId(taskModel.TaskId);
+                return Ok(taskModel.ToTaskDtoLabels(taskLabels));
             }
             return StatusCode(401, "You are not authorized!");
         }catch(Exception e){
@@ -252,7 +288,8 @@ public class  TaskController : ControllerBase{
 
                 var taskModel = taskDto.ToTaskFromCreate();
                 await _taskRepo.CreateTaskAsync(taskModel);
-                return CreatedAtAction(nameof(GetTaskById), new { id = taskModel.TaskId }, taskModel.ToTaskDto());
+                var labels = new List<Models.Label>();
+                return CreatedAtAction(nameof(GetTaskById), new { id = taskModel.TaskId }, taskModel.ToTaskDto(labels));
             }
             return StatusCode(401, "You are not authorized!");
         }catch(Exception e){

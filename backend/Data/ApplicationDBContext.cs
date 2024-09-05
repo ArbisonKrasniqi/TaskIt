@@ -26,12 +26,12 @@ public class ApplicationDBContext : IdentityDbContext<User>
     public DbSet<StarredBoard> StarredBoard { get; set; }
     public DbSet<Invite> Invite { get; set; }
     public DbSet<TaskMember> TaskMember { get; set; }
-
     public DbSet<Label> Label { get; set; }
-
     public DbSet<Comment> Comment { get; set; }
-
     public DbSet<RefreshToken> RefreshTokens { get; set; }
+
+    public DbSet<TaskLabel> TaskLabel { get; set; }
+
     //User roles
     protected override void OnModelCreating(ModelBuilder builder)
     {
