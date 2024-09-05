@@ -20,7 +20,7 @@ public class ListController : ControllerBase
     private readonly IMembersRepository _membersRepo;
     private readonly IUserRepository _userRepo;
     private readonly IWorkspaceRepository _workspaceRepo;
-    private readonly IMapper mapper;
+    private readonly IMapper _mapper;
     public ListController(IListRepository listRepo , IBoardRepository boardRepo, IMembersRepository membersRepo, IUserRepository userRepo, IWorkspaceRepository workspaceRepo,IMapper mapper)
     {
         _listRepo = listRepo;
