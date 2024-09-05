@@ -9,8 +9,7 @@ import { useNavigate } from "react-router-dom";
 const Workspaces = () =>{
     const workspaceContext = useContext(WorkspaceContext);
     const [OwnedWorkspaces, setOwnedWorkspaces] = useState([]);  
-    const [MemberWorkspaces, setMemberWorkspaces] = useState([]);  
-    const [searchTerm, setSearchTerm] = useState('');
+    const [MemberWorkspaces, setMemberWorkspaces] = useState([]);
     const navigate = useNavigate();
     const [filteredOwnedWorkspaces, setFilteredOwnedWorkspaces] = useState([]);
     const [filteredMemberWorkspaces, setFilteredMemberWorkspaces] = useState([]);
