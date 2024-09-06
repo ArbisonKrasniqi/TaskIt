@@ -20,6 +20,7 @@ import WithAuth from "../Services/WithAuth.jsx";
 
 // import Preview from '../Components/Preview/preview.jsx';
 import AboutUs from '../Components/Preview/aboutus.jsx';
+import ContactUs from '../Components/Preview/contactus.jsx';
 
 const Main = () => {
     const {opened, workspaceId, boardId, taskId} = useParams();
@@ -87,6 +88,7 @@ const Main = () => {
                             {opened === 'loadingModal' && <LoadingModal/>}
                             {opened === 'members' && <Members />}
                             {opened === 'aboutus' && <AboutUs/>}
+                            {opened === 'contactus' && <ContactUs/>}
                         </div>
                     </div>
                 </div>

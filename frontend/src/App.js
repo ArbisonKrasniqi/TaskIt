@@ -4,6 +4,7 @@ import Dashboard from './Pages/dashboard.jsx';
 import Main from './Pages/Main.jsx'
 import Preview from './Components/Preview/preview.jsx';
 import AboutUs from './Components/Preview/aboutus.jsx';
+import ContactUs from './Components/Preview/contactus.jsx';
 import Boards from './Components/ContentFromSide/Boards.jsx';
 import TaskModal from './Components/TaskModal/TaskModal.jsx';
 import SignUpPage from './Pages/signUpPage.jsx';
@@ -22,6 +23,7 @@ const App = () => {
           <Route path="/dashboard/*" element={<Dashboard/>}/>
           <Route path="/preview" element={<Preview/>}/>
           <Route path="/aboutus" element={<AboutUs/>}/>
+          <Route path='/contactus' element={<ContactUs/>}/>
           <Route path="/board/:id" element={<Boards/>} />
           <Route path="/task" element={<TaskModal/>}/>
         </Routes>

@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import './contactus.css'
+import Swal from 'sweetalert2'
+import { IconBase } from 'react-icons';
 
-
-
-const AboutUs = () => {
+const ContactUs = () => {
     const [menuOpen, setMenuOpen] = useState(false);
 
     const toggleMenu = () => {
@@ -11,6 +12,36 @@ const AboutUs = () => {
     };
 
     const navigate = useNavigate();
+    const onSubmit = async (event) => {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+    
+        formData.append("access_key", "6b29339c-a880-4f94-af01-36637075a827");
+    
+        const object = Object.fromEntries(formData);
+        const json = JSON.stringify(object);
+    
+        const res = await fetch("https://api.web3forms.com/submit", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json"
+          },
+          body: json
+        }).then((res) => res.json());
+    
+        if (res.success) {
+            Swal.fire({
+                title: "Sent!",
+                text: "Message has been sent successfully!",
+                icon: "success"
+            });
+          
+        }
+      };
+
+
+    
 
     return(
         <div>
@@ -55,31 +86,29 @@ const AboutUs = () => {
                 </div>
             )}
 
-
-            <div style={{ height: '200px', backgroundColor: '#2E3440', textAlign: 'center', paddingTop: '40px'}}>
-                <h1 style={{fontSize: '2rem', fontWeight: 'bold', color: 'white'}}>About TaskIt</h1>
-                <h1 style={{fontSize: '1rem', color: 'white'}}>What’s behind the boards.</h1>
-            </div>
-
-           
-            <div style={{ paddingTop: '70px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-                <h1 style={{ fontSize: '2rem', fontWeight: 'bold', color: '#2E3440' }}>The way your team works is unique — so is TaskIt.</h1>
-                <p style={{ maxWidth: '1000px', width: '100%', fontSize: '1.4rem', lineHeight: '1.6', margin: '0 auto'}}>
-                    At TaskIt, we're passionate about helping individuals and teams stay organized, productive, and focused on what matters most. Our platform allows you to seamlessly manage your tasks, projects, 
-                    and collaborations in one easy-to-use interface. Whether you're planning a personal project, coordinating with a team, or 
-                    tracking progress on a large initiative, TaskIt provides the flexibility and efficiency you need to get things done.
-                    We believe in empowering people to achieve their goals without the clutter of unnecessary complexity. That's why TaskIt is designed to be intuitive, customizable, and responsive to the way you work. 
-                    With features like task boards, labels, lists, and real-time updates, our platform keeps you and your team on track no matter where you are.
-                </p>
-            </div>
-
-
-
-
-
+            <section className="contact">
+                <form onSubmit={onSubmit}>
+                    <h2>Contact Us</h2>
+                    <div className='input-box'>
+                        <label>Full Name</label>
+                        <input type="text" className="field" placeholder='Enter your full name' name='fullname' required/>
+                    </div>
+                    <div className='input-box'>
+                        <label>Email</label>
+                        <input type="email" className="field" placeholder='Enter your email' name='email' required/>
+                    </div>
+                    <div className='input-box'>
+                        <label>Your Message</label>
+                        <textarea name="message" className="field mess" placeholder='Enter your message' required></textarea>
+                    </div>
+                    <button type='submit'>Send Message</button>
+                
+                </form>
+            </section>
         </div>
-    );
 
+        
+    );
 }
 
-export default AboutUs;
+export default ContactUs;
