@@ -4,6 +4,7 @@ using backend.Mappers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using AutoMapper;
+using backend.DTOs.Board.Input;
 using backend.DTOs.Task;
 using backend.Repositories;
 using backend.Models;
@@ -345,7 +346,4 @@ public class LabelController : ControllerBase
         }
 
     }
-
-
-
 }

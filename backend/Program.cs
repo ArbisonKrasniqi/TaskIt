@@ -133,6 +133,7 @@ builder.Services.AddScoped<IChecklistRepository, ChecklistRepository>();
 builder.Services.AddScoped<IChecklistItemRepository, ChecklistItemRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<ILabelRepository, LabelRepository>();
+builder.Services.AddScoped<IWorkspaceActivityRepository, WorkspaceActivityRepository>();
 builder.Services.AddScoped<ITaskLabelRepository, TaskLabelRepository>();
 // CORS configuration
 builder.Services.AddCors(options =>

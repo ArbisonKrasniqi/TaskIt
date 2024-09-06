@@ -28,6 +28,8 @@ public class ApplicationDBContext : IdentityDbContext<User>
     public DbSet<TaskMember> TaskMember { get; set; }
     public DbSet<Label> Label { get; set; }
     public DbSet<Comment> Comment { get; set; }
+    public DbSet<WorkspaceActivity> WorkspaceActivity { get; set; }
+
     public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     public DbSet<TaskLabel> TaskLabel { get; set; }

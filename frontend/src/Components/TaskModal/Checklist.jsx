@@ -1,19 +1,32 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useRef } from 'react';
 import { IoMdCheckboxOutline } from 'react-icons/io';
 import { FaEllipsisH } from 'react-icons/fa';
-import { WorkspaceContext } from '../Side/WorkspaceContext.jsx'
-import { putData } from '../../Services/FetchService.jsx';
+import { WorkspaceContext } from '../Side/WorkspaceContext.jsx';
+import { deleteData, postData, putData } from '../../Services/FetchService.jsx';
+import ChecklistItemDeleteModal from './ChecklistItemDeleteModal.jsx';
+import { TaskModalsContext } from './TaskModal.jsx';
 
 const Checklist = () => {
+  const { checklists, checklistItems, setChecklistItems, setChecklists } = useContext(WorkspaceContext);
+  const {setIsChecklistModalOpen} = useContext(TaskModalsContext);
+  const [checklistItemDotsOpen, setChecklistItemDotsOpen] = useState(null);
+  const [addingItem, setAddingItem] = useState(null);
+  const [newItemContent, setNewItemContent] = useState('');
+  const [editingItemId, setEditingItemId] = useState(null);
+  const [editedContent, setEditedContent] = useState('');
 
-  const {checklists, checklistItems, setChecklistItems} = useContext(WorkspaceContext);
+  const [editingChecklistId, setEditingChecklistId] = useState(null);
+  const [editedChecklistTitle, setEditedChecklistTitle] = useState('');
+  
+  // Reference to the input element for focusing
+  const inputRef = useRef(null);
 
   const handleChange = async (checklistId, checklistItemId) => {
     setChecklistItems(prevItems => {
-      const updatedItems = {...prevItems};
+      const updatedItems = { ...prevItems };
       const checklistItems = updatedItems[checklistId].map(checklistItem => {
         if (checklistItem.checklistItemId === checklistItemId) {
-          return {...checklistItem, checked: !checklistItem.checked};
+          return { ...checklistItem, checked: !checklistItem.checked };
         }
         return checklistItem;
       });
@@ -22,16 +35,187 @@ const Checklist = () => {
     });
 
     try {
-      
-      await putData(`http://localhost:5157/backend/checklistItems/ChangeChecklistItemChecked?checklistItemId=${checklistItemId}`,{});
+      await putData(`http://localhost:5157/backend/checklistItems/ChangeChecklistItemChecked?checklistItemId=${checklistItemId}`, {});
+      setAddingItem(null);
+      setEditingItemId(null);
+      setEditingChecklistId(null);
+      setChecklistItemDotsOpen(null);
+      setIsChecklistModalOpen(false);
     } catch (error) {
-      console.error("Error fetching checklists:", error.message);
+      console.error("Error updating checklist item:", error.message);
     }
-    
   };
 
-  
-  
+  const toggleChecklistItemDots = (checklistItemId) => {
+    setChecklistItemDotsOpen(prevId => (prevId === checklistItemId ? null : checklistItemId));
+    setEditingItemId(null);
+    setAddingItem(null);
+    setEditingChecklistId(null);
+  };
+
+  const closeModal = () => {
+    setChecklistItemDotsOpen(null);
+  };
+
+  const handleChecklistDelete = async (checklistId) => {
+    try {
+      await deleteData('http://localhost:5157/backend/checklistItems/DeleteChecklistItembyChecklistId', { checklistId });
+      await deleteData('http://localhost:5157/backend/checklist/DeleteChecklist', { checklistId });
+
+      const updatedChecklists = checklists.filter(
+        (checklist) => checklist.checklistId !== checklistId
+      );
+      setChecklists(updatedChecklists);
+    } catch (error) {
+      console.error("Error deleting checklist: ", error.message);
+    }
+  };
+
+  const handleAddClick = (checklistId) => {
+    if (addingItem !== checklistId) {
+      setEditingItemId(null);
+      setEditingChecklistId(null);
+      setChecklistItemDotsOpen(null);
+      setIsChecklistModalOpen(false);
+    }
+    setAddingItem(checklistId);
+  };
+
+  const handleAddItem = async (checklistId) => {
+    try {
+      if (newItemContent.length < 2 || newItemContent.length > 280) {
+        console.log("Item content should be between 2 and 280 characters!");
+        return;
+      }
+
+      const data = {
+        content: newItemContent,
+        checklistId: checklistId
+      };
+
+      const response = await postData(`http://localhost:5157/backend/checklistItems/CreateChecklistItem`, data);
+
+      setChecklistItems(prevItems => {
+        const updatedItems = { ...prevItems };
+        updatedItems[checklistId] = [...updatedItems[checklistId], response.data];
+        return updatedItems;
+      });
+
+      setNewItemContent('');
+      setAddingItem(null);
+    } catch (error) {
+      console.error("Error adding checklist item:", error.message);
+    }
+  };
+
+  const handleCancelAddItem = () => {
+    setAddingItem(null);
+    setNewItemContent('');
+  };
+
+  // Handle the click on a checklist item to start editing
+  const handleItemClick = (checklistItemId, currentContent) => {
+    setEditingItemId(checklistItemId);
+    setEditedContent(currentContent);
+    
+    // Focus the input after setting the editing item
+    setTimeout(() => {
+      if (inputRef.current) {
+        setAddingItem(null);
+        setChecklistItemDotsOpen(null);
+        setEditingChecklistId(null);
+        inputRef.current.focus();
+      }
+    }, 0);
+  };
+
+  const handleSaveEdit = async (checklistId, checklistItem) => {
+    try {
+      if (editedContent.length < 2 || editedContent.length > 280) {
+        console.log("Item content should be between 2 and 280 characters!");
+        return;
+      }
+
+      const data = {
+        checklistItemId: checklistItem.checklistItemId,
+        content: editedContent,
+        checked: checklistItem.checked,
+        checklistId: checklistId
+      };
+
+      await putData('http://localhost:5157/backend/checklistItems/UpdateChecklistItem', data);
+
+      setChecklistItems(prevItems => {
+        const updatedItems = { ...prevItems };
+        updatedItems[checklistId] = updatedItems[checklistId].map(item =>
+          item.checklistItemId === checklistItem.checklistItemId ? { ...item, content: editedContent } : item
+        );
+        return updatedItems;
+      });
+
+      setEditingItemId(null);
+      setEditedContent('');
+    } catch (error) {
+      console.error('Error updating checklist item:', error.message);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingItemId(null);
+    setEditedContent('');
+  };
+
+  const handleTitleEdit = (checklistId, currentTitle) => {
+    setEditingChecklistId(checklistId);
+    setEditedChecklistTitle(currentTitle);
+    setAddingItem(null);
+    setEditingItemId(null);
+    setChecklistItemDotsOpen(null);
+    setTimeout(() => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    }, 0);
+  };
+
+
+  const handleSaveTitle = async (checklistId, taskId) => {
+
+    try {
+      if (editedChecklistTitle.length < 2 || editedChecklistTitle.length > 280) {
+        console.log("Title should be between 2 and 280 characters!");
+        return;
+      }
+
+      const data = {
+        checklistId: checklistId,
+        title: editedChecklistTitle,
+        taskId: taskId
+      };
+
+      await putData('http://localhost:5157/backend/checklist/UpdateChecklist',data);
+
+      const updatedChecklists = checklists.map((checklist) =>
+        checklist.checklistId === checklistId ? { ...checklist, title: editedChecklistTitle } : checklist
+      );
+      setChecklists(updatedChecklists);
+      setEditingChecklistId(null);
+      setEditedChecklistTitle('');
+    } catch (error) {
+      console.error("Error updating checklist title: ",error.message);
+      
+      
+    }
+  }
+
+
+
+  const handleCancelEditTitle = () => {
+    setEditingChecklistId(null);
+    setEditedChecklistTitle('');
+  };
+
+
   return (
     <div>
       {checklists.length > 0 && checklists.map(checklist => (
@@ -41,8 +225,42 @@ const Checklist = () => {
               <IoMdCheckboxOutline />
             </div>
             <div className="flex flex-row justify-between w-11/12">
-              <span className="h-10 items-center flex font-semibold">{checklist.title}</span>
-              <button className="font-semibold p-2 h-10 rounded-[4px] text-sm bg-gray-600 bg-opacity-30 w-[70px]">
+              {editingChecklistId === checklist.checklistId ? (
+                  <div className="text-sm flex my-2 items-center justify-between w-[100%] p-2">
+                    <input
+                      type="text"
+                      value={editedChecklistTitle}
+                      onChange={(e) => setEditedChecklistTitle(e.target.value)}
+                      className="bg-gray-700 text-sm rounded p-1 w-full mr-2"
+                      minLength={2}
+                      maxLength={280}
+                      ref={inputRef} // Attach the reference to the input
+                    />
+                    <button
+                      className="bg-blue-500 hover:bg-blue-600 text-gray-800 font-semibold text-sm rounded px-2 py-1 mr-2"
+                      onClick={() => handleSaveTitle(checklist.checklistId, checklist.taskId)}
+                    >
+                      Save
+                    </button>
+                    <button
+                      className="bg-gray-800 hover:bg-slate-700 font-semibold text-sm rounded px-2 py-1"
+                      onClick={handleCancelEditTitle}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <span
+                    className="h-10 items-center flex font-semibold cursor-pointer"
+                    onClick={() => handleTitleEdit(checklist.checklistId, checklist.title)}
+                  >
+                    {checklist.title}
+                  </span>
+                )}
+              <button
+                className="font-semibold p-2 h-10 rounded-[4px] text-sm bg-gray-600 bg-opacity-30 w-[70px]"
+                onClick={() => handleChecklistDelete(checklist.checklistId)}
+              >
                 Delete
               </button>
             </div>
@@ -78,20 +296,95 @@ const Checklist = () => {
                   )}
                 </div>
               </label>
-              <div className="flex items-center w-11/12">
-                <span className="text-sm flex my-2 items-center justify-between w-[100%] hover:bg-gray-700 rounded-xl p-2">
-                  {checklistItem.content}
-                  <button className="w-[5%] h-6 rounded-full flex justify-center items-center text-sm bg-gray-600 bg-opacity-75 outline-white">
-                    <FaEllipsisH />
-                  </button>
-                </span>
+
+              <div className="flex items-center w-11/12 relative">
+                {editingItemId === checklistItem.checklistItemId ? (
+                  <div className="text-sm flex my-2 items-center justify-between w-[100%] p-2">
+                    <input
+                      type="text"
+                      value={editedContent}
+                      onChange={(e) => setEditedContent(e.target.value)}
+                      className="bg-gray-700 text-sm rounded p-1 w-full mr-2"
+                      minLength={2}
+                      maxLength={280}
+                      ref={inputRef} // Attach the reference to the input
+                    />
+                    <button
+                      className="bg-blue-500 hover:bg-blue-600 text-gray-800 font-semibold text-sm rounded px-2 py-1 mr-2"
+                      onClick={() => handleSaveEdit(checklist.checklistId, checklistItem)}
+                    >
+                      Save
+                    </button>
+                    <button
+                      className="bg-gray-800 hover:bg-slate-700 font-semibold text-sm rounded px-2 py-1"
+                      onClick={handleCancelEdit}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <span
+                    className="text-sm flex my-2 items-center justify-between w-[100%] hover:bg-gray-700 rounded-xl p-2 cursor-pointer"
+                    onClick={() => handleItemClick(checklistItem.checklistItemId, checklistItem.content)}
+                  >
+                    {checklistItem.content}
+                    <button
+                      className="w-[5%] flex h-6 rounded-full hover:bg-gray-600 justify-center items-center"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleChecklistItemDots(checklistItem.checklistItemId);
+                      }}
+                    >
+                      <FaEllipsisH />
+                    </button>
+                  </span>
+                )}
+
+                {checklistItemDotsOpen === checklistItem.checklistItemId && (
+                  <ChecklistItemDeleteModal
+                    checklistItemId={checklistItem.checklistItemId}
+                    closeModal={closeModal}
+                  />
+                )}
               </div>
             </div>
           ))}
-          <p className='ml-20'><button className='bg-gray-600 bg-opacity-30 text-sm rounded  px-2 py-1 items-center justify-center'>Add an item</button></p>
+
+          <div className="flex w-full items-center px-4 mt-4 mb-2">
+            {addingItem === checklist.checklistId ? (
+              <div className="flex flex-col ml-10 my-2 w-[70%]">
+                  <textarea className="bg-gray-700 text-sm rounded p-1 w-[100%] mr-2"
+                  placeholder="Add an item"
+                  value={newItemContent}
+                  minLength={2}
+                  maxLength={280}
+                  onChange={(e) => setNewItemContent(e.target.value)}></textarea>
+                <div className='flex mt-1'>
+                  <button
+                    className="bg-blue-500 hover:bg-blue-600 text-gray-800 font-semibold text-sm rounded px-2 py-1 mr-2"
+                    onClick={() => handleAddItem(checklist.checklistId)}
+                  >
+                    Add
+                  </button>
+                  <button
+                    className="bg-gray-800 hover:bg-slate-700 font-semibold text-sm rounded px-2 py-1"
+                    onClick={handleCancelAddItem}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                className="bg-gray-600 bg-opacity-30 text-sm rounded px-2 py-1"
+                onClick={() => handleAddClick(checklist.checklistId)}
+              >
+                Add an item
+              </button>
+            )}
+          </div>
         </div>
       ))}
-      
     </div>
   );
 };

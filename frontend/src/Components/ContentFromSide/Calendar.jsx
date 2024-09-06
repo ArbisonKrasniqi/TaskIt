@@ -43,7 +43,7 @@ const Calendar = () => {
                                     index === 0 ? 'bg-blue-500 text-white border-blue-500' : 'bg-gray-200 border-gray-400 text-gray-500'
                                 }`}
                             >
-                                <div className="mb-4">
+                                <div className="mb-4 turncate">
                                     {formatDate(date)}
                                 </div>
                                 <div className="text-sm text-left p-2 flex flex-col">
@@ -52,7 +52,7 @@ const Calendar = () => {
                                             <p key={i}  className="truncate">{task.taskTitle}</p>
                                         ))
                                     ) : (
-                                        <p>No tasks</p>
+                                        <p className="truncate">No tasks</p>
                                     )}
                                 </div>
                             </div>
