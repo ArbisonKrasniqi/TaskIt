@@ -6,19 +6,36 @@ import DeleteWorkspaceModal from "./DeleteWorkspaceModal";
 import MessageModal from "./MessageModal";
 const WorkspaceSettings = () =>{
 
-    const { workspace, setWorkspace, roli, setShowDeleteWorkspaceModal, showDeleteWorkspaceModal } = useContext(WorkspaceContext);
+    const { workspace, setWorkspace, roli, setShowDeleteWorkspaceModal, showDeleteWorkspaceModal, activities, getInitials } = useContext(WorkspaceContext);
     const [isEditing, setIsEditing] = useState(false);
     const[description, setDescription] =useState('');
     const[errorMessage, setErrorMessage] = useState('');
     const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
     const [message, setMessage] = useState('');
-    
+    const [visibleActivities, setVisibleActivities] = useState(10);
 
+
+    const formatDateTime = (dateString) => {
+        const date = new Date(dateString);
+        // Format date to 'MM/DD/YYYY'
+        const formattedDate = date.toLocaleDateString('en-US');
+        // Format time to 'HH:MM' (24-hour or 12-hour format based on locale)
+        const formattedTime = date.toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true 
+        });
+        return `${formattedDate} - ${formattedTime}`;
+    };
    // const roli = "Member";
     if (workspace == null) {
         return <div>Loading...</div>;
     }
 
+    //FUNKSIONI PER TE NGARKUAR ME SHUME AKTIVITETE
+    const loadMoreActivities = () => {
+        setVisibleActivities(prev => prev + 10); 
+    };
     const handleDelete = () =>{
         setMessage("Workspace deleted successfully!");
         setIsMessageModalOpen(true);
@@ -75,9 +92,15 @@ const WorkspaceSettings = () =>{
         {!isEditing ? (
             <div>
                 <p className="text-l mt-3 mb-10">{workspace.description}</p>
+                {roli === "Owner" ? (
+               <>
                 <button className="text-blue-500 hover:text-blue-700" onClick={handleEditClick}>
                     Edit description
                 </button>
+                </>
+                ) : (<></>)}
+               
+               
                 </div>
         ): (
             <div>
@@ -101,7 +124,33 @@ const WorkspaceSettings = () =>{
     <hr className="w-full border-gray-400"></hr>
     <h1 className="text-3xl mt-10 ml-20 mb-10 font-semibold font-sans text-gray-400">
     Workspace Activity</h1>
-    <hr className="w-full border-gray-400"></hr>
+    <div className="mt-10 ml-10">
+    {activities
+        .sort((a, b) => new Date(b.actionDate) - new Date(a.actionDate)) // Sorting activities by date (newest first)
+        .slice(0, visibleActivities)
+        .map((activity, index) => (
+    <div key={index} className="flex items-center text-gray-300 mb-4">
+    
+      <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-m text-white bg-gradient-to-r from-orange-400 to-orange-600">
+        {getInitials(activity.userName, activity.userLastName)}
+      </div>
+
+      <div className="ml-2">
+        <p><b>{activity.userName} {activity.userLastName} </b>{activity.actionType} {activity.entityName}</p>
+        <p className="text-sm text-gray-500">{formatDateTime(activity.actionDate)}</p>
+      </div>
+    </div>
+  ))}
+    {visibleActivities < activities.length && (
+        <button
+            className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            onClick={loadMoreActivities}
+        >
+            Load More
+        </button>
+    )}
+</div>
+    <hr className="w-full border-gray-400 mt-5"></hr>
     <div className="mt-10 ml-10">
     {roli === "Owner" ? (
                     <>

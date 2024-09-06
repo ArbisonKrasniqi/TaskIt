@@ -12,6 +12,11 @@ const NotificationButton = (props) => {
     const [workspaceTitles, setWorkspaceTitles] = useState([]);
     const navigate = useNavigate();
    
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        // Format date to 'MM/DD/YYYY' or any other format you prefer
+        return date.toLocaleDateString('en-US');
+    };
     
     const getInvites = async () => {
         try {
@@ -104,6 +109,8 @@ const NotificationButton = (props) => {
                                     </div>
                                     <p className="text-sm mt-2">
                                         invited you to join the workspace  <span className="font-bold"> {workspaceTitles[index]}</span>.
+                                        <br/>
+                                        <span>{formatDate(invite.dateSent)}</span>
                                     </p>
                                     <div className="mt-3 flex space-x-2">
                                         <button

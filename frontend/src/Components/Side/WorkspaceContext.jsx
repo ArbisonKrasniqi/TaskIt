@@ -42,6 +42,7 @@ export const WorkspaceProvider = ({ children }) => {
     const [list, setList] = useState(null);
     const{} = useParams();
     const [checklists, setChecklists] = useState([]);
+    const [activities, setActivities]= useState([]);
 
     useEffect(() => {
         const getWorkspaces = async () => {
@@ -67,6 +68,31 @@ export const WorkspaceProvider = ({ children }) => {
         // const interval = setInterval(getWorkspaces, 5 * 1000);
         // return () => clearInterval(interval); //Get workspaces every 5 seconds
     }, [userId, mainContext.userInfo.accessToken]);
+
+    useEffect(()=>{
+        const getActivities = async () =>{
+            try{
+                if(workspace){
+                    const activityResponse = await getDataWithId("http://localhost:5157/GetWorkspaceActivityByWorkspaceId?WorkspaceId", WorkspaceId);
+                    console.log("Te dhenat e aktivitetit ",activityResponse.data)
+                    const activityData = activityResponse.data;
+                    if (activityData && Array.isArray(activityData) && activityData.length > 0) {
+                        setActivities(activityData);
+                    } else {
+                        setActivities([]);
+                        console.log("There is no activity");
+                    }
+                }
+                //Waiting for userIdn
+            } catch (error) {
+                console.error("There has been an error fetching workspaces")
+                setWorkspaces([]);
+            }
+        };
+        getActivities();
+        console.log("Activity fetched ",activities);
+    },[workspace]);
+    
     useEffect(() => {
         const getWorkspace = async () => {
             try {
@@ -87,7 +113,7 @@ export const WorkspaceProvider = ({ children }) => {
         // return () => clearInterval(interval); //Get workspace every 5 seconds
     }, [WorkspaceId, userId, mainContext.userInfo.accessToken]);//userid
 
- 
+
     useEffect(()=>{
         if (workspace && WorkspaceId && userId) {
             const ownerId = workspace.ownerId;
@@ -343,7 +369,7 @@ export const WorkspaceProvider = ({ children }) => {
             if (!firstName || !lastName) {
                 return '';
             }
-            return `${firstName.charAt(0)}${lastName.charAt(0)}`;
+            return `${firstName.charAt(0).toUpperCase()}${lastName.charAt(0).toUpperCase()}`;
         };
 
         const getInitialsFromFullName = (fullName) => {
@@ -602,7 +628,8 @@ export const WorkspaceProvider = ({ children }) => {
             setLists,
             handleCreateList,
             listId,
-            list
+            list,
+            activities
         }}>
             {children}
         </WorkspaceContext.Provider>

@@ -132,6 +132,7 @@ builder.Services.AddScoped<IChecklistRepository, ChecklistRepository>();
 builder.Services.AddScoped<IChecklistItemRepository, ChecklistItemRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<ILabelRepository, LabelRepository>();
+builder.Services.AddScoped<IWorkspaceActivityRepository, WorkspaceActivityRepository>();
 // CORS configuration
 builder.Services.AddCors(options =>
 {
@@ -157,6 +158,7 @@ builder.Services.AddAutoMapper(typeof(ListProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(TaskProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(InviteProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(UserProfile).Assembly);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

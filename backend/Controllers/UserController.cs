@@ -308,15 +308,6 @@ namespace backend.Controllers;
                 }
                 try
                 {
-                    var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
-                    var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
-                    if (string.IsNullOrEmpty(userId))
-                    {
-                        return NotFound("User Not Found!");
-                    }
-
-                    if (userId == editUserDto.Id || userTokenRole == "Admin")
-                    {
                         //Check user that is being edited if it exists.
                         var user = await _userManager.FindByIdAsync(editUserDto.Id);
                         if (user == null) return BadRequest("User does not exist!");
@@ -345,7 +336,6 @@ namespace backend.Controllers;
                         }
 
                         //Apply changes
-
                         var editResult = await _userManager.UpdateAsync(user);
                         if (editResult.Succeeded)
                         {
@@ -353,14 +343,11 @@ namespace backend.Controllers;
                         }
 
                         return StatusCode(500, "User could not be updated!");
-                    }
-                    return StatusCode(401, "You are not authorized!");
                 }
                 catch (Exception e)
                 {
                     return StatusCode(500, e);
                 }
-
         }
 
         [HttpPut("adminUpdatePassword")]
@@ -379,15 +366,6 @@ namespace backend.Controllers;
             
             try
             {
-                var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
-                var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
-                if (string.IsNullOrEmpty(userId))
-                {
-                    return NotFound("User Not Found!");
-                }
-
-                if (userId == editUserPasswordDto.Id || userTokenRole == "Admin")
-                {
                     //Check if user first exists.
                     var user = await _userManager.FindByIdAsync(editUserPasswordDto.Id);
                     if (user == null) return BadRequest("User does not exist!");
@@ -418,8 +396,6 @@ namespace backend.Controllers;
                     }
 
                     return StatusCode(500, "Password could not be changed!");
-                }
-                return StatusCode(401, "You are not authorized!");
             }
             catch (Exception e)
             {
