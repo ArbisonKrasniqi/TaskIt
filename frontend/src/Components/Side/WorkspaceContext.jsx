@@ -487,9 +487,9 @@ export const WorkspaceProvider = ({ children }) => {
                 try {
                     if (boardId) {
                         const listsResponse = await getDataWithId("/backend/list/GetListByBoardId?boardId",boardId);
-                        const listData = listsResponse.data;
-                        if (listData) {
-                            setLists(listData);
+                        const listsData = listsResponse.data;
+                        if (listsData) {
+                            setLists(listsData);
                         } else {
                             console.log("There are no lists");
                         }
@@ -608,7 +608,8 @@ export const WorkspaceProvider = ({ children }) => {
             list,
             isLoading,
             setIsLoading,
-            getWorkspaces
+            getWorkspaces,
+            setList
         }}>
             {children}
         </WorkspaceContext.Provider>
