@@ -23,10 +23,10 @@ const List = ({ listData = [], setLists, isSingleList = false }) => {
           >
             <h3 className="text-xl font-bold mb-4">{listData.title}</h3>
             {/* Uncomment the following lines to render tasks and task form */}
-            {/* {listData.tasks.map((task) => (
+            {listData.tasks.map((task) => (
               <Task key={task.id} task={task} />
             ))}
-            <TaskForm onAddTask={(task) => addTask(listData.id, task)} /> */}
+            <TaskForm />
           </div>
         ))}
         {isSingleList ? null : <ListForm  />}

@@ -1,10 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using backend.DTOs.Checklist.Output;
-using backend.DTOs.TaskMember.Output;
 
 namespace backend.DTOs.Task;
 
-public class TaskDto{
+public class TaskDtoLabels
+{
     public int TaskId { get; set; }
     [Required]
     [MinLength(2, ErrorMessage = "Title must be at least 2 characters")]
@@ -20,7 +20,9 @@ public class TaskDto{
     [Range(0, int.MaxValue, ErrorMessage = "List Id can not be negative!")]
     public int ListId { get; set; }
     public DateTime DueDate { get; set; }
-    public DateTime DateAdded { get; set; }
+    
+    public List<ChecklistDTO> Checklists { get; set; }
     public List<Models.Label> Labels { get; set; }
-    public List<TaskMemberDto> TaskMembers { get; set; }
+
+    public DateTime DateAdded { get; set; }
 }

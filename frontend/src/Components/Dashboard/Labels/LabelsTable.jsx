@@ -4,26 +4,29 @@ import { DashboardContext } from "../../../Pages/dashboard";
 import { deleteData } from "../../../Services/FetchService";
 import UpdateLabelButton from "./Buttons/UpdateLabelButton";
 import CustomButton from "../Buttons/CustomButton";
+import { useParams } from "react-router-dom";
 
 export const UpdateContext = createContext();
 
 const LabelsTable = () => {
+    const {taskId} = useParams();
     const labelsContext = useContext(LabelsContext);
     const dashboardContext = useContext(DashboardContext);
     const [searchQuery, setSearchQuery] = useState('');
 
-    const HandleLabelDelete = (id) => {
+    const HandleLabelDelete = (labelId) => {
         async function deleteLabel() {
             try {
                 const data = {
-                    labelId: id
+                    labelId: labelId,
+                    taskId: taskId,
                 };
-                const response = await deleteData('/backend/label/DeleteLabel?LabelId', data);
+                const response = await deleteData('/backend/taskLabel/RemoveLabelFromTask', data);
                 console.log(response);
-                const updatedLabels = labelsContext.labels.filter(label => label.labelId !== id);
+                const updatedLabels = labelsContext.labels.filter(label => label.labelId !== labelId);
                 labelsContext.setLabels(updatedLabels);
             } catch (error) {
-                dashboardContext.setDashboardErrorMessage(error.message + id);
+                dashboardContext.setDashboardErrorMessage(error.message);
                 dashboardContext.setShowDashboardErrorModal(true);
                 labelsContext.getLabels();
             }
@@ -86,6 +89,8 @@ const LabelsTable = () => {
                                         <UpdateContext.Provider value={label}>
                                             <UpdateLabelButton/>
                                         </UpdateContext.Provider>
+                                        {
+                                        taskId &&
                                         <CustomButton
                                             color="red"
                                             text="Delete"
@@ -93,6 +98,7 @@ const LabelsTable = () => {
                                                 HandleLabelDelete(label.labelId);
                                             }}
                                         />
+                                        }
                                     </td>
                                 </tr>
                             ))

@@ -36,7 +36,7 @@ const BoardsTable = () => {
 
     const handleBoardRowClick = boardId => {
         console.log(boardId);
-        navigate(`/dashboard/lists/${boardId}`);
+        navigate(`/dashboard/board/${boardId}`);
     }
 
     const handleSearchChange = (event) => {

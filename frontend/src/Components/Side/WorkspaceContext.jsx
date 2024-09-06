@@ -43,11 +43,12 @@ export const WorkspaceProvider = ({ children }) => {
     const{} = useParams();
     const [checklists, setChecklists] = useState([]);
     const [activities, setActivities]= useState([]);
+    const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
+
         const getWorkspaces = async () => {
             try {
-                if (userId) {
+                setIsLoading(true);
                     const workspacesResponse = await getDataWithId('http://localhost:5157/backend/workspace/GetWorkspacesByMemberId?memberId', userId);
                     const workspacesData = workspacesResponse.data;
                     if (workspacesData && Array.isArray(workspacesData) && workspacesData.length > 0) {
@@ -56,18 +57,22 @@ export const WorkspaceProvider = ({ children }) => {
                         setWorkspaces([]);
                         console.log("There are no workspaces");
                     }
-                }
                 //Waiting for userIdn
             } catch (error) {
                 console.error("There has been an error fetching workspaces")
                 setWorkspaces([]);
+            } finally {
+                setIsLoading(false);
             }
         };
-        getWorkspaces();
-        
+    useEffect(() => {
+        if (userId) {
+            getWorkspaces();
+        }
+    }, [userId]);
         // const interval = setInterval(getWorkspaces, 5 * 1000);
         // return () => clearInterval(interval); //Get workspaces every 5 seconds
-    }, [userId, mainContext.userInfo.accessToken]);
+ 
 
     useEffect(()=>{
         const getActivities = async () =>{
@@ -630,7 +635,10 @@ export const WorkspaceProvider = ({ children }) => {
             handleCreateList,
             listId,
             list,
-            activities
+            activities,
+            isLoading,
+            setIsLoading,
+            getWorkspaces
         }}>
             {children}
         </WorkspaceContext.Provider>

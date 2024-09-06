@@ -1,7 +1,7 @@
 import React, { useState, useContext, createContext } from 'react';
 import UpdateUserButton from "./Buttons/UpdateUserButton.jsx";
 import { deleteData } from '../../../Services/FetchService.jsx';
-import { UserContext } from "./UsersList.jsx";
+import { UserContext } from './UsersList.jsx';
 import CustomButton from "../Buttons/CustomButton.jsx";
 import { useNavigate } from "react-router-dom";
 import { DashboardContext } from '../../../Pages/dashboard.jsx';
@@ -33,14 +33,13 @@ const UsersTable = () => {
 
     const handleRowClick = userId => {
         console.log(userId);
-        navigate(`/dashboard/workspaces/${userId}`);
+        navigate(`/dashboard/user/${userId}`);
     }
 
     const handleSearchChange = (event) => {
         setSearchQuery(event.target.value.toLowerCase());
     }
 
-    // Ensure userContext.users is always an array
     const users = userContext.users || [];
     const filteredUsers = users.filter(user => {
         return (

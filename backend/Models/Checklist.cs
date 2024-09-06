@@ -12,4 +12,5 @@ public class Checklist
     public DateTime DateCreated { get; set; } = DateTime.Now;
     public int TaskId { get; set; }
     public List<ChecklistItem>? ChecklistItems { get; set; }
+    public virtual Tasks Task { get; set; }
 }

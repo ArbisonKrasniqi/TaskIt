@@ -364,7 +364,7 @@ public class TaskMemberController : ControllerBase
     [HttpDelete("DeleteMember")]
     [Authorize(AuthenticationSchemes = "Bearer")]
     [Authorize(Policy = "AdminOnly")]
-    public async Task<IActionResult> DeleteTaskMemberById([FromQuery] TaskMemberIdDto taskMemberIdDto)
+    public async Task<IActionResult> DeleteTaskMemberById(TaskMemberIdDto taskMemberIdDto)
     {
         if (!ModelState.IsValid)
         {

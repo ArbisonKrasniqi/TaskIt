@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { postData } from '../../../../Services/FetchService';
+import { BackgroundContext } from '../BackgroundsList';
 
 const BackgroundCreationModal = ({ open, onClose, onBackgroundCreated }) => {
 
@@ -7,6 +8,7 @@ const BackgroundCreationModal = ({ open, onClose, onBackgroundCreated }) => {
     const [backgroundTitle, setBackgroundTitle] = useState('');
     const [imageFile, setImageFile] = useState(null);
     const [errorMessage, setErrorMessage] = useState('');
+    const backgroundContext = useContext(BackgroundContext);
 
     
 
@@ -46,9 +48,10 @@ const BackgroundCreationModal = ({ open, onClose, onBackgroundCreated }) => {
 
         console.log("Background created successfully");
         onBackgroundCreated(response.data);
+        backgroundContext.handleBackgroundCreate();
         onClose();
     } catch (error) {
-        console.error("Error response data:", error.response.data);
+        console.error("Error response data:", error.message);
     }
 };
 
