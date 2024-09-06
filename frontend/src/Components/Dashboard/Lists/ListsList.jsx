@@ -9,6 +9,7 @@ export const ListsContext = createContext();
 
 const ListsList = () => {
     const { boardId } = useParams(); 
+    
     const [lists, setLists] = useState(null);
     const dashboardContext = useContext(DashboardContext);
 

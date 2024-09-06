@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using backend.DTOs.Checklist.Output;
+using backend.DTOs.TaskMember.Output;
 
 namespace backend.DTOs.Task;
 
@@ -21,4 +22,5 @@ public class TaskDto{
     public DateTime DueDate { get; set; }
     public DateTime DateAdded { get; set; }
     public List<Models.Label> Labels { get; set; }
+    public List<TaskMemberDto> TaskMembers { get; set; }
 }

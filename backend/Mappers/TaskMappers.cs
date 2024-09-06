@@ -1,11 +1,12 @@
 using backend.DTOs.Task;
+using backend.DTOs.TaskMember.Output;
 using backend.Models;
 
 namespace backend.Mappers;
 
 public static class TaskMappers{
 
-    public static TaskDto ToTaskDto (this Tasks taskModel, List<Models.Label> labels){
+    public static TaskDto ToTaskDto (this Tasks taskModel, List<Models.Label> labels, List<TaskMemberDto> taskMembers){
         return new TaskDto{
             TaskId = taskModel.TaskId,
             Title = taskModel.Title,
@@ -13,11 +14,12 @@ public static class TaskMappers{
             ListId = taskModel.ListId,
             DueDate = taskModel.DueDate,
             DateAdded = taskModel.DateAdded,
-            Labels = labels
+            Labels = labels,
+            TaskMembers = taskMembers
         };
     }
 
-    public static TaskInfoDto2 toTaskInfoDto2(this TaskInfoDto taskModel, List<Models.Label> labels)
+    public static TaskInfoDto2 toTaskInfoDto2(this TaskInfoDto taskModel, List<Models.Label> labels, List<TaskMemberDto> taskMembers)
     {
         return new TaskInfoDto2
         {
@@ -26,7 +28,8 @@ public static class TaskMappers{
             ListTitle = taskModel.ListTitle,
             BoardTitle = taskModel.BoardTitle,
             DueDate = taskModel.DueDate,
-            Labels = labels
+            Labels = labels,
+            TaskMembers = taskMembers
         };
     } 
 

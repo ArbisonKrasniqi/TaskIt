@@ -15,8 +15,10 @@ namespace backend.Controllers;
 [ApiController]
 
 
-public class LabelController : ControllerBase{
+public class LabelController : ControllerBase
+{
 
+    private readonly ITaskRepository _taskRepo;
     private readonly ILabelRepository _labelRepo;
     private readonly IUserRepository _userRepo;
     private readonly IMembersRepository _memberRepo;
@@ -25,8 +27,10 @@ public class LabelController : ControllerBase{
     private readonly IListRepository _listRepo;
     private readonly IWorkspaceRepository _workspaceRepo;
 
-    public LabelController (ILabelRepository labelRepo, IUserRepository userRepo, IMembersRepository memberRepo, IMapper mapperRepo, IBoardRepository boardRepo, IListRepository listRepo, IWorkspaceRepository workspaceRepo){
-       
+    public LabelController (ITaskRepository taskRepo, ILabelRepository labelRepo, IUserRepository userRepo, IMembersRepository memberRepo, IMapper mapperRepo, IBoardRepository boardRepo, IListRepository listRepo, IWorkspaceRepository workspaceRepo)
+    {
+
+        _taskRepo = taskRepo;
         _labelRepo = labelRepo;
         _userRepo = userRepo;
         _memberRepo = memberRepo;
@@ -51,6 +55,53 @@ public class LabelController : ControllerBase{
             return Ok(labelDtos);
         }catch(Exception e){
             return StatusCode(500, "Internal server error!" + e.Message);
+        }
+    }
+
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    [HttpGet("GetLabelsByTaskId")]
+    public async Task<IActionResult> GetLabelsByTaskId(int taskId)
+    {
+        try
+        {
+            var task = await _taskRepo.GetTaskByIdAsync(taskId);
+            if (task == null) return NotFound("Task not found");
+
+            var list = await _listRepo.GetListByIdAsync(task.ListId);
+            if (list == null) return NotFound("List not found");
+
+            var board = await _boardRepo.GetBoardByIdAsync(list.BoardId);
+            if (board == null) return NotFound("Board not found");
+
+            var workspace = await _workspaceRepo.GetWorkspaceByIdAsync(board.WorkspaceId);
+            if (workspace == null) return NotFound("Workspace not found");
+            
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+            var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+            var isMember = await _memberRepo.IsAMember(userId, workspace.WorkspaceId);
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspace.WorkspaceId);
+            if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+            {
+                return StatusCode(403, "The board is closed");
+            }
+
+            if (isMember || userTokenRole == "Admin")
+            {
+                var labels = await _labelRepo.GetLabelsByTaskId(taskId);
+                if (labels.Count == 0)
+                {
+                    return Ok(new List<LabelDto>());
+                }
+
+                var labelDtos = _mapperRepo.Map<List<LabelDto>>(labels);
+                return Ok(labelDtos);
+            }
+
+            return StatusCode(401, "You are not authorized");
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, "Internal server error");
         }
     }
 

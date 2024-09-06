@@ -9,16 +9,22 @@ import { useParams } from "react-router-dom";
 export const LabelsContext = createContext();
 
 const LabelsList = () => {
-    const {boardId} = useParams();
+    const {boardId,taskId} = useParams();
     const [labels, setLabels] = useState(null);
     const dashboardContext = useContext(DashboardContext);
 
     const getLabels = async () => {
         try{
             if (boardId) {
+                console.log('boardId:' +boardId);
                 const labelsWithBoardId = await getDataWithId('/backend/label/GetLabelsByBoardId?boardId', boardId);
                 setLabels (labelsWithBoardId.data);
+            } else if (taskId) {
+                console.log('taskId'+taskId);
+                const labelsWithTaskId = await getDataWithId('/backend/label/GetLabelsByTaskId?taskId', taskId);
+                setLabels(labelsWithTaskId.data);
             } else {
+                console.log('ska id???');
                 const allLabels = await getData("/backend/label/GetAllLabels");
                 setLabels(allLabels.data);
             }

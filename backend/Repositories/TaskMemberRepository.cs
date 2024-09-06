@@ -1,5 +1,6 @@
 ﻿using backend.Data;
 using backend.DTOs.TaskMember.Input;
+using backend.DTOs.TaskMember.Output;
 using backend.Interfaces;
 using backend.Models;
 using Microsoft.EntityFrameworkCore;
@@ -28,19 +29,33 @@ public class TaskMemberRepository : ITaskMemberRepository
     }
     
     //GET ALL BY TaskID
-    public async Task<List<TaskMember>> GetAllTaskMembersByTaskIdAsync(int taskId)
+    public async Task<List<TaskMemberDto>> GetAllTaskMembersByTaskIdAsync(int taskId)
     {
-        var task = await _context.Tasks.
-            Include(t => t.TaskMembers).
-            ThenInclude(t => t.User)
+        var task = await _context.Tasks
+            .Include(t => t.TaskMembers)
+            .ThenInclude(tm => tm.User)
             .FirstOrDefaultAsync(x => x.TaskId == taskId);
 
+        // Handle the case where the task is not found
         if (task == null)
         {
             throw new KeyNotFoundException("Task Not found!");
         }
 
-        return task.TaskMembers.ToList();
+        // Map the task members to TaskMemberDto, including FirstName and LastName
+        var taskMembersDto = task.TaskMembers.Select(tm => new TaskMemberDto
+        {
+            TaskMemberId = tm.TaskMemberId,
+            UserId = tm.UserId,
+            FirstName = tm.User.FirstName, // Assuming User has FirstName
+            LastName = tm.User.LastName,
+            DateJoined = tm.DateJoined,
+            TaskId = tm.TaskId
+            // Assuming User has LastName
+            // Map other TaskMemberDto properties if needed
+        }).ToList();
+
+        return taskMembersDto;
     }
 
     //ADD MEMBER TO TASK
