@@ -78,6 +78,10 @@ const WorkspaceSettings = () =>{
         }));
         
         setIsEditing(false);
+        setMessage("Workspace description updated successfully!");
+        setIsMessageModalOpen(true);  // This should trigger the modal
+    
+      
         }catch (error) {
             console.log('Error response data: ', error.response?.data || error.message);
         }

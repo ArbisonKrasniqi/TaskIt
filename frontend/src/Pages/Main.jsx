@@ -20,6 +20,7 @@ import PrivacyPolicy from '../Components/Navbar/PrivacyPolicy.jsx';
 import Profile from '../Components/Navbar/Profile.jsx';
 import TaskModal from '../Components/TaskModal/TaskModal.jsx';
 import Board from '../Components/BoardContent/Board.jsx';
+import BoardSettings from '../Components/ContentFromSide/BoardSettings.jsx';
 
 const Main = () => {
     const {opened, workspaceId, boardId, taskId} = useParams();
@@ -91,6 +92,7 @@ const Main = () => {
                             {opened === 'privacyPolicy' && <PrivacyPolicy/>}
                             {opened === 'profile' && <Profile/>}
                             {opened === 'task' && <TaskModal/>}
+                            {opened === 'boardSettings' &&  <BoardSettings/>}
                         </div>
                     </div>
                 </div>

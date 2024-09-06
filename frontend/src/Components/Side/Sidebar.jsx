@@ -97,7 +97,6 @@ const WorkspaceViews = [
             ))}
 
             </ul>
-            <br/>
             <div className="flex justify-between" 
             onMouseEnter={() => setHover(true)}
             onMouseLeave={() => setHover(false)}>

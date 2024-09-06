@@ -17,7 +17,11 @@ const SideMenusHeader = () => {
             setIsMessageModalOpen(true);
             closeInviteModal();
         };
-
+        const handleWorkspaceUpdated = () => {
+            setMessage('Workspace updated successfully!');
+            setIsMessageModalOpen(true);
+            setUpdateWorkspaceModal(false);//mbylle modalin pas update-imit
+        };
    
     // Ensure workspace is not null or undefined
     if (!workspace) {
@@ -41,7 +45,10 @@ const SideMenusHeader = () => {
             <button onClick={()=>setUpdateWorkspaceModal(prev => !prev)}>
             <GoPencil className=" text-gray-400 font-bold text-2xl duration-20 mt-5 mb-5 cursor-pointer hover:text-3xl"/>
             </button>
-            <UpdateWorkspaceModal open={updateWorkspaceModal} onClose={()=>setUpdateWorkspaceModal(false)} workspace={workspace} onWorkspaceUpdated={handleWorkspaceUpdate}></UpdateWorkspaceModal>
+            <UpdateWorkspaceModal open={updateWorkspaceModal} 
+            onClose={()=>setUpdateWorkspaceModal(false)} 
+            workspace={workspace} 
+            onWorkspaceUpdated={handleWorkspaceUpdated}></UpdateWorkspaceModal>
             </>
             ):(<></>)}</div>
 

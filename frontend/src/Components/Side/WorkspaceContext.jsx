@@ -624,6 +624,7 @@ export const WorkspaceProvider = ({ children }) => {
             checklistItems,
             setChecklistItems,
             board,
+            setBoard,
             lists,
             setLists,
             handleCreateList,
