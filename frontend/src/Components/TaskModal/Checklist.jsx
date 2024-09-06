@@ -4,14 +4,19 @@ import { FaEllipsisH } from 'react-icons/fa';
 import { WorkspaceContext } from '../Side/WorkspaceContext.jsx';
 import { deleteData, postData, putData } from '../../Services/FetchService.jsx';
 import ChecklistItemDeleteModal from './ChecklistItemDeleteModal.jsx';
+import { TaskModalsContext } from './TaskModal.jsx';
 
 const Checklist = () => {
-  const { checklists, checklistItems, setChecklistItems } = useContext(WorkspaceContext);
+  const { checklists, checklistItems, setChecklistItems, setChecklists } = useContext(WorkspaceContext);
+  const {setIsChecklistModalOpen} = useContext(TaskModalsContext);
   const [checklistItemDotsOpen, setChecklistItemDotsOpen] = useState(null);
   const [addingItem, setAddingItem] = useState(null);
   const [newItemContent, setNewItemContent] = useState('');
   const [editingItemId, setEditingItemId] = useState(null);
   const [editedContent, setEditedContent] = useState('');
+
+  const [editingChecklistId, setEditingChecklistId] = useState(null);
+  const [editedChecklistTitle, setEditedChecklistTitle] = useState('');
   
   // Reference to the input element for focusing
   const inputRef = useRef(null);
@@ -31,6 +36,11 @@ const Checklist = () => {
 
     try {
       await putData(`http://localhost:5157/backend/checklistItems/ChangeChecklistItemChecked?checklistItemId=${checklistItemId}`, {});
+      setAddingItem(null);
+      setEditingItemId(null);
+      setEditingChecklistId(null);
+      setChecklistItemDotsOpen(null);
+      setIsChecklistModalOpen(false);
     } catch (error) {
       console.error("Error updating checklist item:", error.message);
     }
@@ -39,8 +49,8 @@ const Checklist = () => {
   const toggleChecklistItemDots = (checklistItemId) => {
     setChecklistItemDotsOpen(prevId => (prevId === checklistItemId ? null : checklistItemId));
     setEditingItemId(null);
-    setEditedContent('');
     setAddingItem(null);
+    setEditingChecklistId(null);
   };
 
   const closeModal = () => {
@@ -49,8 +59,13 @@ const Checklist = () => {
 
   const handleChecklistDelete = async (checklistId) => {
     try {
-      await deleteData('http://localhost:5157/backend/checklist/DeleteChecklist', { checklistId });
       await deleteData('http://localhost:5157/backend/checklistItems/DeleteChecklistItembyChecklistId', { checklistId });
+      await deleteData('http://localhost:5157/backend/checklist/DeleteChecklist', { checklistId });
+
+      const updatedChecklists = checklists.filter(
+        (checklist) => checklist.checklistId !== checklistId
+      );
+      setChecklists(updatedChecklists);
     } catch (error) {
       console.error("Error deleting checklist: ", error.message);
     }
@@ -58,10 +73,10 @@ const Checklist = () => {
 
   const handleAddClick = (checklistId) => {
     if (addingItem !== checklistId) {
-      setNewItemContent('');
       setEditingItemId(null);
-      setEditedContent('');
+      setEditingChecklistId(null);
       setChecklistItemDotsOpen(null);
+      setIsChecklistModalOpen(false);
     }
     setAddingItem(checklistId);
   };
@@ -108,6 +123,7 @@ const Checklist = () => {
       if (inputRef.current) {
         setAddingItem(null);
         setChecklistItemDotsOpen(null);
+        setEditingChecklistId(null);
         inputRef.current.focus();
       }
     }, 0);
@@ -149,6 +165,57 @@ const Checklist = () => {
     setEditedContent('');
   };
 
+  const handleTitleEdit = (checklistId, currentTitle) => {
+    setEditingChecklistId(checklistId);
+    setEditedChecklistTitle(currentTitle);
+    setAddingItem(null);
+    setEditingItemId(null);
+    setChecklistItemDotsOpen(null);
+    setTimeout(() => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    }, 0);
+  };
+
+
+  const handleSaveTitle = async (checklistId, taskId) => {
+
+    try {
+      if (editedChecklistTitle.length < 2 || editedChecklistTitle.length > 280) {
+        console.log("Title should be between 2 and 280 characters!");
+        return;
+      }
+
+      const data = {
+        checklistId: checklistId,
+        title: editedChecklistTitle,
+        taskId: taskId
+      };
+
+      await putData('http://localhost:5157/backend/checklist/UpdateChecklist',data);
+
+      const updatedChecklists = checklists.map((checklist) =>
+        checklist.checklistId === checklistId ? { ...checklist, title: editedChecklistTitle } : checklist
+      );
+      setChecklists(updatedChecklists);
+      setEditingChecklistId(null);
+      setEditedChecklistTitle('');
+    } catch (error) {
+      console.error("Error updating checklist title: ",error.message);
+      
+      
+    }
+  }
+
+
+
+  const handleCancelEditTitle = () => {
+    setEditingChecklistId(null);
+    setEditedChecklistTitle('');
+  };
+
+
   return (
     <div>
       {checklists.length > 0 && checklists.map(checklist => (
@@ -158,7 +225,38 @@ const Checklist = () => {
               <IoMdCheckboxOutline />
             </div>
             <div className="flex flex-row justify-between w-11/12">
-              <span className="h-10 items-center flex font-semibold">{checklist.title}</span>
+              {editingChecklistId === checklist.checklistId ? (
+                  <div className="text-sm flex my-2 items-center justify-between w-[100%] p-2">
+                    <input
+                      type="text"
+                      value={editedChecklistTitle}
+                      onChange={(e) => setEditedChecklistTitle(e.target.value)}
+                      className="bg-gray-700 text-sm rounded p-1 w-full mr-2"
+                      minLength={2}
+                      maxLength={280}
+                      ref={inputRef} // Attach the reference to the input
+                    />
+                    <button
+                      className="bg-blue-500 hover:bg-blue-600 text-gray-800 font-semibold text-sm rounded px-2 py-1 mr-2"
+                      onClick={() => handleSaveTitle(checklist.checklistId, checklist.taskId)}
+                    >
+                      Save
+                    </button>
+                    <button
+                      className="bg-gray-800 hover:bg-slate-700 font-semibold text-sm rounded px-2 py-1"
+                      onClick={handleCancelEditTitle}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <span
+                    className="h-10 items-center flex font-semibold cursor-pointer"
+                    onClick={() => handleTitleEdit(checklist.checklistId, checklist.title)}
+                  >
+                    {checklist.title}
+                  </span>
+                )}
               <button
                 className="font-semibold p-2 h-10 rounded-[4px] text-sm bg-gray-600 bg-opacity-30 w-[70px]"
                 onClick={() => handleChecklistDelete(checklist.checklistId)}
