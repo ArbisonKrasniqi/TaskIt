@@ -15,12 +15,13 @@ namespace backend.Controllers
         private readonly IWorkspaceRepository _workspaceRepo;
         private readonly IUserRepository _userRepo; 
         private readonly IMapper _mapper;
-
-        public WorkspaceController(IWorkspaceRepository workspaceRepo, IUserRepository userRepo, IMapper mapper)
+        private readonly IWorkspaceActivityRepository _workspaceActivityRepo;
+        public WorkspaceController(IWorkspaceRepository workspaceRepo, IUserRepository userRepo, IMapper mapper, IWorkspaceActivityRepository workspaceActivityRepo)
         {
             _userRepo = userRepo;
             _workspaceRepo = workspaceRepo;
             _mapper = mapper;
+            _workspaceActivityRepo = workspaceActivityRepo;
         }
         
         [Authorize(AuthenticationSchemes = "Bearer")]
@@ -143,13 +144,29 @@ namespace backend.Controllers
                 
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
-
+                if (userId == null)
+                {
+                    return NotFound("User not found");
+                }
+                
                 if (userId == workspaceDto.OwnerId || userTokenRole == "Admin")
                 {
                     var workspaceModel = _mapper.Map<Workspace>(workspaceDto);
                     var createdWorkspace = await _workspaceRepo.CreateWorkspaceAsync(workspaceModel);
                     var createdWorkspaceDto = _mapper.Map<WorkspaceDto>(createdWorkspace);
-                    return CreatedAtAction(nameof(GetWorkspaceById), new { id = createdWorkspace.WorkspaceId }, createdWorkspaceDto);
+
+                    var workspaceActivity = new WorkspaceActivity
+                    {
+                        WorkspaceId = createdWorkspace.WorkspaceId,
+                        UserId = userId,
+                        ActionType = "Created",
+                        EntityName = "workspace "+workspaceDto.Title,
+                        ActionDate = DateTime.Now
+                    };
+                    
+                    await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
+                    return CreatedAtAction(nameof(GetWorkspaceById), new { id = createdWorkspace.WorkspaceId }, createdWorkspaceDto); 
+                    //kthe pergjigjie 201 Created per burimin e ri te krijuar 
                 }
                 return StatusCode(401, "You are not authorized!");
                 
@@ -189,6 +206,18 @@ namespace backend.Controllers
                         return NotFound("Workspace not found!");
                     }
 
+                    var workspaceActivity = new WorkspaceActivity
+                    {
+                        WorkspaceId = updateDto.WorkspaceId,
+                        UserId = userId,
+                        ActionType = "Updated",
+                        EntityName = "workspace "+updateDto.Title,
+                        ActionDate = DateTime.Now
+                    };
+                    
+                    await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
+
+                    
                     var updatedWorkspaceDto = _mapper.Map<WorkspaceDto>(workspaceModel);
                     return Ok(updatedWorkspaceDto);
                 }

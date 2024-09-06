@@ -36,18 +36,19 @@ export const WorkspaceProvider = ({ children }) => {
     const userId = mainContext.userInfo.userId;
     const WorkspaceId = mainContext.workspaceId;
     const [board, setBoard] = useState(null);
-    const {boardId }= useParams();
+    const {boardId, listId, taskId }= useParams();
     // const boardId = mainContext.boardId;
     const [lists, setLists] = useState([]); 
     const [list, setList] = useState(null);
-    const{listId} = useParams();
-
+    const{} = useParams();
     const [checklists, setChecklists] = useState([]);
+    const [activities, setActivities]= useState([]);
+    const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
+
         const getWorkspaces = async () => {
             try {
-                if (userId) {
+                setIsLoading(true);
                     const workspacesResponse = await getDataWithId('http://localhost:5157/backend/workspace/GetWorkspacesByMemberId?memberId', userId);
                     const workspacesData = workspacesResponse.data;
                     if (workspacesData && Array.isArray(workspacesData) && workspacesData.length > 0) {
@@ -56,6 +57,36 @@ export const WorkspaceProvider = ({ children }) => {
                         setWorkspaces([]);
                         console.log("There are no workspaces");
                     }
+                //Waiting for userIdn
+            } catch (error) {
+                console.error("There has been an error fetching workspaces")
+                setWorkspaces([]);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+    useEffect(() => {
+        if (userId) {
+            getWorkspaces();
+        }
+    }, [userId]);
+        // const interval = setInterval(getWorkspaces, 5 * 1000);
+        // return () => clearInterval(interval); //Get workspaces every 5 seconds
+ 
+
+    useEffect(()=>{
+        const getActivities = async () =>{
+            try{
+                if(workspace){
+                    const activityResponse = await getDataWithId("http://localhost:5157/GetWorkspaceActivityByWorkspaceId?WorkspaceId", WorkspaceId);
+                    console.log("Te dhenat e aktivitetit ",activityResponse.data)
+                    const activityData = activityResponse.data;
+                    if (activityData && Array.isArray(activityData) && activityData.length > 0) {
+                        setActivities(activityData);
+                    } else {
+                        setActivities([]);
+                        console.log("There is no activity");
+                    }
                 }
                 //Waiting for userIdn
             } catch (error) {
@@ -63,11 +94,10 @@ export const WorkspaceProvider = ({ children }) => {
                 setWorkspaces([]);
             }
         };
-        getWorkspaces();
-        
-        // const interval = setInterval(getWorkspaces, 5 * 1000);
-        // return () => clearInterval(interval); //Get workspaces every 5 seconds
-    }, [userId, mainContext.userInfo.accessToken]);
+        getActivities();
+        console.log("Activity fetched ",activities);
+    },[workspace]);
+    
     useEffect(() => {
         const getWorkspace = async () => {
             try {
@@ -88,7 +118,7 @@ export const WorkspaceProvider = ({ children }) => {
         // return () => clearInterval(interval); //Get workspace every 5 seconds
     }, [WorkspaceId, userId, mainContext.userInfo.accessToken]);//userid
 
- 
+
     useEffect(()=>{
         if (workspace && WorkspaceId && userId) {
             const ownerId = workspace.ownerId;
@@ -142,7 +172,8 @@ export const WorkspaceProvider = ({ children }) => {
     const [memberDetails, setMemberDetails] = useState([]);
 
         const getMembers = async () => {
-            try {
+            try {   
+                if (workspace) {
                     const response = await getDataWithId('/backend/Members/getAllMembersByWorkspace?workspaceId', WorkspaceId);
                     const data = response.data;
                     setMembers(data);
@@ -152,8 +183,8 @@ export const WorkspaceProvider = ({ children }) => {
                         return responseMemberDetail.data;
                     }))
                     setMemberDetails(memberDetail);
-                        
-                    
+                    console.log('Members fetched: ',members);
+                }                    
             } catch (error) {
                 console.error("Error fetching members: ",error.message);
 
@@ -162,10 +193,7 @@ export const WorkspaceProvider = ({ children }) => {
 
     useEffect(() => {
         getMembers();
-        console.log('Members fetched: ',members);
-        console.log();
-        
-    },[WorkspaceId, workspace, userId, mainContext.userInfo.accessToken]);
+    },[WorkspaceId, workspace, mainContext.userInfo.accessToken]);
 
 
     const handleRemoveMember = async(memberId, workspaceId) => {
@@ -346,7 +374,7 @@ export const WorkspaceProvider = ({ children }) => {
             if (!firstName || !lastName) {
                 return '';
             }
-            return `${firstName.charAt(0)}${lastName.charAt(0)}`;
+            return `${firstName.charAt(0).toUpperCase()}${lastName.charAt(0).toUpperCase()}`;
         };
 
         const getInitialsFromFullName = (fullName) => {
@@ -438,20 +466,24 @@ export const WorkspaceProvider = ({ children }) => {
             getBoard();
         },[boardId, userId, mainContext.userInfo.accessToken]);
 
-        const taskId = 1;
             const getChecklistsByTask = async () => {
                 
                 try {
-                    const response = await getDataWithId('http://localhost:5157/backend/checklist/GetChecklistByTaskId?taskId', taskId); //static for now
-                    const data = response.data;
-                    setChecklists(data);
-                    fetchChecklistItems(data);
+                    if (taskId) {
+                        const response = await getDataWithId('http://localhost:5157/backend/checklist/GetChecklistByTaskId?taskId', taskId); //static for now
+                        const data = response.data;
+                        setChecklists(data);
+                        fetchChecklistItems(data);
+                    }
                     
                 } catch (error) {
                     console.error("Error fetching checklists: ",error.message);
                     
                 }
             }
+            useEffect(() => {
+                getChecklistsByTask();
+            },[WorkspaceId, workspaces, mainContext.userInfo.accessToken]);
 
             const [checklistItems, setChecklistItems] = useState([]);
 
@@ -470,9 +502,7 @@ export const WorkspaceProvider = ({ children }) => {
                 setChecklistItems(items);
               };
 
-            useEffect(() => {
-            getChecklistsByTask();
-        },[WorkspaceId, userId, workspace, mainContext.userInfo.accessToken]);
+            
 
 
 
@@ -600,11 +630,16 @@ export const WorkspaceProvider = ({ children }) => {
             setChecklistItems,
             setChecklists,
             board,
+            setBoard,
             lists,
             setLists,
             handleCreateList,
             listId,
-            list
+            list,
+            activities,
+            isLoading,
+            setIsLoading,
+            getWorkspaces
         }}>
             {children}
         </WorkspaceContext.Provider>

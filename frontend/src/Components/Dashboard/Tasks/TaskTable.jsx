@@ -1,6 +1,7 @@
 import { useState } from "react";
 import ChecklistsList from "../Checklists/ChecklistsList";
 import LabelsList from "../Labels/LabelsList";
+import TaskMemberList from "../TaskMember/TaskMemberList";
 
 const TaskTable = () => {
 
@@ -16,15 +17,15 @@ const TaskTable = () => {
                     className={`flex-1 px-4 py-2 border ${activeList === 'labels' ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-200 text-gray-800 border-gray-300'}`}
                     onClick={() => setActiveList('labels')}>Labels</button>
                 <button
-                    className={`flex-1 px-4 py-2 border ${activeList === 'invites' ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-200 text-gray-800 border-gray-300'}`}
-                    onClick={() => setActiveList('assignedUsers')}>Assigned Users</button>
+                    className={`flex-1 px-4 py-2 border ${activeList === 'taskMembers' ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-200 text-gray-800 border-gray-300'}`}
+                    onClick={() => setActiveList('taskMembers')}>Assigned Users</button>
             </div>
 
             {/* Render the selected list */}
             <div className="flex-grow overflow-auto">
                 {activeList === 'checklists' && <ChecklistsList />}
                 {activeList === 'labels' && <LabelsList />}
-                {/*activeList === 'assignedUsers' && <InvitesList />*/}
+                {activeList === 'taskMembers' && <TaskMemberList/>}
             </div>
         </div>
     )

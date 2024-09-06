@@ -16,8 +16,11 @@ import Calendar from '../Components/ContentFromSide/Calendar.jsx';
 import LoadingModal from '../Components/Modal/LoadingModal.jsx';
 import Members from '../Components/ContentFromSide/Members.jsx';
 import WithAuth from "../Services/WithAuth.jsx";
+import PrivacyPolicy from '../Components/Navbar/PrivacyPolicy.jsx';
+import Profile from '../Components/Navbar/Profile.jsx';
 import TaskModal from '../Components/TaskModal/TaskModal.jsx';
 import Board from '../Components/BoardContent/Board.jsx';
+import BoardSettings from '../Components/ContentFromSide/BoardSettings.jsx';
 
 const Main = () => {
     const {opened, workspaceId, boardId, taskId} = useParams();
@@ -39,6 +42,7 @@ const Main = () => {
                         userId: decodedToken.Id,
                         email: decodedToken.Email,
                         role: decodedToken.Role,
+                        name: decodedToken.Name,
                         accessToken: decodedToken
                     });
                 } else {
@@ -73,7 +77,7 @@ const Main = () => {
                     {/* Container for Sidebar and Boards */}
                     <div className="flex flex-grow h-full p-0">
                         {/* Sidebar on the left */}
-                        {opened !== 'workspaces' && <Sidebar />}
+                        {opened !== 'workspaces' && opened !== 'privacyPolicy'  && opened !== 'profile' && <Sidebar />}
 
                         {/* Conditional rendering based on the value of `opened` */}
                         <div className='w-full flex-grow h-full p-0'>
@@ -85,7 +89,10 @@ const Main = () => {
                             {opened === 'calendar' && <Calendar/>}
                             {opened === 'loadingModal' && <LoadingModal/>}
                             {opened === 'members' && <Members />}
+                            {opened === 'privacyPolicy' && <PrivacyPolicy/>}
+                            {opened === 'profile' && <Profile/>}
                             {opened === 'task' && <TaskModal/>}
+                            {opened === 'boardSettings' &&  <BoardSettings/>}
                         </div>
                     </div>
                 </div>

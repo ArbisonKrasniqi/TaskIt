@@ -59,17 +59,6 @@ namespace backend.Repositories
             existingBackground.Title = backgroundDto.Title;
             existingBackground.IsActive = backgroundDto.IsActive;
 
-            // Update the image data if a new image file is provided
-            if (backgroundDto.ImageFile != null && backgroundDto.ImageFile.Length > 0)
-            {
-
-                using (var memoryStream = new MemoryStream())
-                {
-                    await backgroundDto.ImageFile.CopyToAsync(memoryStream);
-                    existingBackground.ImageData = memoryStream.ToArray();
-                }
-            }
-
             await _context.SaveChangesAsync();
             return existingBackground;
         }

@@ -6,7 +6,11 @@ import { getDataWithId, deleteData } from "../../Services/FetchService";
 const Members = () => {
 
         const { members, memberDetails, getInitials, roli, sentInvites,inviteeDetails, workspaceTitles, handleDeleteInvite, workspace, handleRemoveMember } = useContext(WorkspaceContext);
-        
+        const formatDate = (dateString) => {
+            const date = new Date(dateString);
+            // Format date to 'MM/DD/YYYY' or any other format you prefer
+            return date.toLocaleDateString('en-US');
+        };
         
 
     return(
@@ -42,6 +46,8 @@ const Members = () => {
                                         </div>
                                         <p className="text-sm mt-2">
                                            <strong>Workspace: </strong>  <span> {workspaceTitles[index]}</span>.
+                                           <br/>
+                                           <span>{formatDate(invite.dateSent)}</span>
                                         </p>
                                         <button
                                             className="bg-red-500 text-white px-4 py-2 rounded-md"

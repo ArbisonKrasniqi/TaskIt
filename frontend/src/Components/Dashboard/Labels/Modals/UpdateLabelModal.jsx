@@ -12,7 +12,6 @@ const UpdateLabelModal = (props) => {
     const dashboardContext = useContext(DashboardContext);
 
     const [name, setName] = useState(updateContext.name);
-    const [color, setColor] = useState(updateContext.color);
     const [boardId, setBoardId] = useState(updateContext.boardId);
 
     const handleSubmit = async (e) => {
@@ -21,8 +20,6 @@ const UpdateLabelModal = (props) => {
             const data = {
                 labelId: updateContext.labelId,
                 name: name,
-                color: color,
-                boardId: boardId,
             }
 
             const response = await putData('/backend/label/UpdateLabel', data);
@@ -33,8 +30,6 @@ const UpdateLabelModal = (props) => {
                     return {
                         ...label,
                         name: name,
-                        color: color,
-                        boardId: boardId
                     };
                 } else {
                     return label;
@@ -64,28 +59,6 @@ const UpdateLabelModal = (props) => {
                         id="name"
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     />
-                </div>
-                <div className="grid md:grid-cols-2 md:gap-6">
-                    <div className="mb-6">
-                        <label htmlFor="color" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Color</label>
-                        <input
-                            value={color}
-                            onChange={(e) => setColor(e.target.value)}
-                            type="color"
-                            id="color"
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 h-10 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        />
-                    </div>
-                    <div className="mb-6">
-                        <label htmlFor="boardId" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Board ID</label>
-                        <input
-                            value={boardId}
-                            onChange={(e) => setBoardId(e.target.value)}
-                            type="number"
-                            id="boardId"
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        />
-                    </div>
                 </div>
                 <div className="flex justify-around">
                     <CustomButton onClick={() => props.setShowUpdateInfoModal(false)} type="button" text="Close" color="longRed" />

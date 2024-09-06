@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using backend.DTOs.Checklist.Output;
+using backend.DTOs.TaskMember.Output;
 
 namespace backend.DTOs.Task;
 
@@ -19,9 +20,7 @@ public class TaskDto{
     [Range(0, int.MaxValue, ErrorMessage = "List Id can not be negative!")]
     public int ListId { get; set; }
     public DateTime DueDate { get; set; }
-    
-    public List<ChecklistDTO> Checklists { get; set; }
-    
-    
     public DateTime DateAdded { get; set; }
+    public List<Models.Label> Labels { get; set; }
+    public List<TaskMemberDto> TaskMembers { get; set; }
 }

@@ -47,8 +47,8 @@ const tagComponents = {
     LuCalendarDays: <LuCalendarDays/>,
     };
 const WorkspaceViews = [
-    {title: "Table", tag: "PiTable", path: `/table/${workspace?.workspaceId}`},
-    {title: "Calendar", tag: "LuCalendarDays", path: `/calendar/${workspace?.workspaceId}`},
+    {title: "Table", tag: "PiTable", path: `/main/table/${workspace?.workspaceId}`},
+    {title: "Calendar", tag: "LuCalendarDays", path: `/main/calendar/${workspace?.workspaceId}`},
   ]
 
   const handleMenuClick = (path) => {
@@ -97,7 +97,6 @@ const WorkspaceViews = [
             ))}
 
             </ul>
-            <br/>
             <div className="flex justify-between" 
             onMouseEnter={() => setHover(true)}
             onMouseLeave={() => setHover(false)}>

@@ -294,6 +294,7 @@ namespace backend.Controllers;
         
         [HttpPut("adminUpdateUser")]
         [Authorize(AuthenticationSchemes = "Bearer")]
+       
         public async Task<IActionResult> EditUser(EditUserDTO editUserDto)
         {
                 //Check if valid ModelState(DTO) and if the role is either Admin or User
@@ -307,52 +308,50 @@ namespace backend.Controllers;
                 }
                 try
                 {
-                    //Check user that is being edited if it exists.
-                    var user = await _userManager.FindByIdAsync(editUserDto.Id);
-                    if (user == null) return BadRequest("User does not exist!");
+                        //Check user that is being edited if it exists.
+                        var user = await _userManager.FindByIdAsync(editUserDto.Id);
+                        if (user == null) return BadRequest("User does not exist!");
 
-                    //Change parameters
-                    if (user.FirstName != editUserDto.FirstName) user.FirstName = editUserDto.FirstName;
+                        //Change parameters
+                        if (user.FirstName != editUserDto.FirstName) user.FirstName = editUserDto.FirstName;
 
-                    if (user.LastName != editUserDto.LastName) user.LastName = editUserDto.LastName;
+                        if (user.LastName != editUserDto.LastName) user.LastName = editUserDto.LastName;
 
-                    //Check if the email is being changed
-                    if (user.Email != editUserDto.Email)
-                    {
-                        //If email is being changed, check if it exists for another user
-                        var emailResult = await _userManager.FindByEmailAsync(editUserDto.Email);
-                        if (emailResult == null)
+                        //Check if the email is being changed
+                        if (user.Email != editUserDto.Email)
                         {
-                            //UserName and Email are the same in our project
-                            user.Email = editUserDto.Email;
-                            user.UserName = editUserDto.Email;
+                            //If email is being changed, check if it exists for another user
+                            var emailResult = await _userManager.FindByEmailAsync(editUserDto.Email);
+                            if (emailResult == null)
+                            {
+                                //UserName and Email are the same in our project
+                                user.Email = editUserDto.Email;
+                                user.UserName = editUserDto.Email;
+                            }
+                            else
+                            {
+                                //Conflict error code
+                                return BadRequest("New email already exists!");
+                            }
                         }
-                        else
-                        {
-                            //Conflict error code
-                            return BadRequest("New email already exists!");
-                        }
-                    }
-                    
-                    //Apply changes
-                    var editResult = await _userManager.UpdateAsync(user);
-                    if (editResult.Succeeded)
-                    {
-                        return Ok("User successfully updated");
-                    }
 
-                    return StatusCode(500, "User could not be updated!");
+                        //Apply changes
+                        var editResult = await _userManager.UpdateAsync(user);
+                        if (editResult.Succeeded)
+                        {
+                            return Ok("User successfully updated");
+                        }
+
+                        return StatusCode(500, "User could not be updated!");
                 }
                 catch (Exception e)
                 {
                     return StatusCode(500, e);
                 }
-
         }
 
         [HttpPut("adminUpdatePassword")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        
         public async Task<IActionResult> UpdatePassword(EditUserPasswordDTO editUserPasswordDto)
         {
             if (!ModelState.IsValid)
@@ -367,36 +366,36 @@ namespace backend.Controllers;
             
             try
             {
-                //Check if user first exists.
-                var user = await _userManager.FindByIdAsync(editUserPasswordDto.Id);
-                if (user == null) return BadRequest("User does not exist!");
+                    //Check if user first exists.
+                    var user = await _userManager.FindByIdAsync(editUserPasswordDto.Id);
+                    if (user == null) return BadRequest("User does not exist!");
 
-                //Check if new password is valid
+                    //Check if new password is valid
 
-                bool isValidPassword = Regex.IsMatch(editUserPasswordDto.Password,
-                    @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W).{8,}$");
+                    bool isValidPassword = Regex.IsMatch(editUserPasswordDto.Password,
+                        @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W).{8,}$");
 
-                if (isValidPassword)
-                {
-                    var newHash = _userManager.PasswordHasher.HashPassword(user, editUserPasswordDto.Password);
-                    if (user.PasswordHash != newHash)
+                    if (isValidPassword)
                     {
-                        user.PasswordHash = newHash;
+                        var newHash = _userManager.PasswordHasher.HashPassword(user, editUserPasswordDto.Password);
+                        if (user.PasswordHash != newHash)
+                        {
+                            user.PasswordHash = newHash;
+                        }
                     }
-                }
-                else
-                {
-                    return BadRequest("New password is not secure!");
-                }
+                    else
+                    {
+                        return BadRequest("New password is not secure!");
+                    }
 
-                //Apply changes
-                var editResult = await _userManager.UpdateAsync(user);
-                if (editResult.Succeeded)
-                {
-                    return Ok("Password successfully udpated!");
-                }
+                    //Apply changes
+                    var editResult = await _userManager.UpdateAsync(user);
+                    if (editResult.Succeeded)
+                    {
+                        return Ok("Password successfully udpated!");
+                    }
 
-                return StatusCode(500, "Password could not be changed!");
+                    return StatusCode(500, "Password could not be changed!");
             }
             catch (Exception e)
             {
@@ -408,7 +407,7 @@ namespace backend.Controllers;
 
 
         [HttpPut("adminUpdateRole")]
-        [Authorize(AuthenticationSchemes = "Bearer")]
+        //[Authorize(AuthenticationSchemes = "Bearer")]
        // [Authorize(Policy = "AdminOnly")]
 
         public async Task<IActionResult> UpdateRole(EditRoleDTO editRoleDto)

@@ -10,31 +10,11 @@ const List = ({ listData = [], setLists, isSingleList = false }) => {
   const [localLists, setLocalLists] = useState(listData);
   const [hoveredListIndex, setHoveredListIndex] = useState(null); // Track hovered list
 
-  // useEffect(() => {
-  //   setLocalLists(listData);
-  // }, [listData]);
-
-  // Function to add a task (to be replaced with create task == handleCreateTask)
-
-  // const addTask = (listId, task) => {
-  //   const updateLists = (prevLists) =>
-  //     prevLists.map((list) =>
-  //       list.id === listId ? { ...list, tasks: [...list.tasks, task] } : list
-  //     );
-
-  //   if (setLists) {
-  //     setLists(updateLists);
-  //   } else {
-  //     setLocalLists(updateLists);
-  //   }
-  // };
-
-
   if(workspaceContext.lists == null) {
     return (<div> skasen</div>);
   }else {
     return(
-      <div className="p-10 bg-zinc-400 min-h-screen">
+      <div className="p-10 bg-gray-200 min-h-screen">
       <div className="flex space-x-4">
         {workspaceContext.lists.map((listData, index) => (
           <div
@@ -43,10 +23,10 @@ const List = ({ listData = [], setLists, isSingleList = false }) => {
           >
             <h3 className="text-xl font-bold mb-4">{listData.title}</h3>
             {/* Uncomment the following lines to render tasks and task form */}
-            {/* {listData.tasks.map((task) => (
+            {listData.tasks.map((task) => (
               <Task key={task.id} task={task} />
             ))}
-            <TaskForm onAddTask={(task) => addTask(listData.id, task)} /> */}
+            <TaskForm />
           </div>
         ))}
         {isSingleList ? null : <ListForm  />}

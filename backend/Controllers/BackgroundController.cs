@@ -171,11 +171,6 @@ namespace backend.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-
-            if (updateDto.ImageFile.Length == 0)
-            {
-                return BadRequest("No file uploaded!");
-            }
             
             try
             {
@@ -197,7 +192,7 @@ namespace backend.Controllers
         [Authorize(AuthenticationSchemes = "Bearer")]
         [Authorize(Policy = "AdminOnly")]
         [HttpDelete("DeleteBackgroundByID")]
-        public async Task<IActionResult> DeleteBoardById([FromQuery] BackgroundIdDto backgroundIdDto)
+        public async Task<IActionResult> DeleteBackgroundById(BackgroundIdDto backgroundIdDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
