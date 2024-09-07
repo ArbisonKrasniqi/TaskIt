@@ -10,5 +10,5 @@ public class TaskInfoDto2
     public string BoardTitle { get; set; } = string.Empty;
     public DateTime DueDate { get; set; }
     public List<Models.Label> Labels { get; set; }
-    public List<TaskMemberDto> TaskMembers { get; set; }
+    public List<Models.TaskMember> TaskMembers { get; set; }
 }

@@ -59,9 +59,8 @@ public class  TaskController : ControllerBase{
                 // Get the labels for the current task
                 var labels = await _labelRepo.GetLabelsByTaskId(task.TaskId);
                 var taskMembers = await _taskMemberRepo.GetAllTaskMembersByTaskIdAsync(task.TaskId);
-                var taskMembersDto = _mapper.Map<List<TaskMemberDto>>(taskMembers);
                 // Convert the task to a DTO and add the labels
-                var taskDto = task.ToTaskDto(labels, taskMembersDto);
+                var taskDto = task.ToTaskDto(labels, taskMembers);
 
                 // Add the DTO to the list
                 taskDtos.Add(taskDto);
@@ -348,7 +347,7 @@ public class  TaskController : ControllerBase{
                 var taskModel = taskDto.ToTaskFromCreate();
                 await _taskRepo.CreateTaskAsync(taskModel);
                 var labels = new List<Models.Label>();
-                var taskMembers = new List<TaskMemberDto>();
+                var taskMembers = new List<TaskMember>();
                 return CreatedAtAction(nameof(GetTaskById), new { id = taskModel.TaskId }, taskModel.ToTaskDto(labels,taskMembers));
             }
             return StatusCode(401, "You are not authorized!");
@@ -400,9 +399,7 @@ public class  TaskController : ControllerBase{
                     // Get the labels for the current task
                     var labels = await _labelRepo.GetLabelsByTaskId(task.TaskId);
                     var taskMembers = await _taskMemberRepo.GetAllTaskMembersByTaskIdAsync(task.TaskId);
-                    var taskMembersDto = _mapper.Map<List<TaskMemberDto>>(taskMembers);
-                    // Convert the task to a DTO and add the labels
-                    var taskDto = task.ToTaskDto(labels, taskMembersDto);
+                    var taskDto = task.ToTaskDto(labels, taskMembers);
 
                     // Add the DTO to the list
                     taskDtos.Add(taskDto);

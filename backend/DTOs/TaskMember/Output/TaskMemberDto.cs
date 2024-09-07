@@ -11,4 +11,5 @@ public class TaskMemberDto
     public string LastName { get; set; }
     public DateTime DateJoined { get; set; }
     public int  TaskId { get; set; }
+
 }

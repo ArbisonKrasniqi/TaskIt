@@ -23,5 +23,5 @@ public class TaskDto{
     public DateTime DueDate { get; set; }
     public DateTime DateAdded { get; set; }
     public List<Models.Label> Labels { get; set; }
-    public List<TaskMemberDto> TaskMembers { get; set; }
+    public List<Models.TaskMember> TaskMembers { get; set; }
 }

@@ -6,7 +6,7 @@ namespace backend.Mappers;
 
 public static class TaskMappers{
 
-    public static TaskDto ToTaskDto (this Tasks taskModel, List<Models.Label> labels, List<TaskMemberDto> taskMembers){
+    public static TaskDto ToTaskDto (this Tasks taskModel, List<Models.Label> labels, List<Models.TaskMember> taskMembers){
         return new TaskDto{
             TaskId = taskModel.TaskId,
             Title = taskModel.Title,
@@ -19,7 +19,7 @@ public static class TaskMappers{
         };
     }
 
-    public static TaskInfoDto2 toTaskInfoDto2(this TaskInfoDto taskModel, List<Models.Label> labels, List<TaskMemberDto> taskMembers)
+    public static TaskInfoDto2 toTaskInfoDto2(this TaskInfoDto taskModel, List<Models.Label> labels, List<Models.TaskMember> taskMembers)
     {
         return new TaskInfoDto2
         {

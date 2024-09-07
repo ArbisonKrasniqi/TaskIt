@@ -1,20 +1,31 @@
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import React from "react";
 
-const Task = ({task, onDelete}) => {
+const Task = ({task}) => {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging,
+    } = useSortable({
+        id: task.uniqueId,
+        data: {
+            type: 'task',
+        },
+    });
     return(
-        // <div>
-        //     <h4 className="hover:bg-gray-100 p-2 rounded-lg mb-2">
-        //         {task.title}
-        //     </h4>
-        //     {/* <p>{task.description}</p> */}
-        // </div>
-        <div className="bg hover:bg-slate-500 p-2 rounded-lg mb-2">
-
+        <div className="bg hover:bg-slate-500 p-2 rounded-lg mb-2"
+            ref={setNodeRef}
+            {...attributes}
+            {...listeners}
+            style={{
+                transition,
+                transform: CSS.Translate.toString(transform)
+                }}>
             <p>{task.title}</p>
-            {/* <button onClick={() => onDelete(task.index)}
-                className="text-red-500 hover:text-red-700">
-                Delete
-            </button> */}
         </div>
     );
 };

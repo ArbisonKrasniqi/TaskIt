@@ -10,10 +10,15 @@ public class ListRepository : IListRepository
 {
     private readonly ApplicationDBContext _context;
     private readonly ITaskRepository _taskRepo;
-    public ListRepository(ApplicationDBContext context, ITaskRepository taskRepo)
+    private readonly ILabelRepository _labelRepo;
+    private readonly ITaskMemberRepository _taskMemberRepo;
+    public ListRepository(ApplicationDBContext context, ITaskRepository taskRepo, ILabelRepository labelRepo, ITaskMemberRepository taskMemberRepo)
     {
         _context = context;
         _taskRepo = taskRepo;
+        _labelRepo = labelRepo;
+        _taskMemberRepo = taskMemberRepo;
+
     }
 
     public async Task<List<List>> GetAllListsAsync()
@@ -102,9 +107,22 @@ public class ListRepository : IListRepository
     
     public async Task<List<List>> GetListByBoardId(int BoardId)
     {
-        return await _context.List
+        var lists = await _context.List
             .Include(l=>l.Tasks)
             .Where(b => b.BoardId == BoardId).ToListAsync();
+        
+        foreach (var list in lists)
+        {
+            foreach (var task in list.Tasks)
+            {
+                var labels = await _labelRepo.GetLabelsByTaskId(task.TaskId);
+                var taskMembers = await _taskMemberRepo.GetAllTaskMembersByTaskIdAsync(task.TaskId);
+                task.Labels = labels;
+                task.TaskMembers = taskMembers;
+            }
+        }
+
+        return lists;
     }
     
     public async Task<List<List>> DeleteListsByBoardIdAsync(int BoardId)

@@ -29,7 +29,7 @@ public class TaskMemberRepository : ITaskMemberRepository
     }
     
     //GET ALL BY TaskID
-    public async Task<List<TaskMemberDto>> GetAllTaskMembersByTaskIdAsync(int taskId)
+    public async Task<List<TaskMember>> GetAllTaskMembersByTaskIdAsync(int taskId)
     {
         var task = await _context.Tasks
             .Include(t => t.TaskMembers)
@@ -43,7 +43,7 @@ public class TaskMemberRepository : ITaskMemberRepository
         }
 
         // Map the task members to TaskMemberDto, including FirstName and LastName
-        var taskMembersDto = task.TaskMembers.Select(tm => new TaskMemberDto
+        var taskMembersDto = task.TaskMembers.Select(tm => new TaskMember
         {
             TaskMemberId = tm.TaskMemberId,
             UserId = tm.UserId,

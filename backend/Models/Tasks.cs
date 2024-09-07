@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using backend.DTOs.TaskMember.Output;
 using Microsoft.EntityFrameworkCore;
 
 namespace backend.Models
@@ -28,9 +29,10 @@ namespace backend.Models
         [Range(0, int.MaxValue, ErrorMessage = "List Id can not be negative!")]
         public int ListId { get; set;}
 
-        public List<TaskMember> TaskMembers { get; set; }
+        public List<TaskMember>? TaskMembers { get; set; }
         public List<Checklist>? Checklists { get; set; }
-        
+        public List<Label>? Labels { get; set; }
+
     }
 
     

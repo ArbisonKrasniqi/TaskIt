@@ -10,6 +10,8 @@ public class TaskMember
     public int  TaskId { get; set; }
     public Tasks Task { get; set; }
     public string UserId { get; set; } = string.Empty;
+    public string FirstName { get; set; } = string.Empty;
+    public string LastName { get; set; } = string.Empty;
 
     public User User { get; set; }
     [Required]

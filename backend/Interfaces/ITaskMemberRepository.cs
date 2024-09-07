@@ -8,7 +8,7 @@ public interface ITaskMemberRepository
 {
     Task<List<TaskMember>> GetAllTaskMembersAsync();
     Task<TaskMember> GetTaskMemberByIdAsync(int taskMemberId);
-    Task<List<TaskMemberDto>> GetAllTaskMembersByTaskIdAsync(int taskId);
+    Task<List<TaskMember>> GetAllTaskMembersByTaskIdAsync(int taskId);
     Task<TaskMember> AddTaskMemberAsync(AddTaskMemberDto addTaskMemberDto);
     Task<TaskMember?> UpdateTaskMemberAsync(UpdateTaskMemberDto updateTaskMemberDto);
     Task<User> RemoveTaskMemberAsync(int taskId, string userId);
