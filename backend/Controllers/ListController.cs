@@ -157,7 +157,55 @@ public class ListController : ControllerBase
                 return StatusCode(500, "Internal Server Error!"+e.Message);
             }
         }
-  
+
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    [HttpPut("DragNDropList")]
+    public async Task<IActionResult> DragNDropList(DragNDropListDTO dragNDropListDto)
+    {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+
+        try
+        {
+            var board = await _boardRepo.GetBoardByIdAsync(dragNDropListDto.BoardId);
+            if (board == null) return NotFound("Board not found");
+
+            var lists = await _listRepo.GetListByBoardId(board.BoardId);
+            if (lists.Count < dragNDropListDto.newIndex) return BadRequest("Invalid new index");
+
+            var list = lists.FirstOrDefault(l => l.index == dragNDropListDto.oldIndex);
+            if (list == null) return BadRequest("Old index not found");
+
+            var workspace = await _workspaceRepo.GetWorkspaceByIdAsync(board.WorkspaceId);
+            if (workspace == null) return NotFound("Workspace not found");
+
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+            var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+            var isMember = await _membersRepo.IsAMember(userId, workspace.WorkspaceId);
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspace.WorkspaceId);
+            if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+            {
+                return StatusCode(403, "The board is closed");
+            }
+
+            if (isMember || userTokenRole == "Admin")
+            {
+                var successful = await _listRepo.HandleDragNDrop(list, dragNDropListDto.newIndex);
+                if (successful)
+                {
+                    return Ok("List reordered");
+                }
+
+                return StatusCode(500, "Internal server error");
+            }
+
+            return StatusCode(401, "You are not authorized");
+
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, "Internal Server Error: " + e.Message);
+        }
+    }
     [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpDelete("DeleteList")]
 
@@ -291,7 +339,8 @@ public class ListController : ControllerBase
                     return Ok(new List<ListDTO>());
                 }
                 var listDto = _mapper.Map<IEnumerable<ListDTO>>(lists);
-                return Ok(listDto);
+                var orderedListDto = listDto.OrderBy(l => l.index).ToList();
+                return Ok(orderedListDto);
             }
             return StatusCode(401, "You are not authorized!");
         }

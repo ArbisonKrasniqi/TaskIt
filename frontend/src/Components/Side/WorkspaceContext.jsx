@@ -527,7 +527,7 @@ export const WorkspaceProvider = ({ children }) => {
                 }
             };
             getLists();
-        },[boardId,mainContext.userInfo.accessToken]
+        },[boardId,mainContext.userInfo.accessToken, WorkspaceId]
 
         );
 

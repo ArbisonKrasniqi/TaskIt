@@ -16,5 +16,6 @@ public interface IListRepository
     Task<List<List>> GetListByBoardId(int BoardId);
     Task<bool> ListExists(int listId);
     Task<bool> ListInBoard(int listId, int boardId);
-   
+    Task<bool> HandleDragNDrop(Models.List list, int newIndex);
+
 }

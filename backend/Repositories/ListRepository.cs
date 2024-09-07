@@ -55,21 +55,46 @@ public class ListRepository : IListRepository
     public async Task<List?> DeleteListAsync(int ListId)
     {
         var listModel = await _context.List.FirstOrDefaultAsync(x => x.ListId == ListId);
-
         if (listModel == null)
         {
             return null;
         }
 
-        await _taskRepo.DeleteTaskByListIdAsync(ListId);
+        if (listModel.index == 0)
+        {
+            await _taskRepo.DeleteTaskByListIdAsync(ListId);
+            _context.List.Remove(listModel);
+            await _context.SaveChangesAsync();
+            return listModel;
+        }
+        
+        var listsToUpdate = _context.List
+            .Where(l => l.BoardId == listModel.BoardId && l.index > listModel.index)
+            .OrderBy(l => l.index)
+            .ToList();
+            
         _context.List.Remove(listModel);
-        await _context.SaveChangesAsync();
+            
+        foreach (var list in listsToUpdate)
+        {
+            list.index -= 1;
+        }
+        _context.SaveChanges();
         return listModel;
     }
-    
+
     //
     public async Task<List> CreateAsync(List listModel)
     {
+        var lists = _context.List.Where(l => l.BoardId == listModel.BoardId);
+        if (lists.Count() == 0)
+        {
+            listModel.index = 0;
+            await _context.List.AddAsync(listModel);
+            await _context.SaveChangesAsync();
+        }
+
+        listModel.index = lists.Count();
         await _context.List.AddAsync(listModel);
         await _context.SaveChangesAsync();
         return listModel;
@@ -119,5 +144,37 @@ public class ListRepository : IListRepository
 
         return false;
     }
-    
+
+    public async Task<bool> HandleDragNDrop(List updatedList, int newIndex)
+    {
+        var list = await _context.List.FirstOrDefaultAsync(l => l.ListId == updatedList.ListId);
+        if (list == null) return false;
+
+        var board = await _context.Board.FirstOrDefaultAsync(b => b.BoardId == list.BoardId);
+        if (board == null) return false;
+
+        var lists = await _context.List
+            .Where(l => l.BoardId == board.BoardId)
+            .OrderBy(l => l.index)
+            .ToListAsync();
+        var currentIndex = list.index;
+        for (int i = Math.Min(newIndex, currentIndex); i <= Math.Max(newIndex, list.index); i++)
+        {
+            if (lists[i] != list)
+            {
+                if (currentIndex < newIndex)
+                {
+                    lists[i].index -= 1;
+                }
+
+                if (currentIndex > newIndex)
+                {
+                    lists[i].index += 1;
+                }
+            } 
+        }
+        list.index = newIndex;
+        await _context.SaveChangesAsync();
+        return true;
+    }
 }

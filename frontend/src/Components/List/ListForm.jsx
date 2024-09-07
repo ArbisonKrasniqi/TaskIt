@@ -12,8 +12,8 @@ const ListForm = ({ onAddList }) => {
         setListTitle(e.target.value);
     };
 
-    const handleCreateList = async () => {
-        
+    const handleCreateList = async (e) => {
+        e.preventDefault();
 
         if (listTitle.length < 2 || listTitle.length > 20) {
             setErrorMessage("List title must be between 2 and 20 characters.");
