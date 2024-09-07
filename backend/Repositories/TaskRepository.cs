@@ -123,6 +123,27 @@ public async Task<Tasks> CreateTaskAsync(Tasks taskModel){
 
         return tasks;
     }
+    
+    public async Task<List<Tasks>> GetTasksByBoardIdAsync(int boardId)
+    {
+        var tasks = await (from board in _context.Board
+            join list in _context.List on board.BoardId equals list.BoardId
+            join task in _context.Tasks on list.ListId equals task.ListId
+            where board.BoardId == boardId && board.IsClosed == false
+            select new Tasks
+            {
+                TaskId = task.TaskId,
+                Title = task.Title,
+                Description = task.Description,
+                index = task.index,
+                DueDate = task.DueDate,
+                DateAdded = task.DateAdded,
+                ListId = task.ListId
+                
+            }).ToListAsync();
+
+        return tasks;
+    }
 
     public async Task<bool> TaskExists(int taskId)
     {

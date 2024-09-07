@@ -18,7 +18,7 @@ public interface ITaskRepository{
     Task<List<Tasks>> GetTaskByListId (int ListId);
     Task<bool> TaskInList(int taskId, int listId);
     Task<List<TaskInfoDto>> GetTasksByWorkspaceIdAsync(int workspaceId);
-
+    Task<List<Tasks>> GetTasksByBoardIdAsync(int boardId);
     Task<bool> TaskExists(int taskId);
     Task<List<Tasks>> FilterClosedBoardTasksAsync(List<Tasks> tasks);
 

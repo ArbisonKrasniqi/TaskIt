@@ -27,8 +27,9 @@ public class  TaskController : ControllerBase{
     private readonly ILabelRepository _labelRepo;
     private readonly ITaskMemberRepository _taskMemberRepo;
     private readonly IMapper _mapper;
+    private readonly IWorkspaceRepository _workspaceRepo;
     
-    public TaskController(IMapper mapper, ITaskMemberRepository taskMemberRepo, ITaskRepository taskRepo, IListRepository listRepo, IBoardRepository boardRepo, IMembersRepository membersRepo, IUserRepository userRepo, ILabelRepository labelRepo)
+    public TaskController(IWorkspaceRepository workspaceRepo, IMapper mapper, ITaskMemberRepository taskMemberRepo, ITaskRepository taskRepo, IListRepository listRepo, IBoardRepository boardRepo, IMembersRepository membersRepo, IUserRepository userRepo, ILabelRepository labelRepo)
     {
         _mapper = mapper;
         _taskMemberRepo = taskMemberRepo;
@@ -38,6 +39,7 @@ public class  TaskController : ControllerBase{
         _membersRepo = membersRepo;
         _userRepo = userRepo;
         _labelRepo = labelRepo;
+        _workspaceRepo = workspaceRepo;
     }
 
     [Authorize(AuthenticationSchemes = "Bearer")]
@@ -152,6 +154,53 @@ public class  TaskController : ControllerBase{
             return StatusCode(500, "Internal Server Error"+e.Message);
         }
     }
+
+
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    [HttpGet("GetTasksByBoardId")]
+    public async Task<IActionResult> GetTasksByBoardId(int boardId)
+    {
+        try
+        {
+            var board = await _boardRepo.GetBoardByIdAsync(boardId);
+            if (board == null) return NotFound("Board not found");
+
+            var workspace = await _workspaceRepo.GetWorkspaceByIdAsync(board.WorkspaceId);
+            if (workspace == null) return NotFound("Workspace not found");
+            
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+            var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+
+            var isMember = await _membersRepo.IsAMember(userId, workspace.WorkspaceId);
+            if (isMember || userTokenRole == "Admin")
+            {
+                var tasks = await _taskRepo.GetTasksByBoardIdAsync(boardId);
+                
+                var taskDtos = new List<TaskDto>();
+
+                foreach (var task in tasks)
+                {
+                    // Get the labels for the current task
+                    var labels = await _labelRepo.GetLabelsByTaskId(task.TaskId);
+                    var taskMembers = await _taskMemberRepo.GetAllTaskMembersByTaskIdAsync(task.TaskId);
+                    // Convert the task to a DTO and add the labels
+                    var taskDto = task.ToTaskDto(labels, taskMembers);
+
+                    // Add the DTO to the list
+                    taskDtos.Add(taskDto);
+                }
+
+                return Ok(taskDtos);
+                
+            }
+            return StatusCode(401, "You are not authorized!");
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, "Internal server error" + e.Message);
+        }
+    }
+    
     [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpPut("UpdateTask")]
     public async Task<IActionResult> UpdateTask (UpdateTaskRequestDTO taskDto){

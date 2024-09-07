@@ -1,17 +1,42 @@
-import { useContext } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { WorkspaceContext } from "../Side/WorkspaceContext";
 import ListForm from "../List/ListForm.jsx";
 import {DndContext, closestCorners} from "@dnd-kit/core";
 import List from "../List/List.jsx";
 import {SortableContext, horizontalListSortingStrategy, arrayMove} from "@dnd-kit/sortable";
-import { putData } from "../../Services/FetchService.jsx";
+import { getDataWithId, putData } from "../../Services/FetchService.jsx";
 import { useParams } from "react-router-dom";
+
+export const BoardContext = createContext();
 
 const Board = () => {
   const workspaceContext = useContext(WorkspaceContext);
-  const {boardId} = useParams();
-  const getListPos = id => workspaceContext.lists.findIndex(list => list.listId === id);
+  const {workspaceId, boardId, taskId} = useParams();
+  
+  const [boardTasks, setBoardTasks] = useState([]);
 
+  
+  const getBoardTasks = async () => {
+    try {
+      const tasksResponse = await getDataWithId('/backend/task/GetTasksByBoardId?boardId', boardId);
+      const tasksWithUniqueIds = tasksResponse.data.map(task => ({
+        ...task,
+        uniqueId: `${task.taskId}-${task.listId}`
+      }));
+      setBoardTasks(tasksWithUniqueIds);
+    } catch (error) {
+      console.log("Error fetching tasks: " + error);
+    }
+  }
+  useEffect( () => {
+    if (workspaceId && boardId) {
+      getBoardTasks();
+    }
+  }, [workspaceId, boardId, workspaceContext.workspaces])
+  
+  
+  
+  const getListPos = id => workspaceContext.lists.findIndex(list => list.listId === id);
   const updateListBackend = async (originalPos, newPos) => {
     try {
       const data = {
@@ -45,29 +70,32 @@ const Board = () => {
     }
   };
 
+  var contextValue = {boardTasks, setBoardTasks, getBoardTasks}
   return (
-    <div>
+    <BoardContext.Provider value={contextValue}>
       <div>
-        <header>
-          <h2>
-          {workspaceContext.board && workspaceContext.board.title ? workspaceContext.board.title : ''}
-          </h2>
-        </header>
+        <div>
+          <header>
+            <h2>
+            {workspaceContext.board && workspaceContext.board.title ? workspaceContext.board.title : ''}
+            </h2>
+          </header>
+        </div>
+        
+        <div className="p-10 bg-gray-200 min-h-screen">
+        <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCorners}>
+            <div className="flex space-x-4">
+              <SortableContext items={workspaceContext.lists.map(list => list.listId)} strategy={horizontalListSortingStrategy}>
+                {workspaceContext.lists.map((list) => (
+                  <List key={list.listId} list={list} />
+                ))}
+              </SortableContext>
+              <ListForm />
+            </div>
+          </DndContext>
+        </div>
       </div>
-      
-      <div className="p-10 bg-gray-200 min-h-screen">
-      <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCorners}>
-          <div className="flex space-x-4">
-            <SortableContext items={workspaceContext.lists.map(list => list.listId)} strategy={horizontalListSortingStrategy}>
-              {workspaceContext.lists.map((list) => (
-                <List key={list.listId} list={list} />
-              ))}
-            </SortableContext>
-            <ListForm />
-          </div>
-        </DndContext>
-      </div>
-    </div>
+    </BoardContext.Provider>
   );
 };
 

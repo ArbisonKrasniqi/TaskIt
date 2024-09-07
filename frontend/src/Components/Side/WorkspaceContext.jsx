@@ -69,7 +69,7 @@ export const WorkspaceProvider = ({ children }) => {
         if (userId) {
             getWorkspaces();
         }
-    }, [userId]);
+    }, [userId, mainContext.userInfo]);
         // const interval = setInterval(getWorkspaces, 5 * 1000);
         // return () => clearInterval(interval); //Get workspaces every 5 seconds
  

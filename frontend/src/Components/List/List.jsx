@@ -3,8 +3,11 @@ import Task from "../Task/Task.jsx";
 import TaskForm from "../Task/TaskForm.jsx";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { BoardContext } from "../BoardContent/Board.jsx";
+import { useContext } from "react";
 
 const List = ({ list }) => {
+  const boardContext = useContext(BoardContext);
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
     id: list.listId
   });
@@ -24,10 +27,12 @@ const List = ({ list }) => {
     >
       <h3 className="text-xl font-bold mb-4">{list.title}</h3>
 
-      {list.tasks.map((task) => (
+      {boardContext.boardTasks
+      .filter((task) => task.listId === list.listId)
+      .sort((a, b) => a.index - b.index)
+      .map((task) => (
         <Task key={task.taskId} task={task} />
       ))}
-
       <TaskForm listId={list.listId} />
     </div>
   );
