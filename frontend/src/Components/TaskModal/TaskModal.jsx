@@ -181,7 +181,7 @@ const TaskModal = () => {
                                         ) : (
                                             <span></span>
                                         )}
-                                        <button onClick={toggleMembersModal} className='w-8 h-8 rounded-full flex justify-center items-center mr-1 bg-gray-700 bg-opacity-50 hover:bg-gray-700 text-xl'>
+                                        <button onClick={toggleMembersModal} className='w-10 h-10 rounded-full flex justify-center items-center m-1 bg-gray-700 bg-opacity-50 hover:bg-gray-700 text-xl'>
                                             <PiPlus/>
                                         </button>
                                     </div>
