@@ -136,6 +136,7 @@ namespace backend.Repositories
 
             await _listRepo.DeleteListsByBoardIdAsync(id);
             await _starredRepo.DeleteStarredBoardByIdAsync(id);
+            await _labelRepo.DeleteLabelsByBoardId(id);
             
             _context.Board.Remove(boardModel);
             await _context.SaveChangesAsync();
@@ -154,7 +155,8 @@ namespace backend.Repositories
             {     
                 await _listRepo.DeleteListsByBoardIdAsync(board.BoardId);
                 await _starredRepo.DeleteStarredBoardByIdAsync(board.BoardId);
-            
+                await _labelRepo.DeleteLabelsByBoardId(board.BoardId);
+
             }
             _context.Board.RemoveRange(boards);
             await _context.SaveChangesAsync();

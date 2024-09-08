@@ -456,34 +456,39 @@ export const WorkspaceProvider = ({ children }) => {
         const [sentInvites, setSentInvites] = useState([]);
         const [inviteeDetails, setInviteeDetails] = useState([]);
         const [workspaceTitles, setWorkspaceTitles] = useState([]);
-    
         const getSentInvites = async () => {
             try {
                 const response = await getDataWithId('http://localhost:5157/backend/invite/GetInvitesByWorkspace?workspaceId', WorkspaceId);
-                const data = response.data;
+                let data = response.data;
                 console.log("Sent Invites fetched: ", data);
-    
-                const pendingInvites = data.filter(invite =>invite.inviteStatus === "Pending");
-                console.log("Pending invites: ",pendingInvites);
+        
+                // filtrimi i ftesave pending
+                let pendingInvites = data.filter(invite => invite.inviteStatus === "Pending");
+                console.log("Pending invites: ", pendingInvites);
+        
+                // sortimi i ftesave ne baze te dates (recent lart)
+                pendingInvites = pendingInvites.sort((a, b) => new Date(b.dateSent) - new Date(a.dateSent));
                 setSentInvites(pendingInvites);
-    
-                // Fetch inviter details for each invite
+        
+                //merri informatat e secilit te ftuar invitee
                 const invited = await Promise.all(pendingInvites.map(async invite => {
                     const responseInvitee = await getDataWithId('http://localhost:5157/backend/user/adminUserID?userId', invite.inviteeId);
                     return responseInvitee.data;
                 }));
+        
+                //merri titujt e secilit workspace
                 const workspaceTitlesData = await Promise.all(pendingInvites.map(async invite => {
                     const responseWorkspace = await getDataWithId('http://localhost:5157/backend/workspace/getWorkspaceById?workspaceId', invite.workspaceId);
-                    return responseWorkspace.data.title; // Assuming the workspace object has a 'title' field
+                    return responseWorkspace.data.title; 
                 }));
-    
+        
                 setInviteeDetails(invited);
                 setWorkspaceTitles(workspaceTitlesData);
             } catch (error) {
                 console.log("Error fetching invites: ", error.message);
             }
         };
-
+        
         
     
         useEffect(() => {

@@ -79,7 +79,7 @@ const WorkspaceSettings = () => {
         }
     };
 
-    // Filter activities based on the search term (user's first and last name)
+   //filtrimi i aktivitetit bazuar ne emrin ose mbiemrin e personit kush eka bo
     const filteredActivities = activities.filter((activity) => {
         const fullName = `${activity.userName} ${activity.userLastName}`.toLowerCase(); //search ne baz te emrit dhe mbiemrit
         return fullName.includes(searchTerm.toLowerCase());

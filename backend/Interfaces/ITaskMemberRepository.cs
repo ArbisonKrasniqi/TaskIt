@@ -14,4 +14,5 @@ public interface ITaskMemberRepository
     Task<User> RemoveTaskMemberAsync(int taskId, string userId);
     Task<TaskMember?> DeleteTaskMemberByIdAsync(int taskId);
     Task<bool> IsATaskMember(string userId, int taskId);
+    Task<List<TaskMember>> DeleteTaskMembersByTaskIdAsync(int taskId);
 }
