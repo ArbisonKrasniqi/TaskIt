@@ -26,7 +26,7 @@ const AboutUs = () => {
 
                 {/* Desktop Login Button */}
                 <div className="hidden md:flex">
-                    <button className="flex items-center justify-center px-5 py-3 rounded-md text-base font-medium text-center border border-transparent shadow-md" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
+                    <button onClick={() => navigate(`/Login`)} className="flex items-center justify-center px-5 py-3 rounded-md text-base font-medium text-center border border-transparent shadow-md" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
                         <span className="text-white">Login</span>
                     </button>
                 </div>
@@ -47,7 +47,7 @@ const AboutUs = () => {
                         <li><button  onClick={() => navigate(`/AboutUs`)} className="text-gray-400">About Us</button></li>
                         <li><button onClick={() => navigate('/ContactUs')} className="text-gray-400">Contact Us</button></li>
                         <li>
-                            <button className="w-full py-3 px-5 text-center text-white rounded-md" style={{ backgroundImage: 'linear-gradient(115deg,  #1a202c, #2d3748)'}}>
+                            <button onClick={() => navigate(`/Login`)} className="w-full py-3 px-5 text-center text-white rounded-md" style={{ backgroundImage: 'linear-gradient(115deg,  #1a202c, #2d3748)'}}>
                                 Login
                             </button>
                         </li>

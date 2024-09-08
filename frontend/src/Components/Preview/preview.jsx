@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import mainimg from '../Preview/main.png';
 import { useNavigate } from 'react-router-dom';
-import AboutUs from '../Preview/aboutus.jsx';
+// import AboutUs from '../Preview/aboutus.jsx';
 
 const Preview = () =>{
 
@@ -29,7 +29,7 @@ const Preview = () =>{
       </div>
 
       <div className="hidden md:flex">
-        <button className="flex items-center justify-center px-5 py-3 rounded-md text-base font-medium text-center border border-transparent shadow-md" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
+        <button onClick={() => navigate('/Login')} className="flex items-center justify-center px-5 py-3 rounded-md text-base font-medium text-center border border-transparent shadow-md" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
           <span className="text-white">Login</span>
         </button>
       </div>
@@ -51,7 +51,7 @@ const Preview = () =>{
           <li><button  onClick={() => navigate(`/AboutUs`)} className="text-gray-400 ">About Us</button></li>
           <li><button onClick={() => navigate('/ContactUs')} className="text-gray-400">Contact Us</button></li>
           <li>
-            <button className="w-full py-3 px-5 text-center text-white rounded-md" style={{ backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
+            <button onClick={() => navigate('/Login')} className="w-full py-3 px-5 text-center text-white rounded-md" style={{ backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
               Login
             </button>
           </li>
@@ -59,23 +59,22 @@ const Preview = () =>{
       </div>
     )}
 
-    <div className="relative mt-5s">
-        <div className="absolute top-1/2 left-0 transform -translate-y-1/2 w-full md:w-1/2 text-center pt-40 md:pt-80 text-2xl md:text-4xl lg:text-5xl px-6 md:px-20">
-            <h1 className="text-black text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl">
-                Taskit brings all your tasks, team, and tools in one place
-            </h1>
-            <h4 className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl mt-4">
-            Keep everything in the same place - even if your team isn’t.
-            </h4>
-            <div className="mt-8 md:mt-12">
-                <button className="flex items-center justify-center text-base h-12 px-4 py-2 rounded-md w-[60%] font-medium text-center border border-transparent rounded-lg" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)', margin: '0 auto'}}>
-                    <span className=" text-white">Sign Up here!</span>
-                </button>
-            </div>
-               
+ 
+      <div className="relative mt-5s top-1/2 left-0 transform -translate-y-1/2 w-full md:w-1/2 text-center pt-40 md:pt-80 text-2xl md:text-4xl lg:text-5xl px-6 md:px-20">
+        <h1 className="text-black text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl">
+          Taskit brings all your tasks, team, and tools in one place
+        </h1>
+        <h4 className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl mt-4">
+          Keep everything in the same place - even if your team isn’t.
+        </h4>
+        <div className="mt-8 md:mt-12">
+          <button onClick={() => navigate('/signup')} className="flex items-center justify-center text-base h-12 px-4 py-2 rounded-md w-[60%] font-medium text-center border border-transparent rounded-lg" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)', margin: '0 auto'}}>
+            <span className=" text-white">Sign Up here!</span>
+          </button>
         </div>
-       
-    </div>
+               
+      </div>
+
     <div className="absolute bottom-0 right-0 p-10">
         <img src={mainimg} alt="Description of the image" style={{ width: '750px', height: '300px' }}/>
     </div>

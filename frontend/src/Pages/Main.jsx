@@ -94,10 +94,8 @@ const Main = () => {
                             {opened === 'calendar' && <Calendar/>}
                             {opened === 'loadingModal' && <LoadingModal/>}
                             {opened === 'members' && <Members />}
-
                             {opened === 'aboutus' && <AboutUs/>}
                             {opened === 'contactus' && <ContactUs/>}
-
                             {opened === 'privacyPolicy' && <PrivacyPolicy/>}
                             {opened === 'profile' && <Profile/>}
                             {opened === 'task' && <TaskModal/>}
