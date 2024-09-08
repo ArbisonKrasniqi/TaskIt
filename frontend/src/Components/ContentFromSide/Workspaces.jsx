@@ -13,6 +13,7 @@ const Workspaces = () =>{
     const navigate = useNavigate();
     const [filteredOwnedWorkspaces, setFilteredOwnedWorkspaces] = useState([]);
     const [filteredMemberWorkspaces, setFilteredMemberWorkspaces] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
         if (workspaceContext.userId && workspaceContext.workspaces) {

@@ -466,41 +466,63 @@ export const WorkspaceProvider = ({ children }) => {
             getBoard();
         },[boardId, userId, mainContext.userInfo.accessToken]);
 
-            const getChecklistsByTask = async () => {
-                
-                try {
-                    if (taskId) {
-                        const response = await getDataWithId('http://localhost:5157/backend/checklist/GetChecklistByTaskId?taskId', taskId); //static for now
-                        const data = response.data;
-                        setChecklists(data);
-                        fetchChecklistItems(data);
-                    }
-                    
-                } catch (error) {
-                    console.error("Error fetching checklists: ",error.message);
-                    
+        const getChecklistsByTask = async () => {
+            try {
+              if (taskId) {
+                const response = await getDataWithId(
+                  'http://localhost:5157/backend/checklist/GetChecklistByTaskId?taskId',
+                  taskId
+                );
+                const data = response.data;
+                console.log('Fetched checklists:', data); // Log checklists data for debugging
+                setChecklists(data);
+          
+                // Fetch checklist items after setting checklists
+                if (Array.isArray(data)) {
+                  fetchChecklistItems(data);
+                } else {
+                  console.error("Invalid checklists data received.");
                 }
+              }
+            } catch (error) {
+              console.error("Error fetching checklists: ", error.message);
             }
-            useEffect(() => {
-                getChecklistsByTask();
-            },[WorkspaceId, workspaces, mainContext.userInfo.accessToken]);
-
-            const [checklistItems, setChecklistItems] = useState([]);
-
-            const fetchChecklistItems = async (checklists) => {
-                const items = {};
-                for (const checklist of checklists) {
-                    
-                  try {
-                    const response = await getDataWithId('http://localhost:5157/backend/checklistItems/GetChecklistItemByChecklistId?checklistId', checklist.checklistId);
-                    items[checklist.checklistId] = response.data; // Store items by checklist ID
-                    
-                  } catch (error) {
-                    console.error(`Error fetching items for checklist ${checklist.id}: `, error.message);
-                  }
-                }
-                setChecklistItems(items);
-              };
+          };
+          
+          useEffect(() => {
+            getChecklistsByTask();
+          }, [WorkspaceId, workspaces, mainContext.userInfo.accessToken, taskId]);
+          
+          const [checklistItems, setChecklistItems] = useState([]);
+          
+          const fetchChecklistItems = async (checklists) => {
+            const items = {};
+          
+            if (!Array.isArray(checklists)) {
+              console.error("Invalid checklists:", checklists);
+              return;
+            }
+          
+            for (const checklist of checklists) {
+              if (!checklist.checklistId) {
+                console.error("Invalid checklistId for checklist:", checklist);
+                continue;
+              }
+          
+              try {
+                const response = await getDataWithId(
+                  'http://localhost:5157/backend/checklistItems/GetChecklistItemByChecklistId?checklistId',
+                  checklist.checklistId
+                );
+                items[checklist.checklistId] = response.data; // Store items by checklist ID
+              } catch (error) {
+                console.error(`Error fetching items for checklist ${checklist.checklistId}: `, error.message);
+              }
+            }
+          
+            setChecklistItems(items);
+          };
+          
 
             
 
@@ -639,7 +661,8 @@ export const WorkspaceProvider = ({ children }) => {
             activities,
             isLoading,
             setIsLoading,
-            getWorkspaces
+            getWorkspaces,
+            fetchChecklistItems
         }}>
             {children}
         </WorkspaceContext.Provider>

@@ -68,13 +68,16 @@ function MembersModal({ taskId }) {
         }
     };
 
-    const filteredTaskMembers = taskMembers.filter(member =>
-        member.firstName?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredTaskMembers = taskMembers.filter(member => {
+        const fullName = `${member.firstName?.toLowerCase()} ${member.lastName?.toLowerCase()}`;
+        return fullName.includes(searchTerm.toLowerCase());
+    });
     
-    const boardMembersToShow = filteredBoardMembers.filter(member =>
-        member.firstName?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const boardMembersToShow = filteredBoardMembers.filter(member => {
+        const fullName = `${member.firstName?.toLowerCase()} ${member.lastName?.toLowerCase()}`;
+        return fullName.includes(searchTerm.toLowerCase());
+    });
+    
 
 
     return (

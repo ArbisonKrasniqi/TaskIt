@@ -1,21 +1,86 @@
-import React,{ useState, useContext} from 'react'
+import React,{ useState, useContext, useEffect} from 'react'
 import { TaskModalsContext } from './TaskModal'
 import { MdOutlineEdit } from "react-icons/md";
+import { useParams } from 'react-router-dom';
+import { deleteData, getDataWithId, postData } from '../../Services/FetchService';
+
 
 function LabelsModal() {
-    const { toggleLabelsModal, toggleCreateLabelModal, toggleEditLabelModal } = useContext(TaskModalsContext);
+    const { toggleLabelsModal, toggleEditLabelModal, assignedLabels, setAssignedLabels } = useContext(TaskModalsContext);
     const [searchLabel, setSearchLabel] = useState("");
+    const {boardId,taskId} = useParams();
+    const [labels, setLabels] = useState([]);
+
+    const [secondAssignedLabels, setSecondAssignedLabels] = useState(assignedLabels);
+
+    useEffect(() => {
+        const getLabels = async () => {
+            try {
+                if (boardId) {
+                    const labelsResponse = await getDataWithId('http://localhost:5157/backend/label/GetLabelsByBoardId?boardId',boardId);
+                    setLabels(labelsResponse.data);
+                }
+            } catch (error) {
+                console.error(error.response.data);
+                
+            }
+        };
+        getLabels();
+    },[assignedLabels]);
+
+    useEffect(() => {
+        const getAssignedLabels = async () => {
+            try {
+                const assignedLabelResponse = await getDataWithId('http://localhost:5157/backend/label/GetLabelsByTaskId?taskId',taskId);
+                setSecondAssignedLabels(assignedLabelResponse.data.map(label => label.labelId));
+            } catch (error) {
+                console.error("Error fetching assigned labels: ",error);
+                
+            }
+        };
+        if (taskId) {
+            getAssignedLabels();
+        }
+    },[taskId])
     
-    const labels = [
-        { id: 1, name: "Completed", color: "green", background: "bg-green-800 bg-opacity-80" },
-        { id: 2, name: "", color: "yellow", background: "bg-yellow-400 bg-opacity-70"},
-        { id: 3, name: "STUCK", color: "red", background: "bg-red-600"}
-    ];
     const filterLabels = labels.filter( label =>
-        label.name.toLowerCase().includes(searchLabel.toLowerCase()) ||
-        label.color.toLowerCase().includes(searchLabel.toLowerCase())
+        label.name.toLowerCase().includes(searchLabel.toLowerCase())
     );
 
+    const handleAssignLabelCheckbox = async (label) => {
+        if (!label.name) {
+            console.log("The label should be named before using!");
+            
+            return;
+        }
+        const isChecked = secondAssignedLabels.includes(label.labelId);
+
+        if (isChecked) {
+            try {
+                const labelData = {
+                    labelId: label.labelId,
+                    taskId: taskId
+                }
+                await deleteData('http://localhost:5157/backend/taskLabel/RemoveLabelFromTask',labelData);
+                setSecondAssignedLabels(prev => prev.filter(id => id !== label.labelId));
+            } catch (error) {
+                console.error("Error unassigning label: ",error);
+                
+            }
+        } else {
+            try {
+                const labelData = {
+                    labelId: label.labelId,
+                    taskId: taskId
+                }
+                await postData('http://localhost:5157/backend/taskLabel/AssignLabelToTask',labelData);
+                setSecondAssignedLabels(prev => [...prev, label.labelId]);
+            } catch (error) {
+                console.error("Error assigning label: ",error);
+                
+            }
+        }
+    }
 
     return (
         <div className="absolute  inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
@@ -42,25 +107,30 @@ function LabelsModal() {
                     <div className="mb-4">
                         <h3 className="text-xs font-semibold text-gray-400 mb-">Labels:</h3>
                         {filterLabels.map(labels => (
-                            <div key={labels.id} className="flex items-center py-2 h-[50px] rounded-md mb-1">
+                            <div key={labels.labelId} className="flex items-center py-2 h-[50px] rounded-md mb-1">
                                 <input 
                                     type="checkbox"
-                                    className='w-6 h-6'/>
-                                <span className={`text-sm font-medium rounded-sm text-white ${labels.background} w-full h-full flex items-center pl-2 mx-1`}
-                                    title={`Color: ${labels.color}, title: "${(labels.name.length == 0 )? ("none") : (labels.name)}"`}>
-                                    {labels.name}
+                                    className='w-6 h-6'
+                                    checked={secondAssignedLabels.includes(labels.labelId)}
+                                    onChange={() => handleAssignLabelCheckbox(labels)}
+                                    />
+                                <span 
+                                    className="text-sm font-medium rounded-sm text-white w-full h-full flex items-center pl-2 mx-1"
+                                    style={{ backgroundColor: labels.color }}
+                                    title={`Color: ${labels.color}, Title: "${labels.name.length === 0 ? '' : labels.name}"`}
+                                >
+                                    {labels.name.length === 0 ? '' : labels.name}
                                 </span>
                                 <button
                                     className="ml-auto text-xl text-gray-500 rounded-xs w-8 h-8 flex justify-center items-center hover:bg-gray-800"
-                                    onClick={() => toggleEditLabelModal(labels)}>
+                                    onClick={() => toggleEditLabelModal(labels)}
+                                >
                                     <MdOutlineEdit/>
                                 </button>
                             </div>
                         ))}
                     </div>
                 )}
-                <button className='w-full h-8 rounded-sm bg-gray-600 bg-opacity-25 text-gray-400 font-semibold hover:bg-opacity-50'
-                    onClick={toggleCreateLabelModal}>Create a new label</button>
             </div>
         </div>
     );

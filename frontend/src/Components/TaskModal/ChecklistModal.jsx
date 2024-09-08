@@ -1,13 +1,15 @@
-import React, { useState, useContext, useEffect, useRef } from 'react';
+import React, { useState, useContext, useEffect, useRef} from 'react';
 import { TaskModalsContext } from './TaskModal';
 import { postData } from '../../Services/FetchService';
 import { WorkspaceContext } from '../Side/WorkspaceContext';
+import { useParams } from 'react-router-dom';
 
 function ChecklistModal() {
   const { toggleChecklistModal, setIsChecklistModalOpen } = useContext(TaskModalsContext);
   const { setChecklists, getChecklistsByTask } = useContext(WorkspaceContext);
-
   const [checklistTitle, setCheklistTitle] = useState('');
+  const {taskId} = useParams();
+  
   
   // Ref to the checklist button to position the modal below it
   const checklistButtonRef = useRef(null);
@@ -27,7 +29,6 @@ function ChecklistModal() {
         return;
       }
 
-      const taskId = 1; // Static
       const data = {
         title: checklistTitle,
         taskId: taskId,

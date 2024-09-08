@@ -2,12 +2,14 @@ import React, { useState, useContext, useRef } from 'react';
 import { IoMdCheckboxOutline } from 'react-icons/io';
 import { FaEllipsisH } from 'react-icons/fa';
 import { WorkspaceContext } from '../Side/WorkspaceContext.jsx';
-import { deleteData, postData, putData } from '../../Services/FetchService.jsx';
+import { deleteData, postData, putData, getDataWithId } from '../../Services/FetchService.jsx';
 import ChecklistItemDeleteModal from './ChecklistItemDeleteModal.jsx';
 import { TaskModalsContext } from './TaskModal.jsx';
+import { useParams } from 'react-router-dom';
+
 
 const Checklist = () => {
-  const { checklists, checklistItems, setChecklistItems, setChecklists } = useContext(WorkspaceContext);
+  const { checklists, checklistItems, setChecklistItems, setChecklists, fetchChecklistItems } = useContext(WorkspaceContext);
   const {setIsChecklistModalOpen} = useContext(TaskModalsContext);
   const [checklistItemDotsOpen, setChecklistItemDotsOpen] = useState(null);
   const [addingItem, setAddingItem] = useState(null);
@@ -17,6 +19,8 @@ const Checklist = () => {
 
   const [editingChecklistId, setEditingChecklistId] = useState(null);
   const [editedChecklistTitle, setEditedChecklistTitle] = useState('');
+  const {taskId} = useParams();
+
   
   // Reference to the input element for focusing
   const inputRef = useRef(null);
@@ -59,7 +63,11 @@ const Checklist = () => {
 
   const handleChecklistDelete = async (checklistId) => {
     try {
-      await deleteData('http://localhost:5157/backend/checklistItems/DeleteChecklistItembyChecklistId', { checklistId });
+      const items = await getDataWithId('http://localhost:5157/backend/checklistItems/GetChecklistItemByChecklistId?checklistId', checklistId);;
+
+      if (items.length > 0) {
+        await deleteData('http://localhost:5157/backend/checklistItems/DeleteChecklistItembyChecklistId', { checklistId }); 
+      }
       await deleteData('http://localhost:5157/backend/checklist/DeleteChecklist', { checklistId });
 
       const updatedChecklists = checklists.filter(

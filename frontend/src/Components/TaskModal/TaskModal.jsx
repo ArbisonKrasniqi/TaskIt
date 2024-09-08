@@ -3,12 +3,9 @@ import { TbAlignBoxLeftTopFilled } from "react-icons/tb";
 import { IoMdCheckboxOutline } from "react-icons/io";
 import { LuClock4 } from "react-icons/lu";
 import { CgTag } from "react-icons/cg";
-import { IoMdArrowForward } from "react-icons/io";
-import { LuArchive } from "react-icons/lu";
 import { MdOutlineSubject } from "react-icons/md";
 import { PiPlus } from "react-icons/pi";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
-import { FaCheck } from "react-icons/fa6";
 import { BsPerson } from "react-icons/bs";
 import AutoResizingTextarea from './AutoResizingTextarea';
 import TaskActivityLog from './TaskActivityLog'
@@ -16,8 +13,10 @@ import Checklist from './Checklist';
 import MembersModal from './MembersModal';
 import LabelsModal from './LabelsModal';
 import ChecklistModal from './ChecklistModal';
-import CreateLabelModal from './CreateLabelModal';
 import EditLabelModal from './EditLabelModal';
+import { getDataWithId } from '../../Services/FetchService';
+import { useParams } from 'react-router-dom';
+
 
 export const TaskModalsContext = createContext();
 
@@ -29,6 +28,24 @@ const TaskModal = () => {
     const [isCreateLabelModalOpen, setIsCreateLabelModalOpen] = useState(false);
     const [isEditLabelModalOpen, setIsEditLabelModalOpen] = useState(false);
     const [selectedLabel, setSelectedLabel] = useState(null);
+    const {taskId} = useParams();
+    const [assignedLabels, setAssignedLabels] = useState([]);
+
+    useEffect(() => {
+        const fetchAssignedLabels = async () => {
+            try {
+                const response = await getDataWithId('http://localhost:5157/backend/label/GetLabelsByTaskId?taskId',taskId);
+                setAssignedLabels(response.data);
+            } catch (error) {
+                console.error("Error fetching assigned labels: ",error);
+                
+            }
+        };
+        if (taskId) {
+            fetchAssignedLabels();
+        }
+    },[taskId,assignedLabels]);
+
 
     const toggleMembersModal = () => {
         setIsMembersModalOpen(!isMembersModalOpen);
@@ -46,15 +63,6 @@ const TaskModal = () => {
 
     const toggleChecklistModal = () => {
         setIsChecklistModalOpen(!isChecklistModalOpen);
-    };
-
-    const toggleCreateLabelModal = () => {
-        if (!isCreateLabelModalOpen) {
-            setIsLabelModalOpen(false);
-            setIsCreateLabelModalOpen(true);
-        } else {
-            setIsCreateLabelModalOpen(false);
-        }
     };
 
     const toggleEditLabelModal = (label) => {
@@ -75,11 +83,13 @@ const TaskModal = () => {
         isChecklistModalOpen,
         toggleChecklistModal,
         isCreateLabelModalOpen,
-        toggleCreateLabelModal,
         isEditLabelModalOpen,
         toggleEditLabelModal,
         selectedLabel,
-        setIsChecklistModalOpen
+        setIsChecklistModalOpen,
+        setIsLabelModalOpen,
+        assignedLabels,
+        setAssignedLabels
     };
     
 
@@ -119,25 +129,24 @@ const TaskModal = () => {
 
                                 <div className='flex flex-col flex-wrap ml-3'>
                                     <p className='w-[100px] text-xs font-semibold'>Labels</p>
-                                    <div className='flex h-12  items-center justify-around'>
-                                        <button className='rounded-[4px] px-2 py-1 bg-green-800 bg-opacity-80 text-gray-100 text-opacity-85 font-semibold'>
-                                            Completed
-                                        </button>
-                                        <button 
+                                    <div className='flex flex-wrap h-auto items-center justify-start'>
+                                        {assignedLabels.length > 0 ? (
+                                            assignedLabels.map((label) => (
+                                                <button
+                                                    key={label.id}
+                                                    className={`rounded-[4px] m-1  px-2 py-2 text-gray-100 font-semibold `}
+                                                    style={{ backgroundColor: label.color }}
+                                                >
+                                                    {label.name}
+                                                </button>
+                                            ))
+                                        ) : (
+                                            <span className="text-gray-500 text-xs"></span>
+                                        )}
+                                        <button
                                             className='w-8 h-8 rounded flex justify-center items-center m-1 bg-gray-700 bg-opacity-50 hover:bg-gray-700 text-xl text-gray-400'
                                             onClick={toggleLabelsModal}>
-                                            <PiPlus/>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className='flex flex-col flex-wrap ml-3'>
-                                    <p className='w-[100px] text-xs font-semibold'>Notifications</p>
-                                    <div className='flex h-12  items-center justify-around'>
-                                        <button className='rounded-[4px] px-2 py-1 bg-gray-600 bg-opacity-30 text-gray-400 font-semibold flex items-center'>
-                                            <span className='pr-2'><MdOutlineRemoveRedEye/></span>
-                                            <span className='pr-3'>Watching</span>
-                                            <span className='bg-gray-400 w-5 h-5 flex items-center justify-center text-gray-800 text-sm rounded-sm'><FaCheck/></span>
+                                            <PiPlus />
                                         </button>
                                     </div>
                                 </div>
@@ -190,7 +199,6 @@ const TaskModal = () => {
                     {isMembersModalOpen && <MembersModal />}
                     {isLabelModalOpen && <LabelsModal/>}
                     {isChecklistModalOpen && <ChecklistModal/>}
-                    {isCreateLabelModalOpen && <CreateLabelModal/>}
                     {isEditLabelModalOpen && <EditLabelModal/>}
                     
                 </div>
