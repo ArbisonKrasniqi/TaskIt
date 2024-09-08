@@ -101,7 +101,7 @@ return (
             border-solid border-gray-700 ${hoveredBoardSIndex===index ? ` bg-gray-400 opacity-50`: ''} `}>
 
             <div className="relative w-full h-full" style={{ 
-                   backgroundImage: `url(${backgroundUrls[board.boardId] || '/path/to/default/image.jpg'})`,  
+                   backgroundImage: `url(${backgroundUrls[board.boardId] || '../Side/background.jpg'})`,  
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                 }}>
@@ -134,7 +134,7 @@ return (
               border-solid border-gray-700 ${hoveredBoardIndex===index ? ` bg-gray-400 opacity-50`: ''} `}>
 
               <div className="relative w-full h-full" style={{ 
-                    backgroundImage: `url(${backgroundUrls[board.boardId] || '/path/to/default/image.jpg'})`, 
+                    backgroundImage: `url(${backgroundUrls[board.boardId] || '../Side/background.jpg'})`, 
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                   }}>

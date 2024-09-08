@@ -1,16 +1,14 @@
-import {useContext, useEffect, useState} from 'react';
+import {useContext} from 'react';
 import { WorkspaceContext } from '../Side/WorkspaceContext';
 
 const Table = () =>{
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
-        // Format date to 'MM/DD/YYYY' or any other format you prefer
         return date.toLocaleDateString('en-US');
     };
-    const {tasks} = useContext(WorkspaceContext);
 
-    
+    const {tasks, getInitials} = useContext(WorkspaceContext);
 
     return(
         <div className="min-h-screen h-full" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
@@ -30,47 +28,63 @@ const Table = () =>{
             <tbody>
                 {tasks.length === 0 ? (
                     <tr>
-                    <th className="px-4 py-2"></th>
-                    <th className="px-4 py-2"></th>
-                    <th className="px-4 py-2"></th>
-                    <th className="px-4 py-2"></th>
-                    <th className="px-4 py-2"></th>
-                    <th className="px-4 py-2"></th>
-                </tr>
+                        <td className="px-4 py-2" colSpan="6">No tasks available</td>
+                    </tr>
                 ) : tasks.map((task, index)=>(
                     <tr key={index} className="hover:bg-gray-700 hover:cursor-pointer">
-                    <td className="px-4 py-2">{task.taskTitle}</td>
-                
-                    <td className="px-4 py-2">{task.listTitle}</td>
-                    <td className="px-4 py-2">{task.boardTitle}</td>
-                    
-                    {/* <td className="px-4 py-2">
-                        {task.labels.map(label => (
-                            <span key={label} className="inline-block bg-blue-500 rounded-full px-3 py-1 text-sm font-semibold text-white mr-2">
-                                {label}
-                            </span>
+                        <td className="px-4 py-2">{task.taskTitle}</td>
+                        <td className="px-4 py-2">{task.listTitle}</td>
+                        <td className="px-4 py-2">{task.boardTitle}</td>
+
+                        {/* Labels */}
+                      
+                        <td className="px-4 py-2">
+                        {task.labels && task.labels.length > 0 ? (
+                            <div className="flex flex-col">
+                             {task.labels.map(label => (
+                             <span 
+                                key={label.labelId} 
+                                className="inline-block rounded-full px-3 py-1 text-sm font-semibold text-white mb-2"
+                                style={{ backgroundColor: label.color }}>
+                               {label.name || " "}
+                             </span>
                         ))}
-                    </td> */}
-                    {/* <td className="px-4 py-2">
-                        {task.members.map(member => (
-                            <span key={member} className="inline-block bg-green-500 rounded-full px-3 py-1 text-sm font-semibold text-white mr-2">
-                                {member}
-                            </span>
-                        ))}
-                    </td> */}
-                    <td className="px-4 py-2"> </td>
-                    <th className="px-4 py-2"> </th>
-                    <td className="px-4 py-2">{formatDate(task.dueDate)}</td>
-                </tr>
+                      </div>
+    ) : (
+        <span>No labels</span>
+    )}
+</td>
+
+                        {/* Members */}
+                        <td className="px-4 py-2">
+    {task.taskMembers && task.taskMembers.length > 0 ? (
+        <div className="flex flex-col">
+            {task.taskMembers.map(member => (
+                <div key={member.taskMemberId} className='flex flex-row p-4 text-gray-400'>
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white bg-gradient-to-r from-orange-400 to-orange-600">
+                        {getInitials(member.firstName, member.lastName)}
+                    </div>
+                    <div className="ml-2 mt-1">
+                        <div className="text-sm font-medium text-gray-200">
+                            {member.firstName} {member.lastName}
+                        </div>
+                    </div>
+                </div>
+            ))}
+        </div>
+    ) : (
+        <span>No members</span>
+    )}
+</td>
+
+                        <td className="px-4 py-2">{formatDate(task.dueDate)}</td>
+                    </tr>
                 ))}
-               
             </tbody>
         </table>
         </div>
         </div>
     );
-
-
-
 };
-export default Table
+
+export default Table;

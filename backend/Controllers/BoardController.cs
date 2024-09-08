@@ -388,6 +388,17 @@ namespace backend.Controllers
                 var ownsWorkspace = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
                 if (ownsWorkspace || userTokenRole == "Admin")
                 {
+                    var workspaceActivity = new WorkspaceActivity
+                    {
+                        WorkspaceId = board.WorkspaceId,
+                        UserId = userId,
+                        ActionType = "Closed",
+                        EntityName = "board "+board.Title,
+                        ActionDate = DateTime.Now
+                    };
+                    
+                    await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
+
                     var result = await _boardRepo.CloseBoardAsync(dto.BoardId, userId);
                     if (!result)
                     {
@@ -423,6 +434,17 @@ namespace backend.Controllers
                 var ownsWorkspace = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
                 if (ownsWorkspace || userTokenRole == "Admin")
                 {
+                    var workspaceActivity = new WorkspaceActivity
+                    {
+                        WorkspaceId = board.WorkspaceId,
+                        UserId = userId,
+                        ActionType = "Reopened",
+                        EntityName = "board "+board.Title,
+                        ActionDate = DateTime.Now
+                    };
+                    
+                    await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
+
                     var result = await _boardRepo.ReopenBoardAsync(dto.BoardId, userId);
                     if (!result)
                     {

@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from "react";
 import { WorkspaceContext } from "../Side/WorkspaceContext";
 import { putData, getData } from "../../Services/FetchService";
 import MessageModal from "./MessageModal";
+import { RxActivityLog } from "react-icons/rx";
 
 const BoardSettings = () => {
   const { board, setBoard, getBackgroundImageUrl } = useContext(WorkspaceContext);
@@ -15,6 +16,7 @@ const BoardSettings = () => {
   const [activeBackgrounds, setActiveBackgrounds] = useState([]);
   const [activeBackgroundUrls, setActiveBackgroundUrls] = useState({});
   const [selectedBackgroundId, setSelectedBackgroundId] = useState(board?.backgroundId || null);
+  const [labels, setLabels] = useState([]);
 
   useEffect(() => {
     const fetchBackground = async () => {
@@ -61,6 +63,23 @@ const BoardSettings = () => {
 
     fetchActiveBackgrounds();
   }, []);
+
+  // Fetch labels for the board
+  useEffect(() => {
+    const fetchLabels = async () => {
+      try {
+        if (board && board.boardId) {
+          const labelsResponse = await getData(`http://localhost:5157/backend/label/GetLabelsByBoardId?boardId=${board.boardId}`);
+          const labelsData = labelsResponse.data;
+          setLabels(labelsData);
+        }
+      } catch (error) {
+        console.error("Error fetching labels:", error.message);
+      }
+    };
+
+    fetchLabels();
+  }, [board]);
 
   // Update the board background
   const handleSaveBackground = async () => {
@@ -225,15 +244,43 @@ const BoardSettings = () => {
                 ))}
               </div>
               <button 
-                className="w-full py-2 mt-5 bg-gray-800 text-white rounded-md font-semibold hover:bg-gray-600"
-                onClick={handleSaveBackground}
+                onClick={handleSaveBackground} 
+                className="mt-5 px-4 py-2 rounded-lg bg-gray-800 text-white"
               >
-                Save
+                Save Background
               </button>
             </div>
           </div>
         )}
       </div>
+      <div className="font-semibold font-sans text-gray-400 ml-20 pt-10 mr-20">
+      <h1 className="text-3xl">Board Labels</h1>
+        <div className="mt-5 flex flex-wrap gap-4">
+            {labels.map((label) => (
+             <div 
+                 key={label.labelId}
+                 className="p-2 rounded-lg border border-gray-300 flex items-center justify-center w-[150px] h-[50px]"
+                 style={{ backgroundColor: label.color }}
+             >
+              <p className="text-white truncate">{label.name}</p>
+            </div>
+             ))}
+        <div className="mt-3 mb-5">
+          <button
+            className="bg-gray-800 text-white px-4 py-2 rounded-md"
+          >
+            Edit Labels
+          </button>
+        </div>
+     </div> 
+    </div>
+             <br/>
+
+    <div className="font-semibold font-sans text-gray-400 ml-20 pt-10 mr-20 flex flex-row items-center">
+    <RxActivityLog className="mr-3 text-3xl" />
+    <h1 className="text-3xl">Board Activity</h1>
+    </div>
+    <br/>
     </div>
   );
 };
