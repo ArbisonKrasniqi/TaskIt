@@ -1,11 +1,10 @@
-import React, { useState, createContext, useEffect, useContext} from 'react';
+import React, { useState, createContext, useEffect} from 'react';
 import { TbAlignBoxLeftTopFilled } from "react-icons/tb";
 import { IoMdCheckboxOutline } from "react-icons/io";
 import { LuClock4 } from "react-icons/lu";
 import { CgTag } from "react-icons/cg";
 import { MdOutlineSubject } from "react-icons/md";
 import { PiPlus } from "react-icons/pi";
-import { MdOutlineRemoveRedEye } from "react-icons/md";
 import { BsPerson } from "react-icons/bs";
 import AutoResizingTextarea from './AutoResizingTextarea';
 import TaskActivityLog from './TaskActivityLog'
@@ -30,6 +29,35 @@ const TaskModal = () => {
     const [selectedLabel, setSelectedLabel] = useState(null);
     const {taskId} = useParams();
     const [assignedLabels, setAssignedLabels] = useState([]);
+    const [taskData, setTaskData] = useState([]);
+    const [listData, setListData] = useState([]);
+
+    useEffect(() => {   
+        const getTaskById = async () => {
+            try {
+                const response = await getDataWithId('http://localhost:5157/backend/task/GetTaskById?taskId',taskId);
+                setTaskData(response.data);
+            } catch (error) {
+                console.error("Error fetching task by id: ",error);
+            }
+        };
+        if (taskId) {
+            getTaskById();
+        }
+    },[taskId,taskData]);
+
+    useEffect(() => {
+        const getListById = async () => {
+            try {
+                const response = await getDataWithId('http://localhost:5157/backend/list/GetListById?listId',taskData.listId);
+                setListData(response.data);
+                
+            } catch (error) {
+                console.error("Error fetching list by id: ",error);
+            }
+        };
+            getListById();
+    },[taskId,taskData]);
 
     useEffect(() => {
         const fetchAssignedLabels = async () => {
@@ -89,7 +117,9 @@ const TaskModal = () => {
         setIsChecklistModalOpen,
         setIsLabelModalOpen,
         assignedLabels,
-        setAssignedLabels
+        setAssignedLabels,
+        taskData,
+        setTaskData
     };
     
 
@@ -100,10 +130,9 @@ const TaskModal = () => {
                     <div className="flex flex-row items-center justify-between mx-2 mt-3 text-gray-400 h-[60px]">
                         <TbAlignBoxLeftTopFilled className="bg-gray-800 text-2xl ml-5"/>
                         <div className="flex flex-col w-[550px] -ml-16">
-                            <h2 className="w-[100%] font-bold text-xl">Task Name</h2>
+                            <h2 className="w-[100%] font-bold text-xl">{taskData.title}</h2>
                             <div className='flex '>
-                                <span className="text-xs"> in list LISTNAME</span>
-                                <span className='ml-2'><MdOutlineRemoveRedEye/></span>
+                                <span className="text-xs"> in list {listData.title}</span>
                             </div>
                         </div>
                         <button className="mx-2 hover:bg-gray-600 hover:rounded-full transition w-6 rounded-full flex justify-center">X</button>
@@ -158,7 +187,9 @@ const TaskModal = () => {
                                 </div>
                                 <div className='flex flex-col w-11/12'>
                                     <span className='h-10 items-center flex font-semibold'>Description</span>
-                                    <AutoResizingTextarea/>
+                                    <AutoResizingTextarea
+                                    taskDescription={taskData.description}
+                                    />
                                 </div>
                             </div>
                             <div>
