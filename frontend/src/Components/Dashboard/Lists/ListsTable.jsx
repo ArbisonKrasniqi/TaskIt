@@ -4,6 +4,7 @@ import CustomButton from '../Buttons/CustomButton';
 import { ListsContext } from './ListsList';
 import { deleteData } from '../../../Services/FetchService';
 import { useNavigate } from 'react-router-dom';
+import { DashboardContext } from '../../../Pages/dashboard';
 
 export const UpdateContext = createContext();
 
@@ -11,6 +12,7 @@ const ListsTable = () => {
     const navigate = useNavigate();
     const listsContext = useContext(ListsContext);
     const [searchQuery, setSearchQuery] = useState('');
+    const dashboardContext = useContext(DashboardContext);
 
     const HandleListDelete = (id) => {
         async function deleteList() {
@@ -23,8 +25,8 @@ const ListsTable = () => {
                 const updatedLists = listsContext.lists.filter(list => list.listId !== id);
                 listsContext.setLists(updatedLists);
             } catch (error) {
-                listsContext.setErrorMessage(error.message + id);
-                listsContext.setShowListsErrorModal(true);
+                dashboardContext.setDashboardErrorMessage(error.message + id);
+                dashboardContext.setShowDashboardErrorModal(true);
                 listsContext.getLists();
             }
         }
@@ -81,22 +83,25 @@ const ListsTable = () => {
                             filteredLists.map((list, index) => (
                                 <tr
                                     key={index}
-                                    className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 cursor-pointer"
-                                    onClick={() => handleListRowClick(list.listId)}
+                                    className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
                                 >
                                     <td className="px-6 py-4">{list.listId}</td>
                                     <td className="px-6 py-4">{list.title}</td>
                                     <td className="px-6 py-4">{list.boardId}</td>
                                     <td className="px-6 py-4">{list.dateCreated}</td>
                                     <td className="px-6 py-4">
+                                    <CustomButton 
+                                            onClick={() => handleListRowClick(list.listId)}
+                                            type="button"
+                                            text="Open"
+                                        />
                                         <UpdateContext.Provider value={list}>
-                                            <UpdateListButton onClick={(e) => e.stopPropagation()} />
+                                            <UpdateListButton/>
                                         </UpdateContext.Provider>
                                         <CustomButton
                                             color="red"
                                             text="Delete"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
+                                            onClick={() => {
                                                 HandleListDelete(list.listId);
                                             }}
                                         />

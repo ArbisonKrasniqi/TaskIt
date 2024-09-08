@@ -1,17 +1,19 @@
-import { useState, useEffect, createContext } from 'react';
+import { useState, useEffect, createContext, useContext } from 'react';
 import { getData, getDataWithId } from '../../../Services/FetchService.jsx';
 import BoardsTable from './BoardsTable.jsx';
-import BoardErrorModal from './Modals/BoardErrorModal.jsx';
+import DashboardErrorModal from '../DashboardErrorModal.jsx';
 import UpdateBoardModal from './Modals/UpdateBoardModal.jsx';
 import { useParams } from 'react-router-dom';
+import { DashboardContext } from '../../../Pages/dashboard.jsx';
+
 
 export const BoardsContext = createContext();
 
 const BoardsList = (workspaceIdParam) => {
     const { workspaceId } = useParams();
     const [boards, setBoards] = useState(null);
-    const [showBoardsErrorModal, setShowBoardsErrorModal] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("There has been a server error!");
+    const dashboardContext = useContext(DashboardContext);
+
     const [showUpdateInfoModal, setShowUpdateInfoModal] = useState(false);
     const [boardToUpdate, setBoardToUpdate] = useState(null);
 
@@ -26,8 +28,8 @@ const BoardsList = (workspaceIdParam) => {
             }
             
         } catch (error) {
-            setErrorMessage(error.message);
-            setShowBoardsErrorModal(true);
+            dashboardContext.setDashboardErrorMessage(error.message);
+            dashboardContext.setShowDashboardErrorModal(true);
         }
     };
 
@@ -36,8 +38,6 @@ const BoardsList = (workspaceIdParam) => {
     const contextValue = { 
         boards, setBoards, 
         getBoards, 
-        showBoardsErrorModal, setShowBoardsErrorModal, 
-        errorMessage, setErrorMessage, 
         showUpdateInfoModal, setShowUpdateInfoModal, 
         boardToUpdate, setBoardToUpdate 
     };
@@ -45,7 +45,7 @@ const BoardsList = (workspaceIdParam) => {
     return (
         <BoardsContext.Provider value={contextValue}>
             <BoardsTable />
-            {showBoardsErrorModal && <BoardErrorModal />}
+            {dashboardContext.ShowDashboardErrorModal && <DashboardErrorModal />}
             {showUpdateInfoModal && <UpdateBoardModal setShowUpdateInfoModal={setShowUpdateInfoModal} />}
         </BoardsContext.Provider>
     );

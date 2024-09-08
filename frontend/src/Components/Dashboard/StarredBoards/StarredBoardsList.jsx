@@ -1,34 +1,37 @@
-import {useState, useEffect, createContext} from "react";
-import { getData } from "../../../Services/FetchService";
+import {useState, useEffect, useContext, createContext} from "react";
+import { getData, getDataWithId } from "../../../Services/FetchService";
 import StarredBoardsTable from "./StarredBoardsTable";
-import StarredBoardsErrorModal from "./Modals/StarredBoardsErrorModal"
+import { DashboardContext } from "../../../Pages/dashboard";
+import DashboardErrorModal from "../DashboardErrorModal";
+import { useParams } from "react-router-dom";
+
 export const StarredBoardsContext = createContext();
 
 const StarredBoardsList = () =>{
+    const {userId} = useParams();
     const [StarredBoards, setStarredBoards] = useState([]);
-    const [showStarredBoardsErrorModal, setShowStarredBoardsErrorModal] =useState(false);
-    const [errorMessage, setErrorMessage] = useState("There has been a server error!");
-
+    const dashboardContext = useContext(DashboardContext);
     const getStarredBoards = async ()=>{
         try{
-            const response = await getData('http://localhost:5157/backend/starredBoard/GetAllStarredBoards');
-            setStarredBoards(response.data);
+            if (userId) {
+                const userStarredBoards = await getDataWithId('/backend/starredBoard/GetStarredBoardsByUserId?userId', userId);
+                setStarredBoards(userStarredBoards.data);
+            } 
         }catch(error){
-            setErrorMessage(error.message);
-            setShowStarredBoardsErrorModal(true);
+            dashboardContext.setDashboardErrorMessage(error.message);
+            dashboardContext.setShowStarredBoardsErrorModal(true);
         }
     };
     useEffect(()=>{
         getStarredBoards();
     }, []);
 
-    const contextValue = {StarredBoards, setStarredBoards, getStarredBoards, 
-        showStarredBoardsErrorModal, setShowStarredBoardsErrorModal, errorMessage, setErrorMessage};
+    const contextValue = {StarredBoards, setStarredBoards, getStarredBoards};
 
         return(
             <StarredBoardsContext.Provider value={contextValue}>
+                {dashboardContext.showDashboardErrorModal && <DashboardErrorModal/>}
                 <StarredBoardsTable/>
-                {showStarredBoardsErrorModal && <StarredBoardsErrorModal/>}
             </StarredBoardsContext.Provider>
         );
 }

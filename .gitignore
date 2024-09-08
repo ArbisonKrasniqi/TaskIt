@@ -4,3 +4,5 @@
 /backend/.idea/
 /backend/Migrations/
 /frontend/node_modules/
+
+.fake

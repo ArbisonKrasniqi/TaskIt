@@ -1,15 +1,16 @@
 import React, { useState, useContext } from 'react';
-import DatePicker from 'react-datepicker';
-import "react-datepicker/dist/react-datepicker.css"; // Import the styles
+// import DatePicker from 'react-datepicker';
+// import "react-datepicker/dist/react-datepicker.css"; // Import the styles
 import { putData } from '../../../../Services/FetchService';
 import { UpdateContext } from '../TasksTable';
 import { TasksContext } from '../TasksList';
 import CustomButton from '../../Buttons/CustomButton';
+import { DashboardContext } from '../../../../Pages/dashboard';
 
 const UpdateTaskModal = (props) => {
     const updateContext = useContext(UpdateContext);
     const tasksContext = useContext(TasksContext);
-
+    const dashboardContext = useContext(DashboardContext);
     // Initialize date
     const initialDueDate = updateContext.dueDate ? new Date(updateContext.dueDate) : new Date();
 
@@ -65,8 +66,8 @@ const UpdateTaskModal = (props) => {
             props.setShowUpdateInfoModal(false);
             
         } catch (error) {
-            tasksContext.setErrorMessage(error.message);
-            tasksContext.setShowTasksErrorModal(true);
+            dashboardContext.setDashboardErrorMessage(error.message);
+            dashboardContext.setShowDashboardErrorModal(true);
             tasksContext.getTasks();
 
             props.setShowUpdateInfoModal(false);
@@ -104,14 +105,14 @@ const UpdateTaskModal = (props) => {
 
                 <div className='mb-6'>
                     <label htmlFor="dueDate" className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>Due Date</label>
-                    <DatePicker
+                    {/* <DatePicker
                         selected={dueDate}
                         onChange={(date) => setDueDate(date)}
                         showTimeSelect
                         dateFormat="yyyy-MM-dd'T'HH:mm:ss"
                         timeFormat="HH:mm:ss"
                         className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
-                    />
+                    /> */}
                 </div>
 
                 <div className='flex justify-around'>

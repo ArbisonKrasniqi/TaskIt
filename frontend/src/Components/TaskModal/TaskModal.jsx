@@ -1,4 +1,4 @@
-import React, { useState, createContext } from 'react';
+import React, { useState, createContext, useEffect, useContext} from 'react';
 import { TbAlignBoxLeftTopFilled } from "react-icons/tb";
 import { IoMdCheckboxOutline } from "react-icons/io";
 import { LuClock4 } from "react-icons/lu";
@@ -78,8 +78,10 @@ const TaskModal = () => {
         toggleCreateLabelModal,
         isEditLabelModalOpen,
         toggleEditLabelModal,
-        selectedLabel
+        selectedLabel,
+        setIsChecklistModalOpen
     };
+    
 
     return (
         <TaskModalsContext.Provider value={values}>

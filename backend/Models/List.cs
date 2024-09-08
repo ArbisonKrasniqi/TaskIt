@@ -4,6 +4,8 @@ namespace backend.Models;
 
 public class List
 {
+    [Required]
+    [Range(0, int.MaxValue, ErrorMessage = "List Id can not be negative!")]
     public int ListId { get; set; }
     [Required]
     [Range(0, int.MaxValue, ErrorMessage = "Index value can not be negative!")]

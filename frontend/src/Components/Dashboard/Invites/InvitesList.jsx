@@ -1,15 +1,15 @@
-import {useState, useEffect, createContext} from "react";
+import {useState, useEffect, createContext, useContext} from "react";
 import { getData,getDataWithId } from "../../../Services/FetchService";
 import InvitesTable from "./InvitesTable";
-import InvitesErrorModal from "./Modals/InvitesErrorModal"
+import DashboardErrorModal from "../DashboardErrorModal";
 import { useParams } from "react-router-dom";
+import {DashboardContext} from "../../../Pages/dashboard";
 
 export const InvitesContext = createContext();
 
 const InvitesList = () =>{
     const [invites, setInvites] = useState([]);
-    const [showInvitesErrorModal, setShowInvitesErrorModal] =useState(false);
-    const [errorMessage, setErrorMessage] = useState("There has been a server error!");
+    const dashboardContext = useContext(DashboardContext);
     const { workspaceId } = useParams();
 
     const getInvites = async () =>{
@@ -25,21 +25,20 @@ const InvitesList = () =>{
             
         }
         catch(error){
-            setErrorMessage(error.message);
-            setShowInvitesErrorModal(true);
+            dashboardContext.setDashboardErrorMessage(error.message);
+            dashboardContext.setShowDashboardErrorModal(true);
         }
     };
     useEffect(()=>{
         getInvites();
     }, []);
 
-    const contextValue = {invites, setInvites, getInvites, 
-        showInvitesErrorModal, setShowInvitesErrorModal, errorMessage, setErrorMessage};
+    const contextValue = {invites, setInvites, getInvites};
 
         return(
             <InvitesContext.Provider value={contextValue}>
                 <InvitesTable/>
-                {showInvitesErrorModal && <InvitesErrorModal/>}
+                {dashboardContext.showDashboardErrorModal && <DashboardErrorModal/>}
             </InvitesContext.Provider>
         );
 }

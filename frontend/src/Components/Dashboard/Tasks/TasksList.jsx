@@ -1,16 +1,16 @@
-import { useState, useEffect, createContext } from "react";
+import { useState, useEffect, createContext, useContext } from "react";
 import { getData, getDataWithId } from "../../../Services/FetchService";
 import TasksTable from "./TasksTable";
-import TasksErrorModal from "./Modals/TasksErrorModal.jsx";
+import DashboardErrorModal from "../DashboardErrorModal.jsx";
 import { useParams } from "react-router-dom";
+import { DashboardContext } from "../../../Pages/dashboard.jsx";
 
 export const TasksContext = createContext();
 
 const TasksList = () => {
     const { listId } = useParams();
     const [tasks, setTasks] = useState(null);
-    const [showTasksErrorModal, setShowTasksErrorModal] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("There has been a server error");
+    const dashboardContext = useContext(DashboardContext);
 
     const getTasks = async () => {
         try {
@@ -22,8 +22,8 @@ const TasksList = () => {
                 setTasks(allTasks.data);
             }   
         } catch (error) {
-            setErrorMessage(error.message);
-            setShowTasksErrorModal(true);
+            dashboardContext.setDashboardErrorMessage(error.message);
+            dashboardContext.setShowDashboardErrorModal(true);
         }
     };
 
@@ -31,12 +31,12 @@ const TasksList = () => {
         getTasks();
     }, [listId]);
 
-    const contextValue = {tasks, setTasks, showTasksErrorModal, setShowTasksErrorModal, errorMessage, setErrorMessage, getTasks};
+    const contextValue = {tasks, setTasks, getTasks};
 
     return (
         <TasksContext.Provider value={contextValue}>
             <TasksTable/>
-            {showTasksErrorModal && <TasksErrorModal/> }
+            {dashboardContext.showDashboardErrorModal && <DashboardErrorModal/> }
         </TasksContext.Provider>
     );
 

@@ -120,7 +120,7 @@ const SignUpForm = () =>{
                     <div className='w-full lg:w-5/12 flex flex-col items-center justify-center p-12 bg-no-repeat bg-cover bg-center' style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
                     <h1 className='text-white text-3xl mb-3 font-sans font-bold'>Already a member?</h1>
                         <p className='text-white mt-5 font-sans'>Welcome back! Log in and get back to tasking</p>
-                        <button type='submit' className='bg-white text-gray-700 px-4 py-2 mt-20 border border-solid border-gray-700 rounded-md w-[50%]  hover:border hover:border-solid hover:border-black hover:text-black font-bold'>Log in</button>
+                        <button onClick={()=> {navigate('/login')}} className='bg-white text-gray-700 px-4 py-2 mt-20 border border-solid border-gray-700 rounded-md w-[50%]  hover:border hover:border-solid hover:border-black hover:text-black font-bold'>Log in</button>
                     
                     </div>
                     <div className='w-full lg:w-7/12 py-16 px-12'>

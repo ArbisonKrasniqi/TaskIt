@@ -4,12 +4,14 @@ import { WorkspacesContext } from './WorkspacesList.jsx';
 import CustomButton from '../Buttons/CustomButton.jsx';
 import { deleteData } from '../../../Services/FetchService.jsx';
 import { useNavigate } from 'react-router-dom';
+import { DashboardContext } from '../../../Pages/dashboard.jsx';
 
 export const UpdateContext = createContext();
 
 const WorkspacesTable = () => {
     const navigate = useNavigate();
     const workspacesContext = useContext(WorkspacesContext);
+    const dashboardContext = useContext(DashboardContext);
     const [searchQuery, setSearchQuery] = useState('');
 
     const HandleWorkspaceDelete = (id) => {
@@ -22,8 +24,8 @@ const WorkspacesTable = () => {
                 const updatedWorkspaces = (workspacesContext.workspaces || []).filter(workspace => workspace.workspaceId !== id);
                 workspacesContext.setWorkspaces(updatedWorkspaces);
             } catch (error) {
-                workspacesContext.setErrorMessage(error.message + id);
-                workspacesContext.setShowWorkspacesErrorModal(true);
+                dashboardContext.setDashboardErrorMessage(error.message + id);
+                dashboardContext.setShowDashboardErrorModal(true);
                 workspacesContext.getWorkspaces();
             }
         }
@@ -79,22 +81,25 @@ const WorkspacesTable = () => {
                             filteredWorkspaces.map((workspace, index) => (
                                 <tr
                                     key={index}
-                                    className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 cursor-pointer"
-                                    onClick={() => handleWorkspaceRowClick(workspace.workspaceId)}
+                                    className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
                                 >
                                     <td className="px-6 py-4">{workspace.workspaceId}</td>
                                     <td className="px-6 py-4">{workspace.title}</td>
                                     <td className="px-6 py-4">{workspace.description}</td>
                                     <td className="px-6 py-4">{workspace.ownerId}</td>
                                     <td className="px-6 py-4">
+                                    <CustomButton 
+                                            onClick={() => handleWorkspaceRowClick(workspace.workspaceId)}
+                                            type="button"
+                                            text="Open"
+                                        />
                                         <UpdateContext.Provider value={workspace}>
-                                            <UpdateWorkspaceButton onClick={(e) => e.stopPropagation()} />
+                                            <UpdateWorkspaceButton/>
                                         </UpdateContext.Provider>
                                         <CustomButton
                                             color="red"
                                             text="Delete"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
+                                            onClick={() => {
                                                 HandleWorkspaceDelete(workspace.workspaceId);
                                             }}
                                         />

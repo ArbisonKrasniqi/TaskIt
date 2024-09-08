@@ -44,6 +44,7 @@ public class ChecklistItemRepository:IChecklistItemRepository
 
         existingChecklistItem.Content = checklistItemDto.Content;
         existingChecklistItem.ChecklistId = checklistItemDto.ChecklistId;
+        existingChecklistItem.Checked = checklistItemDto.Checked;
 
         await _context.SaveChangesAsync();
         return existingChecklistItem;
@@ -100,6 +101,21 @@ public class ChecklistItemRepository:IChecklistItemRepository
         }
 
         return false;
+    }
+
+    public async Task<ChecklistItem> ChangeChecklistItemChecked(int checklisItemtId)
+    {
+        var checklistItemModel = await _context.ChecklistItem.FirstOrDefaultAsync(c => c.ChecklistItemId == checklisItemtId);
+
+        if (checklistItemModel == null)
+        {
+            throw new NullReferenceException("Checklist Not found!");
+        }
+
+        checklistItemModel.Checked = !checklistItemModel.Checked;
+        await _context.SaveChangesAsync();
+
+        return checklistItemModel;
     }
 
 }

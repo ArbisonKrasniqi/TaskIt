@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using backend.DTOs.Invite.Input;
 using backend.DTOs.Invite.Output;
+using backend.DTOs.Members;
 using backend.DTOs.Workspace;
 using backend.Interfaces;
 using backend.Models;
@@ -284,9 +285,8 @@ namespace backend.Controllers
                 
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
-                var inviterId = invite.InviterId;
                 var inviteeId = invite.InviteeId;
-                if (userId == inviteeId || userId == inviterId || userTokenRole == "Admin")
+                if (userId == inviteeId || userTokenRole == "Admin")
                 {
 
                     var inviteUpdate = await _inviteRepo.UpdateInviteStatusAsync(updateDto);
@@ -357,10 +357,76 @@ namespace backend.Controllers
 
             try
             {
-                var invite = await _inviteRepo.UpdateInviteAsync(updateDto);
-                if (invite == null) return NotFound("Invite not found!");
 
-                var inviteDto = _mapper.Map<InviteDto>(invite);
+                var invite = await _inviteRepo.GetInviteByIdAsync(updateDto.InviteId);
+                if (invite == null)
+                {
+                    return NotFound("Invite not found");
+                }
+
+                var workspace = await _workspaceRepo.GetWorkspaceByIdAsync(updateDto.WorkspaceId);
+                if (workspace == null)
+                {
+                    return NotFound("Workspace not found");
+                }
+                
+                var inviterIsMember = await _userRepo.UserIsMember(updateDto.InviterId, updateDto.WorkspaceId);
+                if (!inviterIsMember)
+                {
+                    return StatusCode(403, "Inviter does not own workspace");
+                }
+                var inviteeExists = await _userRepo.UserExists(updateDto.InviteeId);
+                if (!inviteeExists)
+                {
+                    return NotFound("Invitee does not exist");
+                }
+                
+                
+                if (invite.InviteStatus != updateDto.InviteStatus)
+                {
+                    switch (updateDto.InviteStatus)
+                    {
+                        case "Accepted":
+                            var isMemberAccepted = await _memberRepo.IsAMember(updateDto.InviteeId, updateDto.WorkspaceId);
+                            if (!isMemberAccepted)
+                            {
+                                var addMemberDto = new AddMemberDto
+                                {
+                                    UserId = updateDto.InviteeId,
+                                    WorkspaceId = updateDto.WorkspaceId
+                                };
+                                await _memberRepo.AddMemberAsync(addMemberDto);
+                            }
+                            break;
+        
+                        case "Pending":
+
+                            var isMemberPending = await _memberRepo.IsAMember(updateDto.InviteeId, updateDto.WorkspaceId);
+                            if (isMemberPending)
+                            {
+                                await _memberRepo.RemoveMemberAsync(updateDto.WorkspaceId, updateDto.InviteeId);
+                            }
+
+                            break;
+
+                        case "Declined":
+                            var isMemberDeclined = await _memberRepo.IsAMember(updateDto.InviteeId, updateDto.WorkspaceId);
+                            if (isMemberDeclined)
+                            {
+                                await _memberRepo.RemoveMemberAsync(updateDto.WorkspaceId, updateDto.InviteeId);
+                            }
+                            break;
+
+                        default:
+                            return BadRequest("InviteStatus BadRequest: Only values 'Accepted', 'Pending', and 'Declined' are allowed");
+                    }
+                }
+                
+                var inviteResponse = await _inviteRepo.UpdateInviteAsync(updateDto);
+                
+                if (inviteResponse == null) return NotFound("Invite not found!");
+
+                var inviteDto = _mapper.Map<InviteDto>(inviteResponse);
                 return Ok(inviteDto);
             }
             catch (Exception e)

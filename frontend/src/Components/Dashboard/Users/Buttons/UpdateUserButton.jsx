@@ -39,7 +39,7 @@ const UpdateUserButton = () => {
         setShowEditRoleModal(true);
     };
 
-    const toggleModal = () => {
+    const toggleModal = (e) => {
         setShowModal(!showModal);
     }
 

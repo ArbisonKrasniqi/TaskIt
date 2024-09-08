@@ -1,11 +1,16 @@
 using System.Linq; 
 using System.Threading.Tasks;
+using AutoMapper;
 using backend.DTOs.Task;
 using backend.Interfaces;
 using backend.Mappers;
 using Microsoft.AspNetCore.Mvc;
 using backend.DTOs.List;
+using backend.DTOs.TaskMember.Output;
+using backend.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Data.SqlClient.DataClassification;
+
 namespace backend.Controllers;
 
 
@@ -18,12 +23,21 @@ public class  TaskController : ControllerBase{
     private readonly ITaskRepository _taskRepo;
     private readonly IBoardRepository _boardRepo;
     private readonly IMembersRepository _membersRepo;
-
-    public TaskController(ITaskRepository taskRepo, IListRepository listRepo, IBoardRepository boardRepo, IMembersRepository membersRepo){
+    private readonly IUserRepository _userRepo;
+    private readonly ILabelRepository _labelRepo;
+    private readonly ITaskMemberRepository _taskMemberRepo;
+    private readonly IMapper _mapper;
+    
+    public TaskController(IMapper mapper, ITaskMemberRepository taskMemberRepo, ITaskRepository taskRepo, IListRepository listRepo, IBoardRepository boardRepo, IMembersRepository membersRepo, IUserRepository userRepo, ILabelRepository labelRepo)
+    {
+        _mapper = mapper;
+        _taskMemberRepo = taskMemberRepo;
         _listRepo = listRepo;
         _taskRepo = taskRepo;
         _boardRepo = boardRepo;
         _membersRepo = membersRepo;
+        _userRepo = userRepo;
+        _labelRepo = labelRepo;
     }
 
     [Authorize(AuthenticationSchemes = "Bearer")]
@@ -36,8 +50,22 @@ public class  TaskController : ControllerBase{
                 return NotFound("No tasks found");
             }
 
-            var taskDto = tasks.Select(x => x.ToTaskDto());
-            return Ok(taskDto);
+            var taskDtos = new List<TaskDto>();
+
+            foreach (var task in tasks)
+            {
+                // Get the labels for the current task
+                var labels = await _labelRepo.GetLabelsByTaskId(task.TaskId);
+                var taskMembers = await _taskMemberRepo.GetAllTaskMembersByTaskIdAsync(task.TaskId);
+                var taskMembersDto = _mapper.Map<List<TaskMemberDto>>(taskMembers);
+                // Convert the task to a DTO and add the labels
+                var taskDto = task.ToTaskDto(labels, taskMembersDto);
+
+                // Add the DTO to the list
+                taskDtos.Add(taskDto);
+            }
+
+            return Ok(taskDtos);
 
         }catch(Exception e){
             return StatusCode(500, e.Message);
@@ -69,9 +97,17 @@ public class  TaskController : ControllerBase{
             
             var workspaceId = board.WorkspaceId;
             var isMember = await _membersRepo.IsAMember(userId, workspaceId);
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
+            if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+            {
+                return StatusCode(403, "The board is closed");
+            }
+            
             if (isMember || userTokenRole == "Admin")
             {
-                return Ok(task.ToTaskDto());
+                var taskLabels = await _labelRepo.GetLabelsByTaskId(task.TaskId);
+                var taskMembers = await _taskMemberRepo.GetAllTaskMembersByTaskIdAsync(task.TaskId);
+                return Ok(task.ToTaskDto(taskLabels, taskMembers));
             }
             return StatusCode(401, "You are not authorized!");
         }catch(Exception e){
@@ -86,15 +122,28 @@ public class  TaskController : ControllerBase{
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
-            if (string.IsNullOrEmpty(userId))
-            {
-                return NotFound("User Not Found!");
-            }
+
             var isMember = await _membersRepo.IsAMember(userId, workspaceId);
             if (isMember || userTokenRole == "Admin")
             {
                 var tasks = await _taskRepo.GetTasksByWorkspaceIdAsync(workspaceId); // Await here
-                return Ok(tasks);
+                
+                var taskDtos = new List<TaskInfoDto2>();
+
+                foreach (var task in tasks)
+                {
+                    // Get the labels for the current task
+                    var labels = await _labelRepo.GetLabelsByTaskId(task.TaskId);
+                    var taskMembers = await _taskMemberRepo.GetAllTaskMembersByTaskIdAsync(task.TaskId);
+                    // Convert the task to a DTO and add the labels
+                    var taskDto = task.toTaskInfoDto2(labels, taskMembers);
+
+                    // Add the DTO to the list
+                    taskDtos.Add(taskDto);
+                }
+
+                return Ok(taskDtos);
+                
             }
             return StatusCode(401, "You are not authorized!");
         }
@@ -131,6 +180,11 @@ public class  TaskController : ControllerBase{
             
             var workspaceId = board.WorkspaceId;
             var isMember = await _membersRepo.IsAMember(userId, workspaceId);
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
+            if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+            {
+                return StatusCode(403, "The board is closed");
+            }
             
             if (isMember || userTokenRole == "Admin")
             {
@@ -139,8 +193,10 @@ public class  TaskController : ControllerBase{
                 {
                     return NotFound("Task not found");
                 }
+                
 
-                return Ok(taskModel.ToTaskDto());
+                var taskLabels = await _labelRepo.GetLabelsByTaskId(taskModel.TaskId);
+                return Ok(taskModel.ToTaskDtoLabels(taskLabels));
             }
             return StatusCode(401, "You are not authorized!");
         }catch(Exception e){
@@ -177,6 +233,11 @@ public class  TaskController : ControllerBase{
                 
                 var workspaceId = board.WorkspaceId;
                 var isMember = await _membersRepo.IsAMember(userId, workspaceId);
+                var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
+                if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+                {
+                    return StatusCode(403, "The board is closed");
+                }
                 
                 if (isMember || userTokenRole == "Admin")
                 {
@@ -192,7 +253,6 @@ public class  TaskController : ControllerBase{
         }catch(Exception e){
             return StatusCode(500, "Internal Server Error "+e.Message);
         }
-
     }
 
     // relationship task and list 1-many
@@ -222,6 +282,12 @@ public class  TaskController : ControllerBase{
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
             var isMember = await _membersRepo.IsAMember(userId, workspaceId);
 
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
+            if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+            {
+                return StatusCode(403, "The board is closed");
+            }
+            
             if (isMember || userTokenRole == "Admin")
             {
                 if (!await _listRepo.ListExists(taskDto.ListId))
@@ -232,7 +298,9 @@ public class  TaskController : ControllerBase{
 
                 var taskModel = taskDto.ToTaskFromCreate();
                 await _taskRepo.CreateTaskAsync(taskModel);
-                return CreatedAtAction(nameof(GetTaskById), new { id = taskModel.TaskId }, taskModel.ToTaskDto());
+                var labels = new List<Models.Label>();
+                var taskMembers = new List<TaskMemberDto>();
+                return CreatedAtAction(nameof(GetTaskById), new { id = taskModel.TaskId }, taskModel.ToTaskDto(labels,taskMembers));
             }
             return StatusCode(401, "You are not authorized!");
         }catch(Exception e){
@@ -261,6 +329,12 @@ public class  TaskController : ControllerBase{
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
             var isMember = await _membersRepo.IsAMember(userId, workspaceId);
 
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
+            if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+            {
+                return StatusCode(403, "The board is closed");
+            }
+            
             if (isMember || userTokenRole == "Admin")
             {
                 var tasks = await _taskRepo.GetTaskByListId(listId);
@@ -270,7 +344,23 @@ public class  TaskController : ControllerBase{
                     return NotFound("There are no Tasks!");
                 }
 
-                return Ok(tasks);
+                var taskDtos = new List<TaskDto>();
+
+                foreach (var task in tasks)
+                {
+                    // Get the labels for the current task
+                    var labels = await _labelRepo.GetLabelsByTaskId(task.TaskId);
+                    var taskMembers = await _taskMemberRepo.GetAllTaskMembersByTaskIdAsync(task.TaskId);
+                    var taskMembersDto = _mapper.Map<List<TaskMemberDto>>(taskMembers);
+                    // Convert the task to a DTO and add the labels
+                    var taskDto = task.ToTaskDto(labels, taskMembersDto);
+
+                    // Add the DTO to the list
+                    taskDtos.Add(taskDto);
+                }
+
+                return Ok(taskDtos);
+                
             }
             return StatusCode(401, "You are not authorized!");
         }catch(Exception e){
@@ -303,6 +393,13 @@ public class  TaskController : ControllerBase{
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
             var isMember = await _membersRepo.IsAMember(userId, workspaceId);
+            
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
+            if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+            {
+                return StatusCode(403, "The board is closed");
+            }
+            
             if (isMember || userTokenRole == "Admin")
             {
 

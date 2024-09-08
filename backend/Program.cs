@@ -13,8 +13,12 @@ using backend.Mappers;
 using backend.Mappers.Background;
 using backend.Mappers.Board;
 using backend.Mappers.Invite;
+using backend.Mappers.Lista;
 using backend.Mappers.Member;
 using backend.Mappers.StarredBoard;
+using backend.Mappers.TaskLabel;
+using backend.Mappers.TaskMember;
+using backend.Mappers.TaskProfile;
 using backend.Mappers.User;
 using backend.Mappers.Workspace;
 
@@ -124,10 +128,13 @@ builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddScoped<IBackgroundRepository, BackgroundRepository>();
 builder.Services.AddScoped<IStarredBoardRepository, StarredBoardRepository>();
 builder.Services.AddScoped<IInviteRepository, InviteRepository>();
+builder.Services.AddScoped<ITaskMemberRepository, TaskMemberRepository>();
 builder.Services.AddScoped<IChecklistRepository, ChecklistRepository>();
 builder.Services.AddScoped<IChecklistItemRepository, ChecklistItemRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<ILabelRepository, LabelRepository>();
+builder.Services.AddScoped<IWorkspaceActivityRepository, WorkspaceActivityRepository>();
+builder.Services.AddScoped<ITaskLabelRepository, TaskLabelRepository>();
 // CORS configuration
 builder.Services.AddCors(options =>
 {
@@ -148,8 +155,12 @@ builder.Services.AddAutoMapper(typeof(WorkspaceProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(BackgroundProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(MemberProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(StarredBoardProfile).Assembly);
+builder.Services.AddAutoMapper(typeof(TaskMemberProfile));
+builder.Services.AddAutoMapper(typeof(ListProfile).Assembly);
+builder.Services.AddAutoMapper(typeof(TaskProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(InviteProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(UserProfile).Assembly);
+builder.Services.AddAutoMapper(typeof(TaskLabelProfile).Assembly);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

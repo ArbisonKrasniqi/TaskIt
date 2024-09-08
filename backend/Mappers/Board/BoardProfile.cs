@@ -10,7 +10,7 @@ public class BoardProfile : Profile
     public BoardProfile()
     {
         CreateMap<Models.Board, BoardDto>().ForMember(dest => dest.Lists,
-            opt => opt.MapFrom(src => src.Lists.Select(l => l.ToListDto()).ToList()));
+            opt => opt.MapFrom(src => src.Lists));
 
         CreateMap<CreateBoardDto, Models.Board>();
         CreateMap<UpdateBoardRequestDto, Models.Board>();

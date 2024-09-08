@@ -27,7 +27,7 @@ namespace backend.Controllers
 
         //GET ALL
         [Authorize(AuthenticationSchemes = "Bearer")]
-        [Authorize(Policy = "AdminOnly")]
+        //[Authorize(Policy = "AdminOnly")]
         [HttpGet(template: "GetAllBackgrounds")]
         public async Task<IActionResult> GetAllBackgrounds()
         {
@@ -36,7 +36,7 @@ namespace backend.Controllers
                 var backgrounds = await _backgroundRepo.GetAllBackgroundsAsync();
                 
 
-                if (backgrounds.Count() == 0)
+                if (backgrounds.Count == 0)
                     return Ok(new List<BackgroundDto>()); //Kthe list te zbrazet
 
                 var backgroundDto = _mapper.Map<List<BackgroundDto>>(backgrounds);
@@ -130,12 +130,6 @@ namespace backend.Controllers
             {
                 return BadRequest(ModelState);
             }
-            
-            //Doesnt Create a Background if the Id of the user that is given doesnt exist
-            if (!await _userRepo.UserExists(backgroundDto.CreatorId))
-            {
-                return BadRequest("User Not Found");
-            }
 
             if (backgroundDto.ImageFile == null || backgroundDto.ImageFile.Length == 0)
             {
@@ -155,7 +149,7 @@ namespace backend.Controllers
                 
                 var backgroundModel = new Background
                 {
-                    CreatorId = backgroundDto.CreatorId,
+                    CreatorId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value,
                     Title = backgroundDto.Title,
                     ImageData = imageData
                 };
@@ -177,11 +171,6 @@ namespace backend.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-
-            if (updateDto.ImageFile == null || updateDto.ImageFile.Length == 0)
-            {
-                return BadRequest("No file uploaded!");
-            }
             
             try
             {
@@ -203,7 +192,7 @@ namespace backend.Controllers
         [Authorize(AuthenticationSchemes = "Bearer")]
         [Authorize(Policy = "AdminOnly")]
         [HttpDelete("DeleteBackgroundByID")]
-        public async Task<IActionResult> DeleteBoardById([FromQuery] BackgroundIdDto backgroundIdDto)
+        public async Task<IActionResult> DeleteBackgroundById(BackgroundIdDto backgroundIdDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

@@ -3,13 +3,14 @@ import { putData } from '../../../../Services/FetchService';
 import { UpdateContext } from '../ListsTable';
 import { ListsContext } from '../ListsList';
 import CustomButton from '../../Buttons/CustomButton';
+import { DashboardContext } from '../../../../Pages/dashboard';
 
 const UpdateListModal = (props) => {
     const updateContext = useContext(UpdateContext);
     const listsContext = useContext(ListsContext);
+    const dashboardContext = useContext(DashboardContext);
 
     const [title, setTitle] = useState(updateContext.title);
-    const [boardId, setBoardId] = useState(updateContext.boardId);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -18,7 +19,6 @@ const UpdateListModal = (props) => {
             const data = {
                 listId: updateContext.listId,
                 title: title,
-                boardId: boardId
             };
 
             const response = await putData('/backend/list/UpdateList', data);
@@ -28,7 +28,6 @@ const UpdateListModal = (props) => {
                     return {
                         ... list,
                         title: title,
-                        boardId: boardId
                     };
                 } else {
                     return list;
@@ -38,8 +37,8 @@ const UpdateListModal = (props) => {
             listsContext.setLists(updatedLists);
             props.setShowUpdateInfoModal(false);
         } catch (error) {
-            listsContext.setErrorMessage(error.message);
-            listsContext.setShowListsErrorModal(true);
+            dashboardContext.setDashboardErrorMessage(error.message);
+            dashboardContext.setShowDashboardErrorModal(true);
             listsContext.getLists();
 
             props.setShowUpdateInfoModal(false);
@@ -56,16 +55,6 @@ const UpdateListModal = (props) => {
                         type="text"
                         id="title"
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"></input>
-                </div>
-                <div className="grid md:grid-cols-2 md:gap-6">
-                    <div className="mb-6">
-                        <label htmlFor="default-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">BoardId</label>
-                        <input value={boardId}
-                            onChange={(e) => setBoardId(e.target.value)}
-                            type="text"
-                            id="boardId"
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"></input>
-                    </div>
                 </div>
                 <div className="flex justify-around">
                     {/*Nese shtypet butoni close, atehere mbyll modal duke vendosur vleren false*/}

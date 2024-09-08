@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import MembersList from './Members/MembersList';
-import InvitesList from './Invites/InvitesList';
-import BoardsList from './Boards/BoardsList';
+import MembersList from '../Members/MembersList';
+import InvitesList from '../Invites/InvitesList';
+import BoardsList from '../Boards/BoardsList';
 import { useParams } from 'react-router-dom';
 
 const WorkspaceTable = () => {

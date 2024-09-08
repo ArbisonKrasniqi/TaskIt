@@ -9,25 +9,29 @@ using Microsoft.EntityFrameworkCore;
 
 namespace backend.Repositories;
 
-public class TaskRepository : ITaskRepository{
+public class TaskRepository : ITaskRepository
+{
     private readonly ApplicationDBContext _context;
 
-    public TaskRepository(ApplicationDBContext context){
+    public TaskRepository(ApplicationDBContext context)
+    {
         _context = context;
     }
 
-    public async Task<List<Tasks>> GetAllTaskAsync(){
+    public async Task<List<Tasks>> GetAllTaskAsync()
+    {
 
-        return  await _context.Tasks.ToListAsync();
+        return await _context.Tasks.ToListAsync();
     }
 
-    public async Task<Tasks?> GetTaskByIdAsync(int taskId){
-
+    public async Task<Tasks?> GetTaskByIdAsync(int taskId)
+    {
         return await _context.Tasks.FirstOrDefaultAsync(x => x.TaskId == taskId);
     }
 
 
-    public async Task<Tasks> CreateTaskAsync(Tasks taskModel){
+
+public async Task<Tasks> CreateTaskAsync(Tasks taskModel){
 
         await _context.Tasks.AddAsync(taskModel);
         await _context.SaveChangesAsync();
@@ -107,20 +111,47 @@ public class TaskRepository : ITaskRepository{
             join board in _context.Board on workspace.WorkspaceId equals board.WorkspaceId
             join list in _context.List on board.BoardId equals list.BoardId
             join task in _context.Tasks on list.ListId equals task.ListId
-            where workspace.WorkspaceId == workspaceId
+            where workspace.WorkspaceId == workspaceId && board.IsClosed == false
             select new TaskInfoDto
             {
+                TaskId = task.TaskId,
                 TaskTitle = task.Title,
                 ListTitle = list.Title,
                 BoardTitle = board.Title,
                 DueDate = task.DueDate
             }).ToListAsync();
-        
+
         return tasks;
     }
 
     public async Task<bool> TaskExists(int taskId)
     {
         return await _context.Tasks.AnyAsync(t => t.TaskId == taskId);
+    }
+
+    public async Task<List<Tasks>> FilterClosedBoardTasksAsync(List<Tasks> tasks)
+    {
+        var boardIds = tasks.Select(t => 
+             _context.List
+                    .Where(l => l.ListId == t.ListId)
+                    .Select(l => l.BoardId)
+                    .FirstOrDefault())
+            .Distinct()
+            .ToList();
+        
+        var closedBoardIds = await _context.Board
+            .Where(b => boardIds.Contains(b.BoardId) && b.IsClosed)
+            .Select(b => b.BoardId)
+            .ToListAsync();
+        
+        var filteredTasks = tasks.Where(t => 
+            !closedBoardIds.Contains(
+                _context.List
+                    .Where(l => l.ListId == t.ListId)
+                    .Select(l => l.BoardId)
+                    .FirstOrDefault())
+        ).ToList();
+
+        return filteredTasks;
     }
 }

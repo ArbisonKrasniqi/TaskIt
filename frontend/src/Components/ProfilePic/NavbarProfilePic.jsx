@@ -3,6 +3,10 @@ import { DropdownContext } from '../Navbar/Navbar';
 import { MainContext } from '../../Pages/MainContext';
 import { WorkspaceContext } from '../Side/WorkspaceContext';
 import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import { CiLogout } from "react-icons/ci";
+
+
 const NavbarProfilePic = () => {
 
     const navigate = useNavigate();
@@ -35,7 +39,11 @@ const NavbarProfilePic = () => {
           {dropdownContext.ProfilePicIsOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg p-">
 
-              <div className='flex items-start p-1 bg-gray-800 rounded-lg text-gray-400 hover:bg-gray-700 mb-2 hover:cursor-pointer'>
+              <div   onClick={() => {
+              dropdownContext.toggleDropdownProfilePic();
+              navigate(`/main/profile`);
+            }}
+              className='flex items-start p-1 bg-gray-800 rounded-lg text-gray-400 hover:bg-gray-700 mb-2 hover:cursor-pointer'>
            <div className="flex-shrink-0 w-8 h-8 ml-1 mt-1 rounded-full flex items-center justify-center text-sm text-white bg-gradient-to-r from-orange-400 to-orange-600">
              {getInitialsFromFullName(name)}
            </div>
@@ -48,15 +56,10 @@ const NavbarProfilePic = () => {
             </div>
             </div>
            </div>
-              <button className="block w-full text-left px-4 py-2 bg-gray-800 text-gray-400 rounded-lg hover:bg-gray-700">
-                Profile
-              </button>
-              <button className="block w-full text-left px-4 py-2 bg-gray-800 text-gray-400 rounded-lg hover:bg-gray-700">
-                Settings
-              </button>
-              <button className="block w-full text-left px-4 py-2 bg-gray-800 text-gray-400 rounded-lg hover:bg-gray-700"
+                       
+              <button className="block w-full text-left px-4 py-2 bg-gray-800 text-gray-400 rounded-lg hover:bg-gray-700 flex flex-row  flex-start items-center"
                       onClick={() => {handleSignOutClick()}}>
-                Logout
+               <CiLogout className='mr-1 mt-1'/> Logout
               </button>
             </div>
           )}

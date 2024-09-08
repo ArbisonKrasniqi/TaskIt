@@ -1,14 +1,16 @@
 import React, { useState, useContext, createContext } from 'react';
 import UpdateUserButton from "./Buttons/UpdateUserButton.jsx";
 import { deleteData } from '../../../Services/FetchService.jsx';
-import { UserContext } from "./UsersList.jsx";
+import { UserContext } from './UsersList.jsx';
 import CustomButton from "../Buttons/CustomButton.jsx";
 import { useNavigate } from "react-router-dom";
+import { DashboardContext } from '../../../Pages/dashboard.jsx';
 
 export const UpdateContext = createContext();
 
 const UsersTable = () => {
     const userContext = useContext(UserContext);
+    const dashboardContext = useContext(DashboardContext);
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -21,8 +23,8 @@ const UsersTable = () => {
                 const updatedUsers = (userContext.users || []).filter(user => user.id !== id);
                 userContext.setUsers(updatedUsers);
             } catch (error) {
-                userContext.setErrorMessage(error.message);
-                userContext.setShowUserErrorModal(true);
+                dashboardContext.setDashboardErrorMessage(error.message);
+                dashboardContext.setShowDashboardErrorModal(true);
                 userContext.getUsers();
             }
         }
@@ -31,14 +33,13 @@ const UsersTable = () => {
 
     const handleRowClick = userId => {
         console.log(userId);
-        navigate(`/dashboard/workspaces/${userId}`);
+        navigate(`/dashboard/user/${userId}`);
     }
 
     const handleSearchChange = (event) => {
         setSearchQuery(event.target.value.toLowerCase());
     }
 
-    // Ensure userContext.users is always an array
     const users = userContext.users || [];
     const filteredUsers = users.filter(user => {
         return (
@@ -83,8 +84,7 @@ const UsersTable = () => {
                             filteredUsers.map((user, index) => (
                                 <tr
                                     key={index}
-                                    className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 cursor-pointer"
-                                    onClick={() => handleRowClick(user.id)}
+                                    className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
                                 >
                                     <td className="px-6 py-4">{user.firstName}</td>
                                     <td className="px-6 py-4">{user.lastName}</td>
@@ -93,14 +93,20 @@ const UsersTable = () => {
                                     <td className="px-6 py-4">{user.id}</td>
                                     <td className="px-6 py-4">{user.role}</td>
                                     <td className="px-6 py-4">
+                                        <CustomButton 
+                                            onClick={() => handleRowClick(user.id)}
+                                            type="button"
+                                            text="Open"
+                                        />
                                         <UpdateContext.Provider value={user}>
                                             <UpdateUserButton
-                                                onClick={(e) => e.stopPropagation()}
+                                                onClick={(e) => {
+                                                    console.log("Update user pressed");
+                                                }}
                                             />
                                         </UpdateContext.Provider>
                                         <CustomButton
                                             onClick={(e) => {
-                                                e.stopPropagation();
                                                 handleUserDelete(user.id);
                                             }}
                                             type="button"

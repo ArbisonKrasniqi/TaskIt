@@ -8,10 +8,6 @@ namespace backend.Models
         [Key]
 
         public int LabelId { get; set;}
-        [Required]
-        [Range(0, int.MaxValue, ErrorMessage = "Index value cannot be negative")]
-
-        public int index { get; set; } 
 
         [Required]
         [MinLength(2, ErrorMessage = "Name must be at least 2 characters")]
@@ -24,6 +20,6 @@ namespace backend.Models
         public DateTime DateAdded { get; set; } = DateTime.Now;
 
         public int BoardId { get; set;}
-         
+
     }
 }
