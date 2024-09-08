@@ -1,4 +1,4 @@
-import React, { useState, createContext, useEffect} from 'react';
+import React, { useState, createContext, useEffect, useContext} from 'react';
 import { TbAlignBoxLeftTopFilled } from "react-icons/tb";
 import { IoMdCheckboxOutline } from "react-icons/io";
 import { LuClock4 } from "react-icons/lu";
@@ -15,11 +15,14 @@ import ChecklistModal from './ChecklistModal';
 import EditLabelModal from './EditLabelModal';
 import { getDataWithId } from '../../Services/FetchService';
 import { useParams } from 'react-router-dom';
+import { WorkspaceContext } from '../Side/WorkspaceContext';
 
 
 export const TaskModalsContext = createContext();
 
 const TaskModal = () => {
+
+    const {getInitials} = useContext(WorkspaceContext);
 
     const [isMembersModalOpen, setIsMembersModalOpen] = useState(false);
     const [isLabelModalOpen, setIsLabelModalOpen] = useState(false);
@@ -31,6 +34,7 @@ const TaskModal = () => {
     const [assignedLabels, setAssignedLabels] = useState([]);
     const [taskData, setTaskData] = useState([]);
     const [listData, setListData] = useState([]);
+    const [assignedMembers, setAssignedMembers] = useState([]);
 
     useEffect(() => {   
         const getTaskById = async () => {
@@ -73,6 +77,26 @@ const TaskModal = () => {
             fetchAssignedLabels();
         }
     },[taskId,assignedLabels]);
+
+    useEffect(() => {
+        const fetchTaskMembers = async () => {
+            try {
+                const response = await getDataWithId(`http://localhost:5157/backend/TaskMembers/GetAllTaskMembersByTaskId?taskId`, 1);
+                const data = response.data;
+
+                const taskMembers = await Promise.all(data.map(async (taskMember) => {
+                    const responseTaskMemberDetail = await getDataWithId('http://localhost:5157/backend/user/adminUserID?userId', taskMember.userId);
+                    return responseTaskMemberDetail.data;
+                }));
+
+                setAssignedMembers(taskMembers);
+            } catch (error) {
+                console.error("Error fetching task members:", error);
+            }
+        };
+
+        fetchTaskMembers();
+    }, [taskId]);
 
 
     const toggleMembersModal = () => {
@@ -119,7 +143,9 @@ const TaskModal = () => {
         assignedLabels,
         setAssignedLabels,
         taskData,
-        setTaskData
+        setTaskData,
+        assignedMembers,
+        setAssignedMembers
     };
     
 
@@ -141,15 +167,20 @@ const TaskModal = () => {
                     <div className="flex text-gray-400">
                         <div className="w-3/4 flex flex-col flex-wrap">
                             <div className='flex'>
-                                <div className='flex flex-col ml-[70px]'>
+                                <div className='flex flex-col flex-wrap ml-[70px]'>
                                     <p className='w-[82px] text-xs font-semibold'>Members</p>
-                                    <div className='flex h-12 items-center justify-around'>
-                                        <button className='rounded-full mr-1'>
-                                            <img
-                                                src="https://via.placeholder.com/40"
-                                                alt="Profile"
-                                                className="w-8 h-8 rounded-full"/>
-                                        </button>
+                                    <div className='flex flex-wrap h-auto items-center justify-start'>
+                                        {assignedMembers.length > 0 ? (
+                                            assignedMembers.map((member) => (
+                                                <button className='rounded-full m-1'>
+                                                    <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-sm text-white bg-gradient-to-r from-orange-400 to-orange-600">
+                                                        {getInitials(member.firstName, member.lastName)}
+                                                    </div>
+                                                </button>
+                                            ))
+                                        ) : (
+                                            <span></span>
+                                        )}
                                         <button onClick={toggleMembersModal} className='w-8 h-8 rounded-full flex justify-center items-center mr-1 bg-gray-700 bg-opacity-50 hover:bg-gray-700 text-xl'>
                                             <PiPlus/>
                                         </button>

@@ -5,41 +5,19 @@ import { MainContext } from "../../Pages/MainContext";
 import { deleteData, getDataWithId, postData } from "../../Services/FetchService";
 
 
-function MembersModal({ taskId }) {
-    const { toggleMembersModal } = useContext(TaskModalsContext);
+const MembersModal = ({ taskId }) => {
+    const { toggleMembersModal, assignedMembers, setAssignedMembers } = useContext(TaskModalsContext);
     const { memberDetails, getInitials } = useContext(WorkspaceContext);
     const [searchTerm, setSearchTerm] = useState("");
-    const [taskMembers, setTaskMembers] = useState([]);
     const [originalBoardMembers, setOriginalBoardMembers] = useState(memberDetails || []);  // Per me i rujt members mos me i prek direkt
     const [filteredBoardMembers, setFilteredBoardMembers] = useState([]);
 
-    
-    useEffect(() => {
-        const fetchTaskMembers = async () => {
-            try {
-                const response = await getDataWithId(`http://localhost:5157/backend/TaskMembers/GetAllTaskMembersByTaskId?taskId`, 1);
-                const data = response.data;
-
-                const taskMembers = await Promise.all(data.map(async (taskMember) => {
-                    const responseTaskMemberDetail = await getDataWithId('http://localhost:5157/backend/user/adminUserID?userId', taskMember.userId);
-                    return responseTaskMemberDetail.data;
-                }));
-
-                setTaskMembers(taskMembers);
-            } catch (error) {
-                console.error("Error fetching task members:", error);
-            }
-        };
-
-        fetchTaskMembers();
-    }, [taskId]);
-
     useEffect(() => {
         const updatedBoardMembers = originalBoardMembers.filter(boardMember =>
-            !taskMembers.some(taskMember => taskMember.id === boardMember.id)
+            !assignedMembers.some(taskMember => taskMember.id === boardMember.id)
         );
         setFilteredBoardMembers(updatedBoardMembers);
-    }, [taskMembers, originalBoardMembers]);
+    }, [assignedMembers, originalBoardMembers]);
 
     const addMemberToTask = async (member) => {
         try {
@@ -49,8 +27,8 @@ function MembersModal({ taskId }) {
             };
             await postData('http://localhost:5157/backend/TaskMembers/AddTaskMember', data);
             
-            // Shtoje anetarin ne taskMembers edhe largoje prej filteredBoardMembers
-            setTaskMembers([...taskMembers, member]);
+            // Shtoje anetarin ne assignedMembers edhe largoje prej filteredBoardMembers
+            setAssignedMembers([...assignedMembers, member]);
         } catch (error) {
             console.error("Error adding member to task", error);
         }
@@ -61,14 +39,14 @@ function MembersModal({ taskId }) {
             const userId = member.id;
             await deleteData(`http://localhost:5157/backend/TaskMembers/RemoveTaskMember?userId=${userId}&taskId=1`);
             
-            // Largoje prej taskMembers edhe shto prap ne filteredBoardMembers
-            setTaskMembers(taskMembers.filter(m => m.id !== member.id));
+            // Largoje prej assignedMembers edhe shto prap ne filteredBoardMembers
+            setAssignedMembers(assignedMembers.filter(m => m.id !== member.id));
         } catch (error) {
             console.error("Error removing member from task", error);
         }
     };
 
-    const filteredTaskMembers = taskMembers.filter(member => {
+    const filteredTaskMembers = assignedMembers.filter(member => {
         const fullName = `${member.firstName?.toLowerCase()} ${member.lastName?.toLowerCase()}`;
         return fullName.includes(searchTerm.toLowerCase());
     });
