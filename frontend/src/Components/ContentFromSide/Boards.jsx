@@ -18,8 +18,8 @@ const Boards = () =>{
     const { workspace,openClosedBoardsModal, showLimitModal, setShowLimitModal, 
         boardCount, setOpenClosedBoardsModal, boards, handleCreateBoard, openModal, 
         setOpenModal, setOpenCloseModal, handleStarBoard, handleSortChange, setOpenSortModal,
-         openSortModal, selectedSort, getBackgroundImageUrl,hoveredBoardIndex, 
-         setHoveredBoardIndex, hoveredBoardSIndex, setHoveredBoardSIndex, roli, starredBoards, boardId, board} = useContext(WorkspaceContext);
+         openSortModal, selectedSort,hoveredBoardIndex, 
+         setHoveredBoardIndex, hoveredBoardSIndex, setHoveredBoardSIndex, roli, starredBoards, backgroundUrls} = useContext(WorkspaceContext);
 
          const [searchTerm, setSearchTerm] = useState('');
          // per me handle ndryshimet ne search input
@@ -101,7 +101,7 @@ return (
             border-solid border-gray-700 ${hoveredBoardSIndex===index ? ` bg-gray-400 opacity-50`: ''} `}>
 
             <div className="relative w-full h-full" style={{ 
-                  backgroundImage: `url(${getBackgroundImageUrl(board)})`, 
+                   backgroundImage: `url(${backgroundUrls[board.boardId] || '/path/to/default/image.jpg'})`,  
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                 }}>
@@ -134,7 +134,7 @@ return (
               border-solid border-gray-700 ${hoveredBoardIndex===index ? ` bg-gray-400 opacity-50`: ''} `}>
 
               <div className="relative w-full h-full" style={{ 
-                    backgroundImage: `url(${getBackgroundImageUrl(board)})`, 
+                    backgroundImage: `url(${backgroundUrls[board.boardId] || '/path/to/default/image.jpg'})`, 
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                   }}>

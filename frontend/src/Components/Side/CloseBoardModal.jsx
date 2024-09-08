@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import { postData } from '../../Services/FetchService';
+import React, {useContext, useState} from 'react';
+import { WorkspaceContext } from './WorkspaceContext';
 
 
 const CloseBoardModal = ({open, boardTitle ,onClose, role, boardId, onBoardClosed}) =>{
@@ -8,6 +8,7 @@ const CloseBoardModal = ({open, boardTitle ,onClose, role, boardId, onBoardClose
 
     const [modalContent, setModalContent] =useState(" ");
     const [clicked, setClicked] = useState(false);
+    const {workspace}= useContext(WorkspaceContext);
 
     
         const handleClickH2 = () =>{
@@ -16,7 +17,7 @@ const CloseBoardModal = ({open, boardTitle ,onClose, role, boardId, onBoardClose
                     <div>
                    <span className='text-gray-900'>
                     You can find and reopen closed boards at the bottom of 
-                    <a href="/boards" className="text-blue-500 underline ml-1">Your Boards Page</a>.
+                    <a href={`/main/boards/${workspace.workspaceId}`} className="text-blue-500 underline ml-1">Your Boards Page</a>.
                 </span>
                 <button className='text-gray-900 bg-red-700 w-48 m-2 rounded' onClick={handleClose}>Close Board</button>
                     </div>

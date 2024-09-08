@@ -164,31 +164,37 @@ namespace backend.Controllers
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
 
+                if (userId == null)
+                {
+                    return NotFound("User not found");
+                }
                 var isMember = await _membersRepo.IsAMember(userId, boardDto.WorkspaceId);
                 if (isMember || userTokenRole == "Admin")
                 {
                     var boardModel = _mapper.Map<Board>(boardDto);
-                    await _boardRepo.CreateBoardAsync(boardModel);
-                    
+                    var createdBoard =  await _boardRepo.CreateBoardAsync(boardModel);
+                    var createdBoardDto = _mapper.Map<BoardDto>(createdBoard);
                     
                     var workspaceActivity = new WorkspaceActivity
                     {
-                        WorkspaceId = boardDto.WorkspaceId,
+                        WorkspaceId = createdBoard.WorkspaceId,
                         UserId = userId,
                         ActionType = "Created",
-                        EntityName = "board "+boardDto.Title,
+                        EntityName = "board "+createdBoard.Title,
                         ActionDate = DateTime.Now
                     };
                     
                     await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
-                    return CreatedAtAction(nameof(GetBoardById), new { id = boardModel.BoardId },
-                        _mapper.Map<BoardDto>(boardModel));
+                    return CreatedAtAction(nameof(GetBoardById), new { id = createdBoard.BoardId }, createdBoardDto);
+
                 }
                 return StatusCode(401, "You are not authorized!");
             }
             catch (Exception e)
             {
-                return StatusCode(500, "Internal Server Error!"+e.Message);
+                // Log the inner exception details for better debugging
+                var innerExceptionMessage = e.InnerException != null ? e.InnerException.Message : string.Empty;
+                return StatusCode(500, $"Internal Server Error! {e.Message} {innerExceptionMessage}");
             }
         }
 
