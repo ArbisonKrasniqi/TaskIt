@@ -7,9 +7,9 @@ public class CreateTaskRequestDTO{
     [MaxLength(280, ErrorMessage = "Title cannot be over 280 characters")]
     public string Title { get; set; } = string.Empty;
     
-    // [Required]
-    // [MinLength(10, ErrorMessage = "Description must be at least 2 characters")]
-    // [MaxLength(280, ErrorMessage = "Description cannot be over 280 characters")]
+    [Required]
+    [MinLength(10, ErrorMessage = "Description must be at least 2 characters")]
+    [MaxLength(280, ErrorMessage = "Description cannot be over 280 characters")]
     public string Description { get; set; } = string.Empty;
     public DateTime DueDate { get; set; }
     [Required]

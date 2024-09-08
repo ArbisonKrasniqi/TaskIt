@@ -573,9 +573,9 @@ export const WorkspaceProvider = ({ children }) => {
                 try {
                     if (boardId) {
                         const listsResponse = await getDataWithId("/backend/list/GetListByBoardId?boardId",boardId);
-                        const listsData = listsResponse.data;
-                        if (listsData) {
-                            setLists(listsData);
+                        const listData = listsResponse.data;
+                        if (listData) {
+                            setLists(listData);
                         } else {
                             console.log("There are no lists");
                         }
@@ -686,7 +686,6 @@ export const WorkspaceProvider = ({ children }) => {
             checklists,
             checklistItems,
             setChecklistItems,
-            setChecklists,
             board,
             setBoard,
             lists,
@@ -701,8 +700,7 @@ export const WorkspaceProvider = ({ children }) => {
             backgroundUrls,
             activeBackgrounds,
             activeBackgroundUrls,
-            getActiveBackgrounds,
-            setList
+            getActiveBackgrounds
         }}>
             {children}
         </WorkspaceContext.Provider>
