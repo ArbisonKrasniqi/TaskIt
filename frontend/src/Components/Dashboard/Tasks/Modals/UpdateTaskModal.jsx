@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
-// import DatePicker from 'react-datepicker';
-// import "react-datepicker/dist/react-datepicker.css"; // Import the styles
+import DatePicker from 'react-datepicker';
+import "react-datepicker/dist/react-datepicker.css"; // Import the styles
 import { putData } from '../../../../Services/FetchService';
 import { UpdateContext } from '../TasksTable';
 import { TasksContext } from '../TasksList';
@@ -17,7 +17,6 @@ const UpdateTaskModal = (props) => {
     const [title, setTitle] = useState(updateContext.title);
     const [description, setDescription] = useState(updateContext.description);
     const [dueDate, setDueDate] = useState(initialDueDate);
-    const [listId, setListId] = useState(updateContext.listId);
 
     // Format date as "2024-07-27T04:30:00" without converting to UTC
     const formatDate = (date) => {
@@ -42,7 +41,6 @@ const UpdateTaskModal = (props) => {
                 title: title,
                 description: description,
                 dueDate: formattedDueDate,
-                listId: listId,
             };
 
             const response = await putData('/backend/task/UpdateTask', data);
@@ -55,7 +53,6 @@ const UpdateTaskModal = (props) => {
                         title: title,
                         description: description,
                         dueDate: formattedDueDate,  // Ensure this is a string
-                        listId: listId,
                     };
                 } else {
                     return task;
@@ -95,24 +92,15 @@ const UpdateTaskModal = (props) => {
                 </div>
 
                 <div className='mb-6'>
-                    <label htmlFor="listId" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">List ID</label>
-                    <input value={listId}
-                           onChange={(e) => setListId(e.target.value)}
-                           type="text"
-                           id="listId"
-                           className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500' />
-                </div>
-
-                <div className='mb-6'>
                     <label htmlFor="dueDate" className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>Due Date</label>
-                    {/* <DatePicker
+                    <DatePicker
                         selected={dueDate}
                         onChange={(date) => setDueDate(date)}
                         showTimeSelect
                         dateFormat="yyyy-MM-dd'T'HH:mm:ss"
                         timeFormat="HH:mm:ss"
                         className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
-                    /> */}
+                    />
                 </div>
 
                 <div className='flex justify-around'>

@@ -510,36 +510,6 @@ export const WorkspaceProvider = ({ children }) => {
             setLists((prevLists) => [...prevLists, newList]);
         };
 
-        useEffect(()=> {
-            const getLists = async () => {
-                try {
-                    if (boardId) {
-                        const listsResponse = await getDataWithId("/backend/list/GetListByBoardId?boardId",boardId);
-                        const listsData = listsResponse.data;
-                        if (listsData) {
-                            const updatedLists = listsData.map(list => {
-                                return {
-                                    ...list,
-                                    tasks: list.tasks.map(task => ({
-                                        ...task,
-                                        uniqueId: `${task.taskId}-${task.listId}`
-                                    }))
-                                };
-                            });
-                            setLists(updatedLists);
-                        } else {
-                            console.log("There are no lists");
-                        }
-                    }
-                } catch (error) {
-                    console.error("There has been an error fetching lists")
-                }
-            };
-            //getLists();
-        },[]
-        //boardId,mainContext.userInfo.accessToken, WorkspaceId
-        );
-
         useEffect(() =>{
             const getList = async () => {
                 try {

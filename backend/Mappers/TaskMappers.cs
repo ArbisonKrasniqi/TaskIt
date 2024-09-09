@@ -53,7 +53,6 @@ public static class TaskMappers{
         return new Tasks{
             Title = taskDto.Title,
             Description = taskDto.Description,
-            DueDate = taskDto.DueDate,
             ListId = taskDto.ListId
         };
     }
@@ -65,7 +64,6 @@ public static class TaskMappers{
             Description = taskDto.Description,
             DateAdded = taskDto.DateAdded,
             DueDate = taskDto.DueDate,
-            ListId = taskDto.ListId
         };
     }
 }

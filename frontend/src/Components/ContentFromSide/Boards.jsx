@@ -105,7 +105,7 @@ return (
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                 }}>
-              <h2 className="ml-3">{board.title}</h2>
+              <h2 className="ml-3" onClick={() => navigate(`/main/board/${workspaceId}/${board.boardId}`)} >{board.title}</h2>
 
 
               <button

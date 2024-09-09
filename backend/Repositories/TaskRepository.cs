@@ -51,7 +51,6 @@ public async Task<Tasks> CreateTaskAsync(Tasks taskModel){
         existingTask.Description = taskModel.Description;
         existingTask.DateAdded = existingTask.DateAdded;
         existingTask.DueDate = taskModel.DueDate;
-        existingTask.ListId = taskModel.ListId;
 
         await _context.SaveChangesAsync();
         return existingTask;

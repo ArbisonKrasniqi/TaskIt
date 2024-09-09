@@ -31,6 +31,7 @@ const ListForm = ({ }) => {
         try {
             const response = await postData("http://localhost:5157/backend/list/CreateList", newList);
             boardContext.setLists([... boardContext.lists, response.data]);
+            setListTitle("");
         } catch (error) {
             console.log("Error response data: ", error.message);
         }

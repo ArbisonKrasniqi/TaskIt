@@ -5,7 +5,7 @@ import { AiOutlineClose } from "react-icons/ai";
 import { BoardContext } from "../BoardContent/Board";
 
 
-const TaskForm = ({ listId }) => {
+const TaskForm = ({ listId, onClose }) => {
     const boardContext = useContext(BoardContext);
     const [taskTitle, setTaskTitle] = useState('');
     const [errorMessage, setErrorMessage] = useState('');

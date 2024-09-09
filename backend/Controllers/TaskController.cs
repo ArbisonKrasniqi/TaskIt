@@ -212,7 +212,7 @@ public class  TaskController : ControllerBase{
                 return NotFound("Task not found");
             }
            
-            var list = await _listRepo.GetListByIdAsync(taskDto.ListId);
+            var list = await _listRepo.GetListByIdAsync(task.ListId);
             if (list == null)
             {
                 return StatusCode(404, "List Not Found");

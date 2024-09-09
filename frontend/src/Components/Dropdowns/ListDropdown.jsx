@@ -3,12 +3,16 @@ import { WorkspaceContext } from "../Side/WorkspaceContext";
 import { BiDotsHorizontal } from "react-icons/bi";
 import { BoardContext } from "../BoardContent/Board";
 import { deleteData } from "../../Services/FetchService";
+import { useParams } from "react-router-dom";
 
 const ListDropdown = ({ listId, onAddCardClick }) => {
+  const {boardId} = useParams();
   const [isOpen, setIsOpen] = useState(false);
   const boardContext = useContext(BoardContext);
+  const workspaceContext = useContext(WorkspaceContext);
   const handleDeleteList = async (listId) =>{
-    try {
+    if (boardId && workspaceContext.board) {
+      try {
         const response = await deleteData('http://localhost:5157/backend/list/DeleteList',{listId : listId});
         boardContext.getLists();
     } catch (error) {
@@ -16,12 +20,13 @@ const ListDropdown = ({ listId, onAddCardClick }) => {
         boardContext.getLists();
         boardContext.getTasks();
     }
+  }
   };
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
-  boardContext.getLists();
+
   const closeDropdown = () => {
     setIsOpen(false);
   };

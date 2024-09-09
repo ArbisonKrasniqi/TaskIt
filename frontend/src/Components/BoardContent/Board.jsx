@@ -59,9 +59,9 @@ const getTasks = async () => {
         console.error("There has been an error fetching tasks");
       }
     }
-    const getLists = async () => {
+const getLists = async () => {
       try {
-          if (boardId) {
+        if (boardId) {
               const listsResponse = await getDataWithId("/backend/list/GetListByBoardId?boardId",boardId);
               const listsData = listsResponse.data;
               if (listsData) {
@@ -312,7 +312,7 @@ const getTasks = async () => {
     
   }
 
-  const contextValue = {tasks,setTasks, lists,setLists, getTasks, getLists}
+  const contextValue = {tasks, setTasks, lists, setLists, getTasks, getLists, selectedListId, setSelectedListId}
   if (workspaceContext.board == null) {
     return <LoadingModal/>
   }
