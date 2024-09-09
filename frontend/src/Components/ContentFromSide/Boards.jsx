@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CiSearch } from "react-icons/ci";
 import SortModal from "../Side/SortModal.jsx";
 import CreateBoardModal from "../Side/CreateBoardModal.jsx";
@@ -19,7 +19,7 @@ const Boards = () =>{
         boardCount, setOpenClosedBoardsModal, boards, handleCreateBoard, openModal, 
         setOpenModal, setOpenCloseModal, handleStarBoard, handleSortChange, setOpenSortModal,
          openSortModal, selectedSort,hoveredBoardIndex, 
-         setHoveredBoardIndex, hoveredBoardSIndex, setHoveredBoardSIndex, roli, starredBoards, backgroundUrls} = useContext(WorkspaceContext);
+         setHoveredBoardIndex, hoveredBoardSIndex, setHoveredBoardSIndex, roli, starredBoards, backgroundUrls, closedBoards, fetchClosedBoards, ALLBoardsCount} = useContext(WorkspaceContext);
 
          const [searchTerm, setSearchTerm] = useState('');
          // per me handle ndryshimet ne search input
@@ -37,6 +37,14 @@ const Boards = () =>{
     const navigate = useNavigate();
     const {workspaceId} = useParams();
 
+    const countClosedBoards = closedBoards.length;
+
+    useEffect(()=>{
+     
+          fetchClosedBoards();
+
+  }, [workspace]);
+
     if (workspace == null) {
         return <div>Loading...</div>;
     }
@@ -44,7 +52,7 @@ return (
     <div className="min-h-screen h-full" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
       <SideMenusHeader />
       <div className="font-semibold font-sans text-gray-400 flex justify-normal mt-10 flex-col ml-20 mr-20 flex-wrap">
-        <h2 className="text-2xl ">Boards {boardCount}/10</h2>
+        <h2 className="text-2xl ">Boards {boardCount}/10 (+{countClosedBoards} Closed Boards) </h2>
 
         <div className="flex flex-row flex-wrap gap-10">
 
@@ -79,7 +87,7 @@ return (
           <ul className="flex flex-wrap flex-row justify-between gap-10">
             <li
               className="w-[300px] h-[150px] flex justify-normal text-gray-400 text-lg font-semibold items-center mt-2 p-1 cursor-pointer hover:bg-gray-500 border border-solid border-gray-700">
-              <button onClick={()=>{boardCount>=10 ? setShowLimitModal(true) : setOpenModal(prev => !prev);
+              <button onClick={()=>{ALLBoardsCount>=10 ? setShowLimitModal(true) : setOpenModal(prev => !prev);
                 setOpenClosedBoardsModal(false)}} className="w-full h-full flex items-center text-gray-400
                 cursor-pointer gap-2 p-1">
                 <FaPlus /> Create new Board
@@ -105,7 +113,7 @@ return (
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                 }}>
-              <h2 className="ml-3">{board.title}</h2>
+              <h2 className="ml-3"  onClick={() => navigate(`/main/board/${workspaceId}/${board.boardId}`)} >{board.title}</h2>
 
 
               <button

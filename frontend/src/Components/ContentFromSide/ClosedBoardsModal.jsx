@@ -11,8 +11,8 @@ import { MainContext } from '../../Pages/MainContext.jsx';
 const ClosedBoardsModal = ({ open, onClose }) => {
     const mainContext = useContext(MainContext);
     const [WorkspaceId, setWorkspaceId]=useState(mainContext.workspaceId);
-    const {boards, setBoards } = useContext(WorkspaceContext);
-    const [closedBoards, setClosedBoards] = useState([]);
+    const {boards, setBoards, closedBoards,setClosedBoards, fetchClosedBoards } = useContext(WorkspaceContext);
+
 
 
 
@@ -22,15 +22,7 @@ const ClosedBoardsModal = ({ open, onClose }) => {
         }
     }, [open]);
 
-    const fetchClosedBoards=async ()=>{
-        try{
-            const response = await getDataWithId('http://localhost:5157/backend/board/GetClosedBoards?workspaceId', WorkspaceId);
-            setClosedBoards(response.data);
-        }catch(error){
-            console.error("Error fetching closed boards: ",error);
-        }
-    };
-
+  
     const handleReopenBoard = async(boardId)=>{
         try{
             const board = {

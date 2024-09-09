@@ -1,6 +1,6 @@
 import {useContext} from 'react';
 import { WorkspaceContext } from '../Side/WorkspaceContext';
-
+import {useNavigate} from 'react-router-dom';
 const Table = () =>{
 
     const formatDate = (dateString) => {
@@ -8,8 +8,8 @@ const Table = () =>{
         return date.toLocaleDateString('en-US');
     };
 
-    const {tasks, getInitials} = useContext(WorkspaceContext);
-
+    const {tasks, getInitials, WorkspaceId} = useContext(WorkspaceContext);
+    const navigate = useNavigate();
     return(
         <div className="min-h-screen h-full" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
          <div className="font-semibold font-sans text-gray-400 flex justify-normal flex-col">
@@ -31,7 +31,9 @@ const Table = () =>{
                         <td className="px-4 py-2" colSpan="6">No tasks available</td>
                     </tr>
                 ) : tasks.map((task, index)=>(
-                    <tr key={index} className="hover:bg-gray-700 hover:cursor-pointer">
+                    <tr key={index} className="hover:bg-gray-700 hover:cursor-pointer"
+                    // onClick={() => navigate(`/main/board/${WorkspaceId}/${task.boardId}/${task.taskId}`)}
+                    >
                         <td className="px-4 py-2">{task.taskTitle}</td>
                         <td className="px-4 py-2">{task.listTitle}</td>
                         <td className="px-4 py-2">{task.boardTitle}</td>

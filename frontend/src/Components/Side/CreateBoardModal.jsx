@@ -51,10 +51,15 @@ const CreateBoardModal = ({ open, onClose, onBoardCreated, children }) => {
                 setBoardTitle('');  
                 setBackgroundId(null);  
                 setErrorMessage('');
-                // navigate(`/main/board/${workspaceId}/${newBoard.boardId}`);
+                navigate(`/main/board/${workspaceId}/${response.data.boardId}`);
          
         } catch (error) {
-            console.log('Full error object: ', error); 
+            console.log('Error creating board: ', error.message);
+            if(error.response){
+                console.error("response status ",error.response.status);
+                console.error("response data ",error.response.data);
+                console.error("response header ",error.response.headers);
+            } 
            
         }
     

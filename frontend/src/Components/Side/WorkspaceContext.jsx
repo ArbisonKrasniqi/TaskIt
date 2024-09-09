@@ -219,7 +219,7 @@ export const WorkspaceProvider = ({ children }) => {
 
     
     const[updateWorkspaceModal, setUpdateWorkspaceModal] = useState(false);
-
+    const [closedBoards, setClosedBoards] = useState([]);
     const handleWorkspaceUpdate = (updatedWorkspace) => {
         setWorkspace((prev) => ({
           ...prev,
@@ -228,6 +228,14 @@ export const WorkspaceProvider = ({ children }) => {
         }));
       };
 
+      const fetchClosedBoards=async ()=>{
+        try{
+            const response = await getDataWithId('http://localhost:5157/backend/board/GetClosedBoards?workspaceId', WorkspaceId);
+            setClosedBoards(response.data);
+        }catch(error){
+            console.error("Error fetching closed boards: ",error);
+        }
+    };
 
 
 
@@ -612,7 +620,8 @@ export const WorkspaceProvider = ({ children }) => {
         },[listId, userId ,mainContext.userInfo.accessToken]);
 
 
-
+        const countClosedBoards = closedBoards.length;
+        const ALLBoardsCount = boardCount+countClosedBoards;
 
     return (
         <WorkspaceContext.Provider value={{
@@ -705,7 +714,12 @@ export const WorkspaceProvider = ({ children }) => {
             backgroundUrls,
             activeBackgrounds,
             activeBackgroundUrls,
-            getActiveBackgrounds
+            getActiveBackgrounds,
+            fetchClosedBoards,
+            closedBoards,
+            setClosedBoards, 
+            countClosedBoards,
+            ALLBoardsCount
         }}>
             {children}
         </WorkspaceContext.Provider>

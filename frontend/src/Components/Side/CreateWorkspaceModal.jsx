@@ -2,21 +2,36 @@ import React, { useState, useContext } from 'react';
 import { postData } from './../../Services/FetchService'
 import { MainContext } from '../../Pages/MainContext';
 import { WorkspaceContext } from './WorkspaceContext';
+import { useNavigate, useLocation } from 'react-router-dom';
 const CreateWorkspaceModal = ({open, onClose, onWorkspaceCreated, children}) => {
   const mainContext = useContext(MainContext);
   const [workspaceTitle, setWorkspaceTitle] = useState('');
   const [workspaceDescription, setWorkspacecDescription] = useState('');
   const [ownerId, setOwnerId] = useState(mainContext.userInfo.userId);
+  const [errorMessage, setErrorMessage] =useState('');
+  const navigate = useNavigate();
+
 
   const handleTitleChange = (e) => {
     setWorkspaceTitle(e.target.value);
+    setErrorMessage('');
   };
 
   const handleDescriptionChange = (e) => {
     setWorkspacecDescription(e.target.value);
+    setErrorMessage('');
   }
 
   const handleCreateWorkspace=  async () => {
+    if(workspaceTitle.length < 2 || workspaceTitle.length > 25 ){
+      setErrorMessage('Workspace title must be between 2 and 20 characters.');
+      return;
+  }
+  if(workspaceDescription<10 || workspaceDescription>280){
+      setErrorMessage('Workspace description must be between 10 and 280 characters.');
+      return;
+  }
+
     const newWorkspace = {
       title: workspaceTitle,
       description: workspaceDescription,
@@ -30,10 +45,22 @@ const CreateWorkspaceModal = ({open, onClose, onWorkspaceCreated, children}) => 
       console.log('Workspace created successfully:', response.data);
       onWorkspaceCreated(response.data);
       onClose();
+      navigate(`/main/boards/${response.data.workspaceId}`);
     } catch (error) {
-      console.log('Failed to create board',error);
-      console.log('Error response data:', error.message);
+      if (error.response && error.response.data && error.response.data.errors) {
+        const serverErrors = error.response.data.errors;
+        if (serverErrors.Title) {
+            setErrorMessage(serverErrors.Title[0]);
+        } else if (serverErrors.Description) {
+            setErrorMessage(serverErrors.Description[0]);
+        } else {
+            setErrorMessage('An unknown error occurred.');
+        }
+    } else {
+        setErrorMessage('An error occurred while updating the workspace.');
     }
+    console.log('Error response data: ', error.response?.data || error.message);
+}
   };
 
   return(
@@ -74,6 +101,7 @@ const CreateWorkspaceModal = ({open, onClose, onWorkspaceCreated, children}) => 
                 value={workspaceDescription}
                 onChange={handleDescriptionChange}></textarea>
 
+                {errorMessage && <p className="text-red-500 text-sm">{errorMessage}</p>}
                 <br /><br />
                 <button
                     className="bg-gray-800 font-bold text-white px-4 py-2 rounded-md w-[60%] hover:text-white hover:bg-gray-900 transition-colors duration-300 ease-in-out"

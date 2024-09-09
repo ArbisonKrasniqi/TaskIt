@@ -192,9 +192,10 @@ namespace backend.Controllers
             }
             catch (Exception e)
             {
-                // Log the inner exception details for better debugging
+                
+
                 var innerExceptionMessage = e.InnerException != null ? e.InnerException.Message : string.Empty;
-                return StatusCode(500, $"Internal Server Error! {e.Message} {innerExceptionMessage}");
+                return StatusCode(500, $"Internal Server Error: {e.Message} {innerExceptionMessage}");
             }
         }
 

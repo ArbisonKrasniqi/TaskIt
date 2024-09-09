@@ -30,7 +30,7 @@ const Sidebar = () => {
         handleCreateBoard, setHoveredIndex, hoveredIndex, hoveredSIndex, setHoveredSIndex, setSelectedBoardTitle, 
          selectedBoardTitle, boards, selectedSort, handleSortChange, 
         handleStarBoard, backgroundUrls,handleCloseBoard,setOpenClosedBoardsModal, 
-        showLimitModal, setShowLimitModal, boardCount, roli, starredBoards } = useContext(WorkspaceContext);
+        showLimitModal, setShowLimitModal, boardCount, roli, starredBoards,ALLBoardsCount } = useContext(WorkspaceContext);
 
         const [boardToClose, setBoardToClose] = useState(null);
      
@@ -109,7 +109,7 @@ const WorkspaceViews = [
             )}
             <SortModal open={openSortModal} onClose={()=> setOpenSortModal(false)} selectedSort={selectedSort} onSortChange={handleSortChange}></SortModal>
                   
-                   <button onClick={()=>{boardCount>=10 ? setShowLimitModal(true) : setOpenModal(true); setOpenClosedBoardsModal(false)}} className={`text-gray-400 cursor-pointer p-1 ${!open && "scale-0"}`}><FaPlus/></button>
+                   <button onClick={()=>{ALLBoardsCount>=10 ? setShowLimitModal(true) : setOpenModal(true); setOpenClosedBoardsModal(false)}} className={`text-gray-400 cursor-pointer p-1 ${!open && "scale-0"}`}><FaPlus/></button>
                    {showLimitModal && <LimitModal onClose={() => setShowLimitModal(false)} />}
            <CreateBoardModal 
            open={openModal} 
@@ -125,9 +125,11 @@ const WorkspaceViews = [
                             className={`flex justify-between text-gray-400 text-lg font-semibold items-center mt-2 p-1 cursor-pointer hover:bg-gray-500 ${!open && "scale-0"}`}
                             onMouseEnter={() => setHoveredSIndex(index)}
                             onMouseLeave={() => setHoveredSIndex(null)}
+                            onClick={() => navigate(`/main/board/${workspace.workspaceId}/${board.boardId}`)}
                         >
-                            <div className="flex items-center gap-x-2">
-                                <div 
+                            <div className="flex items-center gap-x-2"
+                            >
+                                <div
                                     className="relative flex items-center justify-center" 
                                     style={{ 
                                         width: '1.5em', 
@@ -171,7 +173,8 @@ const WorkspaceViews = [
             <li key={index} 
             className={`flex justify-between text-gray-400 text-lg font-semibold items-center mt-2 p-1 cursor-pointer hover:bg-gray-500 ${!open && "scale-0"}`}
              onMouseEnter={() => setHoveredIndex(index)}
-            onMouseLeave={() => setHoveredIndex(null)}>
+            onMouseLeave={() => setHoveredIndex(null)}
+            onClick={() => navigate(`/main/board/${workspace.workspaceId}/${board.boardId}`)}>
                 <div className="flex items-center gap-x-2 ">
           
                 <div 
