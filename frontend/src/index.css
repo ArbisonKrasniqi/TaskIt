@@ -11,3 +11,15 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+/* In DateCalendarModal.css */
+.react-calendar__tile--due-date {
+    background-color: #ee9898 !important; /* Tailwind's bg-blue-500 */
+    color: black !important; /* Tailwind's text-white */
+    border: solid 2px red !important;
+    border-radius: 100% !important;
+}
+
+.react-calendar__tile--due-date:hover {
+    background-color: #ea6b6b !important; /* Darker blue on hover */
+}

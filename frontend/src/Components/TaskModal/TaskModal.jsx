@@ -16,6 +16,7 @@ import EditLabelModal from './EditLabelModal';
 import { getDataWithId } from '../../Services/FetchService';
 import { useParams } from 'react-router-dom';
 import { WorkspaceContext } from '../Side/WorkspaceContext';
+import DateCalendarModal from './DateCalendarModal';
 
 
 export const TaskModalsContext = createContext();
@@ -35,6 +36,19 @@ const TaskModal = () => {
     const [taskData, setTaskData] = useState([]);
     const [listData, setListData] = useState([]);
     const [assignedMembers, setAssignedMembers] = useState([]);
+
+
+    const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+
+  const openCalendar = () => {
+    setIsCalendarOpen(true);
+    console.log("CLOSEEEEEE");
+    
+  };
+
+  const closeCalendar = () => {
+    setIsCalendarOpen(!isCalendarOpen);
+  };
 
     useEffect(() => {   
         const getTaskById = async () => {
@@ -145,7 +159,8 @@ const TaskModal = () => {
         taskData,
         setTaskData,
         assignedMembers,
-        setAssignedMembers
+        setAssignedMembers,
+        closeCalendar
     };
     
 
@@ -250,7 +265,9 @@ const TaskModal = () => {
                                         onClick={toggleChecklistModal}>
                                         <IoMdCheckboxOutline className="mx-2 text-lg"/> Checklist
                                     </button>
-                                    <button className="flex justify-start items-center bg-gray-600 bg-opacity-30 rounded-sm h-8 my-1 hover:bg-opacity-80">
+                                    <button
+                                        onClick={openCalendar} 
+                                        className="flex justify-start items-center bg-gray-600 bg-opacity-30 rounded-sm h-8 my-1 hover:bg-opacity-80">
                                         <LuClock4 className="mx-2 text-lg"/> Dates
                                     </button>
                                 </div>
@@ -262,6 +279,7 @@ const TaskModal = () => {
                     {isLabelModalOpen && <LabelsModal/>}
                     {isChecklistModalOpen && <ChecklistModal/>}
                     {isEditLabelModalOpen && <EditLabelModal/>}
+                    {isCalendarOpen && <DateCalendarModal/>}
                     
                 </div>
             </div>
