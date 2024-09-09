@@ -166,6 +166,14 @@ public class CommentRepository : ICommentRepository
         return commentModel;
     }
 
+    public async Task<List<Comment>> DeleteCommentsByTaskIdAsync(int taskId)
+    {
+        var comments = await _context.Comment.Where(c => c.TaskId == taskId).ToListAsync();
+        _context.Comment.RemoveRange(comments);
+        await _context.SaveChangesAsync();
+        return comments;
+    }
+
     public async Task<Comment> UpdateCommentAsync(UpdateCommentDTO updateCommentDto)
     {
         var existingComment =

@@ -13,4 +13,5 @@ public interface ITaskLabelRepository
     Task<TaskLabel> assignLabelToTask(TaskLabel taskLabelModel);
     Task<bool> TaskLabelExists(AssignLabelDTO assignLabelDto);
     Task<TaskLabel> removeTaskLabel(TaskLabel taskLabelModel);
+    Task<List<TaskLabel>> DeleteTaskLabelsByTaskId(int taskId);
 }

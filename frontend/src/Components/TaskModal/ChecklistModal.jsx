@@ -14,14 +14,7 @@ function ChecklistModal() {
   // Ref to the checklist button to position the modal below it
   const checklistButtonRef = useRef(null);
   const [modalPosition, setModalPosition] = useState({ top: 220, right: -124 });
-
-  useEffect(() => {
-    if (checklistButtonRef.current) {
-      const rect = checklistButtonRef.current.getBoundingClientRect();
-      setModalPosition({ top: rect.bottom, right: rect.right });
-    }
-  }, [checklistButtonRef]);
-
+  
   const handleAddChecklist = async () => {
     try {
       if (checklistTitle.length < 2 || checklistTitle.length > 280) {
@@ -47,45 +40,39 @@ function ChecklistModal() {
     setIsChecklistModalOpen(false);
   };
 
-  return (
+  return(
+    <>
     <div
-      className="absolute z-50 bg-black bg-opacity-50 rounded-md"
-      style={{
-        top: `${modalPosition.top}px`,
-        right: `${modalPosition.right}px`,
-        width: '300px',
-      }}
-    >
-      <div className="bg-gray-900 p-5 rounded-md shadow-lg">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-sm font-semibold text-gray-400">Add checklist</h2>
-          <button
-            onClick={toggleChecklistModal}
-            className="text-gray-500 hover:bg-gray-800 w-6 h-6 rounded-full flex justify-center items-center"
-          >
-            X
-          </button>
-        </div>
-
-        <div>
-          <h3 className="text-gray-400 text-sm font-semibold">Title</h3>
-          <input
-            value={checklistTitle}
-            onChange={(e) => setCheklistTitle(e.target.value)}
-            type="text"
-            placeholder="Checklist"
-            className="w-full pl-[5px] py-1 mb-4 bg-gray-900 border border-gray-700 rounded-sm text-white"
-          />
-          <button
-            className="w-16 h-8 rounded-sm bg-blue-400 bg-opacity-90 text-gray-800 font-semibold hover:bg-opacity-80"
-            onClick={handleAddClick}
-          >
-            Add
-          </button>
-        </div>
+    className="absolute z-50 bg-black bg-opacity-50 rounded-md"
+    style={{
+      top: `${modalPosition.top}px`,
+      right: `${modalPosition.right}px`,
+      width: '300px',
+    }}
+  >
+    <div className="bg-gray-900 p-5 rounded-md shadow-lg">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-sm font-semibold text-gray-400">Add checklist</h2>
+        <button
+          onClick={toggleChecklistModal}
+          className="text-gray-500 hover:bg-gray-800 w-6 h-6 rounded-full flex justify-center items-center"
+        >
+          X
+        </button>
+              <div>
+              <h3 className='text-gray-400 text-sm font-semibold'>Title</h3>
+              <input
+                  type="text"
+                  placeholder="Checklist"
+                  className="w-full pl-[5px] py-1 mb-4 bg-gray-900 border border-gray-700 rounded-sm text-white"
+              />
+              <button className='w-16 h-8 rounded-sm bg-blue-400 bg-opacity-90 text-gray-800 font-semibold hover:bg-opacity-80'>Add</button>
+              </div>
+          </div>
       </div>
-    </div>
+      </div>
+      </>
   );
-}
+};
 
 export default ChecklistModal;

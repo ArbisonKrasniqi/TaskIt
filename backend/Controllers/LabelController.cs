@@ -8,6 +8,8 @@ using backend.DTOs.Board.Input;
 using backend.DTOs.Task;
 using backend.Repositories;
 using backend.Models;
+using Microsoft.IdentityModel.Tokens;
+
 namespace backend.Controllers;
 
 
@@ -27,8 +29,9 @@ public class LabelController : ControllerBase
     private readonly IBoardRepository _boardRepo;
     private readonly IListRepository _listRepo;
     private readonly IWorkspaceRepository _workspaceRepo;
+    private readonly IWorkspaceActivityRepository _workspaceActivityRepo;
 
-    public LabelController (ITaskRepository taskRepo, ILabelRepository labelRepo, IUserRepository userRepo, IMembersRepository memberRepo, IMapper mapperRepo, IBoardRepository boardRepo, IListRepository listRepo, IWorkspaceRepository workspaceRepo)
+    public LabelController (ITaskRepository taskRepo, ILabelRepository labelRepo, IUserRepository userRepo, IMembersRepository memberRepo, IMapper mapperRepo, IBoardRepository boardRepo, IListRepository listRepo, IWorkspaceRepository workspaceRepo, IWorkspaceActivityRepository workspaceActivityRepo)
     {
 
         _taskRepo = taskRepo;
@@ -39,6 +42,7 @@ public class LabelController : ControllerBase
         _boardRepo = boardRepo;
         _listRepo = listRepo;
         _workspaceRepo = workspaceRepo;
+        _workspaceActivityRepo = workspaceActivityRepo;
     }
 
 
@@ -280,7 +284,17 @@ public class LabelController : ControllerBase
                 if(labelModel == null){
                     return NotFound("Label not found!");
                 }
-
+                var workspaceActivity = new WorkspaceActivity
+                    {
+                        WorkspaceId = workspace.WorkspaceId,
+                        UserId = userId,
+                        ActionType = "Updated",
+                        EntityName ="label " + (string.IsNullOrWhiteSpace(labelModel.Name) ? " " : labelModel.Name)+" in board "+board.Title,
+                        ActionDate = DateTime.Now
+                    };
+                    
+                    await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
+                   
                 var updateLabelDto = _mapperRepo.Map<LabelDto>(labelModel);
                 return Ok(updateLabelDto);
 
