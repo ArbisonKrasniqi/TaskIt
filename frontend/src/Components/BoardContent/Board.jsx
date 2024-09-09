@@ -9,6 +9,10 @@ import { useAsyncError, useParams } from "react-router-dom";
 import Task from "../Task/Task.jsx";
 import { DragOverlay } from '@dnd-kit/core';
 import DummyList from "../List/DummyList.jsx";
+import { MdOutlineStarOutline, MdOutlineStarPurple500 } from "react-icons/md";
+import {DropdownContext} from "../Navbar/Navbar.jsx";
+import MemberProfilePic from "../ProfilePic/MemberProfilepic.jsx";
+import LoadingModal from "../Modal/LoadingModal.jsx";
 
 export const BoardContext = createContext();
 
@@ -22,6 +26,16 @@ const Board = () => {
   const [activeId, setActiveId] = useState(null);
   const [activeTask, setActiveTask] = useState(null);
   const [activeList, setActiveList] = useState(null);
+
+  const [selectedListId, setSelectedListId] = useState(null);
+  const [ProfilePicIsOpen, setProfilePicIsOpen] = useState(false);
+  const toggleDropdownProfilePic = () => {
+    setProfilePicIsOpen(prev => !prev);
+  };
+  const pfpValues = {
+    ProfilePicIsOpen,
+    toggleDropdownProfilePic
+  }
 
 
 const getTasks = async () => {
@@ -71,9 +85,10 @@ const getTasks = async () => {
   };
   useEffect(()=> {
   
-    getLists();
-    getTasks();
-
+    if (workspaceContext.board && boardId) {
+      getLists();
+      getTasks();
+    }
   },[workspaceContext.board]);
 
   const updateListBackend = async (originalPos, newPos) => {
@@ -298,16 +313,30 @@ const getTasks = async () => {
   }
 
   const contextValue = {tasks,setTasks, lists,setLists, getTasks, getLists}
+  if (workspaceContext.board == null) {
+    return <LoadingModal/>
+  }
   return (
     <BoardContext.Provider value={contextValue}>
       <div className="max-w-full max-h-screen h-screen">
-        <div>
-          <header>
-            <h2>
-            {workspaceContext.board && workspaceContext.board.title ? workspaceContext.board.title : ''}
-            </h2>
-          </header>
-        </div>
+      <header className="flex items-center justify-between w-full p-4 bg-white bg-opacity-30 text-white shadow-lg">
+                <div className="flex items-center">
+                    <h2 className="text-xl font-semibold text-slate-900 mr-4">{workspaceContext.board.title}</h2>
+                    <button
+                        className="text-slate-900 text-2xl focus:outline-none"
+                        onClick={() => workspaceContext.handleStarBoard(workspaceContext.board)}
+                        aria-label={workspaceContext.board.isStarred ? "Unstar board" : "Star board"}
+                    >
+                        {workspaceContext.board.isStarred ? <MdOutlineStarPurple500 /> : <MdOutlineStarOutline />}
+                    </button>
+                </div>
+
+                <div className="flex items-center space-x-4">
+                    <DropdownContext.Provider value={pfpValues}>
+                        <MemberProfilePic/>
+                    </DropdownContext.Provider>
+                </div>
+            </header>
         
         <div className="m-0 p-5 h-full flex flex-start space-x-4 items-baseline bg-gray-200 min-h-screen max-h-screen overflow-x-auto max-w-full">
             <DndContext onDragStart={handleDragStart} onDragMove={handleDragMove} onDragEnd={handleDragEnd}>
@@ -344,3 +373,5 @@ const getTasks = async () => {
 };
 
 export default Board;
+
+

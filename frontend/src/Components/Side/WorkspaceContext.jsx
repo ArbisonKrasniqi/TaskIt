@@ -557,6 +557,15 @@ export const WorkspaceProvider = ({ children }) => {
             getList();
         },[listId, userId ,mainContext.userInfo.accessToken]);
 
+        const handleDeleteList = async(listId) =>{
+            try {
+                const response = await deleteData('http://localhost:5157/backend/list/DeleteList',{listId : listId});
+                console.log("Deleting list");
+                // navigate('main/workspaces');
+            } catch (error) {
+                console.error('Error deleting list:', error.message);
+            }
+        };
 
 
 
@@ -649,7 +658,8 @@ export const WorkspaceProvider = ({ children }) => {
             isLoading,
             setIsLoading,
             getWorkspaces,
-            setList
+            setList,
+            handleDeleteList
         }}>
             {children}
         </WorkspaceContext.Provider>
