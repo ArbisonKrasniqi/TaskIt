@@ -14,7 +14,7 @@ const List = ({ listData = [], setLists, isSingleList = false }) => {
     return (<div> skasen</div>);
   }else {
     return(
-      <div className="p-10 min-h-screen">
+      <div className="p-10 bg-gray-200 min-h-screen">
       <div className="flex space-x-4">
         {workspaceContext.lists.map((listData, index) => (
           <div

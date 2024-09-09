@@ -21,8 +21,7 @@ public class ListController : ControllerBase
     private readonly IUserRepository _userRepo;
     private readonly IWorkspaceRepository _workspaceRepo;
     private readonly IMapper _mapper;
-    private readonly IWorkspaceActivityRepository _workspaceActivityRepo;
-    public ListController(IListRepository listRepo , IBoardRepository boardRepo, IMembersRepository membersRepo, IUserRepository userRepo, IWorkspaceRepository workspaceRepo,IMapper mapper,IWorkspaceActivityRepository workspaceActivityRepo)
+    public ListController(IListRepository listRepo , IBoardRepository boardRepo, IMembersRepository membersRepo, IUserRepository userRepo, IWorkspaceRepository workspaceRepo,IMapper mapper)
     {
         _listRepo = listRepo;
         _boardRepo = boardRepo;
@@ -30,7 +29,6 @@ public class ListController : ControllerBase
         _userRepo = userRepo;
         _workspaceRepo = workspaceRepo;
         _mapper = mapper;
-        _workspaceActivityRepo = workspaceActivityRepo;
     }
     [Authorize(AuthenticationSchemes = "Bearer")]
     [Authorize(Policy = "AdminOnly")]
@@ -147,18 +145,6 @@ public class ListController : ControllerBase
                     {
                         return NotFound("List Not Found");
                     }
-                    var workspaceActivity = new WorkspaceActivity
-                    {
-                        WorkspaceId = workspace.WorkspaceId,
-                        UserId = userId,
-                        ActionType = "Updated",
-                        EntityName = "list "+list.Title+" in board "+board.Title,
-                        ActionDate = DateTime.Now
-                    };
-                    
-                    await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
-
-
 
                     var listDto = _mapper.Map<ListDTO>(listModel);
                     return Ok(listDto);
@@ -210,19 +196,6 @@ public class ListController : ControllerBase
             }
             if (isMember || userTokenRole == "Admin")
             {
-                
-                  
-                var workspaceActivity = new WorkspaceActivity
-                {
-                    WorkspaceId = board.WorkspaceId,
-                    UserId = userId,
-                    ActionType = "Deleted",
-                    EntityName = "list "+list.Title+" in board "+board.Title,
-                    ActionDate = DateTime.Now
-                };
-                    
-                await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
-
                 var listModel = await _listRepo.DeleteListAsync(listIdDto.ListId);
 
                 if (listModel == null)
@@ -277,18 +250,6 @@ public class ListController : ControllerBase
             {
                 var listModel = _mapper.Map<List>(listDto);
                 await _listRepo.CreateAsync(listModel);
-                
-                
-                var workspaceActivity = new WorkspaceActivity
-                {
-                    WorkspaceId = workspaceId,
-                    UserId = userId,
-                    ActionType = "Created",
-                    EntityName = "list "+listDto.Title+" in board "+board.Title,
-                    ActionDate = DateTime.Now
-                };
-                    
-                await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
                 return CreatedAtAction(nameof(GetById), new {id = listModel.ListId },
                     _mapper.Map<ListDTO>(listModel));
             } 

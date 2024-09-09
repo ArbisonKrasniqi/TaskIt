@@ -164,37 +164,31 @@ namespace backend.Controllers
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
 
-                if (userId == null)
-                {
-                    return NotFound("User not found");
-                }
                 var isMember = await _membersRepo.IsAMember(userId, boardDto.WorkspaceId);
                 if (isMember || userTokenRole == "Admin")
                 {
                     var boardModel = _mapper.Map<Board>(boardDto);
-                    var createdBoard =  await _boardRepo.CreateBoardAsync(boardModel);
-                    var createdBoardDto = _mapper.Map<BoardDto>(createdBoard);
+                    await _boardRepo.CreateBoardAsync(boardModel);
+                    
                     
                     var workspaceActivity = new WorkspaceActivity
                     {
-                        WorkspaceId = createdBoard.WorkspaceId,
+                        WorkspaceId = boardDto.WorkspaceId,
                         UserId = userId,
                         ActionType = "Created",
-                        EntityName = "board "+createdBoard.Title,
+                        EntityName = "board "+boardDto.Title,
                         ActionDate = DateTime.Now
                     };
                     
                     await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
-                    return CreatedAtAction(nameof(GetBoardById), new { id = createdBoard.BoardId }, createdBoardDto);
-
+                    return CreatedAtAction(nameof(GetBoardById), new { id = boardModel.BoardId },
+                        _mapper.Map<BoardDto>(boardModel));
                 }
                 return StatusCode(401, "You are not authorized!");
             }
             catch (Exception e)
             {
-                // Log the inner exception details for better debugging
-                var innerExceptionMessage = e.InnerException != null ? e.InnerException.Message : string.Empty;
-                return StatusCode(500, $"Internal Server Error! {e.Message} {innerExceptionMessage}");
+                return StatusCode(500, "Internal Server Error!"+e.Message);
             }
         }
 
@@ -388,17 +382,6 @@ namespace backend.Controllers
                 var ownsWorkspace = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
                 if (ownsWorkspace || userTokenRole == "Admin")
                 {
-                    var workspaceActivity = new WorkspaceActivity
-                    {
-                        WorkspaceId = board.WorkspaceId,
-                        UserId = userId,
-                        ActionType = "Closed",
-                        EntityName = "board "+board.Title,
-                        ActionDate = DateTime.Now
-                    };
-                    
-                    await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
-
                     var result = await _boardRepo.CloseBoardAsync(dto.BoardId, userId);
                     if (!result)
                     {
@@ -434,17 +417,6 @@ namespace backend.Controllers
                 var ownsWorkspace = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
                 if (ownsWorkspace || userTokenRole == "Admin")
                 {
-                    var workspaceActivity = new WorkspaceActivity
-                    {
-                        WorkspaceId = board.WorkspaceId,
-                        UserId = userId,
-                        ActionType = "Reopened",
-                        EntityName = "board "+board.Title,
-                        ActionDate = DateTime.Now
-                    };
-                    
-                    await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
-
                     var result = await _boardRepo.ReopenBoardAsync(dto.BoardId, userId);
                     if (!result)
                     {

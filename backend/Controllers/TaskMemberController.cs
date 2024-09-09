@@ -4,7 +4,6 @@ using backend.DTOs.TaskMember.Output;
 using backend.Interfaces;
 using backend.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers;
@@ -20,9 +19,7 @@ public class TaskMemberController : ControllerBase
     private readonly IListRepository _listRepo;
     private readonly IBoardRepository _boardRepo;
     private readonly IWorkspaceRepository _workspaceRepo;
-    private readonly IWorkspaceActivityRepository _workspaceActivityRepo;
-    private readonly UserManager<User> _userManager;
-    
+
     public TaskMemberController(ITaskMemberRepository taskMemberRepo,
                                 IMapper mapper,
                                 ITaskRepository taskRepo,
@@ -30,9 +27,7 @@ public class TaskMemberController : ControllerBase
                                 IMembersRepository memberRepo,
                                 IListRepository listRepo,
                                 IBoardRepository boardRepo,
-                                IWorkspaceRepository workspaceRepo,
-                                IWorkspaceActivityRepository workspaceActivityRepo,
-                                UserManager<User> userManager)
+                                IWorkspaceRepository workspaceRepo)
     {
         _taskMemberRepo = taskMemberRepo;
         _mapper = mapper;
@@ -42,8 +37,6 @@ public class TaskMemberController : ControllerBase
         _listRepo = listRepo;
         _boardRepo = boardRepo;
         _workspaceRepo = workspaceRepo;
-        _workspaceActivityRepo = workspaceActivityRepo;
-        _userManager = userManager;
     }
 
     [Authorize(AuthenticationSchemes = "Bearer")]
@@ -176,11 +169,7 @@ public class TaskMemberController : ControllerBase
             
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
-            if (userId==null)
-            {
-                return NotFound("User Not Found!");
-            }
-            
+
             var task = await _taskRepo.GetTaskByIdAsync(addTaskMemberDto.TaskId);
             if (task == null)
             {
@@ -218,25 +207,9 @@ public class TaskMemberController : ControllerBase
             {
                 return BadRequest("User is already a member in this task!");
             }
-
-            var taskMember = await _userManager.FindByIdAsync(addTaskMemberDto.UserId);
-            if (taskMember == null)
-            {
-                return NotFound("User not found!");
-            }
+            
             if (isMember || userTokenRole == "Admin")
             {
-                var workspaceActivity = new WorkspaceActivity
-                {
-                    WorkspaceId = workspace.WorkspaceId,
-                    UserId = userId,
-                    ActionType = "Assigned",
-                    EntityName = ""+taskMember.Email+" to task "+task.Title,
-                    ActionDate = DateTime.Now
-                };
-                    
-                await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
-
                 await _taskMemberRepo.AddTaskMemberAsync(addTaskMemberDto);
                 return StatusCode(200, "Member added to Task!");
             }
@@ -366,34 +339,12 @@ public class TaskMemberController : ControllerBase
 
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
-            if (userId == null)
-            {
-                return NotFound("User Not Found!");
-            }
             var isMember = await _memberRepo.IsAMember(userId, workspace.WorkspaceId);
             var isTaskMember = await _taskMemberRepo.IsATaskMember(removeTaskMemberDto.UserId, removeTaskMemberDto.TaskId);
-            
-            var taskMember = await _userManager.FindByIdAsync(removeTaskMemberDto.UserId);
-            if (taskMember == null)
-            {
-                return NotFound("User not found!");
-            }
             if (isMember || userTokenRole == "Admin")
             {
                 if (isTaskMember)
                 {
-                    var workspaceActivity = new WorkspaceActivity
-                    {
-                        WorkspaceId = workspace.WorkspaceId,
-                        UserId = userId,
-                        ActionType = "Removed",
-                        EntityName = ""+taskMember.Email+" from task "+task.Title,
-                        ActionDate = DateTime.Now
-                    };
-                    
-                    await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
-
-                    
                     await _taskMemberRepo.RemoveTaskMemberAsync(removeTaskMemberDto.TaskId, removeTaskMemberDto.UserId);
 
                     return Ok("Member removed from Task");

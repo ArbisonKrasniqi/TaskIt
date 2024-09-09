@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using backend.Data;
+﻿using backend.Data;
 using backend.DTOs.Board.Output;
 using backend.DTOs.Checklist.Input;
 using backend.Interfaces;
@@ -11,12 +10,10 @@ namespace backend.Repositories;
 public class ChecklistRepository : IChecklistRepository
 {
     private readonly ApplicationDBContext _context;
-    private readonly IChecklistItemRepository _checklistItemRepo;
 
-    public ChecklistRepository(ApplicationDBContext context, IChecklistItemRepository checklistItemRepo)
+    public ChecklistRepository(ApplicationDBContext context)
     {
         _context = context;
-        _checklistItemRepo = checklistItemRepo;
     }
 
     public async Task<List<Checklist>> GetAllChecklistsAsync()
@@ -62,8 +59,10 @@ public class ChecklistRepository : IChecklistRepository
             return null;
         }
 
-        await _checklistItemRepo.DeleteChecklistItemByChecklistIdAsync(checklistId);
-        
+        if (checklistModel.ChecklistItems != null)
+        {
+            _context.ChecklistItem.RemoveRange(checklistModel.ChecklistItems);
+        }
         _context.Checklist.Remove(checklistModel);
         await _context.SaveChangesAsync();
         return checklistModel;
@@ -79,11 +78,7 @@ public class ChecklistRepository : IChecklistRepository
     public async Task<List<Checklist>> DeleteChecklistByTaskIdAsync(int taskId)
     {
         var checklists = await _context.Checklist.Where(c => c.TaskId == taskId).ToListAsync();
-
-        foreach (var checklist in checklists)
-        {
-            await _checklistItemRepo.DeleteChecklistItemByChecklistIdAsync(checklist.ChecklistId);
-        }
+        
         _context.Checklist.RemoveRange(checklists);
         await _context.SaveChangesAsync();
         return checklists;

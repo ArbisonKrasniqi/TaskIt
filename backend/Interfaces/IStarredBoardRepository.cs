@@ -15,5 +15,4 @@ public interface IStarredBoardRepository
     Task<StarredBoard?> DeleteStarredBoardByIdAsync(int id);
     Task<List<StarredBoard?>> GetAllStarredBoardsAsync();
     Task<StarredBoard?> UpdateStarredBoardAsync(UpdateStarredBoardDto starredBoardDto);
-    Task<List<StarredBoard>> DeleteStarredBoardsByWorkspaceIdAsync(int workspaceId);
 }

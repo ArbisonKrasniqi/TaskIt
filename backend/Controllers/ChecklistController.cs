@@ -23,10 +23,9 @@ public class ChecklistController : ControllerBase
     private readonly IMapper _mapper;
     private readonly IUserRepository _userRepo;
     private readonly IWorkspaceRepository _workspaceRepo;
-    private readonly IWorkspaceActivityRepository _workspaceActivityRepo;
 
     public ChecklistController(IChecklistRepository checklistRepo, ITaskRepository taskRepo,
-        IListRepository listRepo,IBoardRepository boardRepo, IMembersRepository membersRepo,IMapper mapper, IUserRepository userRepo, IWorkspaceRepository workspaceRepo,IWorkspaceActivityRepository workspaceActivityRepo)
+        IListRepository listRepo,IBoardRepository boardRepo, IMembersRepository membersRepo,IMapper mapper, IUserRepository userRepo, IWorkspaceRepository workspaceRepo)
     {
         _checklistRepo = checklistRepo;
         _taskRepo = taskRepo;
@@ -36,7 +35,6 @@ public class ChecklistController : ControllerBase
         _mapper = mapper;
         _userRepo = userRepo;
         _workspaceRepo = workspaceRepo;
-        _workspaceActivityRepo = workspaceActivityRepo;
     }
 
     [Authorize(AuthenticationSchemes = "Bearer")]
@@ -169,20 +167,6 @@ public class ChecklistController : ControllerBase
             {
                 var checklistModel = _mapper.Map<Checklist>(checklistDto);
                 await _checklistRepo.CreateChecklistAsync(checklistModel);
-                
-                var workspaceActivity = new WorkspaceActivity
-                {
-                    WorkspaceId = workspace.WorkspaceId,
-                    UserId = userId,
-                    ActionType = "Created",
-                    EntityName = "checklist "+checklistDto.Title+" in task "+task.Title+" in list "+list.Title+" in board "+board.Title,
-                    ActionDate = DateTime.Now
-                };
-                    
-                await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
-
-
-                
                 return CreatedAtAction(nameof(GetChecklistById), new { id = checklistModel.ChecklistId },
                     _mapper.Map<ChecklistDTO>(checklistModel));
             }
@@ -246,16 +230,6 @@ public class ChecklistController : ControllerBase
                 {
                     return NotFound("Checklist not found");
                 }
-                var workspaceActivity = new WorkspaceActivity
-                {
-                    WorkspaceId = workspace.WorkspaceId,
-                    UserId = userId,
-                    ActionType = "Updated",
-                    EntityName = "checklist "+checklist.Title+" in task "+task.Title+" in list "+list.Title+" in board "+board.Title,
-                    ActionDate = DateTime.Now
-                };
-                    
-                await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
 
                 var checklistDto = _mapper.Map<ChecklistDTO>(checklistModel);
                 return Ok(checklistDto);
@@ -322,17 +296,6 @@ public class ChecklistController : ControllerBase
             
             if (isMember || userTokenRole == "Admin")
             {
-                var workspaceActivity = new WorkspaceActivity
-                {
-                    WorkspaceId = workspace.WorkspaceId,
-                    UserId = userId,
-                    ActionType = "Deleted",
-                    EntityName = "checklist "+checklist.Title+" in task "+task.Title+" in list "+list.Title+" in board "+board.Title,
-                    ActionDate = DateTime.Now
-                };
-                    
-                await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
-
                 var checklistModel = await _checklistRepo.DeleteChecklistAsync(checklistIdDto.ChecklistId);
                 return Ok(checklistModel);
             }
