@@ -8,7 +8,7 @@ const MemberProfilePic = () => {
     const navigate = useNavigate();
     const { ProfilePicIsOpen, toggleDropdownProfilePic } = useContext(DropdownContext);
     const { userInfo } = useContext(MainContext);
-    const { getInitialsFromFullName } = useContext(WorkspaceContext);
+    const { getInitialsFromFullName, memberDetails, getInitials } = useContext(WorkspaceContext);
     const name = userInfo.name;
     const email = userInfo.email;
 
@@ -18,16 +18,26 @@ const MemberProfilePic = () => {
         navigate(`/login`);
     };
 
+    console.log("member details : ", memberDetails);
     return (
         <div className="relative">
+            {memberDetails.map(member => (
             <button
                 className="flex items-center focus:outline-none relative mr-2"
                 onClick={toggleDropdownProfilePic}
             >
-                <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm bg-gradient-to-r from-pink-400 to-purple-600">
-                    {getInitialsFromFullName(name)}
+                <div className="flex items-center">
+                    {/* {memberDetails.map(member => ( */}
+                        <div
+                            key={member.id}
+                            className="flex-shrink-0 w-8 h-8 rounded-full overflow-hidden mr-2 bg-gradient-to-r from-pink-400 to-purple-600 flex items-center justify-center text-white text-sm"
+                        >
+                            {getInitials(member.firstName, member.lastName)}
+                        </div>
+                    
                 </div>
             </button>
+            ))}
 
             {/* Dropdown menu */}
             {ProfilePicIsOpen && (

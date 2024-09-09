@@ -6,7 +6,7 @@ import MemberProfilePic from "../ProfilePic/MemberProfilepic";
 import { DropdownContext } from "../Navbar/Navbar";
 
 const Board = () => {
-    const { board, handleStarBoard } = useContext(WorkspaceContext);
+    const { board, handleStarBoard, memberDetails } = useContext(WorkspaceContext);
     const [ProfilePicIsOpen, setProfilePicDropdownIsOpen] = useState(false);
 
     if (!board) {
@@ -40,7 +40,7 @@ const Board = () => {
 
                 <div className="flex items-center space-x-4">
                     <DropdownContext.Provider value={values}>
-                        <MemberProfilePic />
+                        <MemberProfilePic/>
                     </DropdownContext.Provider>
                 </div>
             </header>
