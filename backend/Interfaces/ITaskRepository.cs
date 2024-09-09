@@ -21,5 +21,5 @@ public interface ITaskRepository{
     Task<List<Tasks>> GetTasksByBoardIdAsync(int boardId);
     Task<bool> TaskExists(int taskId);
     Task<List<Tasks>> FilterClosedBoardTasksAsync(List<Tasks> tasks);
-
+    Task<bool> handleDragNDrop(DragNDropTaskDTO dragNDropTaskDto);
 }

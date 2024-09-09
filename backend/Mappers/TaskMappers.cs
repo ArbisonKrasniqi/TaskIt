@@ -11,6 +11,7 @@ public static class TaskMappers{
             TaskId = taskModel.TaskId,
             Title = taskModel.Title,
             Description = taskModel.Description,
+            index = taskModel.index,
             ListId = taskModel.ListId,
             DueDate = taskModel.DueDate,
             DateAdded = taskModel.DateAdded,

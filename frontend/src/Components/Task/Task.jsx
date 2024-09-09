@@ -17,7 +17,7 @@ const Task = ({task}) => {
         },
     });
     return(
-        <div className="bg hover:bg-slate-500 p-2 rounded-lg mb-2"
+        <div className={`bg-slate-200 hover:bg-slate-300 w-full border-black p-2 rounded-lg mb-2 ${isDragging ? 'opacity-0' : ''}`}
             ref={setNodeRef}
             {...attributes}
             {...listeners}

@@ -1,9 +1,11 @@
 import React, { useContext, useState } from "react";
 import { postData } from "../../Services/FetchService";
 import { WorkspaceContext } from "../Side/WorkspaceContext";
+import { BoardContext } from "../BoardContent/Board";
+
 
 const TaskForm = ({ listId }) => {
-    // const {setLists} = useContext(WorkspaceContext);
+    const boardContext = useContext(BoardContext);
     const [taskTitle, setTaskTitle] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
 
@@ -27,19 +29,16 @@ const TaskForm = ({ listId }) => {
 
         try {
             const response = await postData("/backend/task/CreateTask", newTask);
-            console.log("Task created successfully:", response.data); 
-            // setLists(prevLists =>
-            //     prevLists.map(list =>
-            //         list.listId === listId
-            //             ? { ...list, tasks: [...list.tasks, response.data] } // Add the new task to the correct list
-            //             : list // Keep other lists unchanged
-            //     )
-            // );
-    
+            var createdTask = response.data;
+            createdTask.uniqueId = `${response.data.taskId}-${response.data.listId}`;
+            console.log("Task created successfully:", createdTask);
+             
+            boardContext.setTasks([...boardContext.tasks, createdTask]);
+            setErrorMessage("");
             setTaskTitle('');
         } catch (error) {
             console.log("Error response data:", error.message); 
-            setErrorMessage("Failed to create task. Please try again.");
+            setErrorMessage("error.message");
         }
     };
 
@@ -50,6 +49,7 @@ const TaskForm = ({ listId }) => {
                 placeholder="New task"
                 value={taskTitle}
                 onChange={handleTitleChange}
+                onClick={(e) => {e.stopPropagation()}}
                 className="bg-slate-400 border-none w-full p-2 mb-2 border rounded text-black placeholder-gray-700 focus:outline-none focus:border-transparent focus:bg-slate-300"
             />
             <button

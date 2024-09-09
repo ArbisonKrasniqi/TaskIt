@@ -70,7 +70,7 @@ const Main = () => {
     return (
         <MainContext.Provider value={mainContextValue}>
             <WorkspaceProvider>
-                <div className="w-full h-full flex flex-col">
+                <div className="w-screen h-screen flex flex-col overflow-hidden">
                     {/* Navbar at the top */}
                     <Navbar />
                     
@@ -80,7 +80,7 @@ const Main = () => {
                         {opened !== 'workspaces' && opened !== 'privacyPolicy'  && opened !== 'profile' && <Sidebar />}
 
                         {/* Conditional rendering based on the value of `opened` */}
-                        <div className='w-full flex-grow h-full p-0'>
+                        <div className='w-full flex-grow h-full p-0 m-0'>
                             {opened === 'boards' && <Boards />}
                             {opened === 'board' && <Board />}
                             {opened === 'workspaceSettings' && <WorkspaceSettings/>}

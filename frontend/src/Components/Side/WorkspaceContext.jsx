@@ -536,8 +536,8 @@ export const WorkspaceProvider = ({ children }) => {
                 }
             };
             getLists();
-        },[boardId,mainContext.userInfo.accessToken, WorkspaceId]
-
+        },[]
+        //boardId,mainContext.userInfo.accessToken, WorkspaceId
         );
 
         useEffect(() =>{

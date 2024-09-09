@@ -1,11 +1,14 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { WorkspaceContext } from "../Side/WorkspaceContext";
 import ListForm from "../List/ListForm.jsx";
-import {DndContext, closestCorners} from "@dnd-kit/core";
+import {DndContext, KeyboardSensor, PointerSensor, closestCenter, closestCorners, useSensor, useSensors} from "@dnd-kit/core";
 import List from "../List/List.jsx";
-import {SortableContext, horizontalListSortingStrategy, arrayMove} from "@dnd-kit/sortable";
+import {SortableContext, horizontalListSortingStrategy, arrayMove, sortableKeyboardCoordinates} from "@dnd-kit/sortable";
 import { getDataWithId, putData } from "../../Services/FetchService.jsx";
-import { useParams } from "react-router-dom";
+import { useAsyncError, useParams } from "react-router-dom";
+import Task from "../Task/Task.jsx";
+import { DragOverlay } from '@dnd-kit/core';
+import DummyList from "../List/DummyList.jsx";
 
 export const BoardContext = createContext();
 
@@ -13,30 +16,66 @@ const Board = () => {
   const workspaceContext = useContext(WorkspaceContext);
   const {workspaceId, boardId, taskId} = useParams();
   
-  const [boardTasks, setBoardTasks] = useState([]);
+  const [lists, setLists] = useState([]);
+  const [tasks, setTasks] = useState([]);
+   
+  const [activeId, setActiveId] = useState(null);
+  const [activeTask, setActiveTask] = useState(null);
+  const [activeList, setActiveList] = useState(null);
 
-  
-  const getBoardTasks = async () => {
-    try {
-      const tasksResponse = await getDataWithId('/backend/task/GetTasksByBoardId?boardId', boardId);
-      const tasksWithUniqueIds = tasksResponse.data.map(task => ({
-        ...task,
-        uniqueId: `${task.taskId}-${task.listId}`
-      }));
-      setBoardTasks(tasksWithUniqueIds);
-    } catch (error) {
-      console.log("Error fetching tasks: " + error);
+
+const getTasks = async () => {
+      try {
+        if (boardId) {
+          const tasksResponse = await getDataWithId("/backend/task/GetTasksByBoardId?boardId", boardId);
+          const tasksData = tasksResponse.data;
+          if (tasksData) {
+            const updatedTasks = tasksData.map(task => {
+              return {
+                ...task,
+              uniqueId: `${task.taskId}-${task.listId}`
+              }
+            }).sort((a,b) => a.index - b.index);
+            setTasks(updatedTasks);
+          } else {
+            console.log("There are no tasks");
+          }
+        }
+      } catch (error) {
+        console.error("There has been an error fetching tasks");
+      }
     }
-  }
-  useEffect( () => {
-    if (workspaceId && boardId) {
-      getBoardTasks();
-    }
-  }, [workspaceId, boardId, workspaceContext.workspaces])
+    const getLists = async () => {
+      try {
+          if (boardId) {
+              const listsResponse = await getDataWithId("/backend/list/GetListByBoardId?boardId",boardId);
+              const listsData = listsResponse.data;
+              if (listsData) {
+                  const updatedLists = listsData.map(list => {
+                      return {
+                          ...list,
+                          tasks: tasks.map(task => ({
+                              ...task,
+                              uniqueId: `${task.taskId}-${task.listId}`
+                          }))
+                      };
+                  });
+                  setLists(updatedLists);
+              } else {
+                  console.log("There are no lists");
+              }
+          }
+      } catch (error) {
+          console.error("There has been an error fetching lists")
+      }
+  };
+  useEffect(()=> {
   
-  
-  
-  const getListPos = id => workspaceContext.lists.findIndex(list => list.listId === id);
+    getLists();
+    getTasks();
+
+  },[workspaceContext.board]);
+
   const updateListBackend = async (originalPos, newPos) => {
     try {
       const data = {
@@ -48,32 +87,220 @@ const Board = () => {
       console.log(response.data);
     } catch (error) {
       console.log(error.message);
+      getLists();
+      getTasks();
     }
   }
 
+  const updateTaskBackend = async (task, list, newIndex)  => {
+    try {
+      const data = {
+        taskId: task,
+        listId: list,
+        newIndex: newIndex
+      }
+      const taskResponse = await putData("/backend/task/DragNDropTask", data);
+      console.log(taskResponse.data);
+    } catch (error) {
+      console.log(error.message);
+      getLists();
+      getTasks();
+    }
+  }
+
+  const findValueOfItems = (id, type) => {
+    if (type == "list") {
+      return lists.find((list) => list.listId == id);
+    }
+    if (type == "task") {
+      const task = tasks.find((task) => task.uniqueId === id);
+      if (task) {
+        return lists.find((list) => list.listId === task.listId);
+    }
+    }
+  }
+
+  const handleDragStart = event => {
+    const { active }= event;
+    const { id } = event;
+    setActiveId(id);
+    try {
+      if (active.data.current.type.includes("list")) {
+        const draggingList = lists.find(l => l.listId == active.id);
+        setActiveList(draggingList);
+      }
+      if (active.data.current.type.includes("task")) {
+        const draggingTask = tasks.find(t => t.uniqueId == active.id);
+        setActiveTask(draggingTask);
+      }
+    } catch (error) {
+      console.log(error);
+      setActiveId(null);
+      setActiveList(null);
+      setActiveTask(null);
+    }
+    
+  }
+
+  const handleDragMove = event => {
+    const {active, over} = event;
+    
+    try {
+    //handle items sorting
+    //if both tasks
+    if (active?.data.current.type.includes("task") && over?.data.current.type.includes("task") && active && over && active.id != over.id) {
+      //find active list and over list
+      const activeList = findValueOfItems(active.id, 'task');
+      const overList = findValueOfItems(over.id, 'task');
+
+      if (!activeList || !overList) return;
+
+      //Find the active and over list index
+      const activeListIndex = lists.findIndex(
+        list => list.listId == activeList.listId
+      );
+      const overListIndex = lists.findIndex(
+        list => list.listId == overList.listId
+      );
+
+      const activeTaskIndex = tasks.filter(task => task.listId == activeList.listId).findIndex(
+        task => task.uniqueId == active.id
+      );
+
+      const overTaskIndex = tasks.filter(task => task.listId == overList.listId).findIndex(
+        task => task.uniqueId == over.id
+      );
+      
+      //if in same list
+      if (activeListIndex == overListIndex) {
+        const tasksTarget = tasks.filter(task => task.listId == activeList.listId);
+        const reorderedTasks = arrayMove(tasksTarget, activeTaskIndex, overTaskIndex);
+        const newTasks = tasks.map(task => {
+          if (task.listId === activeList.listId) {
+            // Replace tasks with reordered tasks
+            const updatedTask = reorderedTasks.shift();
+            return updatedTask || task;
+          }
+          return task;
+        });
+        setTasks(newTasks);
+        return;
+      } else {
+        // qitu veq change listId tani ne same container e ndreq indeksin
+        // kur e change listId also change oldList indexes
+
+        const updatedTasks = tasks.map(task => {
+          if (task.uniqueId === active.id) {
+            return { ...task, listId: overList.listId };
+          } else {
+            return task;
+          }
+        });
+        setTasks(updatedTasks);
+  
+    }
+    }
+
+    //if task dropped into container
+    if (active.data.current.type.includes("task") && over?.data.current.type.includes("list") && active && over && active.id != over.id) {
+
+      //Find active and over list
+      const activeList = findValueOfItems(active.id, 'task');
+      const overList = findValueOfItems(over.id, 'list');
+
+      if (!activeList || !overList) return;
+
+      //find the index of the active and over list
+
+      const activeListIndex = lists.findIndex(
+        list => list.listId == activeList.listId
+      );
+      const overListIndex = lists.findIndex(
+        list => list.listId == overList.listId
+      );
+
+      const activeTaskIndex = tasks.filter(task => task.listId == activeList.listId).findIndex(
+        task => task.uniqueId == active.id
+      );
+
+      //if moving task and touching list.
+      if (activeListIndex == overListIndex) {
+        //handle in dragend SEND TO 
+        //handle it in task/task
+        console.log("TASK OVER ITS OW?N LISTT");
+      } else {
+        //change list id and handle it with task/task
+        console.log("TASK OVER NEW LISTTT");
+        const updatedTasks = tasks.map(task => {
+          if (task.uniqueId === active.id) {
+            return { ...task, listId: overList.listId };
+          }
+          return task;
+        });
+        setTasks(updatedTasks);
+      }
+
+    }
+  } catch (error) {
+      console.log(error);
+      setActiveId(null);
+      setActiveList(null);
+      setActiveTask(null);
+    }
+
+}
+
   const handleDragEnd = event => {
     const {active, over} = event;
-    if (active.id === over.id) return;
 
     try {
-      
-      workspaceContext.setLists(list => {
-        const originalPos = getListPos(active.id);
-        const newPos = getListPos(over.id);
+        // handle container sorting
+        if (active.data.current.type.includes("list") && over.data.current.type.includes("list") && active && over && active.id != over.id) {
+          const activeListIndex = lists.findIndex(
+            (list) => list.listId == active.id
+          );
+          const overListIndex = lists.findIndex(
+            (list) => list.listId == over.id
+          );
 
-        console.log("OriginalPosition: "+originalPos+" moved to new position: "+newPos);
-        updateListBackend(originalPos, newPos);
-        return arrayMove(list, originalPos, newPos);
-      })
+          let newLists = [... lists];
+          updateListBackend(activeListIndex, overListIndex);
+          newLists = arrayMove(newLists, activeListIndex, overListIndex);
+          setLists(newLists);
+        }
+
+        if (active.data.current.type == "task" && over.data.current.type == "task") {
+          const activeList = findValueOfItems(active.id , "task");
+          
+          const activeTask = tasks.find(task => task.uniqueId == active.id);
+          const activeTaskIndex = tasks.filter(task => task.listId == activeList.listId).findIndex(
+            task => task.uniqueId == active.id
+          );
+          
+          updateTaskBackend(activeTask.taskId, activeList.listId, activeTaskIndex);
+        }
+
+        if (active.data.current.type == "task" && over.data.current.type == "list") {
+          const overList = findValueOfItems(over.id, "list");
+          const overListTasksLength = tasks.filter(t => t.listId == overList.listId).length - 1;
+          const activeTask = tasks.find(task => task.uniqueId == active.id);
+          updateTaskBackend(activeTask.taskId, overList.listId, overListTasksLength);
+        }
+        
     } catch (error) {
-    console.log("Error")
+      console.error(error.message);
+    } finally {
+      setActiveId(null);
+      setActiveTask(null);
+      setActiveList(null);
     }
-  };
+    
+  }
 
-  var contextValue = {boardTasks, setBoardTasks, getBoardTasks}
+  const contextValue = {tasks,setTasks, lists,setLists, getTasks, getLists}
   return (
     <BoardContext.Provider value={contextValue}>
-      <div>
+      <div className="max-w-full max-h-screen h-screen">
         <div>
           <header>
             <h2>
@@ -82,20 +309,37 @@ const Board = () => {
           </header>
         </div>
         
-        <div className="p-10 bg-gray-200 min-h-screen">
-        <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCorners}>
-            <div className="flex space-x-4">
-              <SortableContext items={workspaceContext.lists.map(list => list.listId)} strategy={horizontalListSortingStrategy}>
-                {workspaceContext.lists.map((list) => (
-                  <List key={list.listId} list={list} />
+        <div className="m-0 p-5 h-full flex flex-start space-x-4 items-baseline bg-gray-200 min-h-screen max-h-screen overflow-x-auto max-w-full">
+            <DndContext onDragStart={handleDragStart} onDragMove={handleDragMove} onDragEnd={handleDragEnd}>
+              <SortableContext items={lists.map(list => list.listId)}>
+                {lists.map((list) => (
+                  <List key={list.listId} list={list}>
+                    <SortableContext items={tasks.filter(task => task.listId == list.listId).map(task => task.uniqueId)}>
+                      <div className="flex items-start flex-col">
+                        {tasks.filter(task => task.listId == list.listId).map((task) => (
+                          <Task key={task.uniqueId} task={task} />
+                        ))}
+                      </div>
+                    </SortableContext>  
+                  </List>
                 ))}
               </SortableContext>
-              <ListForm />
-            </div>
-          </DndContext>
+                <DragOverlay>
+                    {activeTask ? <Task key={activeTask.uniqueId} task={activeTask} /> : null}
+                    {activeList ? <List key={activeList.listId} list={activeList}>
+                      <div className="flex items-start flex-col">
+                          {tasks.filter(task => task.listId == activeList.listId).map((task) => (
+                            <Task key={task.uniqueId} task={task} />
+                          ))}
+                      </div>
+                    </List> : null}
+                </DragOverlay>
+            </DndContext>
+          <ListForm />
+          <DummyList/>
         </div>
       </div>
-    </BoardContext.Provider>
+      </BoardContext.Provider>
   );
 };
 

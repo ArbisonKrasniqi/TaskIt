@@ -162,7 +162,10 @@ public class ListController : ControllerBase
     [HttpPut("DragNDropList")]
     public async Task<IActionResult> DragNDropList(DragNDropListDTO dragNDropListDto)
     {
-        if (!ModelState.IsValid) return BadRequest(ModelState);
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
 
         try
         {
@@ -305,7 +308,7 @@ public class ListController : ControllerBase
         }
         catch (Exception e)
         {
-            return StatusCode(500, "Internal Server Error!"+e.Message);
+            return StatusCode(500, "Internal Server Error!"+e);
         }
     }
     [Authorize(AuthenticationSchemes = "Bearer")]

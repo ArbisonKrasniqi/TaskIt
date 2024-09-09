@@ -35,13 +35,6 @@ public class ListRepository : IListRepository
             .FirstOrDefaultAsync(t=>t.ListId==ListId);
     }
 
-    public async Task<List?> CreateListAsync(List listModel)
-    {
-        await _context.List.AddAsync(listModel);
-        await _context.SaveChangesAsync();
-        return listModel;
-    }
-
     public async Task<List?> UpdateListAsync(UpdateListDTO listModel)
     {
         var existingList = await _context.List.FirstOrDefaultAsync(x => x.ListId == listModel.ListId);
@@ -70,7 +63,6 @@ public class ListRepository : IListRepository
             await _taskRepo.DeleteTaskByListIdAsync(ListId);
             _context.List.Remove(listModel);
             await _context.SaveChangesAsync();
-            return listModel;
         }
         
         var listsToUpdate = _context.List
@@ -84,7 +76,7 @@ public class ListRepository : IListRepository
         {
             list.index -= 1;
         }
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
         return listModel;
     }
 
@@ -97,6 +89,7 @@ public class ListRepository : IListRepository
             listModel.index = 0;
             await _context.List.AddAsync(listModel);
             await _context.SaveChangesAsync();
+            return listModel;
         }
 
         listModel.index = lists.Count();

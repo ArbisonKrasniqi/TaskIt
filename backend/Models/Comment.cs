@@ -10,4 +10,7 @@ public class Comment
     public DateTime DateAdded { get; set; }
     public string UserId { get; set; }
     public int TaskId { get; set; }
+
+    public User User { get; set; }
+    public Tasks Task { get; set; }
 }

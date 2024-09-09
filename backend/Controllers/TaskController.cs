@@ -348,7 +348,7 @@ public class  TaskController : ControllerBase{
                 await _taskRepo.CreateTaskAsync(taskModel);
                 var labels = new List<Models.Label>();
                 var taskMembers = new List<TaskMember>();
-                return CreatedAtAction(nameof(GetTaskById), new { id = taskModel.TaskId }, taskModel.ToTaskDto(labels,taskMembers));
+                return CreatedAtAction(nameof(GetTaskById), new { id = taskModel.TaskId, }, taskModel.ToTaskDto(labels,taskMembers));
             }
             return StatusCode(401, "You are not authorized!");
         }catch(Exception e){
@@ -466,5 +466,60 @@ public class  TaskController : ControllerBase{
 
     }
 
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    [HttpPut("DragNDropTask")]
+    public async Task<IActionResult> DragNDropTask([FromBody] DragNDropTaskDTO dragNDropTaskDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        try
+        {
+            var task = await _taskRepo.GetTaskByIdAsync(dragNDropTaskDto.TaskId);
+            if (task == null) return NotFound("Task not found");
+
+            var list = await _listRepo.GetListByIdAsync(task.ListId);
+            if (list == null) return NotFound("List not found");
+
+            var newList = await _listRepo.GetListByIdAsync(dragNDropTaskDto.ListId);
+            if (newList == null) return NotFound("New list not found");
+
+            if (list.BoardId != newList.BoardId) return BadRequest("Task and list aren't in the same board");
+
+            var board = await _boardRepo.GetBoardByIdAsync(list.BoardId);
+            if (board == null) return NotFound("Board not found");
+
+            var workspace = await _workspaceRepo.GetWorkspaceByIdAsync(board.WorkspaceId);
+            if (workspace == null) return NotFound("Workspace not found");
+            
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+            var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+            var isMember = await _membersRepo.IsAMember(userId, workspace.WorkspaceId);
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspace.WorkspaceId);
+            if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+            {
+                return StatusCode(403, "The board is closed");
+            }
+
+            if (isMember || userTokenRole == "Admin")
+            {
+                var successful = await _taskRepo.handleDragNDrop(dragNDropTaskDto);
+                if (successful)
+                {
+                    return Ok("Task reordered");
+                }
+
+                return StatusCode(500, "Internal server error");
+            }
+
+            return StatusCode(401, "You are not authorized");
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, "Internal server error"+e);
+        }
+    }
 
 }

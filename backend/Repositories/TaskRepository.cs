@@ -33,9 +33,11 @@ public class TaskRepository : ITaskRepository
 
 public async Task<Tasks> CreateTaskAsync(Tasks taskModel){
 
-        await _context.Tasks.AddAsync(taskModel);
-        await _context.SaveChangesAsync();
-        return taskModel;
+    var tasks = _context.Tasks.Where(t => t.ListId == taskModel.ListId);
+    taskModel.index = tasks.Count();
+    await _context.Tasks.AddAsync(taskModel);
+    await _context.SaveChangesAsync();
+    return taskModel;
     }
 
 
@@ -61,7 +63,22 @@ public async Task<Tasks> CreateTaskAsync(Tasks taskModel){
             return null;
         }
 
+        if (taskModel.index == 0)
+        {
+            _context.Tasks.Remove(taskModel);
+            await _context.SaveChangesAsync();
+        }
+
+        var tasksToUpdate = _context.Tasks
+            .Where(t => t.ListId == taskModel.ListId && t.index > taskModel.index).OrderBy(t => t.index).ToList();
+
         _context.Tasks.Remove(taskModel);
+
+        foreach (var task in tasksToUpdate)
+        {
+            task.index -= 1;
+        }
+
         await _context.SaveChangesAsync();
         return taskModel;
     }
@@ -70,7 +87,10 @@ public async Task<Tasks> CreateTaskAsync(Tasks taskModel){
 
     // Relation with List from ITaskRepo
 
-    public async Task<Tasks> CreateAsync (Tasks taskModel) {
+    public async Task<Tasks> CreateAsync (Tasks taskModel)
+    {
+        var tasks = _context.Tasks.Where(t => t.ListId == taskModel.ListId);
+        taskModel.index = tasks.Count();
         await _context.Tasks.AddAsync(taskModel);
         await _context.SaveChangesAsync();
         return taskModel;
@@ -174,5 +194,76 @@ public async Task<Tasks> CreateTaskAsync(Tasks taskModel){
         ).ToList();
 
         return filteredTasks;
+    }
+
+    public async Task<bool> handleDragNDrop(DragNDropTaskDTO dragNDropTaskDto)
+    {
+        var task = await _context.Tasks.FirstOrDefaultAsync(t => t.TaskId == dragNDropTaskDto.TaskId);
+        if (task == null) return false;
+
+        var list = await _context.List.FirstOrDefaultAsync(l => l.ListId == task.ListId);
+        if (list == null) return false;
+
+        var newList = await _context.List.FirstOrDefaultAsync(l => l.ListId == dragNDropTaskDto.ListId);
+        if (newList == null) return false;
+
+        if (list.BoardId != newList.BoardId) return false;
+        
+        if (list.ListId == newList.ListId)
+        {
+            var tasks = await _context.Tasks
+                .Where(t => t.ListId == list.ListId)
+                .OrderBy(t => t.index)
+                .ToListAsync();
+            var currentIndex = task.index;
+            var newIndex = dragNDropTaskDto.NewIndex;
+            if (currentIndex == dragNDropTaskDto.NewIndex) return true;
+
+            for (int i = Math.Min(currentIndex, newIndex); i <= Math.Max(currentIndex, newIndex); i++)
+            {
+                if (tasks[i] != task)
+                {
+                    if (currentIndex < newIndex)
+                    {
+                        tasks[i].index -= 1;
+                    }
+
+                    if (currentIndex > newIndex)
+                    {
+                        tasks[i].index += 1;
+                    }
+                }
+            }
+
+            task.index = newIndex;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        else
+        {
+            var tasks = await _context.Tasks
+                .Where(t => t.ListId == dragNDropTaskDto.ListId)
+                .OrderBy(t => t.index)
+                .ToListAsync();
+            var newIndex = dragNDropTaskDto.NewIndex;
+            for (int i = 0; i < tasks.Count; i++)
+            {
+                if (tasks[i].index >= newIndex)
+                {
+                    tasks[i].index += 1;
+                }
+            }
+
+            var oldTasks = _context.Tasks.Where(t => t.ListId == list.ListId && t.index > task.index).OrderBy(t => task.index).ToList();
+            foreach (var t in oldTasks)
+            {
+                t.index -= 1;
+            }
+            
+            task.ListId = dragNDropTaskDto.ListId;
+            task.index = newIndex;
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }
