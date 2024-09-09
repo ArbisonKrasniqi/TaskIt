@@ -9,13 +9,12 @@ namespace backend.Repositories;
 public class TaskLabelRepository : ITaskLabelRepository
 {
     private readonly ApplicationDBContext _context;
-    private readonly ITaskRepository _taskRepo;
     private readonly ILabelRepository _labelRepo;
 
-    public TaskLabelRepository(ApplicationDBContext context, ITaskRepository taskRepo )
+    public TaskLabelRepository(ApplicationDBContext context, ILabelRepository labelRepo )
     {
         _context = context;
-        _taskRepo = taskRepo;
+        _labelRepo = labelRepo;
     }
 
     public async Task<List<TaskLabel>> getAllTaskLabelsOpenBoardAsync()
@@ -87,5 +86,14 @@ public class TaskLabelRepository : ITaskLabelRepository
         await _context.SaveChangesAsync();
         return taskLabelModel;
 
+    }
+    
+    //Delete TaskLabels by task Id
+    public async Task<List<TaskLabel>> DeleteTaskLabelsByTaskId(int taskId)
+    {
+        var taskLabels = await _context.TaskLabel.Where(tl => tl.TaskId == taskId).ToListAsync();
+        _context.TaskLabel.RemoveRange(taskLabels);
+        await _context.SaveChangesAsync();
+        return taskLabels;
     }
 }

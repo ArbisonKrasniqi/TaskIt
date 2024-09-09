@@ -1,4 +1,4 @@
-import { useState,useContext } from "react";
+import { useState,useContext, useEffect } from "react";
 import { SlArrowLeft } from "react-icons/sl";
 import { CiViewBoard } from "react-icons/ci";
 import { IoPersonOutline } from "react-icons/io5";
@@ -29,11 +29,12 @@ const Sidebar = () => {
         setOpenSortModal, setOpenCloseModal, openSortModal, setOpenModal, openModal, 
         handleCreateBoard, setHoveredIndex, hoveredIndex, hoveredSIndex, setHoveredSIndex, setSelectedBoardTitle, 
          selectedBoardTitle, boards, selectedSort, handleSortChange, 
-        handleStarBoard, getBackgroundImageUrl, handleCloseBoard,setOpenClosedBoardsModal, 
-        showLimitModal, setShowLimitModal, boardCount, roli, starredBoards } = useContext(WorkspaceContext);
+        handleStarBoard, backgroundUrls,handleCloseBoard,setOpenClosedBoardsModal, 
+        showLimitModal, setShowLimitModal, boardCount, roli, starredBoards,ALLBoardsCount } = useContext(WorkspaceContext);
 
         const [boardToClose, setBoardToClose] = useState(null);
      
+
 const Menus = [
     {title: "Boards", tag: "CiViewBoard", path: `/main/boards/${workspace?.workspaceId}`},
     {title: "Members", tag: "IoPersonOutline", path: `/main/members/${workspace?.workspaceId}`},
@@ -108,9 +109,12 @@ const WorkspaceViews = [
             )}
             <SortModal open={openSortModal} onClose={()=> setOpenSortModal(false)} selectedSort={selectedSort} onSortChange={handleSortChange}></SortModal>
                   
-                   <button onClick={()=>{boardCount>=10 ? setShowLimitModal(true) : setOpenModal(true); setOpenClosedBoardsModal(false)}} className={`text-gray-400 cursor-pointer p-1 ${!open && "scale-0"}`}><FaPlus/></button>
+                   <button onClick={()=>{ALLBoardsCount>=10 ? setShowLimitModal(true) : setOpenModal(true); setOpenClosedBoardsModal(false)}} className={`text-gray-400 cursor-pointer p-1 ${!open && "scale-0"}`}><FaPlus/></button>
                    {showLimitModal && <LimitModal onClose={() => setShowLimitModal(false)} />}
-           <CreateBoardModal open={openModal} onClose={()=> setOpenModal(false)} onBoardCreated={handleCreateBoard}></CreateBoardModal>
+           <CreateBoardModal 
+           open={openModal} 
+           onClose={()=> setOpenModal(false)} 
+           onBoardCreated={handleCreateBoard}></CreateBoardModal>
             </div>
 
             <ul>
@@ -121,14 +125,16 @@ const WorkspaceViews = [
                             className={`flex justify-between text-gray-400 text-lg font-semibold items-center mt-2 p-1 cursor-pointer hover:bg-gray-500 ${!open && "scale-0"}`}
                             onMouseEnter={() => setHoveredSIndex(index)}
                             onMouseLeave={() => setHoveredSIndex(null)}
+                            onClick={() => navigate(`/main/board/${workspace.workspaceId}/${board.boardId}`)}
                         >
-                            <div className="flex items-center gap-x-2">
-                                <div 
+                            <div className="flex items-center gap-x-2"
+                            >
+                                <div
                                     className="relative flex items-center justify-center" 
                                     style={{ 
                                         width: '1.5em', 
                                         height: '1.5em', 
-                                        backgroundImage: `url(${getBackgroundImageUrl(board)})`, 
+                                        backgroundImage: `url(${backgroundUrls[board.boardId] || '/path/to/default/image.jpg'})`,  
                                         backgroundSize: 'cover', 
                                         backgroundPosition: 'center' 
                                     }}
@@ -167,7 +173,8 @@ const WorkspaceViews = [
             <li key={index} 
             className={`flex justify-between text-gray-400 text-lg font-semibold items-center mt-2 p-1 cursor-pointer hover:bg-gray-500 ${!open && "scale-0"}`}
              onMouseEnter={() => setHoveredIndex(index)}
-            onMouseLeave={() => setHoveredIndex(null)}>
+            onMouseLeave={() => setHoveredIndex(null)}
+            onClick={() => navigate(`/main/board/${workspace.workspaceId}/${board.boardId}`)}>
                 <div className="flex items-center gap-x-2 ">
           
                 <div 
@@ -175,7 +182,7 @@ const WorkspaceViews = [
         style={{ 
           width: '1.5em', 
           height: '1.5em', 
-          backgroundImage: `url(${getBackgroundImageUrl(board)})`, 
+          backgroundImage: `url(${backgroundUrls[board.boardId] || '/path/to/default/image.jpg'})`, 
           backgroundSize: 'cover', 
           backgroundPosition: 'center' 
         }}

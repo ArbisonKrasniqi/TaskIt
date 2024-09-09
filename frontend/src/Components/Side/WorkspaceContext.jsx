@@ -1,5 +1,5 @@
 import React, {createContext, useContext , useState, useEffect} from 'react';
-import { getDataWithId, deleteData, postData, getDataWithIds } from '../../Services/FetchService';
+import { getDataWithId, deleteData, postData, getDataWithIds, getData } from '../../Services/FetchService';
 import myImage from './background.jpg';
 import { MainContext } from '../../Pages/MainContext';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -219,7 +219,7 @@ export const WorkspaceProvider = ({ children }) => {
 
     
     const[updateWorkspaceModal, setUpdateWorkspaceModal] = useState(false);
-
+    const [closedBoards, setClosedBoards] = useState([]);
     const handleWorkspaceUpdate = (updatedWorkspace) => {
         setWorkspace((prev) => ({
           ...prev,
@@ -228,6 +228,14 @@ export const WorkspaceProvider = ({ children }) => {
         }));
       };
 
+      const fetchClosedBoards=async ()=>{
+        try{
+            const response = await getDataWithId('http://localhost:5157/backend/board/GetClosedBoards?workspaceId', WorkspaceId);
+            setClosedBoards(response.data);
+        }catch(error){
+            console.error("Error fetching closed boards: ",error);
+        }
+    };
 
 
 
@@ -317,12 +325,70 @@ export const WorkspaceProvider = ({ children }) => {
             console.error("Error starring/unstarring the board:", error.message);
         }
     };
-    const getBackgroundImageUrl = (board) => {
-        // const background = backgrounds.find(b=>b.backgroundId === board.backgroundId);
-        // return background? background.imageUrl : '';
-        return myImage;
+    
+    const getBackgroundImageUrl = async (board) => {
+        if (!board.backgroundId) {
+            console.error("Board does not have a valid backgroundId");
+            return myImage; // // Return a default image if backgroundId is not valid
+        }
+    
+        try {
+            const response = await getDataWithId('http://localhost:5157/backend/background/GetBackgroundByID?id', board.backgroundId);
+    
+            // Check if response contains image data
+            if (response.data && response.data.imageData) {
+                // Convert ImageData from byte array to Base64 format
+            const background =response.data;
+            const url = `data:image/jpeg;base64,${background.imageDataBase64}`;
+            return url;
+            }
+        } catch (error) {
+            console.error("Error fetching background image:", error);
+            return myImage;  // Return a default image in case of error
+        }
     };
+    
+      const [backgroundUrls, setBackgroundUrls] = useState({});
 
+        useEffect(() => {
+            const getBackgrounds = async () => {
+                const urls = {};
+                for (const board of [...boards, ...starredBoards]) {
+                    const url = await getBackgroundImageUrl(board);
+                    urls[board.boardId] = url;  // Store the URL for each board
+                }
+                setBackgroundUrls(urls);
+            };
+    
+            getBackgrounds();
+        }, [boards, starredBoards]);
+
+        
+    const [activeBackgrounds, setActiveBackgrounds] = useState([]);
+    const [activeBackgroundUrls, setActiveBackgroundUrls] = useState({});
+  
+    const getActiveBackgrounds = async () => {
+        try {
+            const backgroundsResponse = await getData('http://localhost:5157/backend/background/GetActiveBackgrounds');
+            const backgroundsData = backgroundsResponse.data;
+
+            if (backgroundsData && Array.isArray(backgroundsData) && backgroundsData.length > 0) {
+                setActiveBackgrounds(backgroundsData);
+
+                // Create URLs for background images using backgroundId
+                const urls = {};
+                for (let background of backgroundsData) {
+                    const url = `data:image/jpeg;base64,${background.imageDataBase64}`;
+                    urls[background.backgroundId] = url; // Use backgroundId instead of id
+                }
+                setActiveBackgroundUrls(urls);
+            } else {
+                console.error("No active backgrounds found.");
+            }
+        } catch (error) {
+            console.error("Error fetching backgrounds:", error.message);
+        }
+    };
 
     
     const handleDeleteWorkspace = async(workspaceId) =>{
@@ -398,34 +464,39 @@ export const WorkspaceProvider = ({ children }) => {
         const [sentInvites, setSentInvites] = useState([]);
         const [inviteeDetails, setInviteeDetails] = useState([]);
         const [workspaceTitles, setWorkspaceTitles] = useState([]);
-    
         const getSentInvites = async () => {
             try {
                 const response = await getDataWithId('http://localhost:5157/backend/invite/GetInvitesByWorkspace?workspaceId', WorkspaceId);
-                const data = response.data;
+                let data = response.data;
                 //console.log("Sent Invites fetched: ", data);
-    
-                const pendingInvites = data.filter(invite =>invite.inviteStatus === "Pending");
-                //console.log("Pending invites: ",pendingInvites);
+        
+                // filtrimi i ftesave pending
+                let pendingInvites = data.filter(invite => invite.inviteStatus === "Pending");
+                //console.log("Pending invites: ", pendingInvites);
+        
+                // sortimi i ftesave ne baze te dates (recent lart)
+                pendingInvites = pendingInvites.sort((a, b) => new Date(b.dateSent) - new Date(a.dateSent));
                 setSentInvites(pendingInvites);
-    
-                // Fetch inviter details for each invite
+        
+                //merri informatat e secilit te ftuar invitee
                 const invited = await Promise.all(pendingInvites.map(async invite => {
                     const responseInvitee = await getDataWithId('http://localhost:5157/backend/user/adminUserID?userId', invite.inviteeId);
                     return responseInvitee.data;
                 }));
+        
+                //merri titujt e secilit workspace
                 const workspaceTitlesData = await Promise.all(pendingInvites.map(async invite => {
                     const responseWorkspace = await getDataWithId('http://localhost:5157/backend/workspace/getWorkspaceById?workspaceId', invite.workspaceId);
-                    return responseWorkspace.data.title; // Assuming the workspace object has a 'title' field
+                    return responseWorkspace.data.title; 
                 }));
-    
+        
                 setInviteeDetails(invited);
                 setWorkspaceTitles(workspaceTitlesData);
             } catch (error) {
                 console.log("Error fetching invites: ", error.message);
             }
         };
-
+        
         
     
         useEffect(() => {
@@ -528,6 +599,8 @@ export const WorkspaceProvider = ({ children }) => {
         },[listId, userId ,mainContext.userInfo.accessToken]);
 
 
+        const countClosedBoards = closedBoards.length;
+        const ALLBoardsCount = boardCount+countClosedBoards;
 
     return (
         <WorkspaceContext.Provider value={{
@@ -606,7 +679,6 @@ export const WorkspaceProvider = ({ children }) => {
             checklists,
             checklistItems,
             setChecklistItems,
-            setChecklists,
             board,
             setBoard,
             lists,
@@ -619,6 +691,15 @@ export const WorkspaceProvider = ({ children }) => {
             setIsLoading,
             getWorkspaces,
             setList,
+            backgroundUrls,
+            activeBackgrounds,
+            activeBackgroundUrls,
+            getActiveBackgrounds,
+            fetchClosedBoards,
+            closedBoards,
+            setClosedBoards, 
+            countClosedBoards,
+            ALLBoardsCount
         }}>
             {children}
         </WorkspaceContext.Provider>

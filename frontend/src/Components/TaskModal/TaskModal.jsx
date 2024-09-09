@@ -79,7 +79,6 @@ const TaskModal = () => {
         isEditLabelModalOpen,
         toggleEditLabelModal,
         selectedLabel,
-        setIsChecklistModalOpen
     };
     
 

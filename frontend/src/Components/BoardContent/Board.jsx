@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import List from "../List/List";
 import { WorkspaceContext } from "../Side/WorkspaceContext";
 import ListForm from "../List/ListForm.jsx";
 import {DndContext, KeyboardSensor, PointerSensor, closestCenter, closestCorners, useSensor, useSensors} from "@dnd-kit/core";
@@ -26,6 +27,25 @@ const Board = () => {
   const [activeId, setActiveId] = useState(null);
   const [activeTask, setActiveTask] = useState(null);
   const [activeList, setActiveList] = useState(null);
+  const [backgroundUrl, setBackgroundUrl] = useState('');
+
+  useEffect(() => {
+    const fetchBackground = async () => {
+      if (workspaceContext.board && board.backgroundId) {
+        try {
+          const imageUrl = await workspaceContext.getBackgroundImageUrl(board);
+          setBackgroundUrl(imageUrl);  // Set the background URL after fetching
+        } catch (error) {
+          console.error("Error fetching background image:", error);
+        }
+      } else {
+        console.warn("Board or backgroundId is not defined.");
+        setBackgroundUrl('');  // Reset the background URL if board or backgroundId is undefined
+      }
+    };
+
+    fetchBackground();
+  }, [workspaceContext.board, boardId]);
 
   const [selectedListId, setSelectedListId] = useState(null);
   const [ProfilePicIsOpen, setProfilePicIsOpen] = useState(false);
@@ -318,7 +338,10 @@ const getLists = async () => {
   }
   return (
     <BoardContext.Provider value={contextValue}>
-      <div className="max-w-full max-h-screen h-screen">
+      <div className="max-w-full max-h-screen h-screen" style={{backgroundImage: `url(${backgroundUrl})`,backgroundSize: 'cover',
+                                                                backgroundPosition: 'center',
+                                                              }}
+      >
       <header className="flex items-center justify-between w-full p-4 bg-white bg-opacity-30 text-white shadow-lg">
                 <div className="flex items-center">
                     <h2 className="text-xl font-semibold text-slate-900 mr-4">{workspaceContext.board.title}</h2>

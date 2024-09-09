@@ -10,11 +10,7 @@ const TaskForm = ({ listId, onClose }) => {
     const [taskTitle, setTaskTitle] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
 
-    const handleTitleChange = (e) => {
-        setTaskTitle(e.target.value);
-    };
-
-    const handleCreateTask = async (e) => {
+    const handleSubmit = async (e) =>{
         e.preventDefault();
         if (taskTitle.length < 2 || taskTitle.length > 20) {
             setErrorMessage("Task title must be between 2 and 20 characters.");
@@ -75,5 +71,4 @@ const TaskForm = ({ listId, onClose }) => {
         </div>
     );
 };
-
 export default TaskForm;
