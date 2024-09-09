@@ -1,15 +1,27 @@
 import React, { useState, useContext } from "react";
 import { WorkspaceContext } from "../Side/WorkspaceContext";
 import { BiDotsHorizontal } from "react-icons/bi";
+import { BoardContext } from "../BoardContent/Board";
+import { deleteData } from "../../Services/FetchService";
 
 const ListDropdown = ({ listId, onAddCardClick }) => {
-  const { handleDeleteList } = useContext(WorkspaceContext);
   const [isOpen, setIsOpen] = useState(false);
+  const boardContext = useContext(BoardContext);
+  const handleDeleteList = async (listId) =>{
+    try {
+        const response = await deleteData('http://localhost:5157/backend/list/DeleteList',{listId : listId});
+        boardContext.getLists();
+    } catch (error) {
+        console.error('Error deleting list:', error.message);
+        boardContext.getLists();
+        boardContext.getTasks();
+    }
+  };
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
-
+  boardContext.getLists();
   const closeDropdown = () => {
     setIsOpen(false);
   };
@@ -20,7 +32,7 @@ const ListDropdown = ({ listId, onAddCardClick }) => {
         className="hover:bg-gray-300 w-8 h-8 rounded-md grid place-content-center cursor-pointer"
         onClick={toggleDropdown}
       >
-        <BiDotsHorizontal className="w-5 h-5" />
+        <BiDotsHorizontal className="w-5 h-5 text-white" />
       </div>
 
       {isOpen && (

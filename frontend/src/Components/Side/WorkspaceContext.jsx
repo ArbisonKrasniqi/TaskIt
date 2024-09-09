@@ -79,7 +79,7 @@ export const WorkspaceProvider = ({ children }) => {
             try{
                 if(workspace){
                     const activityResponse = await getDataWithId("http://localhost:5157/GetWorkspaceActivityByWorkspaceId?WorkspaceId", WorkspaceId);
-                    console.log("Te dhenat e aktivitetit ",activityResponse.data)
+                    //console.log("Te dhenat e aktivitetit ",activityResponse.data)
                     const activityData = activityResponse.data;
                     if (activityData && Array.isArray(activityData) && activityData.length > 0) {
                         setActivities(activityData);
@@ -95,7 +95,7 @@ export const WorkspaceProvider = ({ children }) => {
             }
         };
         getActivities();
-        console.log("Activity fetched ",activities);
+        //console.log("Activity fetched ",activities);
     },[workspace]);
     
     useEffect(() => {
@@ -124,11 +124,11 @@ export const WorkspaceProvider = ({ children }) => {
             const ownerId = workspace.ownerId;
             if (userId === ownerId) {
                 setRoli("Owner");
-                console.log("Set as owner with id", ownerId);
-                console.log("WORKSPACE OWNER IS: "+workspace.ownerId)
+                //console.log("Set as owner with id", ownerId);
+                //console.log("WORKSPACE OWNER IS: "+workspace.ownerId)
             } else {
                 setRoli("Member");
-                console.log("Set as member with id", userId);
+                //console.log("Set as member with id", userId);
             }
         }
     }, [WorkspaceId, userId, workspace, mainContext.userInfo.accessToken]);
@@ -183,7 +183,7 @@ export const WorkspaceProvider = ({ children }) => {
                         return responseMemberDetail.data;
                     }))
                     setMemberDetails(memberDetail);
-                    console.log('Members fetched: ',members);
+                    //console.log('Members fetched: ',members);
                 }                    
             } catch (error) {
                 console.error("Error fetching members: ",error.message);
@@ -403,10 +403,10 @@ export const WorkspaceProvider = ({ children }) => {
             try {
                 const response = await getDataWithId('http://localhost:5157/backend/invite/GetInvitesByWorkspace?workspaceId', WorkspaceId);
                 const data = response.data;
-                console.log("Sent Invites fetched: ", data);
+                //console.log("Sent Invites fetched: ", data);
     
                 const pendingInvites = data.filter(invite =>invite.inviteStatus === "Pending");
-                console.log("Pending invites: ",pendingInvites);
+                //console.log("Pending invites: ",pendingInvites);
                 setSentInvites(pendingInvites);
     
                 // Fetch inviter details for each invite
@@ -535,7 +535,7 @@ export const WorkspaceProvider = ({ children }) => {
                     console.error("There has been an error fetching lists")
                 }
             };
-            getLists();
+            //getLists();
         },[]
         //boardId,mainContext.userInfo.accessToken, WorkspaceId
         );
@@ -556,16 +556,6 @@ export const WorkspaceProvider = ({ children }) => {
             };
             getList();
         },[listId, userId ,mainContext.userInfo.accessToken]);
-
-        const handleDeleteList = async(listId) =>{
-            try {
-                const response = await deleteData('http://localhost:5157/backend/list/DeleteList',{listId : listId});
-                console.log("Deleting list");
-                // navigate('main/workspaces');
-            } catch (error) {
-                console.error('Error deleting list:', error.message);
-            }
-        };
 
 
 
@@ -659,7 +649,6 @@ export const WorkspaceProvider = ({ children }) => {
             setIsLoading,
             getWorkspaces,
             setList,
-            handleDeleteList
         }}>
             {children}
         </WorkspaceContext.Provider>

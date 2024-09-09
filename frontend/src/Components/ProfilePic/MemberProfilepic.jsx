@@ -17,14 +17,13 @@ const MemberProfilePic = () => {
         document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
         navigate(`/login`);
     };
-
-    console.log("member details : ", memberDetails);
     return (
         <div className="relative">
-            {memberDetails.map(member => (
+            {memberDetails.map((member, key) => (
             <button
                 className="flex items-center focus:outline-none relative mr-2"
-                onClick={toggleDropdownProfilePic}
+                onClick={(e) => {e.stopPropagation(); toggleDropdownProfilePic();}}
+                key={key}
             >
                 <div className="flex items-center">
                     {/* {memberDetails.map(member => ( */}
