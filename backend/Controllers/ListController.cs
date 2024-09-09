@@ -152,7 +152,7 @@ public class ListController : ControllerBase
                         WorkspaceId = workspace.WorkspaceId,
                         UserId = userId,
                         ActionType = "Updated",
-                        EntityName = "list "+list.Title,
+                        EntityName = "list "+list.Title+" in board "+board.Title,
                         ActionDate = DateTime.Now
                     };
                     
@@ -217,7 +217,7 @@ public class ListController : ControllerBase
                     WorkspaceId = board.WorkspaceId,
                     UserId = userId,
                     ActionType = "Deleted",
-                    EntityName = "list "+list.Title,
+                    EntityName = "list "+list.Title+" in board "+board.Title,
                     ActionDate = DateTime.Now
                 };
                     
@@ -284,7 +284,7 @@ public class ListController : ControllerBase
                     WorkspaceId = workspaceId,
                     UserId = userId,
                     ActionType = "Created",
-                    EntityName = "list "+listDto.Title,
+                    EntityName = "list "+listDto.Title+" in board "+board.Title,
                     ActionDate = DateTime.Now
                 };
                     

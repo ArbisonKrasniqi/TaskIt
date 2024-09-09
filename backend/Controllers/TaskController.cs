@@ -200,7 +200,7 @@ public class  TaskController : ControllerBase{
                     WorkspaceId = workspaceId,
                     UserId = userId,
                     ActionType = "Updated",
-                    EntityName = "task "+taskDto.Title,
+                    EntityName = "task "+taskDto.Title+" in list "+list.Title+" in board "+board.Title,
                     ActionDate = DateTime.Now
                 };
                     
@@ -259,7 +259,7 @@ public class  TaskController : ControllerBase{
                         WorkspaceId = board.WorkspaceId,
                         UserId = userId,
                         ActionType = "Deleted",
-                        EntityName = "task "+task.Title,
+                        EntityName = "task "+task.Title+" in list "+list.Title+" in board "+board.Title,
                         ActionDate = DateTime.Now
                     };
                     
@@ -330,7 +330,7 @@ public class  TaskController : ControllerBase{
                     WorkspaceId = workspaceId,
                     UserId = userId,
                     ActionType = "Created",
-                    EntityName = "task "+taskDto.Title,
+                    EntityName = "task "+taskDto.Title+" in list "+list.Title+" in board "+board.Title,
                     ActionDate = DateTime.Now
                 };
                     
