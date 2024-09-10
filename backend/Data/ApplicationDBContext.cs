@@ -85,13 +85,8 @@ public class ApplicationDBContext : IdentityDbContext<User>
             .WithMany(t => t.TaskLabels)
             .HasForeignKey(tl => tl.TaskId)
             .OnDelete(DeleteBehavior.NoAction);
-
-        // Configure TaskLabel and Label relationship
-        builder.Entity<TaskLabel>()
-            .HasOne(tl => tl.Label)
-            .WithMany()
-            .HasForeignKey(tl => tl.LabelId)
-            .OnDelete(DeleteBehavior.NoAction);
+        
+            
     }
     
     
