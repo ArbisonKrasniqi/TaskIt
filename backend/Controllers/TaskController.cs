@@ -27,10 +27,11 @@ public class  TaskController : ControllerBase{
     private readonly ILabelRepository _labelRepo;
     private readonly ITaskMemberRepository _taskMemberRepo;
     private readonly IMapper _mapper;
+    private readonly ITaskActivityRepository _taskActivityRepo;
     private readonly IWorkspaceRepository _workspaceRepo;
     private readonly IWorkspaceActivityRepository _workspaceActivityRepo;
     
-    public TaskController(IWorkspaceRepository workspaceRepo, IMapper mapper, ITaskMemberRepository taskMemberRepo, ITaskRepository taskRepo, IListRepository listRepo, IBoardRepository boardRepo, IMembersRepository membersRepo, IUserRepository userRepo, ILabelRepository labelRepo, IWorkspaceActivityRepository workspaceActivityRepo)
+    public TaskController(ITaskActivityRepository taskActivityRepo, IWorkspaceRepository workspaceRepo, IMapper mapper, ITaskMemberRepository taskMemberRepo, ITaskRepository taskRepo, IListRepository listRepo, IBoardRepository boardRepo, IMembersRepository membersRepo, IUserRepository userRepo, ILabelRepository labelRepo, IWorkspaceActivityRepository workspaceActivityRepo)
     {
         _mapper = mapper;
         _taskMemberRepo = taskMemberRepo;
@@ -42,6 +43,7 @@ public class  TaskController : ControllerBase{
         _labelRepo = labelRepo;
         _workspaceRepo = workspaceRepo;
         _workspaceActivityRepo = workspaceActivityRepo;
+        _taskActivityRepo = taskActivityRepo;
     }
 
     [Authorize(AuthenticationSchemes = "Bearer")]
@@ -249,17 +251,31 @@ public class  TaskController : ControllerBase{
                 {
                     return NotFound("Task not found");
                 }
-                var workspaceActivity = new WorkspaceActivity
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                var taskActivity = new TaskActivity
                 {
-                    WorkspaceId = workspaceId,
+                    TaskId = taskModel.TaskId,
                     UserId = userId,
                     ActionType = "Updated",
-                    EntityName = "task "+taskDto.Title+" in list "+list.Title+" in board "+board.Title,
+                    EntityName = "task " + taskDto.Title + " in list " + list.Title + " in board " + board.Title,
                     ActionDate = DateTime.Now
                 };
-                    
-                await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
 
+                await _taskActivityRepo.CreateTaskActivityAsync(taskActivity);
 
                 var taskLabels = await _labelRepo.GetLabelsByTaskId(taskModel.TaskId);
                 return Ok(taskModel.ToTaskDtoLabels(taskLabels));
@@ -307,18 +323,6 @@ public class  TaskController : ControllerBase{
                 
                 if (isMember || userTokenRole == "Admin")
                 {
-                      
-                    var workspaceActivity = new WorkspaceActivity
-                    {
-                        WorkspaceId = board.WorkspaceId,
-                        UserId = userId,
-                        ActionType = "Deleted",
-                        EntityName = "task "+task.Title+" in list "+list.Title+" in board "+board.Title,
-                        ActionDate = DateTime.Now
-                    };
-                    
-                    await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
-
                     var taskModel = await _taskRepo.DeleteTaskAsync(taskIdDto.TaskId);
                     if (taskModel == null)
                     {
@@ -378,18 +382,31 @@ public class  TaskController : ControllerBase{
                 await _taskRepo.CreateTaskAsync(taskModel);
                 var labels = new List<Models.Label>();
                 var taskMembers = new List<TaskMemberDto>();
-                
-                var workspaceActivity = new WorkspaceActivity
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                var taskActivity = new TaskActivity
                 {
-                    WorkspaceId = workspaceId,
+                    TaskId = taskModel.TaskId,
                     UserId = userId,
                     ActionType = "Created",
-                    EntityName = "task "+taskDto.Title+" in list "+list.Title+" in board "+board.Title,
+                    EntityName = "task " + taskDto.Title + " in list " + list.Title + " in board " + board.Title,
                     ActionDate = DateTime.Now
                 };
-                    
-                await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
-                
+
+                await _taskActivityRepo.CreateTaskActivityAsync(taskActivity);
                 
                 return CreatedAtAction(nameof(GetTaskById), new { id = taskModel.TaskId }, taskModel.ToTaskDto(null,null));
             }

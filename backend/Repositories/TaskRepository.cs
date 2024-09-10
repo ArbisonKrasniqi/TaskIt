@@ -12,17 +12,10 @@ namespace backend.Repositories;
 public class TaskRepository : ITaskRepository
 {
     private readonly ApplicationDBContext _context;
-    private readonly IChecklistRepository _checklistRepo;
-    private readonly ITaskMemberRepository _taskMemberRepo;
-    private readonly ITaskLabelRepository _taskLabelRepo;
-    private readonly ICommentRepository _commentRepo;
-    public TaskRepository(ApplicationDBContext context, IChecklistRepository checklistRepo, ITaskMemberRepository taskMemberRepo, ITaskLabelRepository taskLabelRepo, ICommentRepository commentRepo)
+
+    public TaskRepository(ApplicationDBContext context)
     {
         _context = context;
-        _checklistRepo = checklistRepo;
-        _taskMemberRepo = taskMemberRepo;
-        _taskLabelRepo = taskLabelRepo;
-        _commentRepo = commentRepo;
     }
 
     public async Task<List<Tasks>> GetAllTaskAsync()
@@ -111,15 +104,6 @@ public async Task<Tasks> CreateTaskAsync(Tasks taskModel){
         var tasks = await _context.Tasks.Where(x => x.ListId == ListId).ToListAsync();
         if (tasks.Count == 0){
             return null;
-        }
-
-        foreach (var task in tasks)
-        {
-            
-            await _checklistRepo.DeleteChecklistByTaskIdAsync(task.TaskId);
-            await _taskMemberRepo.DeleteTaskMembersByTaskIdAsync(task.TaskId);
-            await _taskLabelRepo.DeleteTaskLabelsByTaskId(task.TaskId);
-            await _commentRepo.DeleteCommentsByTaskIdAsync(task.TaskId);
         }
         _context.Tasks.RemoveRange(tasks);
         await _context.SaveChangesAsync();

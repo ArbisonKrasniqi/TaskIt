@@ -33,6 +33,7 @@ public class ApplicationDBContext : IdentityDbContext<User>
     public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     public DbSet<TaskLabel> TaskLabel { get; set; }
+    public DbSet<TaskActivity> TaskActivity { get; set; }
 
     //User roles
     protected override void OnModelCreating(ModelBuilder builder)

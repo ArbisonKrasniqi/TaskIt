@@ -14,6 +14,5 @@ public interface ICommentRepository
     Task<List<CommentDTO>> GetCommentsByUserIdAdminAsync(string userId);
     Task<Comment?> DeleteCommentAsync(int commentId);
     Task<Comment> UpdateCommentAsync(UpdateCommentDTO updateCommentDto);
-    Task<List<Comment>> DeleteCommentsByTaskIdAsync(int taskId);
-
+    
 }

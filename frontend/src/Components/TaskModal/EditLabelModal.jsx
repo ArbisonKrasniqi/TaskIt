@@ -1,26 +1,66 @@
-import React, { useRef, useEffect, useContext } from 'react';
+import React, { useRef, useEffect, useContext, useState } from 'react';
 import { TaskModalsContext } from './TaskModal';
 import { FaAngleLeft } from "react-icons/fa6";
+import { deleteData, putData } from '../../Services/FetchService';
+import { useParams } from 'react-router-dom';
+
 
 function EditLabelModal() {
-    const { toggleEditLabelModal, toggleLabelsModal, selectedLabel } = useContext(TaskModalsContext);
+    const { toggleEditLabelModal, toggleLabelsModal, selectedLabel, setIsLabelModalOpen, setAssignedLabels } = useContext(TaskModalsContext);
     const inputRef = useRef(null);
-    const colors = [
-        { id: 1, name: "Deep Blue", color: "bg-blue-900" },
-        { id: 2, name: "Soft Yellow", color: "bg-yellow-300" },
-        { id: 3, name: "Muted Red", color: "bg-red-500" },
-        { id: 4, name: "Teal Green", color: "bg-teal-500" },
-        { id: 5, name: "Vibrant Orange", color: "bg-orange-500" },
-        { id: 6, name: "Subtle Purple", color: "bg-purple-400" },
-        { id: 7, name: "Warm Pink", color: "bg-pink-400" },
-        { id: 8, name: "Emerald Green", color: "bg-green-500" }
-    ];
+    const {taskId} = useParams();
+    const [labelName, setLabelName] = useState(selectedLabel ? selectedLabel.name : '');
 
     useEffect(() => {
         if (inputRef.current) {
             inputRef.current.focus();
         }
     }, []);
+
+    const handleSave = async () => {
+        try {
+            if (labelName) {
+                const updatedLabel = {
+                    labelId: selectedLabel.labelId,
+                    name: labelName
+                };
+
+                await putData('http://localhost:5157/backend/label/UpdateLabel', updatedLabel);
+            } else {
+                console.log("Name should be between 2 and 280 characters");
+                
+            }
+            toggleEditLabelModal();
+            setIsLabelModalOpen(true);
+            
+        } catch (error) {
+            console.error("Error updating label:", error);
+        }
+    };
+
+    const handleDelete = async () => {
+        try {
+            if (labelName) {
+                const updateLabel = {
+                    labelId: selectedLabel.labelId,
+                    name: ''  
+                };
+
+                await putData('http://localhost:5157/backend/label/UpdateLabel', updateLabel);
+
+                const labelData = {
+                    labelId: selectedLabel.labelId,
+                    taskId: taskId
+                }
+                await deleteData('http://localhost:5157/backend/taskLabel/RemoveLabelFromTask',labelData);
+                setAssignedLabels(prev => prev.filter(id => id !== selectedLabel.labelId));
+            }
+            toggleEditLabelModal();
+            setIsLabelModalOpen(true);
+        } catch (error) {
+            
+        }
+    };
 
     return (
         <div className="absolute inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
@@ -30,7 +70,7 @@ function EditLabelModal() {
                         onClick={toggleLabelsModal}>
                         <FaAngleLeft />
                     </button>
-                    <h2 className="text-sm font-semibold text-gray-400">Labels</h2>
+                    <h2 className="text-sm font-semibold text-gray-400">Edit Label</h2>
                     <button
                         className="text-gray-500 hover:bg-gray-800 w-6 h-6 rounded-full flex justify-center items-center"
                         onClick={toggleEditLabelModal}
@@ -43,28 +83,29 @@ function EditLabelModal() {
                 <input
                     type="text"
                     ref={inputRef}
-                    defaultValue={selectedLabel ? selectedLabel.name : ''}
+                    value={labelName}
+                    onChange={(e) => setLabelName(e.target.value)}
                     className="w-full pl-[5px] py-1 mb-4 bg-gray-900 border border-gray-700 rounded-sm text-white"
                 />
-                <h3 className='text-gray-400 text-sm font-semibold'>Select a color</h3>
-                <div className="flex flex-wrap gap-2 mb-4">
-                    {colors.map((color) => (
-                        <div
-                            key={color.id}
-                            className={`w-11 h-8 rounded-sm cursor-pointer ${color.color}`}
-                            title={color.name}
-                            onClick={() => console.log(`Selected color: ${color.name}`)}
-                        />
-                    ))}
+
+                {/* Show label color */}
+                <h3 className='text-gray-400 text-sm font-semibold'>Color</h3>
+                <div 
+                    className={`w-[100%] h-8 mb-4 rounded-sm`} 
+                    style={{ backgroundColor: selectedLabel.color }}>
                 </div>
 
                 <div className='flex justify-between'>
-                <button className='w-1/3 h-8 rounded-sm bg-blue-600 text-gray-900 font-semibold hover:bg-opacity-50'>
-                    Save
-                </button>
-                <button className='w-1/3 h-8 rounded-sm bg-red-600 bg-opacity-85 text-gray-900 font-semibold hover:bg-opacity-50'>
-                    Delete
-                </button>
+                    <button 
+                        onClick={handleSave} 
+                        className='w-1/3 h-8 rounded-sm bg-blue-600 text-gray-900 font-semibold hover:bg-opacity-50'>
+                        Save
+                    </button>
+                    <button 
+                        className='w-1/3 h-8 rounded-sm bg-red-600 bg-opacity-85 text-gray-900 font-semibold hover:bg-opacity-50'
+                        onClick={handleDelete}>
+                        Delete
+                    </button>
                 </div>
             </div>
         </div>

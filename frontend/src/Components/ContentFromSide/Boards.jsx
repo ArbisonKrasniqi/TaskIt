@@ -17,9 +17,9 @@ import { useNavigate, useParams } from "react-router-dom";
 const Boards = () =>{
     const { workspace,openClosedBoardsModal, showLimitModal, setShowLimitModal, 
         boardCount, setOpenClosedBoardsModal, boards, handleCreateBoard, openModal, 
-        setOpenModal, setOpenCloseModal, handleStarBoard, handleSortChange, setOpenSortModal,
-         openSortModal, selectedSort,hoveredBoardIndex, 
-         setHoveredBoardIndex, hoveredBoardSIndex, setHoveredBoardSIndex, roli, starredBoards, backgroundUrls, closedBoards, fetchClosedBoards, ALLBoardsCount} = useContext(WorkspaceContext);
+        setOpenModal, setOpenCloseModal, handleStarBoard, handleSortChange, setOpenSortModal, closedBoards, fetchClosedBoards, ALLBoardsCount,
+        openSortModal, selectedSort, getBackgroundImageUrl,hoveredBoardIndex, 
+        setHoveredBoardIndex, hoveredBoardSIndex, setHoveredBoardSIndex, roli, starredBoards} = useContext(WorkspaceContext);
 
          const [searchTerm, setSearchTerm] = useState('');
          // per me handle ndryshimet ne search input
@@ -109,7 +109,7 @@ return (
             border-solid border-gray-700 ${hoveredBoardSIndex===index ? ` bg-gray-400 opacity-50`: ''} `}>
 
             <div className="relative w-full h-full" style={{ 
-                   backgroundImage: `url(${backgroundUrls[board.boardId] || '../Side/background.jpg'})`,  
+                  backgroundImage: `url(${getBackgroundImageUrl(board)})`, 
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                 }}>
@@ -140,7 +140,7 @@ return (
               border-solid border-gray-700 ${hoveredBoardIndex===index ? ` bg-gray-400 opacity-50`: ''} `}>
 
               <div className="relative w-full h-full" style={{ 
-                    backgroundImage: `url(${backgroundUrls[board.boardId] || '../Side/background.jpg'})`, 
+                    backgroundImage: `url(${getBackgroundImageUrl(board)})`, 
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                   }}>

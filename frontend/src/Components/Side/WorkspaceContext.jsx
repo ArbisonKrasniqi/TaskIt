@@ -1,5 +1,5 @@
 import React, {createContext, useContext , useState, useEffect} from 'react';
-import { getDataWithId, deleteData, postData, getDataWithIds, getData } from '../../Services/FetchService';
+import { getDataWithId, deleteData, postData, getDataWithIds } from '../../Services/FetchService';
 import myImage from './background.jpg';
 import { MainContext } from '../../Pages/MainContext';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -331,70 +331,12 @@ export const WorkspaceProvider = ({ children }) => {
             console.error("Error starring/unstarring the board:", error.message);
         }
     };
-    
-    const getBackgroundImageUrl = async (board) => {
-        if (!board.backgroundId) {
-            console.error("Board does not have a valid backgroundId");
-            return myImage; // // Return a default image if backgroundId is not valid
-        }
-    
-        try {
-            const response = await getDataWithId('http://localhost:5157/backend/background/GetBackgroundByID?id', board.backgroundId);
-    
-            // Check if response contains image data
-            if (response.data && response.data.imageData) {
-                // Convert ImageData from byte array to Base64 format
-            const background =response.data;
-            const url = `data:image/jpeg;base64,${background.imageDataBase64}`;
-            return url;
-            }
-        } catch (error) {
-            console.error("Error fetching background image:", error);
-            return myImage;  // Return a default image in case of error
-        }
+    const getBackgroundImageUrl = (board) => {
+        // const background = backgrounds.find(b=>b.backgroundId === board.backgroundId);
+        // return background? background.imageUrl : '';
+        return myImage;
     };
-    
-      const [backgroundUrls, setBackgroundUrls] = useState({});
 
-        useEffect(() => {
-            const getBackgrounds = async () => {
-                const urls = {};
-                for (const board of [...boards, ...starredBoards]) {
-                    const url = await getBackgroundImageUrl(board);
-                    urls[board.boardId] = url;  // Store the URL for each board
-                }
-                setBackgroundUrls(urls);
-            };
-    
-            getBackgrounds();
-        }, [boards, starredBoards]);
-
-        
-    const [activeBackgrounds, setActiveBackgrounds] = useState([]);
-    const [activeBackgroundUrls, setActiveBackgroundUrls] = useState({});
-  
-    const getActiveBackgrounds = async () => {
-        try {
-            const backgroundsResponse = await getData('http://localhost:5157/backend/background/GetActiveBackgrounds');
-            const backgroundsData = backgroundsResponse.data;
-
-            if (backgroundsData && Array.isArray(backgroundsData) && backgroundsData.length > 0) {
-                setActiveBackgrounds(backgroundsData);
-
-                // Create URLs for background images using backgroundId
-                const urls = {};
-                for (let background of backgroundsData) {
-                    const url = `data:image/jpeg;base64,${background.imageDataBase64}`;
-                    urls[background.backgroundId] = url; // Use backgroundId instead of id
-                }
-                setActiveBackgroundUrls(urls);
-            } else {
-                console.error("No active backgrounds found.");
-            }
-        } catch (error) {
-            console.error("Error fetching backgrounds:", error.message);
-        }
-    };
 
     
     const handleDeleteWorkspace = async(workspaceId) =>{
@@ -470,6 +412,7 @@ export const WorkspaceProvider = ({ children }) => {
         const [sentInvites, setSentInvites] = useState([]);
         const [inviteeDetails, setInviteeDetails] = useState([]);
         const [workspaceTitles, setWorkspaceTitles] = useState([]);
+    
         const getSentInvites = async () => {
             try {
                 const response = await getDataWithId('http://localhost:5157/backend/invite/GetInvitesByWorkspace?workspaceId', WorkspaceId);
@@ -483,26 +426,24 @@ export const WorkspaceProvider = ({ children }) => {
                 // sortimi i ftesave ne baze te dates (recent lart)
                 pendingInvites = pendingInvites.sort((a, b) => new Date(b.dateSent) - new Date(a.dateSent));
                 setSentInvites(pendingInvites);
-        
-                //merri informatat e secilit te ftuar invitee
+    
+                // Fetch inviter details for each invite
                 const invited = await Promise.all(pendingInvites.map(async invite => {
                     const responseInvitee = await getDataWithId('http://localhost:5157/backend/user/adminUserID?userId', invite.inviteeId);
                     return responseInvitee.data;
                 }));
-        
-                //merri titujt e secilit workspace
                 const workspaceTitlesData = await Promise.all(pendingInvites.map(async invite => {
                     const responseWorkspace = await getDataWithId('http://localhost:5157/backend/workspace/getWorkspaceById?workspaceId', invite.workspaceId);
-                    return responseWorkspace.data.title; 
+                    return responseWorkspace.data.title; // Assuming the workspace object has a 'title' field
                 }));
-        
+    
                 setInviteeDetails(invited);
                 setWorkspaceTitles(workspaceTitlesData);
             } catch (error) {
                 console.log("Error fetching invites: ", error.message);
             }
         };
-        
+
         
     
         useEffect(() => {
@@ -546,41 +487,63 @@ export const WorkspaceProvider = ({ children }) => {
             getBoard();
         },[boardId, userId, mainContext.userInfo.accessToken]);
 
-            const getChecklistsByTask = async () => {
-                
-                try {
-                    if (taskId) {
-                        const response = await getDataWithId('http://localhost:5157/backend/checklist/GetChecklistByTaskId?taskId', taskId); //static for now
-                        const data = response.data;
-                        setChecklists(data);
-                        fetchChecklistItems(data);
-                    }
-                    
-                } catch (error) {
-                    console.error("Error fetching checklists: ",error.message);
-                    
+        const getChecklistsByTask = async () => {
+            try {
+              if (taskId) {
+                const response = await getDataWithId(
+                  'http://localhost:5157/backend/checklist/GetChecklistByTaskId?taskId',
+                  taskId
+                );
+                const data = response.data;
+                console.log('Fetched checklists:', data); // Log checklists data for debugging
+                setChecklists(data);
+          
+                // Fetch checklist items after setting checklists
+                if (Array.isArray(data)) {
+                  fetchChecklistItems(data);
+                } else {
+                  console.error("Invalid checklists data received.");
                 }
+              }
+            } catch (error) {
+              console.error("Error fetching checklists: ", error.message);
             }
-            useEffect(() => {
-                getChecklistsByTask();
-            },[WorkspaceId, workspaces, mainContext.userInfo.accessToken]);
-
-            const [checklistItems, setChecklistItems] = useState([]);
-
-            const fetchChecklistItems = async (checklists) => {
-                const items = {};
-                for (const checklist of checklists) {
-                    
-                  try {
-                    const response = await getDataWithId('http://localhost:5157/backend/checklistItems/GetChecklistItemByChecklistId?checklistId', checklist.checklistId);
-                    items[checklist.checklistId] = response.data; // Store items by checklist ID
-                    
-                  } catch (error) {
-                    console.error(`Error fetching items for checklist ${checklist.id}: `, error.message);
-                  }
-                }
-                setChecklistItems(items);
-              };
+          };
+          
+          useEffect(() => {
+            getChecklistsByTask();
+          }, [WorkspaceId, workspaces, mainContext.userInfo.accessToken, taskId]);
+          
+          const [checklistItems, setChecklistItems] = useState([]);
+          
+          const fetchChecklistItems = async (checklists) => {
+            const items = {};
+          
+            if (!Array.isArray(checklists)) {
+              console.error("Invalid checklists:", checklists);
+              return;
+            }
+          
+            for (const checklist of checklists) {
+              if (!checklist.checklistId) {
+                console.error("Invalid checklistId for checklist:", checklist);
+                continue;
+              }
+          
+              try {
+                const response = await getDataWithId(
+                  'http://localhost:5157/backend/checklistItems/GetChecklistItemByChecklistId?checklistId',
+                  checklist.checklistId
+                );
+                items[checklist.checklistId] = response.data; // Store items by checklist ID
+              } catch (error) {
+                console.error(`Error fetching items for checklist ${checklist.checklistId}: `, error.message);
+              }
+            }
+          
+            setChecklistItems(items);
+          };
+          
 
             
 
@@ -690,6 +653,7 @@ export const WorkspaceProvider = ({ children }) => {
             checklists,
             checklistItems,
             setChecklistItems,
+            setChecklists,
             board,
             setBoard,
             lists,
@@ -710,7 +674,8 @@ export const WorkspaceProvider = ({ children }) => {
             closedBoards,
             setClosedBoards, 
             countClosedBoards,
-            ALLBoardsCount
+            ALLBoardsCount,
+            fetchChecklistItems
         }}>
             {children}
         </WorkspaceContext.Provider>

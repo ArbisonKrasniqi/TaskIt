@@ -49,7 +49,7 @@ const Calendar = () => {
                                 <div className="text-sm text-left p-2 flex flex-col">
                                     {tasksForDate.length > 0 ? (
                                         tasksForDate.map((task, i) => (
-                                            <p key={i}  className="truncate text-black">{task.taskTitle}</p>
+                                            <p key={i}  className="truncate">{task.taskTitle}</p>
                                         ))
                                     ) : (
                                         <p className="truncate">No tasks</p>

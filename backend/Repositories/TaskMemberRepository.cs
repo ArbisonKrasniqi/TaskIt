@@ -150,16 +150,6 @@ public class TaskMemberRepository : ITaskMemberRepository
 
         return taskMemberModel;
     }
-    
-    //DELETE TASK MEMBERS BY TASK ID
-    public async Task<List<TaskMember>> DeleteTaskMembersByTaskIdAsync(int taskId)
-    {
-        var taskMembers = await _context.TaskMember.Where(tm => tm.TaskId == taskId).ToListAsync();
-        _context.TaskMember.RemoveRange(taskMembers);
-        await _context.SaveChangesAsync();
-        return taskMembers;
-    }
-    
 
     //To check if user is already a member in the specific task
     public async Task<bool> IsATaskMember(string userId, int taskId)
