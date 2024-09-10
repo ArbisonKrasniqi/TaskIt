@@ -27,8 +27,10 @@ public class  TaskController : ControllerBase{
     private readonly ILabelRepository _labelRepo;
     private readonly ITaskMemberRepository _taskMemberRepo;
     private readonly IMapper _mapper;
+
+    private readonly ITaskActivityRepository _taskActivityRepo;
     
-    public TaskController(IMapper mapper, ITaskMemberRepository taskMemberRepo, ITaskRepository taskRepo, IListRepository listRepo, IBoardRepository boardRepo, IMembersRepository membersRepo, IUserRepository userRepo, ILabelRepository labelRepo)
+    public TaskController(IMapper mapper, ITaskMemberRepository taskMemberRepo, ITaskRepository taskRepo, IListRepository listRepo, IBoardRepository boardRepo, IMembersRepository membersRepo, IUserRepository userRepo, ILabelRepository labelRepo, ITaskActivityRepository taskActivityRepo)
     {
         _mapper = mapper;
         _taskMemberRepo = taskMemberRepo;
@@ -38,6 +40,7 @@ public class  TaskController : ControllerBase{
         _membersRepo = membersRepo;
         _userRepo = userRepo;
         _labelRepo = labelRepo;
+        _taskActivityRepo = taskActivityRepo;
     }
 
     [Authorize(AuthenticationSchemes = "Bearer")]
@@ -194,6 +197,30 @@ public class  TaskController : ControllerBase{
                     return NotFound("Task not found");
                 }
                 
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                var taskActivity = new TaskActivity
+                {
+                    TaskId = taskModel.TaskId,
+                    UserId = userId,
+                    ActionType = "Updated",
+                    EntityName = "task " + taskDto.Title + " in list " + list.Title + " in board " + board.Title,
+                    ActionDate = DateTime.Now
+                };
+
+                await _taskActivityRepo.CreateTaskActivityAsync(taskActivity);
 
                 var taskLabels = await _labelRepo.GetLabelsByTaskId(taskModel.TaskId);
                 return Ok(taskModel.ToTaskDtoLabels(taskLabels));
@@ -300,6 +327,32 @@ public class  TaskController : ControllerBase{
                 await _taskRepo.CreateTaskAsync(taskModel);
                 var labels = new List<Models.Label>();
                 var taskMembers = new List<TaskMemberDto>();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                var taskActivity = new TaskActivity
+                {
+                    TaskId = taskModel.TaskId,
+                    UserId = userId,
+                    ActionType = "Created",
+                    EntityName = "task " + taskDto.Title + " in list " + list.Title + " in board " + board.Title,
+                    ActionDate = DateTime.Now
+                };
+
+                await _taskActivityRepo.CreateTaskActivityAsync(taskActivity);
+                
                 return CreatedAtAction(nameof(GetTaskById), new { id = taskModel.TaskId }, taskModel.ToTaskDto(labels,taskMembers));
             }
             return StatusCode(401, "You are not authorized!");

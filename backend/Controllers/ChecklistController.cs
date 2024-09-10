@@ -23,9 +23,10 @@ public class ChecklistController : ControllerBase
     private readonly IMapper _mapper;
     private readonly IUserRepository _userRepo;
     private readonly IWorkspaceRepository _workspaceRepo;
+    private readonly ITaskActivityRepository _taskActivityRepo;
 
     public ChecklistController(IChecklistRepository checklistRepo, ITaskRepository taskRepo,
-        IListRepository listRepo,IBoardRepository boardRepo, IMembersRepository membersRepo,IMapper mapper, IUserRepository userRepo, IWorkspaceRepository workspaceRepo)
+        IListRepository listRepo,IBoardRepository boardRepo, IMembersRepository membersRepo,IMapper mapper, IUserRepository userRepo, IWorkspaceRepository workspaceRepo, ITaskActivityRepository taskActivityRepo)
     {
         _checklistRepo = checklistRepo;
         _taskRepo = taskRepo;
@@ -35,6 +36,7 @@ public class ChecklistController : ControllerBase
         _mapper = mapper;
         _userRepo = userRepo;
         _workspaceRepo = workspaceRepo;
+        _taskActivityRepo = taskActivityRepo;
     }
 
     [Authorize(AuthenticationSchemes = "Bearer")]
@@ -167,6 +169,38 @@ public class ChecklistController : ControllerBase
             {
                 var checklistModel = _mapper.Map<Checklist>(checklistDto);
                 await _checklistRepo.CreateChecklistAsync(checklistModel);
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                var taskActivity = new TaskActivity
+                {
+                    TaskId = task.TaskId,
+                    UserId = userId,
+                    ActionType = "Created",
+                    EntityName = "checklist "+checklistDto.Title+" in task " + task.Title + " in list " + list.Title + " in board " + board.Title,
+                    ActionDate = DateTime.Now
+                };
+
+                await _taskActivityRepo.CreateTaskActivityAsync(taskActivity);
+                
+                
+                
+                
                 return CreatedAtAction(nameof(GetChecklistById), new { id = checklistModel.ChecklistId },
                     _mapper.Map<ChecklistDTO>(checklistModel));
             }
@@ -230,6 +264,35 @@ public class ChecklistController : ControllerBase
                 {
                     return NotFound("Checklist not found");
                 }
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                var taskActivity = new TaskActivity
+                {
+                    TaskId = task.TaskId,
+                    UserId = userId,
+                    ActionType = "Updated",
+                    EntityName = "checklist "+checklist.Title+" in task " + task.Title + " in list " + list.Title + " in board " + board.Title,
+                    ActionDate = DateTime.Now
+                };
+
+                await _taskActivityRepo.CreateTaskActivityAsync(taskActivity);
 
                 var checklistDto = _mapper.Map<ChecklistDTO>(checklistModel);
                 return Ok(checklistDto);
@@ -296,6 +359,37 @@ public class ChecklistController : ControllerBase
             
             if (isMember || userTokenRole == "Admin")
             {
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                var taskActivity = new TaskActivity
+                {
+                    TaskId = task.TaskId,
+                    UserId = userId,
+                    ActionType = "Deleted",
+                    EntityName = "checklist "+checklist.Title+" in task " + task.Title + " in list " + list.Title + " in board " + board.Title,
+                    ActionDate = DateTime.Now
+                };
+
+                await _taskActivityRepo.CreateTaskActivityAsync(taskActivity);
+                
                 var checklistModel = await _checklistRepo.DeleteChecklistAsync(checklistIdDto.ChecklistId);
                 return Ok(checklistModel);
             }

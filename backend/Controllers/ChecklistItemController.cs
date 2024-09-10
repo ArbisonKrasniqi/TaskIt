@@ -23,10 +23,11 @@ public class ChecklistItemController : ControllerBase
     private readonly IMapper _mapper;
     private readonly IWorkspaceRepository _workspaceRepo;
     private readonly IUserRepository _userRepo;
+    private readonly ITaskActivityRepository _taskActivityRepo;
 
     public ChecklistItemController(IChecklistItemRepository checklistItemRepo, IChecklistRepository checklistRepo,
         ITaskRepository taskRepo,
-        IListRepository listRepo, IBoardRepository boardRepo, IMembersRepository membersRepo, IMapper mapper, IWorkspaceRepository workspaceRepo, IUserRepository userRepo)
+        IListRepository listRepo, IBoardRepository boardRepo, IMembersRepository membersRepo, IMapper mapper, IWorkspaceRepository workspaceRepo, IUserRepository userRepo, ITaskActivityRepository taskActivityRepo)
     {
         _checklistItemRepo = checklistItemRepo;
         _checklistRepo = checklistRepo;
@@ -37,6 +38,7 @@ public class ChecklistItemController : ControllerBase
         _mapper = mapper;
         _workspaceRepo = workspaceRepo;
         _userRepo = userRepo;
+        _taskActivityRepo = taskActivityRepo;
     }
 
     [Authorize(AuthenticationSchemes = "Bearer")]
@@ -177,6 +179,38 @@ public class ChecklistItemController : ControllerBase
             {
                 var checklistItemModel = _mapper.Map<ChecklistItem>(checklistItemDto);
                 await _checklistItemRepo.CreateChecklistItemAsync(checklistItemModel);
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                var taskActivity = new TaskActivity
+                {
+                    TaskId = task.TaskId,
+                    UserId = userId,
+                    ActionType = "Created",
+                    EntityName = "checklistItem "+checklistItemDto.Content+" in checklist "+checklist.Title+" in task " + task.Title + " in list " + list.Title + " in board " + board.Title,
+                    ActionDate = DateTime.Now
+                };
+
+                await _taskActivityRepo.CreateTaskActivityAsync(taskActivity);
+                
                 return CreatedAtAction(nameof(GetChecklistItemById),new {id= checklistItemModel.ChecklistItemId},_mapper
                     .Map<ChecklistItemDTO>(checklistItemModel));
             }
@@ -244,6 +278,38 @@ public class ChecklistItemController : ControllerBase
                     return NotFound("ChecklistItem not found");
                 }
 
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                var taskActivity = new TaskActivity
+                {
+                    TaskId = task.TaskId,
+                    UserId = userId,
+                    ActionType = "Updated",
+                    EntityName = "checklistItem "+checklistItemDto.Content+" in checklist "+checklist.Title+" in task " + task.Title + " in list " + list.Title + " in board " + board.Title,
+                    ActionDate = DateTime.Now
+                };
+
+                await _taskActivityRepo.CreateTaskActivityAsync(taskActivity);
+                
                 var checklistItem = _mapper.Map<ChecklistItemDTO>(checklistItemModel);
                 return Ok(checklistItem);
             }
@@ -314,8 +380,40 @@ public class ChecklistItemController : ControllerBase
             var isMember = await _membersRepo.IsAMember(userId, workspace.WorkspaceId);
             if (isMember || userTokenRole == "Admin")
             {
-                var checklistItemModel =
-                    await _checklistItemRepo.DeleteChecklistItemAsync(checklistItemIdDto.ChecklistItemId);
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                var taskActivity = new TaskActivity
+                {
+                    TaskId = task.TaskId,
+                    UserId = userId,
+                    ActionType = "Deleted",
+                    EntityName = "checklistItem "+checklistItem.Content+" in checklist "+checklist.Title+" in task " + task.Title + " in list " + list.Title + " in board " + board.Title,
+                    ActionDate = DateTime.Now
+                };
+
+                await _taskActivityRepo.CreateTaskActivityAsync(taskActivity);
+                await _checklistItemRepo.DeleteChecklistItemAsync(checklistItemIdDto.ChecklistItemId);
                 return Ok("ChecklistItem deleted");
             }
             return StatusCode(401, "You are not authorized!");
@@ -474,9 +572,66 @@ public class ChecklistItemController : ControllerBase
                 return BadRequest("Wrong checklistItem Id");
             }
 
-            var checklistItem = await _checklistItemRepo.ChangeChecklistItemChecked(checklistItemId);
+            var checklistItemm = await _checklistItemRepo.GetChecklistItemByIdAsync(checklistItemId);
+            
+             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+            var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+            
+            var checklist = await _checklistRepo.GetChecklistByIdAsync(checklistItemm.ChecklistId);
+            if (checklist == null)
+            {
+                return NotFound("Checklist not found");
+            }
 
-            return Ok("ChecklistItem changed to: "+checklistItem.Checked);
+            var task = await _taskRepo.GetTaskByIdAsync(checklist.TaskId);
+            if (task == null)
+            {
+                return NotFound("Task not found");
+            }
+            
+            var list = await _listRepo.GetListByIdAsync(task.ListId);
+            if (list == null)
+            {
+                return NotFound("List not found");
+            }
+            var board = await _boardRepo.GetBoardByIdAsync(list.BoardId);
+            if (board == null)
+            {
+                return NotFound("Board not found");
+            }
+            
+            var workspace = await _workspaceRepo.GetWorkspaceByIdAsync(board.WorkspaceId);
+            if (workspace == null)
+            {
+                return NotFound("Workspace not found");
+            }
+            
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspace.WorkspaceId);
+            if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+            {
+                return StatusCode(403, "The board is closed");
+            }
+            
+            var isMember = await _membersRepo.IsAMember(userId, workspace.WorkspaceId);
+            if (isMember || userTokenRole == "Admin")
+            {
+                var checklistItem = await _checklistItemRepo.ChangeChecklistItemChecked(checklistItemId);
+
+                var taskActivity = new TaskActivity
+                {
+                    TaskId = task.TaskId,
+                    UserId = userId,
+                    ActionType = checklistItem.Checked ? "Checked" : "Unchecked",
+                    EntityName = "checklistItem "+checklistItem.Content+" in checklist "+checklist.Title+" in task " + task.Title + " in list " + list.Title + " in board " + board.Title,
+                    ActionDate = DateTime.Now
+                };
+
+                await _taskActivityRepo.CreateTaskActivityAsync(taskActivity);
+
+                return Ok("ChecklistItem changed to: "+checklistItem.Checked);
+            }
+            return StatusCode(401, "You are not authorized!");
+            
         }
         catch (Exception e)
         {
