@@ -1,4 +1,4 @@
-.contact{
+/* .contact{
     display: flex;
     justify-content: center;
     align-items: center;
@@ -8,7 +8,7 @@
 form{
     max-width: 550px;
     width: 100%;
-    /* background: linear-gradient(115deg, #1a202c, #2d3748); */
+     background: linear-gradient(115deg, #1a202c, #2d3748); 
     padding: 25px 25px 30px ;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, .5);
@@ -54,4 +54,4 @@ form button{
     font-weight: 500;
     color: white;
 }
-
+ */

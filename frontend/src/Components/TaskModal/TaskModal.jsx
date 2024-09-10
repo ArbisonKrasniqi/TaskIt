@@ -36,29 +36,28 @@ const TaskModal = () => {
     const [taskData, setTaskData] = useState([]);
     const [listData, setListData] = useState([]);
     const [assignedMembers, setAssignedMembers] = useState([]);
-
-
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+
+    const specificDate = new Date('0001-01-01T00:00:00Z');
 
   const openCalendar = () => {
     setIsCalendarOpen(true);
-    console.log("CLOSEEEEEE");
-    
   };
 
   const closeCalendar = () => {
     setIsCalendarOpen(!isCalendarOpen);
   };
 
+  const getTaskById = async () => {
+    try {
+        const response = await getDataWithId('http://localhost:5157/backend/task/GetTaskById?taskId',taskId);
+        setTaskData(response.data);
+    } catch (error) {
+        console.error("Error fetching task by id: ",error);
+    }
+};
     useEffect(() => {   
-        const getTaskById = async () => {
-            try {
-                const response = await getDataWithId('http://localhost:5157/backend/task/GetTaskById?taskId',taskId);
-                setTaskData(response.data);
-            } catch (error) {
-                console.error("Error fetching task by id: ",error);
-            }
-        };
+   
         if (taskId) {
             getTaskById();
         }
@@ -113,6 +112,13 @@ const TaskModal = () => {
     }, [taskId]);
 
 
+    const formatDateTime = (dateString) => {
+        const date = new Date(dateString);
+        const formattedDate = date.toLocaleDateString('en-US');
+        return `${formattedDate}`;
+    };
+
+
     const toggleMembersModal = () => {
         setIsMembersModalOpen(!isMembersModalOpen);
     };
@@ -160,20 +166,22 @@ const TaskModal = () => {
         setTaskData,
         assignedMembers,
         setAssignedMembers,
-        closeCalendar
+        closeCalendar,
+        getTaskById
     };
     
 
     return (
         <TaskModalsContext.Provider value={values}>
-            <div className="z-30 inset-0 flex justify-center transition-colors visible bg-black/20 h-screen">
-                <div className="absolute top-12 flex flex-col bg-gray-800 rounded-md w-[750px]">
+            <div className="z-30 inset-0 flex justify-center transition-colors visible bg-black">
+                <div className="absolute top-12 flex flex-col bg-gray-800 rounded-md w-[750px] h-[90%] overflow-y-auto scroll "
+                style={{ scrollbarWidth: 'thin', msOverflowStyle: 'none' }}>
                     <div className="flex flex-row items-center justify-between mx-2 mt-3 text-gray-400 h-[60px]">
                         <TbAlignBoxLeftTopFilled className="bg-gray-800 text-2xl ml-5"/>
                         <div className="flex flex-col w-[550px] -ml-16">
-                            <h2 className="w-[100%] font-bold text-xl">{taskData.title}</h2>
-                            <div className='flex '>
-                                <span className="text-xs"> in list {listData.title}</span>
+                            <h2 className="w-[100%] font-bold text-xl">{taskData.title} <span className='ml-[50px] text-sm font-semibold'>Due Date: <span className='text-red-400 text-opacity-75'>{(formatDateTime(taskData.dueDate) === formatDateTime(specificDate))? '' : (formatDateTime(taskData.dueDate))}</span></span></h2>
+                            <div className='flex text-xs justify-between'>
+                                <span> in list {listData.title}</span>
                             </div>
                         </div>
                         <button className="mx-2 hover:bg-gray-600 hover:rounded-full transition w-6 rounded-full flex justify-center">X</button>
@@ -205,19 +213,20 @@ const TaskModal = () => {
                                 <div className='flex flex-col flex-wrap ml-3'>
                                     <p className='w-[100px] text-xs font-semibold'>Labels</p>
                                     <div className='flex flex-wrap h-auto items-center justify-start'>
-                                        {assignedLabels.length > 0 ? (
-                                            assignedLabels.map((label) => (
+                                        {taskData?.labels?.length > 0 ? (
+                                            taskData.labels.map((label) => (
                                                 <button
-                                                    key={label.id}
-                                                    className={`rounded-[4px] m-1  px-2 py-2 text-gray-100 font-semibold `}
+                                                    key={label.labelId}
+                                                    className="rounded-[4px] m-1 px-2 py-2 text-gray-100 font-semibold"
                                                     style={{ backgroundColor: label.color }}
                                                 >
                                                     {label.name}
                                                 </button>
                                             ))
                                         ) : (
-                                            <span className="text-gray-500 text-xs"></span>
+                                            <span className="text-gray-500 text-xs">No labels assigned</span>
                                         )}
+
                                         <button
                                             className='w-8 h-8 rounded flex justify-center items-center m-1 bg-gray-700 bg-opacity-50 hover:bg-gray-700 text-xl text-gray-400'
                                             onClick={toggleLabelsModal}>

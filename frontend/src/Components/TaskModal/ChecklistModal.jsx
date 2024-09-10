@@ -13,7 +13,7 @@ function ChecklistModal() {
   
   // Ref to the checklist button to position the modal below it
   const checklistButtonRef = useRef(null);
-  const [modalPosition, setModalPosition] = useState({ top: 220, right: -124 });
+  const [modalPosition, setModalPosition] = useState({ top: 220, right: 0 });
 
   useEffect(() => {
     if (checklistButtonRef.current) {
