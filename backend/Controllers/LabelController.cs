@@ -27,8 +27,10 @@ public class LabelController : ControllerBase
     private readonly IBoardRepository _boardRepo;
     private readonly IListRepository _listRepo;
     private readonly IWorkspaceRepository _workspaceRepo;
+    private readonly IWorkspaceActivityRepository _workspaceActivityRepo;
+    private readonly IBoardActivityRepository _boardActivityRepo;
 
-    public LabelController (ITaskRepository taskRepo, ILabelRepository labelRepo, IUserRepository userRepo, IMembersRepository memberRepo, IMapper mapperRepo, IBoardRepository boardRepo, IListRepository listRepo, IWorkspaceRepository workspaceRepo)
+    public LabelController (ITaskRepository taskRepo, ILabelRepository labelRepo, IUserRepository userRepo, IMembersRepository memberRepo, IMapper mapperRepo, IBoardRepository boardRepo, IListRepository listRepo, IWorkspaceRepository workspaceRepo, IWorkspaceActivityRepository workspaceActivityRepo, IBoardActivityRepository boardActivityRepo)
     {
 
         _taskRepo = taskRepo;
@@ -39,6 +41,8 @@ public class LabelController : ControllerBase
         _boardRepo = boardRepo;
         _listRepo = listRepo;
         _workspaceRepo = workspaceRepo;
+        _workspaceActivityRepo = workspaceActivityRepo;
+        _boardActivityRepo = boardActivityRepo;
     }
 
 
@@ -236,8 +240,7 @@ public class LabelController : ControllerBase
         }
     }
 
-
-    [Authorize(AuthenticationSchemes = "Bearer")]
+[Authorize(AuthenticationSchemes = "Bearer")]
     [HttpPut("UpdateLabel")]
     public async Task<IActionResult> UpdateLabel(UpdateLabelRequestDTO updateDto){
         if(!ModelState.IsValid){
@@ -280,7 +283,28 @@ public class LabelController : ControllerBase
                 if(labelModel == null){
                     return NotFound("Label not found!");
                 }
-
+                //WORKSPACE ACTIVITY
+                var workspaceActivity = new WorkspaceActivity
+                    {
+                        WorkspaceId = workspace.WorkspaceId,
+                        UserId = userId,
+                        ActionType = "Updated",
+                        EntityName ="label " + (string.IsNullOrWhiteSpace(updateDto.Name) ? " " : updateDto.Name)+" in board "+board.Title,
+                        ActionDate = DateTime.Now
+                    };
+                    
+                    await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
+                    
+                    //BOARD ACTIVITY
+                    var boardActivity = new BoardActivity{
+                        BoardId = board.BoardId,
+                        UserId = userId,
+                        ActionType = "Updated",
+                        EntityName ="label " + (string.IsNullOrWhiteSpace(updateDto.Name) ? " " : updateDto.Name)+" in board "+board.Title,
+                        ActionDate = DateTime.Now
+                    };
+                    await _boardActivityRepo.CreateBoardActivityAsync(boardActivity);
+                   
                 var updateLabelDto = _mapperRepo.Map<LabelDto>(labelModel);
                 return Ok(updateLabelDto);
 

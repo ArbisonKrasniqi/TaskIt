@@ -2,17 +2,34 @@ import React,{ useContext, useState, useEffect } from "react";
 import SideMenusHeader from "./SideMenusHeader";
 import { WorkspaceContext } from "../Side/WorkspaceContext";
 import { getDataWithId, deleteData } from "../../Services/FetchService";
-
 const Members = () => {
 
         const { members, memberDetails, getInitials, roli, sentInvites,inviteeDetails, workspaceTitles, handleDeleteInvite, workspace, handleRemoveMember } = useContext(WorkspaceContext);
-        const formatDate = (dateString) => {
+        const formatDateTime = (dateString) => {
             const date = new Date(dateString);
-            // Format date to 'MM/DD/YYYY' or any other format you prefer
-            return date.toLocaleDateString('en-US');
+            const formattedDate = date.toLocaleDateString('en-US');
+            const formattedTime = date.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true 
+            });
+            return `${formattedDate} - ${formattedTime}`;
         };
         
+        
+        const [searchTerm, setSearchTerm] = useState("");
 
+        console.log("MEMBERS ",members);
+        console.log("Member DETAILSS ",memberDetails)
+
+        // Map members with details duke perdorur userId
+        const filteredMembers = members.map((member) => {
+            const memberDetail = memberDetails.find((detail) => detail.id === member.userId);
+            if (!memberDetail) return null; 
+            const fullName = `${memberDetail.firstName || ''} ${memberDetail.lastName || ''}`.toLowerCase();
+            return fullName.includes(searchTerm.toLowerCase()) ? { ...member, memberDetail } : null;
+        }).filter(Boolean); // Remove any null values from the array
+    
     return(
         <div className="min-h-screen h-full" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
            <SideMenusHeader></SideMenusHeader>
@@ -47,7 +64,7 @@ const Members = () => {
                                         <p className="text-sm mt-2">
                                            <strong>Workspace: </strong>  <span> {workspaceTitles[index]}</span>.
                                            <br/>
-                                           <span>{formatDate(invite.dateSent)}</span>
+                                           <span>{formatDateTime(invite.dateSent)}</span>
                                         </p>
                                         <button
                                             className="bg-red-500 text-white px-4 py-2 rounded-md"
@@ -83,34 +100,38 @@ const Members = () => {
                     
 
                         <div>
-                            <input className=' rounded-md border border-gray-400 p-2 bg-gray-800 ' 
+                        <input 
+                            className='rounded-md border border-gray-400 p-2 bg-gray-800' 
                             type="text"
-                            placeholder='Filter by name' />
+                            placeholder='Filter by name' 
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)} 
+                        />
                         </div>
                         <br />
                         <hr className='border-gray-400'/>
                         <div>
                             <table className='w-full'>
                                 <tbody>
-                                    {members.map((member, index) => (
+                                {filteredMembers.map((member, index) => (
                                         <>
                                             <tr key={member.memberId} className='h-14'>
                                                 <td className='w-10'>
                                                 <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-sm text-white bg-gradient-to-r from-orange-400 to-orange-600">
-                                        {getInitials(memberDetails[index]?.firstName, memberDetails[index]?.lastName)}
-                                    </div>
+                                                        {getInitials(member.memberDetail?.firstName, member.memberDetail?.lastName)}
+                                                    </div>
                                                 </td>
-                                                <td className='pl-3'>{memberDetails[index]?.firstName} { memberDetails[index]?.lastName}</td>
-                                                <td>Role: {(memberDetails[index]?.id === workspace.ownerId) ? "Owner" : "Member"}
-                                                </td>
+                                                <td className='pl-3'>{member.memberDetail?.firstName} {member.memberDetail?.lastName}</td>
+                                                <td>Role: {(member.memberDetail?.id === workspace.ownerId) ? "Owner" : "Member"}</td>
                                                 <td>
                                                 <button
-                                                    className={(memberDetails[index]?.id === workspace.ownerId)? 'bg-gray-500 text-gray-300 cursor-not-allowed px-4 py-2 rounded-md' : 'bg-red-500 text-white px-4 py-2 rounded-md'}
-                                                    onClick={() => 
-                                                        memberDetails[index]?.id !== workspace.ownerId &&
-                                                        handleRemoveMember(memberDetails[index]?.id, workspace.workspaceId)}
-                                                    >Remove
-                                                </button>
+                                                        className={(member.memberDetail?.id === workspace.ownerId) ? 'bg-gray-500 text-gray-300 cursor-not-allowed px-4 py-2 rounded-md' : 'bg-red-500 text-white px-4 py-2 rounded-md'}
+                                                        onClick={() => 
+                                                            member.memberDetail?.id !== workspace.ownerId &&
+                                                            handleRemoveMember(member.memberDetail?.id, workspace.workspaceId)}
+                                                    >
+                                                        Remove
+                                                    </button>
                                                 </td>
                                             </tr>
                                             <tr>

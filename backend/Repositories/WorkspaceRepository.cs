@@ -14,15 +14,18 @@ public class WorkspaceRepository : IWorkspaceRepository
     private readonly IBoardRepository _boardRepo;
     private readonly IMembersRepository _membersRepo;
     private readonly IInviteRepository _inviteRepo;
-    
+    private readonly IWorkspaceActivityRepository _workspaceActivityRepo;
+    private readonly IStarredBoardRepository _starredBoardRepo;
 
 //constructor
-    public WorkspaceRepository(ApplicationDBContext context, IBoardRepository boardRepo,IMembersRepository membersRepo, IInviteRepository inviteRepo)
+    public WorkspaceRepository(ApplicationDBContext context, IBoardRepository boardRepo,IMembersRepository membersRepo, IInviteRepository inviteRepo, IWorkspaceActivityRepository workspaceActivityRepo, IStarredBoardRepository starredBoardRepo)
     {
         _context = context;
         _boardRepo = boardRepo;
         _membersRepo = membersRepo;
         _inviteRepo = inviteRepo;
+        _workspaceActivityRepo = workspaceActivityRepo;
+        _starredBoardRepo = starredBoardRepo;
     }
     /*Task a wrapper for an object duhet gjithmone me e kthy nje Task kur perdorim async
      kur e perdorim async duhet me perdor await ne rreshtat ku dojna me bo async code
@@ -64,6 +67,8 @@ public class WorkspaceRepository : IWorkspaceRepository
         await _boardRepo.DeleteBoardsByWorkspaceIdAsync(id);
         await _membersRepo.DeleteMembersByWorkspaceIdAsync(id);
         await _inviteRepo.DeleteInvitesByWorkspaceIdAsync(id);
+        await _workspaceActivityRepo.DeleteWorkspaceActivitiesByWorkspace(id);
+        await _starredBoardRepo.DeleteStarredBoardsByWorkspaceIdAsync(id);
         _context.Workspace.Remove(workspaceModel);
         await _context.SaveChangesAsync();
         return workspaceModel;
@@ -82,6 +87,8 @@ public class WorkspaceRepository : IWorkspaceRepository
             await _boardRepo.DeleteBoardsByWorkspaceIdAsync(workspace.WorkspaceId);
             await _membersRepo.DeleteMembersByWorkspaceIdAsync(workspace.WorkspaceId);
             await _inviteRepo.DeleteInvitesByWorkspaceIdAsync(workspace.WorkspaceId);
+            await _workspaceActivityRepo.DeleteWorkspaceActivitiesByWorkspace(workspace.WorkspaceId);
+            await _starredBoardRepo.DeleteStarredBoardsByWorkspaceIdAsync(workspace.WorkspaceId);
         }
 
         _context.Workspace.RemoveRange(workspaces);

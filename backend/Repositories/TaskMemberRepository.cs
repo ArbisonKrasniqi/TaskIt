@@ -156,4 +156,12 @@ public class TaskMemberRepository : ITaskMemberRepository
     {
         return await _context.TaskMember.AnyAsync(tm => tm.UserId == userId && tm.TaskId == taskId);
     }
+    //DELETE TASK MEMBERS BY TASK ID
+    public async Task<List<TaskMember>> DeleteTaskMembersByTaskIdAsync(int taskId)
+    {
+        var taskMembers = await _context.TaskMember.Where(tm => tm.TaskId == taskId).ToListAsync();
+        _context.TaskMember.RemoveRange(taskMembers);
+        await _context.SaveChangesAsync();
+        return taskMembers;
+    }
 }

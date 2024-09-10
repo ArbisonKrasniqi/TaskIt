@@ -5,6 +5,7 @@ using backend.DTOs.Workspace;
 using backend.Interfaces;
 using backend.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 namespace backend.Controllers;
 [Route("backend/Members")]
@@ -17,16 +18,19 @@ public class MembersController: ControllerBase
     private readonly IWorkspaceRepository _workspaceRepo;
     private readonly IMapper _mapper;
     private readonly IUserRepository _userRepo;
-    private readonly IBoardActivityRepository _boardActivityRepo;
-
-    public MembersController(IMembersRepository userWorkspaceRepo, IWorkspaceRepository workspaceRepo, IMapper mapper, IUserRepository userRepo, IBoardActivityRepository boardActivityRepo)
+    private readonly IWorkspaceActivityRepository _workspaceActivityRepo;
+    private readonly UserManager<User> _userManager;
+    public MembersController(IMembersRepository userWorkspaceRepo, IWorkspaceRepository workspaceRepo, IMapper mapper, IUserRepository userRepo, IWorkspaceActivityRepository workspaceActivityRepo, UserManager<User> userManager)
     {
         _membersRepo = userWorkspaceRepo;
         _workspaceRepo = workspaceRepo;
         _mapper = mapper;
         _userRepo = userRepo;
-        _boardActivityRepo = boardActivityRepo;
+        _workspaceActivityRepo = workspaceActivityRepo;
+        _userManager = userManager;
     }
+    
+    
     [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpPost("AddMember")]
     public async Task<IActionResult> AddMember(AddMemberDto addMemberDto)
@@ -126,9 +130,7 @@ public class MembersController: ControllerBase
         }
     }
     
-    
-
-    [Authorize(AuthenticationSchemes = "Bearer")]
+      [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpDelete("RemoveMember")]
     public async Task<IActionResult> RemoveMember(RemoveMemberDto removeMemberDto)
     {
@@ -157,16 +159,32 @@ public class MembersController: ControllerBase
              var isMember = await _membersRepo.IsAMember(userId, removeMemberDto.WorkspaceId);
             if (isMember || userTokenRole == "Admin")
             {
+                var removedMember = await _userManager.FindByIdAsync(removeMemberDto.UserId);
+                if (removedMember == null)
+                {
+                    return NotFound("User does not exists!");
+                }
+                
+                var workspace = await _workspaceRepo.GetWorkspaceByIdAsync(removeMemberDto.WorkspaceId);
+                if (workspace == null)
+                {
+                    return NotFound("Workspace Not found!");
+                }
+                
+                var workspaceActivity = new WorkspaceActivity
+                {
+                    WorkspaceId = removeMemberDto.WorkspaceId,
+                    UserId = userId,
+                    ActionType = "Removed",
+                    EntityName = " "+removedMember.Email+" from workspace "+workspace.Title,
+                    ActionDate = DateTime.Now
+                };
+                await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
                 var result = await _membersRepo.RemoveMemberAsync(removeMemberDto.WorkspaceId, removeMemberDto.UserId);
                 if (result == null)
                 {
                     return StatusCode(500, "User could not be removed");
                 }
-
-
-                
-
-
                 return Ok("Member removed!");
             }
             return StatusCode(401, "You are not authorized!");
@@ -176,7 +194,8 @@ public class MembersController: ControllerBase
             return StatusCode(500, "Internal server error: "+ e.Message);  
         }
     }
-
+    
+    
     [HttpDelete("DeleteMember")]
     [Authorize(AuthenticationSchemes = "Bearer")]
     [Authorize(Policy = "AdminOnly")]

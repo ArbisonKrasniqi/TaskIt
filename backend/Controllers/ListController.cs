@@ -22,7 +22,8 @@ public class ListController : ControllerBase
     private readonly IWorkspaceRepository _workspaceRepo;
     private readonly IMapper _mapper;
     private readonly IBoardActivityRepository _boardActivityRepo;
-    public ListController(IListRepository listRepo , IBoardRepository boardRepo, IMembersRepository membersRepo, IUserRepository userRepo, IWorkspaceRepository workspaceRepo,IMapper mapper, IBoardActivityRepository boardActivityRepo)
+    private readonly IWorkspaceActivityRepository _workspaceActivityRepo;
+    public ListController(IListRepository listRepo , IBoardRepository boardRepo, IMembersRepository membersRepo, IUserRepository userRepo, IWorkspaceRepository workspaceRepo,IMapper mapper, IWorkspaceActivityRepository workspaceActivityRepo, IBoardActivityRepository boardActivityRepo)
     {
         _listRepo = listRepo;
         _boardRepo = boardRepo;
@@ -30,6 +31,7 @@ public class ListController : ControllerBase
         _userRepo = userRepo;
         _workspaceRepo = workspaceRepo;
         _mapper = mapper;
+        _workspaceActivityRepo = workspaceActivityRepo;
         _boardActivityRepo = boardActivityRepo;
     }
     [Authorize(AuthenticationSchemes = "Bearer")]
@@ -147,13 +149,23 @@ public class ListController : ControllerBase
                     {
                         return NotFound("List Not Found");
                     }
-
-                    //Updated BoardActivity
+                    
+                    //WORKSPACE ACTIVITY
+                    var workspaceActivity = new WorkspaceActivity{
+                        WorkspaceId = workspace.WorkspaceId,
+                        UserId = userId,
+                        ActionType = "Updated",
+                        EntityName = "list " + updateListDto.Title+" in board "+board.Title,
+                        ActionDate = DateTime.Now
+                    };
+                    await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
+                    
+                    //BOARD ACTIVITY
                     var boardActivity = new BoardActivity{
                         BoardId = listModel.BoardId,
                         UserId = userId,
-                        ActionType = "updated",
-                        EntityName = "list " + updateListDto.Title,
+                        ActionType = "Updated",
+                        EntityName = "list " + updateListDto.Title+" in board " + board.Title,
                         ActionDate = DateTime.Now
                     };
                     await _boardActivityRepo.CreateBoardActivityAsync(boardActivity);
@@ -247,6 +259,7 @@ public class ListController : ControllerBase
                 return NotFound("Board Not Found!");
             }
             var workspaceId = board.WorkspaceId;
+         
             if (string.IsNullOrEmpty(userId))
             {
                 return NotFound("User Not Found!");
@@ -266,12 +279,23 @@ public class ListController : ControllerBase
                     return NotFound("List Not Found!");
                 }
 
-                //Deleted BoardActivity
+                //WORKSPACE ACTIVITY
+                var workspaceActivity = new WorkspaceActivity{
+                    WorkspaceId = workspaceId,
+                    UserId = userId,
+                    ActionType = "Deleted",
+                    EntityName = "list " + list.Title+" in board "+board.Title,
+                    ActionDate = DateTime.Now
+                };
+                await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
+                
+                
+                //BOARD ACTIVITY
                     var boardActivity = new BoardActivity{
                         BoardId = listModel.BoardId,
                         UserId = userId,
-                        ActionType = "deleted",
-                        EntityName = "list " + listIdDto.ListId,
+                        ActionType = "Deleted",
+                        EntityName = "list " + list.Title+" in board "+board.Title,
                         ActionDate = DateTime.Now
                     };
                 await _boardActivityRepo.CreateBoardActivityAsync(boardActivity);
@@ -311,7 +335,10 @@ public class ListController : ControllerBase
                 return NotFound("Board Not Found!");
             }
             var workspaceId = board.WorkspaceId;
-            
+           if (userId == null)
+            {
+                return NotFound("User not found!");
+            }
             var isMember = await _membersRepo.IsAMember(userId, workspaceId);
             var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
             if (board.IsClosed && !isOwner && userTokenRole != "Admin")
@@ -324,12 +351,23 @@ public class ListController : ControllerBase
                 var listModel = _mapper.Map<List>(listDto);
                 await _listRepo.CreateAsync(listModel);
 
-                //Created BoardActivity
+                
+                //WORKSPACE ACTIVITY
+                var workspaceActivity = new WorkspaceActivity{
+                    WorkspaceId = workspaceId,
+                    UserId = userId,
+                    ActionType = "Created",
+                    EntityName = "list " + listDto.Title+" in board "+board.Title,
+                    ActionDate = DateTime.Now
+                };
+                await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
+
+                //BOARD ACTIVITY
                     var boardActivity = new BoardActivity{
                         BoardId = listModel.BoardId,
                         UserId = userId,
-                        ActionType = "created",
-                        EntityName = "list " + listDto.Title,
+                        ActionType = "Created",
+                        EntityName = "list " + listDto.Title+" in board "+board.Title,
                         ActionDate = DateTime.Now
                     };
                 await _boardActivityRepo.CreateBoardActivityAsync(boardActivity);

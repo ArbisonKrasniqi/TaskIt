@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿﻿using AutoMapper;
 using backend.DTOs.Invite.Input;
 using backend.DTOs.Invite.Output;
 using backend.DTOs.Members;
@@ -6,6 +6,7 @@ using backend.DTOs.Workspace;
 using backend.Interfaces;
 using backend.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers
@@ -20,14 +21,17 @@ namespace backend.Controllers
         private readonly IUserRepository _userRepo;
         private readonly IMembersRepository _memberRepo;
         private readonly IMapper _mapper;
-
-        public InviteController(IInviteRepository inviteRepo, IWorkspaceRepository workspaceRepo, IUserRepository userRepo,IMembersRepository memberRepo, IMapper mapper)
+        private readonly IWorkspaceActivityRepository _workspaceActivityRepo;
+        private readonly UserManager<User> _userManager;
+      public InviteController(IInviteRepository inviteRepo, IWorkspaceRepository workspaceRepo, IUserRepository userRepo,IMembersRepository memberRepo, IMapper mapper, IWorkspaceActivityRepository workspaceActivityRepo, UserManager<User> userManager)
         {
             _inviteRepo = inviteRepo;
             _workspaceRepo = workspaceRepo;
             _userRepo = userRepo;
             _memberRepo = memberRepo;
             _mapper = mapper;
+            _workspaceActivityRepo = workspaceActivityRepo;
+            _userManager = userManager;
         }
 
         [Authorize(AuthenticationSchemes = "Bearer")]
@@ -256,8 +260,26 @@ namespace backend.Controllers
                 var isMember = await _memberRepo.IsAMember(userId, inviteDto.WorkspaceId);
                 if (isMember && userId == inviteDto.InviterId || userTokenRole == "Admin")
                 {
+                    
                     var inviteModel = _mapper.Map<Invite>(inviteDto);
                     await _inviteRepo.AddInviteAsync(inviteModel);
+
+                    var invitee = await _userManager.FindByIdAsync(inviteDto.InviteeId);
+                    if (invitee == null)
+                    {
+                        return NotFound("Invitee Not Found!");
+                    }
+
+                    var workspaceActivity = new WorkspaceActivity
+                    {
+                        WorkspaceId = inviteDto.WorkspaceId,
+                        UserId = userId,
+                        ActionType = "Invited",
+                        EntityName = " "+invitee.Email+" to join workspace "+workspace.Title,
+                        ActionDate = DateTime.Now
+                    };
+                    await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
+                    
                     return CreatedAtAction(nameof(GetInviteById), new { id = inviteModel.InviteId },
                         _mapper.Map<InviteDto>(inviteModel));
                 }
@@ -269,8 +291,7 @@ namespace backend.Controllers
             }
 
         }
-
-        [Authorize(AuthenticationSchemes = "Bearer")]
+ [Authorize(AuthenticationSchemes = "Bearer")]
         [HttpPut("UpdateInviteStatus")]
         public async Task<IActionResult> UpdateInviteStatus(UpdateInviteDto updateDto)
         {
@@ -292,6 +313,26 @@ namespace backend.Controllers
                     var inviteUpdate = await _inviteRepo.UpdateInviteStatusAsync(updateDto);
                     if (inviteUpdate == null) return NotFound("Invite Not Found!");
 
+                    var workspace = await _workspaceRepo.GetWorkspaceByIdAsync(invite.WorkspaceId);
+                    if (workspace == null)
+                    {
+                        return NotFound("Workspace Not Found!");
+                    }
+                    
+                    if (updateDto.InviteStatus == "Accepted")
+                    {
+                        
+                        var workspaceActivity = new WorkspaceActivity
+                        {
+                            WorkspaceId = invite.WorkspaceId,
+                            UserId = inviteeId,
+                            ActionType = "Joined",
+                            EntityName = "workspace "+workspace.Title,
+                            ActionDate = DateTime.Now
+                        };
+                        await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
+                    }
+                   
                     var inviteDto = _mapper.Map<InviteDtoOut>(inviteUpdate);
                     return Ok(inviteDto);
                 }
@@ -517,13 +558,6 @@ namespace backend.Controllers
         
     }
 }
-
-
-
-
-
-
-
 
 
 

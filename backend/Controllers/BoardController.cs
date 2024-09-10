@@ -172,7 +172,7 @@ namespace backend.Controllers
                     var boardModel = _mapper.Map<Board>(boardDto);
                     await _boardRepo.CreateBoardAsync(boardModel);
                     
-                    // Created WorkspaceActivity
+                    //WORKSPACE ACTIVITY
                     var workspaceActivity = new WorkspaceActivity
                     {
                         WorkspaceId = boardDto.WorkspaceId,
@@ -184,7 +184,7 @@ namespace backend.Controllers
                     
                     await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
 
-                    //Created BoardActivity
+                    //BOARD ACTIVITY
                     var boardActivity = new BoardActivity{
                         BoardId = boardModel.BoardId,
                         UserId = userId,
@@ -264,8 +264,8 @@ namespace backend.Controllers
                     
                     if (boardModel == null)
                         return NotFound("Board Not Found!");
-
-                    //Update WorkspaceActivity
+                    
+                    //WORKSPACE ACTIVITY
                     var workspaceActivity = new WorkspaceActivity
                     {
                         WorkspaceId = board.WorkspaceId,
@@ -278,7 +278,7 @@ namespace backend.Controllers
                     await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
 
 
-                    // Update BoardActivity
+                   //BOARD ACTIVITY
                     var boardActivity = new BoardActivity{
                         BoardId = board.BoardId,
                         UserId = userId,
@@ -326,7 +326,7 @@ namespace backend.Controllers
             
                 if (ownsWorkspace || userTokenRole == "Admin")
                 {
-                    // Delete WorkspaceActivity
+                    //WORKSPACE ACTIVITY
                     var workspaceActivity = new WorkspaceActivity
                     {
                         WorkspaceId = board.WorkspaceId,
@@ -338,7 +338,7 @@ namespace backend.Controllers
                     
                     await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
 
-                    //Delete BoardActivity
+                    //BOARD ACTIVITY
                     var boardActivity = new BoardActivity{
                         BoardId = board.BoardId,
                         UserId = userId,
@@ -429,7 +429,19 @@ namespace backend.Controllers
                     {
                         return NotFound();
                     }
-                    // BoardActivity per  board closure
+                  // WORKSPACE ACTIVITY
+                    var workspaceActivity = new WorkspaceActivity
+                    {
+                        WorkspaceId = board.WorkspaceId,
+                        UserId = userId,
+                        ActionType = "Closed",
+                        EntityName = "board "+board.Title,
+                        ActionDate = DateTime.Now
+                    };
+                    
+                    await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
+
+                    // BOARD ACTIVITY
                     var boardActivity = new BoardActivity{
                         BoardId = board.BoardId,
                         UserId = userId,
@@ -474,7 +486,19 @@ namespace backend.Controllers
                     {
                         return NotFound();
                     }
-                    //BoardActivity per board reopen
+                    
+                    //WORKSPACE ACTIVITY
+                    var workspaceActivity = new WorkspaceActivity
+                    {
+                        WorkspaceId = board.WorkspaceId,
+                        UserId = userId,
+                        ActionType = "Reopened",
+                        EntityName = "board "+board.Title,
+                        ActionDate = DateTime.Now
+                    };
+                    
+                    await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
+                    //BOARD ACTIVITY
                     var boardActivity = new BoardActivity{
                         BoardId = board.BoardId,
                         UserId = userId,
