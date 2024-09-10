@@ -27,8 +27,9 @@ public class  TaskController : ControllerBase{
     private readonly ILabelRepository _labelRepo;
     private readonly ITaskMemberRepository _taskMemberRepo;
     private readonly IMapper _mapper;
+    private readonly IBoardActivityRepository _boardActivityRepo;
     
-    public TaskController(IMapper mapper, ITaskMemberRepository taskMemberRepo, ITaskRepository taskRepo, IListRepository listRepo, IBoardRepository boardRepo, IMembersRepository membersRepo, IUserRepository userRepo, ILabelRepository labelRepo)
+    public TaskController(IMapper mapper, ITaskMemberRepository taskMemberRepo, ITaskRepository taskRepo, IListRepository listRepo, IBoardRepository boardRepo, IMembersRepository membersRepo, IUserRepository userRepo, ILabelRepository labelRepo, IBoardActivityRepository boardActivityRepo)
     {
         _mapper = mapper;
         _taskMemberRepo = taskMemberRepo;
@@ -38,6 +39,7 @@ public class  TaskController : ControllerBase{
         _membersRepo = membersRepo;
         _userRepo = userRepo;
         _labelRepo = labelRepo;
+        _boardActivityRepo = boardActivityRepo;
     }
 
     [Authorize(AuthenticationSchemes = "Bearer")]
@@ -193,6 +195,16 @@ public class  TaskController : ControllerBase{
                 {
                     return NotFound("Task not found");
                 }
+
+                //Updated BoardActivity
+                    var boardActivity = new BoardActivity{
+                        BoardId = taskModel.TaskId,
+                        UserId = userId,
+                        ActionType = "updated",
+                        EntityName = "task " + taskDto.Title,
+                        ActionDate = DateTime.Now
+                    };
+                await _boardActivityRepo.CreateBoardActivityAsync(boardActivity);
                 
 
                 var taskLabels = await _labelRepo.GetLabelsByTaskId(taskModel.TaskId);
@@ -247,6 +259,16 @@ public class  TaskController : ControllerBase{
                         return NotFound("Task dose not exists");
                     }
 
+                    //Deleted BoardActivity
+                    var boardActivity = new BoardActivity{
+                        BoardId = taskModel.TaskId,
+                        UserId = userId,
+                        ActionType = "deleted",
+                        EntityName = "task " + taskIdDto.TaskId,
+                        ActionDate = DateTime.Now
+                    };
+                    await _boardActivityRepo.CreateBoardActivityAsync(boardActivity);
+
                     return Ok("Task Deleted");
                 }
                 return StatusCode(401, "You are not authorized!");
@@ -298,6 +320,22 @@ public class  TaskController : ControllerBase{
 
                 var taskModel = taskDto.ToTaskFromCreate();
                 await _taskRepo.CreateTaskAsync(taskModel);
+
+
+                //Created BoardActivity
+                    var boardActivity = new BoardActivity{
+                        BoardId = taskModel.TaskId,
+                        UserId = userId,
+                        ActionType = "created",
+                        EntityName = "task " + taskDto.Title,
+                        ActionDate = DateTime.Now
+                    };
+                    await _boardActivityRepo.CreateBoardActivityAsync(boardActivity);
+
+
+
+
+
                 var labels = new List<Models.Label>();
                 var taskMembers = new List<TaskMemberDto>();
                 return CreatedAtAction(nameof(GetTaskById), new { id = taskModel.TaskId }, taskModel.ToTaskDto(labels,taskMembers));
