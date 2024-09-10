@@ -31,6 +31,8 @@ namespace backend.Models
 
         public List<TaskMember>? TaskMembers { get; set; }
         public List<Checklist>? Checklists { get; set; }
+        
+        public List<TaskLabel> TaskLabels { get; set; }
         public List<Label>? Labels { get; set; }
 
     }

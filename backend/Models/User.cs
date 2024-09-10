@@ -18,6 +18,9 @@ public class User : IdentityUser
 
     public List<Workspace> Workspaces { get; set; }
     public RefreshToken refreshToken { get; set; } = null;
+    public ICollection<Background> Backgrounds { get; set; }
+    public ICollection<Invite> SentInvites { get; set; }
+    public ICollection<Invite> ReceivedInvites { get; set; }
 }
 
 //We dont have to use all of the new attributes below

@@ -48,6 +48,49 @@ public class ApplicationDBContext : IdentityDbContext<User>
                 }
             };
         builder.Entity<IdentityRole>().HasData(roles);
+        
+        builder.Entity<Background>()
+            .HasOne(b => b.User) 
+            .WithMany(u => u.Backgrounds)
+            .HasForeignKey(b => b.CreatorId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<Workspace>()
+            .HasOne(b => b.User)
+            .WithMany(u => u.Workspaces)
+            .HasForeignKey(b => b.OwnerId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<Invite>()
+            .HasOne(i => i.Inviter)
+            .WithMany(u => u.SentInvites)
+            .HasForeignKey(i => i.InviterId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<Invite>()
+            .HasOne(i => i.Invitee)
+            .WithMany(u => u.ReceivedInvites)
+            .HasForeignKey(i => i.InviteeId)
+            .OnDelete(DeleteBehavior.NoAction);
+        
+        builder.Entity<StarredBoard>()
+            .HasOne(sb => sb.Workspace)
+            .WithMany()                  
+            .HasForeignKey(sb => sb.WorkspaceId)
+            .OnDelete(DeleteBehavior.NoAction);
+        
+        builder.Entity<TaskLabel>()
+            .HasOne(tl => tl.Task)
+            .WithMany(t => t.TaskLabels)
+            .HasForeignKey(tl => tl.TaskId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        // Configure TaskLabel and Label relationship
+        builder.Entity<TaskLabel>()
+            .HasOne(tl => tl.Label)
+            .WithMany()
+            .HasForeignKey(tl => tl.LabelId)
+            .OnDelete(DeleteBehavior.NoAction);
     }
     
     

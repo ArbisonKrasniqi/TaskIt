@@ -86,7 +86,7 @@ const WorkspaceSettings = () => {
     });
 
     return (
-        <div className="min-h-screen h-full" style={{ backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)' }}>
+        <div className="min-h-screen h-full overflow-y-auto" style={{ backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)' }}>
             <SideMenusHeader />
             <div className="font-semibold font-sans text-gray-400 ml-20 mt-10">
                 <h1 className="text-3xl">Workspace Settings</h1>
@@ -116,50 +116,8 @@ const WorkspaceSettings = () => {
                 )}
             </div>
             <hr className="w-full border-gray-400"></hr>
-
-            <h1 className="text-3xl mt-10 ml-20 mb-10 font-semibold font-sans text-gray-400">Workspace Activity</h1>
-
-            {/* Search Bar */}
-            <div className="ml-20 mb-6">
-                <input
-                    type="text"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Search by name..."
-                    className="p-2 border border-gray-400 rounded w-1/3 bg-transparent"
-                />
-            </div>
-
-            {/* Activity List */}
-            <div className="mt-10 ml-10">
-                {filteredActivities
-                    .sort((a, b) => new Date(b.actionDate) - new Date(a.actionDate))
-                    .slice(0, visibleActivities)
-                    .map((activity, index) => (
-                        <div key={index} className="flex items-center text-gray-300 mb-4">
-                            <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-m text-white bg-gradient-to-r from-orange-400 to-orange-600">
-                                {getInitials(activity.userName, activity.userLastName)}
-                            </div>
-                            <div className="ml-2">
-                                <p><b>{activity.userName} {activity.userLastName} </b>{activity.actionType} {activity.entityName}</p>
-                                <p className="text-sm text-gray-500">{formatDateTime(activity.actionDate)}</p>
-                            </div>
-                        </div>
-                    ))
-                }
-                {visibleActivities < filteredActivities.length && (
-                    <button
-                        className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                        onClick={loadMoreActivities}
-                    >
-                        Load More
-                    </button>
-                )}
-            </div>
-            <hr className="w-full border-gray-400 mt-5"></hr>
-
             {/* Modal for Deleting or Leaving the Workspace */}
-            <div className="mt-10 ml-10">
+            <div className="pt-10 ml-10">
                 {roli === "Owner" ? (
                     <>
                         <button
@@ -198,6 +156,49 @@ const WorkspaceSettings = () => {
                     onClose={() => setIsMessageModalOpen(false)}
                 />
             </div>
+
+            <h1 className="text-3xl mt-10 ml-20 mb-10 font-semibold font-sans text-gray-400">Workspace Activity</h1>
+
+            {/* Search Bar */}
+            <div className="ml-20 mb-6">
+                <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Search by name..."
+                    className="p-2 border border-gray-400 rounded w-1/3 bg-transparent"
+                />
+            </div>
+
+            {/* Activity List */}
+            <div className="mt-10 ml-10 max-h-[500px] overflow-y-auto">
+                {filteredActivities
+                    .sort((a, b) => new Date(b.actionDate) - new Date(a.actionDate))
+                    .slice(0, visibleActivities)
+                    .map((activity, index) => (
+                        <div key={index} className="flex items-center text-gray-300 mb-4">
+                            <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-m text-white bg-gradient-to-r from-orange-400 to-orange-600">
+                                {getInitials(activity.userName, activity.userLastName)}
+                            </div>
+                            <div className="ml-2">
+                                <p><b>{activity.userName} {activity.userLastName} </b>{activity.actionType} {activity.entityName}</p>
+                                <p className="text-sm text-gray-500">{formatDateTime(activity.actionDate)}</p>
+                            </div>
+                        </div>
+                    ))
+                }
+                {visibleActivities < filteredActivities.length && (
+                    <button
+                        className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                        onClick={loadMoreActivities}
+                    >
+                        Load More
+                    </button>
+                )}
+            </div>
+            <hr className="w-full border-gray-400 mt-5"></hr>
+
+            
         </div>
     );
 };

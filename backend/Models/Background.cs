@@ -6,7 +6,9 @@ namespace backend.Models
     public class Background
     {
         public int BackgroundId { get; set; }
-        public string? CreatorId { get; set; }
+        public string CreatorId { get; set; }
+        public User User { get; set; }
+
         [Required]
         [MinLength(2, ErrorMessage = "Title must be at least 2 characters")]
         [MaxLength(280, ErrorMessage = "Title cannot be over 280 characters")]

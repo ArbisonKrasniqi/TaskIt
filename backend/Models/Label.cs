@@ -20,6 +20,8 @@ namespace backend.Models
         public DateTime DateAdded { get; set; } = DateTime.Now;
 
         public int BoardId { get; set;}
+        public Board Board { get; set;}
+        public List<TaskLabel> TaskLabels { get; set; }
 
     }
 }

@@ -9,7 +9,6 @@ const UpdateBackgroundModal = (props) => {
 
     const [title, setTitle] = useState(backgroundToUpdate.title);
     const [isActive, setIsActive] = useState(backgroundToUpdate.isActive);
-    const [creatorId, setCreatorId] = useState(backgroundToUpdate.creatorId);
 
     useEffect(() => {
         setTitle(backgroundToUpdate.title);
@@ -22,10 +21,8 @@ const UpdateBackgroundModal = (props) => {
         try {
             const data = {
                 backgroundId: backgroundToUpdate.backgroundId,
-                creatorId: creatorId,
                 title: title,
                 isActive: isActive,
-                dateCreated: backgroundToUpdate.dateCreated
             };
 
             console.log('Sending data: ',data);
@@ -39,7 +36,6 @@ const UpdateBackgroundModal = (props) => {
                         ...background,
                         title: title,
                         isActive: isActive,
-                        creatorId: creatorId
                     };
                 }
                 return background;
@@ -74,14 +70,6 @@ const UpdateBackgroundModal = (props) => {
                                onChange={(e) => setIsActive(e.target.value)}
                                type="boolean"
                                id="isActive"
-                               className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500' />
-                    </div><div className="mb-6">
-                        <label htmlFor="creatorId" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Creator Id</label>
-                        <input value={creatorId}
-                               onChange={(e) => setCreatorId(e.target.value)}
-                               readOnly
-                               type="text"
-                               id="creatorId"
                                className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500' />
                     </div>
                 </div>

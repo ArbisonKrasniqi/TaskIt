@@ -18,7 +18,8 @@ public class Workspace
     [MaxLength(280, ErrorMessage = "Description cannot be over 280 characters")]
     public string Description { get; set; } = string.Empty;
 
-    public string OwnerId { get; set; } = string.Empty;
+    public string OwnerId { get; set; }
+    public User User { get; set; }
     public List<Board> Boards { get; set; } = new List<Board>();
     public List<Members> Members { get; set; } = new List<Members>();
 
