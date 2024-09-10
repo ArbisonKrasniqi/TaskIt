@@ -103,7 +103,7 @@ const SignUpForm = () =>{
                 StoreTokens(loginResponse.data.accessToken, loginResponse.data.refreshToken);
                 setShowModalWelcome(true);
             } catch (error) {
-            if (error.response.data[1].description) {
+            if (error.response) {
                 setError(error.response.data[1].description);
             } else {
                 setError("There has been an internal server error! Try again later");

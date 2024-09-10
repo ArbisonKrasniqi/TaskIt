@@ -36,11 +36,12 @@ const List = ({ list, children }) => {
     <div
       ref={setNodeRef} 
       {...attributes}
+      {...listeners}
       style={style}
-      className={`flex-shrink-0 bg-gray-800 p-4 rounded-lg shadow-lg w-[275px] h-auto ${isDragging ? 'opacity-0' : ''}`}
+      className={`flex-shrink-0 bg-gray-800 p-2.5 rounded-lg shadow-lg w-[275px] h-auto ${isDragging ? 'opacity-0' : ''}`}
     >
-       <header className="flex justify-between items-center mb-4">
-              <h3 {...listeners} className="text-xl font-bold mb-4 text-gray-100">{list.title}</h3>
+       <header className="flex justify-between items-center">
+              <h3 className="text-xl font-bold pb-4 text-gray-100 w-full h-full">{list.title}</h3>
               <ListDropdown
                 listId={list.listId}
                 onAddCardClick={() => handleShowTaskForm(list.listId)}
@@ -53,9 +54,9 @@ const List = ({ list, children }) => {
         {boardContext.selectedListId !== list.listId && (
               <button
                 onClick={() => handleShowTaskForm(list.listId)}
-                className="mt-4 p-2 bg-blue-500 text-white rounded"
+                className="bg-transparent text-gray-500 px-4 py-2 rounded hover:bg-gray-700"
               >
-                Add Task
+                + Add Task
               </button>
         )}
     </div>

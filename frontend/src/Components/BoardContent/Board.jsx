@@ -1,5 +1,4 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import List from "../List/List";
 import { WorkspaceContext } from "../Side/WorkspaceContext";
 import ListForm from "../List/ListForm.jsx";
 import {DndContext, KeyboardSensor, PointerSensor, closestCenter, closestCorners, useSensor, useSensors} from "@dnd-kit/core";
@@ -14,6 +13,7 @@ import { MdOutlineStarOutline, MdOutlineStarPurple500 } from "react-icons/md";
 import {DropdownContext} from "../Navbar/Navbar.jsx";
 import MemberProfilePic from "../ProfilePic/MemberProfilepic.jsx";
 import LoadingModal from "../Modal/LoadingModal.jsx";
+import { deleteData } from "../../Services/FetchService.jsx";
 
 export const BoardContext = createContext();
 
@@ -31,9 +31,9 @@ const Board = () => {
 
   useEffect(() => {
     const fetchBackground = async () => {
-      if (workspaceContext.board && board.backgroundId) {
+      if (workspaceContext.board && workspaceContext.board.backgroundId) {
         try {
-          const imageUrl = await workspaceContext.getBackgroundImageUrl(board);
+          const imageUrl = await workspaceContext.getBackgroundImageUrl(workspaceContext.board);
           setBackgroundUrl(imageUrl);  // Set the background URL after fetching
         } catch (error) {
           console.error("Error fetching background image:", error);
@@ -45,7 +45,7 @@ const Board = () => {
     };
 
     fetchBackground();
-  }, [workspaceContext.board, boardId]);
+  }, [boardId, workspaceContext.board]);
 
   const [selectedListId, setSelectedListId] = useState(null);
   const [ProfilePicIsOpen, setProfilePicIsOpen] = useState(false);
@@ -109,7 +109,7 @@ const getLists = async () => {
       getLists();
       getTasks();
     }
-  },[workspaceContext.board]);
+  },[workspaceContext.board, boardId]);
 
   const updateListBackend = async (originalPos, newPos) => {
     try {
@@ -142,6 +142,23 @@ const getLists = async () => {
       getTasks();
     }
   }
+
+  const handleTaskDelete = async (taskId) => {
+    try {
+        const data = {
+            taskId: taskId,
+        };
+        const taskDeleteResponse = await deleteData('/backend/task/DeleteTask', data);
+        if (taskDeleteResponse) {
+            setTasks(prevTasks => prevTasks.filter(t => t.taskId != taskId))
+        }
+
+    } catch (error) {
+        console.error(error);
+        getLists();
+        getTasks();
+    }
+}
 
   const findValueOfItems = (id, type) => {
     if (type == "list") {
@@ -332,7 +349,14 @@ const getLists = async () => {
     
   }
 
-  const contextValue = {tasks, setTasks, lists, setLists, getTasks, getLists, selectedListId, setSelectedListId}
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 3
+      }
+    })
+  );
+  const contextValue = {tasks, setTasks, lists, setLists, getTasks, getLists, selectedListId, setSelectedListId, handleTaskDelete}
   if (workspaceContext.board == null) {
     return <LoadingModal/>
   }
@@ -340,13 +364,12 @@ const getLists = async () => {
     <BoardContext.Provider value={contextValue}>
       <div className="max-w-full max-h-screen h-screen" style={{backgroundImage: `url(${backgroundUrl})`,backgroundSize: 'cover',
                                                                 backgroundPosition: 'center',
-                                                              }}
-      >
-      <header className="flex items-center justify-between w-full p-4 bg-white bg-opacity-30 text-white shadow-lg">
+                                                              }} >
+      <header className="flex items-center justify-between w-full w-max-full p-4 bg-opacity-70 text-white shadow-lg" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
                 <div className="flex items-center">
-                    <h2 className="text-xl font-semibold text-slate-900 mr-4">{workspaceContext.board.title}</h2>
+                    <h2 className="text-xl font-semibold text-slate-200 mr-4">{workspaceContext.board.title}</h2>
                     <button
-                        className="text-slate-900 text-2xl focus:outline-none"
+                        className="text-slate-200 text-2xl focus:outline-none"
                         onClick={() => workspaceContext.handleStarBoard(workspaceContext.board)}
                         aria-label={workspaceContext.board.isStarred ? "Unstar board" : "Star board"}
                     >
@@ -354,15 +377,15 @@ const getLists = async () => {
                     </button>
                 </div>
 
-                <div className="flex items-center space-x-4">
+                <div className="flex w-auto items-center space-x-4">
                     <DropdownContext.Provider value={pfpValues}>
                         <MemberProfilePic/>
                     </DropdownContext.Provider>
                 </div>
             </header>
         
-        <div className="m-0 p-5 h-full flex flex-start space-x-4 items-baseline bg-gray-200 min-h-screen max-h-screen overflow-x-auto max-w-full">
-            <DndContext onDragStart={handleDragStart} onDragMove={handleDragMove} onDragEnd={handleDragEnd}>
+        <div className="m-0 p-5 h-full flex flex-start space-x-4 items-baseline min-h-screen max-h-screen overflow-x-auto max-w-full">
+            <DndContext sensors={sensors} onDragStart={handleDragStart} onDragMove={handleDragMove} onDragEnd={handleDragEnd}>
               <SortableContext items={lists.map(list => list.listId)}>
                 {lists.map((list) => (
                   <List key={list.listId} list={list}>
@@ -388,6 +411,8 @@ const getLists = async () => {
                 </DragOverlay>
             </DndContext>
           <ListForm />
+          <DummyList/>
+          <DummyList/>
           <DummyList/>
         </div>
       </div>

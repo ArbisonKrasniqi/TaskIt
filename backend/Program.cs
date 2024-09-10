@@ -141,7 +141,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowReactApp",
         builder =>
         {
-            builder.WithOrigins("http://localhost:3000") // Adjust origin as needed
+            builder.WithOrigins("http://localhost:3001", "http://localhost:3000") // Adjust origin as needed
                 .AllowAnyMethod()
                 .AllowAnyHeader();
         });

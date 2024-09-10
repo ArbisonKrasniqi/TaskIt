@@ -34,7 +34,7 @@ const NavbarProfilePic = () => {
 
           {/* Dropdown menu */}
           {dropdownContext.ProfilePicIsOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg p-">
+            <div className="absolute z-50 right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg p-">
 
               <div   onClick={() => {
               dropdownContext.toggleDropdownProfilePic();

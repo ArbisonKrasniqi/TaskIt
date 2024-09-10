@@ -375,7 +375,6 @@ public class ListController : ControllerBase
             if (isMember || userTokenRole == "Admin")
             {
                 var lists = await _listRepo.GetListByBoardId(boardId);
-
                 if (lists.Count == 0)
                 {
                     return Ok(new List<ListDTO>());

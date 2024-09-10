@@ -169,7 +169,7 @@ public async Task<Tasks> CreateTaskAsync(Tasks taskModel){
         var tasks = await (from board in _context.Board
             join list in _context.List on board.BoardId equals list.BoardId
             join task in _context.Tasks on list.ListId equals task.ListId
-            where board.BoardId == boardId && board.IsClosed == false
+            where board.BoardId == boardId
             select new Tasks
             {
                 TaskId = task.TaskId,

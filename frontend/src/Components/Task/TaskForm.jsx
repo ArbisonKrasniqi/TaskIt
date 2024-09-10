@@ -10,7 +10,10 @@ const TaskForm = ({ listId, onClose }) => {
     const [taskTitle, setTaskTitle] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
 
-    const handleSubmit = async (e) =>{
+    const handleTitleChange = (e) => {
+        setTaskTitle(e.target.value);
+    };
+    const handleCreateTask = async (e) =>{
         e.preventDefault();
         if (taskTitle.length < 2 || taskTitle.length > 20) {
             setErrorMessage("Task title must be between 2 and 20 characters.");
@@ -41,7 +44,7 @@ const TaskForm = ({ listId, onClose }) => {
     };
 
     return (
-        <div className="relative p-4 bg-white border rounded shadow-lg">
+        <div className="relative p-4 bg-gray-800 border-gray-900 rounded shadow-lg">
             <form onSubmit={handleCreateTask} className="flex flex-col gap-4">
                 <input
                     type="text"
@@ -54,9 +57,9 @@ const TaskForm = ({ listId, onClose }) => {
                 <div className="flex justify-between items-center">
                     <button
                         type="submit"
-                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                        className="bg-transparent text-gray-500 px-4 py-2 rounded hover:bg-gray-700"
                     >
-                        Add Task
+                        + Add Task
                     </button>
                     <button
                         onClick={onClose}

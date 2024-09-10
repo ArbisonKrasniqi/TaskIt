@@ -173,6 +173,12 @@ public class  TaskController : ControllerBase{
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
 
             var isMember = await _membersRepo.IsAMember(userId, workspace.WorkspaceId);
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspace.WorkspaceId);
+            if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+            {
+                return StatusCode(403, "The board is closed");
+            }
+            
             if (isMember || userTokenRole == "Admin")
             {
                 var tasks = await _taskRepo.GetTasksByBoardIdAsync(boardId);
@@ -385,7 +391,7 @@ public class  TaskController : ControllerBase{
                 await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
                 
                 
-                return CreatedAtAction(nameof(GetTaskById), new { id = taskModel.TaskId }, taskModel.ToTaskDto(labels,taskMembers));
+                return CreatedAtAction(nameof(GetTaskById), new { id = taskModel.TaskId }, taskModel.ToTaskDto(null,null));
             }
             return StatusCode(401, "You are not authorized!");
         }catch(Exception e){

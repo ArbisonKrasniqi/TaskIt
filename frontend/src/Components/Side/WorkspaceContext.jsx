@@ -108,7 +108,9 @@ export const WorkspaceProvider = ({ children }) => {
                     setWorkspace(workspaceData);
                 }
             } catch (error) {
-                console.log(error.response.data);
+                if (error.response) {
+                    console.log(error.response.data);
+                }
                 navigate('/main/workspaces'); //Nese ska qasje, shko tek workspaces
             }
         };
@@ -158,7 +160,9 @@ export const WorkspaceProvider = ({ children }) => {
                     setStarredBoards(starred);
                 }
                 } catch (error) {
-                    console.error(error.response.data);
+                    if(error.response) {
+                        console.error(error.response.data);
+                    }
                     setBoards([]);
                     setStarredBoards([]);
                 }
@@ -254,7 +258,9 @@ export const WorkspaceProvider = ({ children }) => {
             // setClosedBoards((prevClosedBoards)=> [...prevClosedBoards, closedBoardData]);
         }
         catch(error){
-            console.error("Error closing board:",error.response?.data || error.message);
+            if (error.response) {
+                console.error("Error closing board:",error.response?.data || error.message);
+            }
         }
     }
 
@@ -530,7 +536,10 @@ export const WorkspaceProvider = ({ children }) => {
                     }
                     
                 } catch (error) {
-                    console.log(error.response.data);
+                    if (error.response) {
+                        console.log(error.response.data);
+                    }
+        
                     navigate('/main/workspaces');
                 }
             };
@@ -590,7 +599,9 @@ export const WorkspaceProvider = ({ children }) => {
                         setList(listData);
                     }
                 } catch (error) {
-                    console.log(error.response.data);
+                    if (error.response) {
+                        console.log(error.response.data);
+                    }   
                     navigate('/main/workspaces');
                     
                 }
