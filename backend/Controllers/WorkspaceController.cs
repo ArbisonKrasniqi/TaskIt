@@ -16,12 +16,15 @@ namespace backend.Controllers
         private readonly IUserRepository _userRepo; 
         private readonly IMapper _mapper;
         private readonly IWorkspaceActivityRepository _workspaceActivityRepo;
-        public WorkspaceController(IWorkspaceRepository workspaceRepo, IUserRepository userRepo, IMapper mapper, IWorkspaceActivityRepository workspaceActivityRepo)
+
+        private readonly IBoardActivityRepository _boardActivityRepo;
+        public WorkspaceController(IWorkspaceRepository workspaceRepo, IUserRepository userRepo, IMapper mapper, IWorkspaceActivityRepository workspaceActivityRepo, IBoardActivityRepository boardActivityRepo)
         {
             _userRepo = userRepo;
             _workspaceRepo = workspaceRepo;
             _mapper = mapper;
             _workspaceActivityRepo = workspaceActivityRepo;
+            _boardActivityRepo = boardActivityRepo;
         }
         
         [Authorize(AuthenticationSchemes = "Bearer")]
@@ -165,6 +168,19 @@ namespace backend.Controllers
                     };
                     
                     await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
+
+
+                    //Created BoardActivity
+                    var boardActivity = new BoardActivity{
+                        BoardId = createdWorkspace.WorkspaceId,
+                        UserId = userId,
+                        ActionType = "created",
+                        EntityName = "workspace " + workspaceDto.Title,
+                        ActionDate = DateTime.Now
+                    };
+                    await _boardActivityRepo.CreateBoardActivityAsync(boardActivity);
+
+
                     return CreatedAtAction(nameof(GetWorkspaceById), new { id = createdWorkspace.WorkspaceId }, createdWorkspaceDto); 
                     //kthe pergjigjie 201 Created per burimin e ri te krijuar 
                 }
@@ -216,6 +232,16 @@ namespace backend.Controllers
                     };
                     
                     await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
+
+                    //Updated BoardActivity
+                    var boardActivity = new BoardActivity{
+                        BoardId = updateDto.WorkspaceId,
+                        UserId = userId,
+                        ActionType = "updated",
+                        EntityName = "workspace " + updateDto.Title,
+                        ActionDate = DateTime.Now
+                    };
+                    await _boardActivityRepo.CreateBoardActivityAsync(boardActivity);
 
                     
                     var updatedWorkspaceDto = _mapper.Map<WorkspaceDto>(workspaceModel);

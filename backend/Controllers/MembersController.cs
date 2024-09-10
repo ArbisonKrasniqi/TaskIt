@@ -3,7 +3,7 @@ using backend.DTOs.Members;
 using backend.DTOs.Members.Output;
 using backend.DTOs.Workspace;
 using backend.Interfaces;
-
+using backend.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 namespace backend.Controllers;
@@ -17,13 +17,15 @@ public class MembersController: ControllerBase
     private readonly IWorkspaceRepository _workspaceRepo;
     private readonly IMapper _mapper;
     private readonly IUserRepository _userRepo;
+    private readonly IBoardActivityRepository _boardActivityRepo;
 
-    public MembersController(IMembersRepository userWorkspaceRepo, IWorkspaceRepository workspaceRepo, IMapper mapper, IUserRepository userRepo)
+    public MembersController(IMembersRepository userWorkspaceRepo, IWorkspaceRepository workspaceRepo, IMapper mapper, IUserRepository userRepo, IBoardActivityRepository boardActivityRepo)
     {
         _membersRepo = userWorkspaceRepo;
         _workspaceRepo = workspaceRepo;
         _mapper = mapper;
         _userRepo = userRepo;
+        _boardActivityRepo = boardActivityRepo;
     }
     [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpPost("AddMember")]
@@ -160,6 +162,11 @@ public class MembersController: ControllerBase
                 {
                     return StatusCode(500, "User could not be removed");
                 }
+
+
+                
+
+
                 return Ok("Member removed!");
             }
             return StatusCode(401, "You are not authorized!");

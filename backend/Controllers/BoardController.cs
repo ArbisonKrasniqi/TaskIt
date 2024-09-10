@@ -20,8 +20,9 @@ namespace backend.Controllers
         private readonly IUserRepository _userRepo;
         private readonly IMapper _mapper;
         private readonly IWorkspaceActivityRepository _workspaceActivityRepo;
+        private readonly IBoardActivityRepository _boardActivityRepo;
 
-        public BoardController(IBoardRepository boardRepo,IWorkspaceRepository workspaceRepo, IBackgroundRepository backgroundRepo, IMembersRepository membersRepo, IUserRepository userRepo, IMapper mapper, IWorkspaceActivityRepository workspaceActivityRepo)
+        public BoardController(IBoardRepository boardRepo,IWorkspaceRepository workspaceRepo, IBackgroundRepository backgroundRepo, IMembersRepository membersRepo, IUserRepository userRepo, IMapper mapper, IWorkspaceActivityRepository workspaceActivityRepo, IBoardActivityRepository boardActivityRepo)
         {
             _boardRepo = boardRepo;
             _workspaceRepo = workspaceRepo;
@@ -30,6 +31,7 @@ namespace backend.Controllers
             _userRepo = userRepo;
             _mapper = mapper;
             _workspaceActivityRepo = workspaceActivityRepo;
+            _boardActivityRepo = boardActivityRepo;
         }
         [Authorize(AuthenticationSchemes = "Bearer")]
         [Authorize(Policy = "AdminOnly")]
@@ -170,7 +172,7 @@ namespace backend.Controllers
                     var boardModel = _mapper.Map<Board>(boardDto);
                     await _boardRepo.CreateBoardAsync(boardModel);
                     
-                    
+                    // Created WorkspaceActivity
                     var workspaceActivity = new WorkspaceActivity
                     {
                         WorkspaceId = boardDto.WorkspaceId,
@@ -181,6 +183,18 @@ namespace backend.Controllers
                     };
                     
                     await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
+
+                    //Created BoardActivity
+                    var boardActivity = new BoardActivity{
+                        BoardId = boardModel.BoardId,
+                        UserId = userId,
+                        ActionType = "created",
+                        EntityName = "board " + boardDto.Title,
+                        ActionDate = DateTime.Now
+                    };
+                    await _boardActivityRepo.CreateBoardActivityAsync(boardActivity);
+
+
                     return CreatedAtAction(nameof(GetBoardById), new { id = boardModel.BoardId },
                         _mapper.Map<BoardDto>(boardModel));
                 }
@@ -247,10 +261,11 @@ namespace backend.Controllers
                 if (isMember || userTokenRole == "Admin")
                 {
                     var boardModel = await _boardRepo.UpdateBoardAsync(updateDto);
-
+                    
                     if (boardModel == null)
                         return NotFound("Board Not Found!");
-                    
+
+                    //Update WorkspaceActivity
                     var workspaceActivity = new WorkspaceActivity
                     {
                         WorkspaceId = board.WorkspaceId,
@@ -262,6 +277,17 @@ namespace backend.Controllers
                     
                     await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
 
+
+                    // Update BoardActivity
+                    var boardActivity = new BoardActivity{
+                        BoardId = board.BoardId,
+                        UserId = userId,
+                        ActionType = "updated",
+                        EntityName = "board " + board.Title,
+                        ActionDate = DateTime.Now
+                    };
+                    await _boardActivityRepo.CreateBoardActivityAsync(boardActivity);
+                    
                     
                     
                     var boardDto = _mapper.Map<BoardDto>(boardModel);
@@ -300,7 +326,7 @@ namespace backend.Controllers
             
                 if (ownsWorkspace || userTokenRole == "Admin")
                 {
-                        
+                    // Delete WorkspaceActivity
                     var workspaceActivity = new WorkspaceActivity
                     {
                         WorkspaceId = board.WorkspaceId,
@@ -311,6 +337,19 @@ namespace backend.Controllers
                     };
                     
                     await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
+
+                    //Delete BoardActivity
+                    var boardActivity = new BoardActivity{
+                        BoardId = board.BoardId,
+                        UserId = userId,
+                        ActionType = "deleted",
+                        EntityName = "board " + board.Title,
+                        ActionDate = DateTime.Now
+                    };
+                    await _boardActivityRepo.CreateBoardActivityAsync(boardActivity);
+
+
+
 
                     var boardModel = await _boardRepo.DeleteBoardAsync(boardIdDto.BoardId);
                     if (boardModel == null)
@@ -390,6 +429,16 @@ namespace backend.Controllers
                     {
                         return NotFound();
                     }
+                    // BoardActivity per  board closure
+                    var boardActivity = new BoardActivity{
+                        BoardId = board.BoardId,
+                        UserId = userId,
+                        ActionType = "closed",
+                        EntityName = "board " + board.Title,
+                        ActionDate = DateTime.Now
+                    };
+                    await _boardActivityRepo.CreateBoardActivityAsync(boardActivity);
+                    
 
                     return Ok("Board closed");
                 }
@@ -425,6 +474,15 @@ namespace backend.Controllers
                     {
                         return NotFound();
                     }
+                    //BoardActivity per board reopen
+                    var boardActivity = new BoardActivity{
+                        BoardId = board.BoardId,
+                        UserId = userId,
+                        ActionType = "reopen",
+                        EntityName = "board " + board.Title,
+                        ActionDate = DateTime.Now
+                    };
+                    await _boardActivityRepo.CreateBoardActivityAsync(boardActivity);
 
                     return Ok("Board reopened");
                 }

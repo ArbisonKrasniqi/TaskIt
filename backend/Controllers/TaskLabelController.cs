@@ -20,10 +20,11 @@ public class TaskLabelController : ControllerBase
     private readonly IWorkspaceRepository _workspaceRepo;
     private readonly IUserRepository _userRepo;
     private readonly IMapper _mapper;
+    private readonly IBoardActivityRepository _boardActivityRepo;
 
     public TaskLabelController(ITaskLabelRepository taskLabelRepo, ILabelRepository labelRepo, ITaskRepository taskRepo,
         IListRepository listRepo, IBoardRepository boardRepo,
-        IWorkspaceRepository workspaceRepo, IUserRepository userRepo, IMapper mapper)
+        IWorkspaceRepository workspaceRepo, IUserRepository userRepo, IMapper mapper, IBoardActivityRepository boardActivityRepo)
     {
         _taskLabelRepo = taskLabelRepo;
         _labelRepo = labelRepo;
@@ -33,6 +34,7 @@ public class TaskLabelController : ControllerBase
         _workspaceRepo = workspaceRepo;
         _userRepo = userRepo;
         _mapper = mapper;
+        _boardActivityRepo = boardActivityRepo;
     }
 
     [HttpGet("GetAllTaskLabels")]
@@ -122,6 +124,17 @@ public class TaskLabelController : ControllerBase
                 var taskLabelModel = _mapper.Map<TaskLabel>(assignLabelDto);
                 var createdTaskLabel = await _taskLabelRepo.assignLabelToTask(taskLabelModel);
                 var createdTaskLabeldto = _mapper.Map<TaskLabelDTO>(createdTaskLabel);
+
+                //Assign BoardActivity
+                    var boardActivity = new BoardActivity{
+                        BoardId = taskLabelModel.TaskLabelId,
+                        UserId = userId,
+                        ActionType = "assign",
+                        EntityName = "label " + assignLabelDto.TaskId,
+                        ActionDate = DateTime.Now
+                    };
+                await _boardActivityRepo.CreateBoardActivityAsync(boardActivity);
+
                 return Ok(createdTaskLabeldto);
             }
 
@@ -189,6 +202,19 @@ public class TaskLabelController : ControllerBase
                 var taskLabelModel =
                     await _taskLabelRepo.getTaskLabelByLabelAndTask(assignLabelDto.LabelId, assignLabelDto.TaskId);
                 await _taskLabelRepo.removeTaskLabel(taskLabelModel);
+
+
+
+                //Remove BoardActivity
+                    var boardActivity = new BoardActivity{
+                        BoardId = taskLabelModel.TaskLabelId,
+                        UserId = userId,
+                        ActionType = "remove",
+                        EntityName = "label " + assignLabelDto.TaskId,
+                        ActionDate = DateTime.Now
+                    };
+                await _boardActivityRepo.CreateBoardActivityAsync(boardActivity);
+                
                 return Ok("Deleted task label");
             }
 

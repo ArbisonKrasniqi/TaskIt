@@ -10,7 +10,8 @@ import { getAccessToken, checkAndRefreshToken } from '../Services/TokenService.j
 import { useParams } from 'react-router-dom';
 import { useState } from "react"; 
 import { useNavigate } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode';
+import jwtDecode from 'jwt-decode';
+//import { jwtDecode } from 'jwt-decode';
 import Table from '../Components/ContentFromSide/Table.jsx';
 import Calendar from '../Components/ContentFromSide/Calendar.jsx';
 import LoadingModal from '../Components/Modal/LoadingModal.jsx';
@@ -21,6 +22,10 @@ import Profile from '../Components/Navbar/Profile.jsx';
 import TaskModal from '../Components/TaskModal/TaskModal.jsx';
 import Board from '../Components/BoardContent/Board.jsx';
 import BoardSettings from '../Components/ContentFromSide/BoardSettings.jsx';
+
+// import Preview from '../Components/Preview/preview.jsx';
+import AboutUs from '../Components/Preview/aboutus.jsx';
+import ContactUs from '../Components/Preview/contactus.jsx';
 
 const Main = () => {
     const {opened, workspaceId, boardId, taskId} = useParams();
@@ -89,10 +94,13 @@ const Main = () => {
                             {opened === 'calendar' && <Calendar/>}
                             {opened === 'loadingModal' && <LoadingModal/>}
                             {opened === 'members' && <Members />}
+                            {opened === 'aboutus' && <AboutUs/>}
+                            {opened === 'contactus' && <ContactUs/>}
                             {opened === 'privacyPolicy' && <PrivacyPolicy/>}
                             {opened === 'profile' && <Profile/>}
                             {opened === 'task' && <TaskModal/>}
                             {opened === 'boardSettings' &&  <BoardSettings/>}
+
                         </div>
                     </div>
                 </div>

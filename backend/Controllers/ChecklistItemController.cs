@@ -23,11 +23,12 @@ public class ChecklistItemController : ControllerBase
     private readonly IMapper _mapper;
     private readonly IWorkspaceRepository _workspaceRepo;
     private readonly IUserRepository _userRepo;
+    private readonly IBoardActivityRepository _boardActivityRepo;
     private readonly ITaskActivityRepository _taskActivityRepo;
 
     public ChecklistItemController(IChecklistItemRepository checklistItemRepo, IChecklistRepository checklistRepo,
         ITaskRepository taskRepo,
-        IListRepository listRepo, IBoardRepository boardRepo, IMembersRepository membersRepo, IMapper mapper, IWorkspaceRepository workspaceRepo, IUserRepository userRepo, ITaskActivityRepository taskActivityRepo)
+        IListRepository listRepo, IBoardRepository boardRepo, IMembersRepository membersRepo, IMapper mapper, IWorkspaceRepository workspaceRepo, IUserRepository userRepo, ITaskActivityRepository taskActivityRepo, IBoardActivityRepository boardActivityRepo)
     {
         _checklistItemRepo = checklistItemRepo;
         _checklistRepo = checklistRepo;
@@ -39,6 +40,7 @@ public class ChecklistItemController : ControllerBase
         _workspaceRepo = workspaceRepo;
         _userRepo = userRepo;
         _taskActivityRepo = taskActivityRepo;
+        _boardActivityRepo = boardActivityRepo;
     }
 
     [Authorize(AuthenticationSchemes = "Bearer")]
@@ -211,6 +213,18 @@ public class ChecklistItemController : ControllerBase
 
                 await _taskActivityRepo.CreateTaskActivityAsync(taskActivity);
                 
+
+                //Created BoardActivity
+                var boardActivity = new BoardActivity{
+                    BoardId = checklistItemModel.ChecklistItemId,
+                    UserId = userId,
+                    ActionType = "created",
+                    EntityName = "checklistItem " + checklistItemDto.Content,
+                    ActionDate = DateTime.Now
+                };
+                await _boardActivityRepo.CreateBoardActivityAsync(boardActivity);
+
+
                 return CreatedAtAction(nameof(GetChecklistItemById),new {id= checklistItemModel.ChecklistItemId},_mapper
                     .Map<ChecklistItemDTO>(checklistItemModel));
             }
@@ -310,6 +324,18 @@ public class ChecklistItemController : ControllerBase
 
                 await _taskActivityRepo.CreateTaskActivityAsync(taskActivity);
                 
+                //Updated BoardActivity
+                var boardActivity = new BoardActivity{
+                    BoardId = checklistItemModel.ChecklistItemId,
+                    UserId = userId,
+                    ActionType = "updated",
+                    EntityName = "checklistItem " + checklistItemDto.Content,
+                    ActionDate = DateTime.Now
+                };
+                await _boardActivityRepo.CreateBoardActivityAsync(boardActivity);
+
+
+
                 var checklistItem = _mapper.Map<ChecklistItemDTO>(checklistItemModel);
                 return Ok(checklistItem);
             }
@@ -414,6 +440,19 @@ public class ChecklistItemController : ControllerBase
 
                 await _taskActivityRepo.CreateTaskActivityAsync(taskActivity);
                 await _checklistItemRepo.DeleteChecklistItemAsync(checklistItemIdDto.ChecklistItemId);
+                var checklistItemModel = await _checklistItemRepo.DeleteChecklistItemAsync(checklistItemIdDto.ChecklistItemId);
+
+                //Deleted BoardActivity
+                var boardActivity = new BoardActivity{
+                    BoardId = checklistItemModel.ChecklistItemId,
+                    UserId = userId,
+                    ActionType = "deleted",
+                    EntityName = "checklistItem " + checklistItemIdDto,
+                    ActionDate = DateTime.Now
+                };
+                await _boardActivityRepo.CreateBoardActivityAsync(boardActivity);
+
+
                 return Ok("ChecklistItem deleted");
             }
             return StatusCode(401, "You are not authorized!");
@@ -564,7 +603,7 @@ public class ChecklistItemController : ControllerBase
         {
             return BadRequest(ModelState);
         }
-
+        
         try
         {
             if (checklistItemId <= 0)
@@ -627,6 +666,14 @@ public class ChecklistItemController : ControllerBase
                 };
 
                 await _taskActivityRepo.CreateTaskActivityAsync(taskActivity);
+                var boardActivity = new BoardActivity{
+                    BoardId = checklistItem.ChecklistItemId,
+                    UserId = userId,
+                    ActionType = "checked",
+                    EntityName = "checklistItem " + checklistItemId,
+                    ActionDate = DateTime.Now
+                };
+                await _boardActivityRepo.CreateBoardActivityAsync(boardActivity);
 
                 return Ok("ChecklistItem changed to: "+checklistItem.Checked);
             }

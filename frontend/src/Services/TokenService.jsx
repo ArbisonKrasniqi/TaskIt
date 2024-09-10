@@ -1,5 +1,6 @@
 import Cookies from 'js-cookie';
-import { jwtDecode } from 'jwt-decode'
+import jwtDecode from 'jwt-decode';
+//import { jwtDecode } from 'jwt-decode'
 import { postData } from './FetchService';
 
 
