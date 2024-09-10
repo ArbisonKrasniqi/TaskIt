@@ -136,6 +136,7 @@ builder.Services.AddScoped<ILabelRepository, LabelRepository>();
 builder.Services.AddScoped<IWorkspaceActivityRepository, WorkspaceActivityRepository>();
 builder.Services.AddScoped<ITaskLabelRepository, TaskLabelRepository>();
 builder.Services.AddScoped<ITaskActivityRepository, TaskActivityRepository>();
+builder.Services.AddScoped<IBoardActivityRepository, BoardActivityRepository>();
 // CORS configuration
 builder.Services.AddCors(options =>
 {

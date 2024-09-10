@@ -5,8 +5,8 @@ import Button from '../Sign-up/Button.jsx';
 import { StoreTokens } from '../../Services/TokenService.jsx';
 import { postData } from '../../Services/FetchService.jsx';
 import { useNavigate } from 'react-router-dom';
-import jwtDecode from 'jwt-decode';
-// import { jwtDecode } from 'jwt-decode'; 
+//import jwtDecode from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode'; 
 // po e boj koment se nuk pom bon me kllapa e qishtu pomm punon 
 
 const LogInForm =  () =>{
@@ -70,7 +70,7 @@ const LogInForm =  () =>{
     }
 
     return(
-        <div className='container mx-auto mt-20 h-[1000px]'>
+        <div className='container mx-auto mt-20 h-[1500px]'>
             <div className='flex flex-col lg:flex-row w-full lg:w-8/12 h-screen lg:h-96 bg-white roundes=x; mx-auto shadow-lg overflow-hidden inset-x-20'>
                 <div className='flex lg:flex-row justify-center items-center w-full lg:w-7/12 py-16 px-12 '>
                     <form onSubmit={handleSubmit} >

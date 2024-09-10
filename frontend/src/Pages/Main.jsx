@@ -10,8 +10,8 @@ import { getAccessToken, checkAndRefreshToken } from '../Services/TokenService.j
 import { useParams } from 'react-router-dom';
 import { useState } from "react"; 
 import { useNavigate } from 'react-router-dom';
-import jwtDecode from 'jwt-decode';
-//import { jwtDecode } from 'jwt-decode';
+//import jwtDecode from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 import Table from '../Components/ContentFromSide/Table.jsx';
 import Calendar from '../Components/ContentFromSide/Calendar.jsx';
 import LoadingModal from '../Components/Modal/LoadingModal.jsx';
