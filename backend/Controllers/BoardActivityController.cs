@@ -33,45 +33,7 @@ public class BoardActivityController : ControllerBase{
     }
 
     [Authorize(AuthenticationSchemes = "Bearer")]
-    [HttpPost("CreateBoardActivity")]
-
-    public async  Task<IActionResult> CreateBoardActivity(AddBoardActivityDto boardActivityDto){
-
-        try{
-            if (!ModelState.IsValid){
-                return BadRequest(ModelState);
-            }
-
-            var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
-            var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
-
-            var board = await _boardRepo.GetBoardByIdAsync(boardActivityDto.BoardId);
-            if(board == null){
-                return NotFound("Board Not Found!");
-            }
-            if(userId == null){
-                return NotFound("User Not Found!");
-            }
-
-            var isMember = await _memberRepo.IsAMember(userId, board.BoardId);
-            if(isMember || userTokenRole == "Admin"){
-
-                var boardActivity = boardActivityDto.ToBoardActivityFromCreate(userId);
-                await _boardActivityRepo.CreateBoardActivityAsync(boardActivity);
-                return CreatedAtAction(nameof(GetBoardActivityById), 
-                    new { id = boardActivity.BoardActivityId }, boardActivity);
-                    
-            }
-
-            return StatusCode(401, "You are not authorized");
-        }catch(Exception e){
-            return StatusCode(500, "Internal server error! " + e.Message);
-        }
-
-    }
-
-
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(Policy = "AdminOnly")]
     [HttpGet("GetAllBoardActivity")]
 
     public async Task<IActionResult> GetAllBoardActivity(){

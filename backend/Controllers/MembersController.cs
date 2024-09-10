@@ -1,10 +1,12 @@
-﻿using AutoMapper;
+﻿
+using AutoMapper;
 using backend.DTOs.Members;
 using backend.DTOs.Members.Output;
 using backend.DTOs.Workspace;
 using backend.Interfaces;
 using backend.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 namespace backend.Controllers;
 [Route("backend/Members")]
@@ -18,54 +20,16 @@ public class MembersController: ControllerBase
     private readonly IMapper _mapper;
     private readonly IUserRepository _userRepo;
     private readonly IBoardActivityRepository _boardActivityRepo;
+    private readonly UserManager<User> _userManager;
 
-    public MembersController(IMembersRepository userWorkspaceRepo, IWorkspaceRepository workspaceRepo, IMapper mapper, IUserRepository userRepo, IBoardActivityRepository boardActivityRepo)
+    public MembersController(UserManager<User> userManager, IMembersRepository userWorkspaceRepo, IWorkspaceRepository workspaceRepo, IMapper mapper, IUserRepository userRepo, IBoardActivityRepository boardActivityRepo)
     {
+        _userManager = userManager;
         _membersRepo = userWorkspaceRepo;
         _workspaceRepo = workspaceRepo;
         _mapper = mapper;
         _userRepo = userRepo;
         _boardActivityRepo = boardActivityRepo;
-    }
-    [Authorize(AuthenticationSchemes = "Bearer")]
-    [HttpPost("AddMember")]
-    public async Task<IActionResult> AddMember(AddMemberDto addMemberDto)
-    {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-        try
-        {
-            if (!await _workspaceRepo.WorkspaceExists(addMemberDto.WorkspaceId))
-            {
-                return NotFound("Workspace Not found!");
-            }
-
-            if (!await _userRepo.UserExists(addMemberDto.UserId))
-            {
-                return NotFound("User does not exists!");
-            }
-            var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
-            var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
-            
-            if (string.IsNullOrEmpty(userId))
-            {
-                return NotFound("User Not Found!");
-            }
-            var ownsWorkspace = await _userRepo.UserOwnsWorkspace(userId, addMemberDto.WorkspaceId);
-            if (ownsWorkspace || userTokenRole == "Admin")
-            {
-                await _membersRepo.AddMemberAsync(addMemberDto);
-                return StatusCode(200, "Member added!");
-            }
-            return StatusCode(401, "You are not authorized!");
-        }
-        catch (Exception e)
-        {
-            return StatusCode(500, "Internal server error: "+e.Message);
-        }
-        
     }
 
     [Authorize(AuthenticationSchemes = "Bearer")]
@@ -149,11 +113,27 @@ public class MembersController: ControllerBase
             }
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+
+            var isOwner = await _userRepo.UserOwnsWorkspace(removeMemberDto.UserId, removeMemberDto.WorkspaceId);
             
-            if (string.IsNullOrEmpty(userId))
+            if (userId == removeMemberDto.UserId && isOwner)
             {
-                return NotFound("User Not Found!");
+                return StatusCode(403, "You cannot leave the workspace you own");
             }
+
+            var removedMember = await _userManager.FindByIdAsync(removeMemberDto.UserId);
+            if (removedMember == null)
+            {
+                return NotFound("User not found");
+            }
+
+            if (userId != removeMemberDto.UserId && !isOwner)
+            {
+                return StatusCode(401, "You are not authorized");
+            }
+            
+            
+            
              var isMember = await _membersRepo.IsAMember(userId, removeMemberDto.WorkspaceId);
             if (isMember || userTokenRole == "Admin")
             {

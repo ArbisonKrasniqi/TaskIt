@@ -72,33 +72,6 @@ public class TaskMemberController : ControllerBase
     }
 
     [Authorize(AuthenticationSchemes = "Bearer")]
-    [HttpGet("GetTaskMemberById")]
-    public async Task<IActionResult> GetTaskMemberById(int taskMemberId)
-    {
-        try
-        {
-            var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
-            var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
-            var taskMember = await _taskMemberRepo.GetTaskMemberByIdAsync(taskMemberId);
-
-            var taskId = taskMember.TaskId;
-            var isTaskMember = userId != null && await _taskMemberRepo.IsATaskMember(userId, taskId);
-
-            if (isTaskMember || userTokenRole == "Admin")
-            {
-                var taskMemberDto = _mapper.Map<TaskMemberDto>(taskMember);
-                return Ok(taskMemberDto);
-            }
-
-            return StatusCode(401, "You are not authorized!");
-        }
-        catch (Exception e)
-        {
-            return StatusCode(500, "Internal Server Error!" + e.Message);
-        }
-    }
-
-    [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpGet("GetAllTaskMembersByTaskId")]
     public async Task<IActionResult> GetAllTaskMembersByTaskId(int taskId)
     {
@@ -202,6 +175,17 @@ public class TaskMemberController : ControllerBase
             if (workspace == null)
             {
                 return NotFound("Workspace Not Found");
+            }
+
+            var addedMember = await _userManager.FindByIdAsync(addTaskMemberDto.UserId);
+            if (addedMember == null)
+            {
+                return NotFound("User not found");
+            }
+
+            if (addedMember.isDeleted)
+            {
+                return StatusCode(403, "User is deleted");
             }
 
             var isMember = userId != null && await _memberRepo.IsAMember(userId, workspace.WorkspaceId);
@@ -384,6 +368,18 @@ public async Task<IActionResult> UpdateTaskMember(UpdateTaskMemberDto updateTask
                 return NotFound("Workspace Not Found!");
             }
 
+            var removedMember = await _userManager.FindByIdAsync(removeTaskMemberDto.UserId);
+            if (removedMember == null)
+            {
+                return NotFound("User not found");
+            }
+
+            if (removedMember.isDeleted)
+            {
+                return StatusCode(403, "User is deleted");
+            }
+
+            
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
             var isMember = await _memberRepo.IsAMember(userId, workspace.WorkspaceId);

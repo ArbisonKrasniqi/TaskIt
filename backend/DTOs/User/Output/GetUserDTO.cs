@@ -8,4 +8,5 @@ public class GetUserDTO
     public string? Email { get; set; }
     public DateTime DateCreated { get; set; }
     public string? Role { get; set; }
+    public bool isDeleted { get; set; }
 }

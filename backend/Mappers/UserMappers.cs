@@ -18,7 +18,8 @@ public static class UserMappers
             LastName = user.LastName,
             Email = user.Email,
             DateCreated = user.DateCreated,
-            Role = role
+            Role = role,
+            isDeleted = user.isDeleted
         };
     }
     

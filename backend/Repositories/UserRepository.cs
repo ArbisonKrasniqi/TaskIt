@@ -3,6 +3,7 @@ using backend.DTOs.User.Output;
 using backend.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
+using backend.Models;
 
 namespace backend.Repositories;
 
@@ -43,11 +44,26 @@ public class UserRepository : IUserRepository
         }
 
         var users = await _context.Users
-            .Where(u => u.UserName.Contains(query) || 
+            .Where(u => (u.UserName.Contains(query) || 
                         u.Email.Contains(query) ||
                         u.FirstName.Contains(query) ||
-                        u.LastName.Contains(query)).ToListAsync();
+                        u.LastName.Contains(query)) && u.isDeleted == false).ToListAsync();
         var userDtos = _mapper.Map<List<SearchUserDto>>(users);
         return userDtos;
+    }
+
+    public async Task<bool> DeleteUserAsync(User User)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == User.Id);
+        if (user == null) return false;
+        user.isDeleted = !user.isDeleted;
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> UserIsDeleted(string userId)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        return user.isDeleted;
     }
 }

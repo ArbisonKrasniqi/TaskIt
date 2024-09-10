@@ -6,6 +6,7 @@ using backend.DTOs.Workspace;
 using backend.Interfaces;
 using backend.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers
@@ -15,14 +16,16 @@ namespace backend.Controllers
     [ApiController]
     public class InviteController : ControllerBase
     {
+        private readonly UserManager<User> _userManager;
         private readonly IInviteRepository _inviteRepo;
         private readonly IWorkspaceRepository _workspaceRepo;
         private readonly IUserRepository _userRepo;
         private readonly IMembersRepository _memberRepo;
         private readonly IMapper _mapper;
 
-        public InviteController(IInviteRepository inviteRepo, IWorkspaceRepository workspaceRepo, IUserRepository userRepo,IMembersRepository memberRepo, IMapper mapper)
+        public InviteController(UserManager<User> userManager, IInviteRepository inviteRepo, IWorkspaceRepository workspaceRepo, IUserRepository userRepo,IMembersRepository memberRepo, IMapper mapper)
         {
+            _userManager = userManager;
             _inviteRepo = inviteRepo;
             _workspaceRepo = workspaceRepo;
             _userRepo = userRepo;
@@ -224,9 +227,12 @@ namespace backend.Controllers
             {
                 return BadRequest("Inviter Not Found!");
             }
-            if (!await _userRepo.UserExists(inviteDto.InviteeId))
+
+            var inviteeUser = await _userManager.FindByIdAsync(inviteDto.InviteeId);
+            if (inviteeUser == null) return BadRequest("Invitee Not Found!");
+            if (inviteeUser.isDeleted)
             {
-                return BadRequest("Invitee Not Found!");
+                return StatusCode(403, "Invitee is deleted");
             }
 
             var workspace = await _workspaceRepo.GetWorkspaceByIdAsync(inviteDto.WorkspaceId);

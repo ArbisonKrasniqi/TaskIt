@@ -47,6 +47,10 @@ public class TokenController : ControllerBase
             {
                 return Unauthorized("User not found.");
             }
+            if (user.isDeleted)
+            {
+                return Unauthorized("User is deleted");
+            }
 
             if (storedToken.Expires <= DateTime.Now)
             {

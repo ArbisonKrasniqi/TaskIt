@@ -15,6 +15,7 @@ public class User : IdentityUser
     [MaxLength(20, ErrorMessage = "Last name cannot be over 20 characters")]
     public string LastName { get; set; } = string.Empty;
     public DateTime DateCreated { get; set; } = DateTime.Now;
+    public bool isDeleted { get; set; } = false;
 
     public List<Workspace> Workspaces { get; set; }
     public RefreshToken refreshToken { get; set; } = null;

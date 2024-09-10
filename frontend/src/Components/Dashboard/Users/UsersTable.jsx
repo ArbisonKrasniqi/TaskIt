@@ -20,7 +20,13 @@ const UsersTable = () => {
                 const data = { id };
                 const response = await deleteData('/backend/user/adminDeleteUserById', data);
                 console.log(response);
-                const updatedUsers = (userContext.users || []).filter(user => user.id !== id);
+                const updatedUsers = (userContext.users || []).map(user => {
+                    if (user.id === id) {
+                        return { ...user, isDeleted: !user.isDeleted };
+                    }
+                    return user;
+                });
+                
                 userContext.setUsers(updatedUsers);
             } catch (error) {
                 dashboardContext.setDashboardErrorMessage(error.message);
@@ -76,6 +82,7 @@ const UsersTable = () => {
                             <th className="px-6 py-3">Date Created</th>
                             <th className="px-6 py-3">User ID</th>
                             <th className="px-6 py-3">Role</th>
+                            <th className="px-6 py-3">Is Deleted</th>
                             <th className="px-6 py-3">Actions</th>
                         </tr>
                     </thead>
@@ -92,6 +99,7 @@ const UsersTable = () => {
                                     <td className="px-6 py-4">{user.dateCreated}</td>
                                     <td className="px-6 py-4">{user.id}</td>
                                     <td className="px-6 py-4">{user.role}</td>
+                                    <td className="px-6 py-4">{user.isDeleted+""}</td>
                                     <td className="px-6 py-4">
                                         <CustomButton 
                                             onClick={() => handleRowClick(user.id)}

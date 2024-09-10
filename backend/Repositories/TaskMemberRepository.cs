@@ -19,7 +19,10 @@ public class TaskMemberRepository : ITaskMemberRepository
     //GET ALL
     public async Task<List<TaskMember>> GetAllTaskMembersAsync()
     {
-        return await _context.TaskMember.ToListAsync();
+        return await _context.TaskMember
+            .Include(tm => tm.User)
+            .Where(tm => !tm.User.isDeleted)
+            .ToListAsync();
     }
     
     //GET BY ID
@@ -43,17 +46,18 @@ public class TaskMemberRepository : ITaskMemberRepository
         }
 
         // Map the task members to TaskMemberDto, including FirstName and LastName
-        var taskMembersDto = task.TaskMembers.Select(tm => new TaskMember
-        {
-            TaskMemberId = tm.TaskMemberId,
-            UserId = tm.UserId,
-            FirstName = tm.User.FirstName, // Assuming User has FirstName
-            LastName = tm.User.LastName,
-            DateJoined = tm.DateJoined,
-            TaskId = tm.TaskId
-            // Assuming User has LastName
-            // Map other TaskMemberDto properties if needed
-        }).ToList();
+        var taskMembersDto = task.TaskMembers
+            .Where(tm => !tm.User.isDeleted)
+            .Select(tm => new TaskMember
+            {
+                TaskMemberId = tm.TaskMemberId,
+                UserId = tm.UserId,
+                FirstName = tm.User.FirstName,
+                LastName = tm.User.LastName, 
+                DateJoined = tm.DateJoined,
+                TaskId = tm.TaskId
+            })
+            .ToList();
 
         return taskMembersDto;
     }

@@ -16,15 +16,12 @@ namespace backend.Controllers
         private readonly IUserRepository _userRepo; 
         private readonly IMapper _mapper;
         private readonly IWorkspaceActivityRepository _workspaceActivityRepo;
-
-        private readonly IBoardActivityRepository _boardActivityRepo;
-        public WorkspaceController(IWorkspaceRepository workspaceRepo, IUserRepository userRepo, IMapper mapper, IWorkspaceActivityRepository workspaceActivityRepo, IBoardActivityRepository boardActivityRepo)
+        public WorkspaceController(IWorkspaceRepository workspaceRepo, IUserRepository userRepo, IMapper mapper, IWorkspaceActivityRepository workspaceActivityRepo)
         {
             _userRepo = userRepo;
             _workspaceRepo = workspaceRepo;
             _mapper = mapper;
             _workspaceActivityRepo = workspaceActivityRepo;
-            _boardActivityRepo = boardActivityRepo;
         }
         
         [Authorize(AuthenticationSchemes = "Bearer")]
@@ -52,12 +49,12 @@ namespace backend.Controllers
         [HttpGet("GetWorkspacesByOwnerId")]
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> GetWorkspacesByOwnerId(string ownerId)
+        
         {
             try
             { 
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
                 var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
-
                 if (userId == ownerId || userTokenRole == "Admin")
                 {
                     var workspaces = await _workspaceRepo.GetWorkspacesByOwnerIdAsync(ownerId);
@@ -109,7 +106,7 @@ namespace backend.Controllers
         }
 
         [HttpGet("GetWorkspaceById")]
-        
+        [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> GetWorkspaceById(int workspaceId)
         {
             try
@@ -170,17 +167,6 @@ namespace backend.Controllers
                     await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
 
 
-                    //Created BoardActivity
-                    var boardActivity = new BoardActivity{
-                        BoardId = createdWorkspace.WorkspaceId,
-                        UserId = userId,
-                        ActionType = "created",
-                        EntityName = "workspace " + workspaceDto.Title,
-                        ActionDate = DateTime.Now
-                    };
-                    await _boardActivityRepo.CreateBoardActivityAsync(boardActivity);
-
-
                     return CreatedAtAction(nameof(GetWorkspaceById), new { id = createdWorkspace.WorkspaceId }, createdWorkspaceDto); 
                     //kthe pergjigjie 201 Created per burimin e ri te krijuar 
                 }
@@ -189,7 +175,7 @@ namespace backend.Controllers
             }
             catch (Exception e)
             {
-                return StatusCode(500, "Internal server error: " + e.Message);
+                return StatusCode(500, "Internal server error: " + e);
             }
         }
 
@@ -232,16 +218,6 @@ namespace backend.Controllers
                     };
                     
                     await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
-
-                    //Updated BoardActivity
-                    var boardActivity = new BoardActivity{
-                        BoardId = updateDto.WorkspaceId,
-                        UserId = userId,
-                        ActionType = "updated",
-                        EntityName = "workspace " + updateDto.Title,
-                        ActionDate = DateTime.Now
-                    };
-                    await _boardActivityRepo.CreateBoardActivityAsync(boardActivity);
 
                     
                     var updatedWorkspaceDto = _mapper.Map<WorkspaceDto>(workspaceModel);

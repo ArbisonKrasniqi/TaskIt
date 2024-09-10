@@ -44,7 +44,6 @@ namespace backend.Controllers;
         //LOGIN AND REGISTER
         //Register as a normal user
         [HttpPost("register")]
-        //[Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> Register(RegisterDTO registerDto)
         {
             try
@@ -88,6 +87,11 @@ namespace backend.Controllers;
                 var user = await _userManager.Users.FirstOrDefaultAsync(x => x.Email == loginDto.Email);
                 if (user == null) return Unauthorized("Invalid username!");
 
+                if (user.isDeleted)
+                {
+                    return Unauthorized("User is deleted");
+                }
+
                 var rolesResult = await _userManager.GetRolesAsync(user);
                 var role = "User";
                 if (rolesResult.Count != 0)
@@ -123,8 +127,8 @@ namespace backend.Controllers;
         
         //ADMIN API CALLS
         [HttpPost("adminCreate")]
-        //[Authorize(AuthenticationSchemes = "Bearer")]
-        //[Authorize(Policy = "AdminOnly")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> Create(CreateUserDTO createUserDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -167,8 +171,8 @@ namespace backend.Controllers;
         
         
         [HttpGet("adminAllUsers")]
-        //[Authorize(AuthenticationSchemes = "Bearer")]
-        //[Authorize(Policy = "AdminOnly")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> GetAllUsers()
         {
             try
@@ -190,45 +194,10 @@ namespace backend.Controllers;
                 return StatusCode(500, e);
             }
         }
-
-        [HttpGet("adminAllAdmins")]
-        [Authorize(AuthenticationSchemes = "Bearer")]
-        public async Task<IActionResult> GetAllAdmins()
-        {
-            try
-            {
-                var users = await _userManager.Users.ToListAsync();
-                var admins = new List<User>();
-
-                foreach (var user in users)
-                {
-                    if (await _userManager.IsInRoleAsync(user, "Admin"))
-                    {
-                        var newAdmin = new User
-                        {
-                            Id = user.Id,
-                            FirstName = user.FirstName,
-                            LastName = user.LastName,
-                            Email = user.Email,
-                            DateCreated = user.DateCreated
-                        };
-                        admins.Add(newAdmin);
-                    }
-                }
-
-                var adminsDto = admins.Select(admin => UserMappers.ToGetUserDTO(admin, "Admin"));
-                return Ok(adminsDto);
-            }
-            catch (Exception e)
-            {
-                return StatusCode(500, e);
-            }
-            
-        }
+        
         
         [HttpGet("adminUserID")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-       // [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> GetUserById(string userId)
         {
             if (!ModelState.IsValid) return BadRequest("Id cannot be empty");
@@ -240,6 +209,11 @@ namespace backend.Controllers;
                 if (user == null)
                 {
                     return StatusCode(404, "User does not exist!");
+                }
+
+                if (user.isDeleted)
+                {
+                    return NotFound("User is deleted");
                 }
 
                 var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
@@ -259,7 +233,6 @@ namespace backend.Controllers;
         
         [HttpGet("adminUserEmail")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> GetUserByEmail(string emailDto)
         {
             if (!ModelState.IsValid)
@@ -274,6 +247,10 @@ namespace backend.Controllers;
                 if (user == null)
                 {
                     return StatusCode(404, "Email does not exist!");
+                }
+                if (user.isDeleted)
+                {
+                    return NotFound("User is deleted");
                 }
 
                 var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
@@ -294,7 +271,6 @@ namespace backend.Controllers;
         
         [HttpPut("adminUpdateUser")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-       
         public async Task<IActionResult> EditUser(EditUserDTO editUserDto)
         {
                 //Check if valid ModelState(DTO) and if the role is either Admin or User
@@ -501,14 +477,21 @@ namespace backend.Controllers;
 
             try
             {
+                
                 //Find specific user using id
                 var user = await _userManager.FindByIdAsync(userIdDto.id);
                 if (user == null) return StatusCode(404, "User does not exist!");
-
+                
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+                if (userId == userIdDto.id)
+                {
+                    return StatusCode(403, "Cannot delete yourself");
+                }
+                
                 var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
                 //Delete found user
-                var result = await _userManager.DeleteAsync(user);
-                if (result.Succeeded)
+                var result = await _userRepo.DeleteUserAsync(user);
+                if (result)
                 {
                     if (isAdmin)
                     {
