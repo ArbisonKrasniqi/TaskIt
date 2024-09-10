@@ -18,7 +18,8 @@ const Boards = () =>{
         boardCount, setOpenClosedBoardsModal, boards, handleCreateBoard, openModal, 
         setOpenModal, setOpenCloseModal, handleStarBoard, handleSortChange, setOpenSortModal,
          openSortModal, selectedSort,hoveredBoardIndex, 
-         setHoveredBoardIndex, hoveredBoardSIndex, setHoveredBoardSIndex, roli, starredBoards, backgroundUrls, closedBoards, fetchClosedBoards, ALLBoardsCount} = useContext(WorkspaceContext);
+         setHoveredBoardIndex, hoveredBoardSIndex, setHoveredBoardSIndex, roli, starredBoards, backgroundUrls, closedBoards, fetchClosedBoards, 
+         ALLBoardsCount, handleStarButtonClick} = useContext(WorkspaceContext);
 
          const [searchTerm, setSearchTerm] = useState('');
          // per me handle ndryshimet ne search input
@@ -48,7 +49,7 @@ const Boards = () =>{
         return <div>Loading...</div>;
     }
 return (
-    <div className="min-h-screen h-full" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
+    <div className="min-h-screen h-full overflow-y-auto" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
       <SideMenusHeader />
       <div className="font-semibold font-sans text-gray-400 flex justify-normal mt-10 flex-col ml-20 mr-20 flex-wrap">
         <h2 className="text-2xl ">Boards {boardCount}/10 (+{countClosedBoards} Closed Boards) </h2>
@@ -111,14 +112,15 @@ return (
                    backgroundImage: `url(${backgroundUrls[board.boardId] || '../Side/background.jpg'})`,  
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
-                }}>
-              <h2 className="ml-3"  onClick={() => navigate(`/main/board/${workspaceId}/${board.boardId}`)} >{board.title}</h2>
+                }}
+                onClick={() => navigate(`/main/board/${workspaceId}/${board.boardId}`)}>
+              <h2 className="ml-3" >{board.title}</h2>
 
 
               <button
                 className="absolute right-2 top-2 text-white font-bold text-3xl transition ease-in-out duration-300"
                 style={{textShadow: '0 0 10px rgba(255, 255, 255, 0.6), 0 0 20px rgba(255, 255, 255, 0.4)'}}
-                onClick={()=>handleStarBoard(board)}>
+                onClick={(e) => handleStarButtonClick(e, board)}>
                 <MdOutlineStarPurple500 /></button>
 
 
@@ -144,14 +146,16 @@ return (
                     backgroundImage: `url(${backgroundUrls[board.boardId] || '../Side/background.jpg'})`, 
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
-                  }}>
-                <h2 key={board.boardId} onClick={() => navigate(`/main/board/${workspaceId}/${board.boardId}`)} className="ml-3">{board.title}</h2>
+                  }}
+                  onClick={() => navigate(`/main/board/${workspaceId}/${board.boardId}`)}>
+
+                <h2 key={board.boardId} className="ml-3">{board.title}</h2>
 
 
                 <button
                   className="absolute right-2 top-2 text-white font-bold text-3xl transition ease-in-out duration-300"
                   style={{textShadow: '0 0 10px rgba(255, 255, 255, 0.6), 0 0 20px rgba(255, 255, 255, 0.4)'}}
-                  onClick={()=>handleStarBoard(board)}
+                  onClick={(e) => handleStarButtonClick(e, board)}
                   >
                   {(hoveredBoardIndex===index ) ?
                   <MdOutlineStarPurple500 /> : <MdOutlineStarOutline /> }</button>

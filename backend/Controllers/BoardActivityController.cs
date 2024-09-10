@@ -49,13 +49,21 @@ public class BoardActivityController : ControllerBase{
             if(board == null){
                 return NotFound("Board Not Found!");
             }
+
+            var workspaceId = board.WorkspaceId;
             if(userId == null){
                 return NotFound("User Not Found!");
             }
 
-            var isMember = await _memberRepo.IsAMember(userId, board.BoardId);
-            if(isMember || userTokenRole == "Admin"){
-
+            var isMember = await _memberRepo.IsAMember(userId, workspaceId);
+    
+                var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
+                if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+                {
+                    return StatusCode(403, "The board is closed");
+                }
+                if(isMember || userTokenRole == "Admin"){
+                    
                 var boardActivity = boardActivityDto.ToBoardActivityFromCreate(userId);
                 await _boardActivityRepo.CreateBoardActivityAsync(boardActivity);
                 return CreatedAtAction(nameof(GetBoardActivityById), 
@@ -64,6 +72,7 @@ public class BoardActivityController : ControllerBase{
             }
 
             return StatusCode(401, "You are not authorized");
+            
         }catch(Exception e){
             return StatusCode(500, "Internal server error! " + e.Message);
         }
@@ -73,7 +82,7 @@ public class BoardActivityController : ControllerBase{
 
     [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpGet("GetAllBoardActivity")]
-
+    [Authorize(Policy = "AdminOnly")]
     public async Task<IActionResult> GetAllBoardActivity(){
 
         try{
@@ -99,7 +108,7 @@ public class BoardActivityController : ControllerBase{
 
     [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpGet("GetBoardActivityById")]
-
+    [Authorize(Policy = "AdminOnly")]
     public async Task<IActionResult> GetBoardActivityById(int boardId){
         
         try{
@@ -127,6 +136,10 @@ public class BoardActivityController : ControllerBase{
     public async Task<IActionResult> GetBoardActivityByBoardId(BoardIdDto boardIdDto){
 
         try{
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
 
@@ -137,8 +150,16 @@ public class BoardActivityController : ControllerBase{
             if(userId == null){
                 return NotFound("User Not Found!");
             }
+
+            var workspaceId = board.WorkspaceId;
             
-            var isMember = await _memberRepo.IsAMember(userId, board.BoardId);
+            var isMember = await _memberRepo.IsAMember(userId, workspaceId);
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
+            if (board.IsClosed && !isOwner && userTokenRole != "Admin")
+            {
+                return StatusCode(403, "The board is closed");
+            }
+
             if(isMember || userTokenRole == "Admin"){
 
                 var boardActivity = await _boardActivityRepo.GetBoardActivityByBoardId(boardIdDto.BoardId);
@@ -193,7 +214,7 @@ public class BoardActivityController : ControllerBase{
 
     [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpDelete("DeleteBoardActivityById")]
-    
+    [Authorize(Policy = "AdminOnly")]
     public async Task<IActionResult> DeleteBoardActivityById(BoardActivityIdDto boardActivityIdDto){
         try{
 
@@ -245,7 +266,8 @@ public class BoardActivityController : ControllerBase{
                 return NotFound("User Not Found!");
             }
 
-            var isOwner = await _userRepo.UserOwnsWorkspace(userId, boardIdDto.BoardId);
+           var workspaceId = board.WorkspaceId;
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspaceId);
             if(isOwner || userTokenRole == "Admin"){
                 
                 var boardActivity = await _boardActivityRepo.GetBoardActivityByBoardId(boardIdDto.BoardId);

@@ -31,7 +31,7 @@ const Members = () => {
         }).filter(Boolean); // Remove any null values from the array
     
     return(
-        <div className="min-h-screen h-full" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
+        <div className="min-h-screen h-full overflow-y-auto" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
            <SideMenusHeader></SideMenusHeader>
             <div className="font-semibold font-sans text-gray-400 flex justify-normal mt-10 flex-col ml-20 mr-20 flex-wrap">
                 <h2 className="text-2xl ">Collaborators {members.length}/10</h2>
@@ -148,6 +148,7 @@ const Members = () => {
 
                             
                         </div>
+                        <br/><br/><br/>
                     
                     </div>
                 </div>

@@ -142,4 +142,13 @@ using backend.Interfaces;
         await _context.SaveChangesAsync();
         return existingStarred;
     }
+    //DELETE STARRED BOARDS BY WORKSPACEID
+        public async Task<List<StarredBoard>> DeleteStarredBoardsByWorkspaceIdAsync(int workspaceId)
+        {
+            var starredBoards = await _context.StarredBoard.Where(x => x.WorkspaceId == workspaceId).ToListAsync();
+            _context.StarredBoard.RemoveRange(starredBoards);
+            await _context.SaveChangesAsync();
+            return starredBoards;
+        }
+        
  }

@@ -1,14 +1,14 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useState} from 'react';
 import { postData } from '../../Services/FetchService';
-
-
+import { useNavigate } from 'react-router-dom';
+import { WorkspaceContext } from './WorkspaceContext';
 const CloseBoardModal = ({open, boardTitle ,onClose, role, boardId, onBoardClosed}) =>{
   
-
+const{WorkspaceId}=useContext(WorkspaceContext);
 
     const [modalContent, setModalContent] =useState(" ");
     const [clicked, setClicked] = useState(false);
-
+    const navigate = useNavigate();
     
         const handleClickH2 = () =>{
             setClicked(true);
@@ -28,6 +28,10 @@ const CloseBoardModal = ({open, boardTitle ,onClose, role, boardId, onBoardClose
             setClicked(false);
             onClose();
         };
+         const handleNav = () =>{
+           navigate(`/main/boardSettings/${WorkspaceId}/${boardId}`);
+           onClose();
+         }
 
 
         if(!open) return null; //kontrollojm a me e shfaq modalin
@@ -49,13 +53,23 @@ const CloseBoardModal = ({open, boardTitle ,onClose, role, boardId, onBoardClose
                     <div className="p-2 m-1">
                         {modalContent}
                     </div>
-                ) : ( // i ndajna qe me mujt mu perdor funksioni handle close tek butoni close(leave)
-                    <h2
-                        className="p-2 m-1 cursor-pointer text-gray-700 hover:bg-gray-300"
-                        onClick={handleClickH2}
-                    >
-                        {'close board'}
-                    </h2>
+                ) : (
+                    <div>
+                        {role === 'Owner' && (
+                            <h2
+                                className="p-2 m-1 cursor-pointer text-gray-700 hover:bg-gray-300"
+                                onClick={handleClickH2}
+                            >
+                                {'Close Board'}
+                            </h2>
+                        )}
+                        <h2
+                            className="p-2 m-1 cursor-pointer text-gray-700 hover:bg-gray-300"
+                            onClick={handleNav}
+                        >
+                            {'Board Settings'}
+                        </h2>
+                    </div>
                 )}
             </div>
         </div>

@@ -26,7 +26,7 @@ const Calendar = () => {
     });
     const toDateKey = (date) => date.toISOString().split('T')[0];
     return (
-        <div className="p-4 min-h-screen h-full" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
+        <div className="p-4 min-h-screen h-full overflow-y-auto" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
             <div className="font-semibold font-sans text-gray-400 flex flex-wrap justify-normal flex-col">
                 <h2 className="text-2xl m-5">Calendar</h2>
                 <h3 className="text-xl m-5">{formatMonthYear(today)}</h3>
@@ -52,7 +52,7 @@ const Calendar = () => {
                                             <p key={i}  className="truncate text-black">{task.taskTitle}</p>
                                         ))
                                     ) : (
-                                        <p className="truncate">No tasks</p>
+                                        <p className="truncate text-black">No tasks</p>
                                     )}
                                 </div>
                             </div>
