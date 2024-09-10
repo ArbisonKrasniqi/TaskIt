@@ -177,4 +177,11 @@ public class CommentRepository : ICommentRepository
         await _context.SaveChangesAsync();
         return existingComment;
     }
+    public async Task<List<Comment>> DeleteCommentsByTaskIdAsync(int taskId)
+    {
+        var comments = await _context.Comment.Where(c => c.TaskId == taskId).ToListAsync();
+        _context.Comment.RemoveRange(comments);
+        await _context.SaveChangesAsync();
+        return comments;
+    }
 }

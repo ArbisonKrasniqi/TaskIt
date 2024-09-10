@@ -3,6 +3,7 @@ import { getDataWithId, deleteData, postData, getDataWithIds } from '../../Servi
 import myImage from './background.jpg';
 import { MainContext } from '../../Pages/MainContext';
 import { useNavigate, useParams } from 'react-router-dom';
+import { getData } from '../../Services/FetchService';
 
 export const WorkspaceContext = createContext();
 
@@ -331,10 +332,68 @@ export const WorkspaceProvider = ({ children }) => {
             console.error("Error starring/unstarring the board:", error.message);
         }
     };
-    const getBackgroundImageUrl = (board) => {
-        // const background = backgrounds.find(b=>b.backgroundId === board.backgroundId);
-        // return background? background.imageUrl : '';
-        return myImage;
+    const getBackgroundImageUrl = async (board) => {
+        if (!board.backgroundId) {
+            console.error("Board does not have a valid backgroundId");
+            return myImage; // // Return a default image if backgroundId is not valid
+        }
+    
+        try {
+            const response = await getDataWithId('http://localhost:5157/backend/background/GetBackgroundByID?id', board.backgroundId);
+    
+            // Check if response contains image data
+            if (response.data && response.data.imageData) {
+                // Convert ImageData from byte array to Base64 format
+            const background =response.data;
+            const url = `data:image/jpeg;base64,${background.imageDataBase64}`;
+            return url;
+            }
+        } catch (error) {
+            console.error("Error fetching background image:", error);
+            return myImage;  // Return a default image in case of error
+        }
+    };
+    
+      const [backgroundUrls, setBackgroundUrls] = useState({});
+
+        useEffect(() => {
+            const getBackgrounds = async () => {
+                const urls = {};
+                for (const board of [...boards, ...starredBoards]) {
+                    const url = await getBackgroundImageUrl(board);
+                    urls[board.boardId] = url;  // Store the URL for each board
+                }
+                setBackgroundUrls(urls);
+            };
+    
+            getBackgrounds();
+        }, [boards, starredBoards]);
+
+        
+    const [activeBackgrounds, setActiveBackgrounds] = useState([]);
+    const [activeBackgroundUrls, setActiveBackgroundUrls] = useState({});
+  
+    const getActiveBackgrounds = async () => {
+        try {
+            const backgroundsResponse = await getData('http://localhost:5157/backend/background/GetActiveBackgrounds');
+            const backgroundsData = backgroundsResponse.data;
+
+            if (backgroundsData && Array.isArray(backgroundsData) && backgroundsData.length > 0) {
+                setActiveBackgrounds(backgroundsData);
+
+                // Create URLs for background images using backgroundId
+                const urls = {};
+                for (let background of backgroundsData) {
+                    const url = `data:image/jpeg;base64,${background.imageDataBase64}`;
+                    urls[background.backgroundId] = url; // Use backgroundId instead of id
+                }
+                setActiveBackgroundUrls(urls);
+            } else {
+                console.error("No active backgrounds found.");
+            }
+        } catch (error) {
+            console.error("Error fetching backgrounds:", error.message);
+        }
     };
 
 
@@ -575,7 +634,6 @@ export const WorkspaceProvider = ({ children }) => {
 
         const countClosedBoards = closedBoards.length;
         const ALLBoardsCount = boardCount+countClosedBoards;
-
     return (
         <WorkspaceContext.Provider value={{
             WorkspaceId,

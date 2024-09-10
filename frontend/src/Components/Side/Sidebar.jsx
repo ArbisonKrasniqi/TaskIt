@@ -1,4 +1,4 @@
-import { useState,useContext } from "react";
+import { useState,useContext, useEffect } from "react";
 import { SlArrowLeft } from "react-icons/sl";
 import { CiViewBoard } from "react-icons/ci";
 import { IoPersonOutline } from "react-icons/io5";
@@ -29,11 +29,12 @@ const Sidebar = () => {
         setOpenSortModal, setOpenCloseModal, openSortModal, setOpenModal, openModal, 
         handleCreateBoard, setHoveredIndex, hoveredIndex, hoveredSIndex, setHoveredSIndex, setSelectedBoardTitle, 
          selectedBoardTitle, boards, selectedSort, handleSortChange, 
-        ALLBoardsCount, getBackgroundImageUrl, handleCloseBoard,setOpenClosedBoardsModal, 
-        showLimitModal, setShowLimitModal, roli, starredBoards } = useContext(WorkspaceContext);
+        handleStarBoard, backgroundUrls,handleCloseBoard,setOpenClosedBoardsModal, 
+        showLimitModal, setShowLimitModal, boardCount, roli, starredBoards,ALLBoardsCount } = useContext(WorkspaceContext);
 
         const [boardToClose, setBoardToClose] = useState(null);
      
+
 const Menus = [
     {title: "Boards", tag: "CiViewBoard", path: `/main/boards/${workspace?.workspaceId}`},
     {title: "Members", tag: "IoPersonOutline", path: `/main/members/${workspace?.workspaceId}`},
@@ -110,7 +111,10 @@ const WorkspaceViews = [
                   
                    <button onClick={()=>{ALLBoardsCount>=10 ? setShowLimitModal(true) : setOpenModal(true); setOpenClosedBoardsModal(false)}} className={`text-gray-400 cursor-pointer p-1 ${!open && "scale-0"}`}><FaPlus/></button>
                    {showLimitModal && <LimitModal onClose={() => setShowLimitModal(false)} />}
-           <CreateBoardModal open={openModal} onClose={()=> setOpenModal(false)} onBoardCreated={handleCreateBoard}></CreateBoardModal>
+           <CreateBoardModal 
+           open={openModal} 
+           onClose={()=> setOpenModal(false)} 
+           onBoardCreated={handleCreateBoard}></CreateBoardModal>
             </div>
 
             <ul>
@@ -130,7 +134,7 @@ const WorkspaceViews = [
                                     style={{ 
                                         width: '1.5em', 
                                         height: '1.5em', 
-                                        backgroundImage: `url(${getBackgroundImageUrl(board)})`, 
+                                        backgroundImage: `url(${backgroundUrls[board.boardId] || '/path/to/default/image.jpg'})`,  
                                         backgroundSize: 'cover', 
                                         backgroundPosition: 'center' 
                                     }}
@@ -178,7 +182,7 @@ const WorkspaceViews = [
         style={{ 
           width: '1.5em', 
           height: '1.5em', 
-          backgroundImage: `url(${getBackgroundImageUrl(board)})`, 
+          backgroundImage: `url(${backgroundUrls[board.boardId] || '/path/to/default/image.jpg'})`, 
           backgroundSize: 'cover', 
           backgroundPosition: 'center' 
         }}

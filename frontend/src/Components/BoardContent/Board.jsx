@@ -14,6 +14,7 @@ import {DropdownContext} from "../Navbar/Navbar.jsx";
 import MemberProfilePic from "../ProfilePic/MemberProfilepic.jsx";
 import LoadingModal from "../Modal/LoadingModal.jsx";
 import { deleteData } from "../../Services/FetchService.jsx";
+import TaskModal from "../TaskModal/TaskModal.jsx";
 
 export const BoardContext = createContext();
 
@@ -416,6 +417,7 @@ const getLists = async () => {
           <DummyList/>
         </div>
       </div>
+      {taskId && <TaskModal/>}
       </BoardContext.Provider>
   );
 };

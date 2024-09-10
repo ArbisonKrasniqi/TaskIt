@@ -74,7 +74,7 @@ const TaskModal = () => {
                 console.error("Error fetching list by id: ",error);
             }
         };
-            getListById();
+            //getListById();
     },[taskId,taskData]);
 
     useEffect(() => {

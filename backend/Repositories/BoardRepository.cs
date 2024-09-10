@@ -16,15 +16,13 @@ namespace backend.Repositories
         private readonly ApplicationDBContext _context;
         private readonly IStarredBoardRepository _starredRepo;
         private readonly IListRepository _listRepo;
-        private readonly ILabelRepository _labelRepo;
 
         public BoardRepository(ApplicationDBContext context, IStarredBoardRepository starredRepo,
-            IListRepository listRepo, ILabelRepository labelRepo)
+            IListRepository listRepo)
         {
             _context=context;
             _starredRepo = starredRepo;
             _listRepo = listRepo;
-            _labelRepo = labelRepo;
         }
         
         //GetAllAsync --> Gets all boards that exists

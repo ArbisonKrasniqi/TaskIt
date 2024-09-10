@@ -22,7 +22,7 @@ const CreateWorkspaceModal = ({open, onClose, onWorkspaceCreated, children}) => 
     setErrorMessage('');
   }
 
-  const handleCreateWorkspace=  async () => {
+  const handleCreateWorkspace =  async () => {
     if(workspaceTitle.length < 2 || workspaceTitle.length > 25 ){
       setErrorMessage('Workspace title must be between 2 and 20 characters.');
       return;
@@ -39,7 +39,7 @@ const CreateWorkspaceModal = ({open, onClose, onWorkspaceCreated, children}) => 
     };
 
     console.log('Creating workspace with data: ',newWorkspace);
-    onClose();
+
     try {
       const response = await postData('http://localhost:5157/backend/workspace/CreateWorkspace', newWorkspace);
       console.log('Workspace created successfully:', response.data);

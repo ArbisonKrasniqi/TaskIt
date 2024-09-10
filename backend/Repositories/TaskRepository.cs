@@ -12,10 +12,20 @@ namespace backend.Repositories;
 public class TaskRepository : ITaskRepository
 {
     private readonly ApplicationDBContext _context;
-
-    public TaskRepository(ApplicationDBContext context)
+    private readonly IChecklistRepository _checklistRepo;
+    private readonly ITaskLabelRepository _taskLabelRepo;
+    private readonly ITaskMemberRepository _taskMemberRepo;
+    private readonly ICommentRepository _commentRepo;
+    private readonly ITaskActivityRepository _taskActivityRepo;
+    
+    public TaskRepository(ApplicationDBContext context,ITaskActivityRepository taskActivityRepo, IChecklistRepository checklistRepo, ITaskLabelRepository taskLabelRepo, ITaskMemberRepository taskMemberRepo, ICommentRepository commentRepo)
     {
         _context = context;
+        _checklistRepo = checklistRepo;
+        _taskLabelRepo = taskLabelRepo;
+        _taskMemberRepo = taskMemberRepo;
+        _commentRepo = commentRepo;
+        _taskActivityRepo = taskActivityRepo;
     }
 
     public async Task<List<Tasks>> GetAllTaskAsync()
@@ -79,9 +89,10 @@ public async Task<Tasks> CreateTaskAsync(Tasks taskModel){
         }
 
         await _checklistRepo.DeleteChecklistByTaskIdAsync(taskId);
-        await _taskMemberRepo.DeleteTaskMembersByTaskIdAsync(taskId);
+        await _taskMemberRepo.DeleteTaskMemberByIdAsync(taskId);
         await _taskLabelRepo.DeleteTaskLabelsByTaskId(taskId);
         await _commentRepo.DeleteCommentsByTaskIdAsync(taskId);
+        await _taskActivityRepo.DeleteTaskActivitiesByTaskId(taskId);
         await _context.SaveChangesAsync();
         
         return taskModel;
