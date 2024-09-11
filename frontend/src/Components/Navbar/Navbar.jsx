@@ -5,7 +5,6 @@
     import CreateDropdown from '../Dropdowns/CreateDropdown';
     import MoreDropdown from '../Dropdowns/MoreDropdown';
     import PlusDropdown from '../Dropdowns/PlusDropdown';
-    import Searchbar from '../Searchbar/Searchbar';
     import NotificationButton from './Notification/NotificationButton';
     import NavbarProfilePic from '../ProfilePic/NavbarProfilePic';
     import { useNavigate } from 'react-router-dom';
@@ -20,7 +19,6 @@
         const [RecentDropdownIsOpen, setRecentDropdownIsOpen] = useState(false);
         const [StarredDropdownIsOpen, setStarredDropdownIsOpen] = useState(false);
         const [CreateDropdownIsOpen, setCreateDropdownIsOpen] = useState(false);
-        const [SearchDropdownIsOpen, setSearchDropdownIsOpen] = useState(false);  
         const [NotificationDropdownIsOpen, setNotificationDropdownIsOpen] = useState(false);
         const [ProfilePicIsOpen, setProfilePicDropdownIsOpen] = useState(false);
         const [MoreDropdownIsOpen, setMoreDropdownIsOpen] = useState(false);
@@ -34,7 +32,6 @@
                 setCreateDropdownIsOpen(false);
                 setMoreDropdownIsOpen(false);
                 setPlusDropdownIsOpen(false);
-                setSearchDropdownIsOpen(false);
                 setNotificationDropdownIsOpen(false);
                 setProfilePicDropdownIsOpen(false);
             }
@@ -43,7 +40,6 @@
                 setRecentDropdownIsOpen(false);
                 setStarredDropdownIsOpen(false);
                 setPlusDropdownIsOpen(false);
-                setSearchDropdownIsOpen(false);
                 setNotificationDropdownIsOpen(false);
                 setProfilePicDropdownIsOpen(false);
             }
@@ -60,7 +56,6 @@
                 setCreateDropdownIsOpen(false);
                 setMoreDropdownIsOpen(false);
                 setPlusDropdownIsOpen(false);
-                setSearchDropdownIsOpen(false);
                 setNotificationDropdownIsOpen(false);
                 setProfilePicDropdownIsOpen(false);
             }
@@ -69,7 +64,6 @@
                 setRecentDropdownIsOpen(true);
                 setStarredDropdownIsOpen(false);
                 setPlusDropdownIsOpen(false);
-                setSearchDropdownIsOpen(false);
                 setNotificationDropdownIsOpen(false);
                 setProfilePicDropdownIsOpen(false);
             }
@@ -85,7 +79,6 @@
                 setStarredDropdownIsOpen(true);
                 setCreateDropdownIsOpen(false);
                 setPlusDropdownIsOpen(false);
-                setSearchDropdownIsOpen(false);
                 setNotificationDropdownIsOpen(false);
                 setProfilePicDropdownIsOpen(false);
             }
@@ -102,7 +95,6 @@
                 setCreateDropdownIsOpen(true);
                 setPlusDropdownIsOpen(true);
                 setMoreDropdownIsOpen(false);
-                setSearchDropdownIsOpen(false);
                 setNotificationDropdownIsOpen(false);
                 setProfilePicDropdownIsOpen(false);
             }
@@ -112,22 +104,7 @@
             }
         }
 
-        const toggleDropdownSearch = () => {
-            if (!SearchDropdownIsOpen) {
-                setWorkspaceDropdownIsOpen(false);
-                setRecentDropdownIsOpen(false);
-                setStarredDropdownIsOpen(false);
-                setCreateDropdownIsOpen(false);
-                setMoreDropdownIsOpen(false);
-                setPlusDropdownIsOpen(false);
-                setSearchDropdownIsOpen(true);
-                setNotificationDropdownIsOpen(false);
-                setProfilePicDropdownIsOpen(false);
-            }
-            else{
-                setSearchDropdownIsOpen(false);
-            }
-        }
+        
 
         const toggleDropdownNotification = () => {
             if (!NotificationDropdownIsOpen) {
@@ -137,7 +114,6 @@
                 setCreateDropdownIsOpen(false);
                 setMoreDropdownIsOpen(false);
                 setPlusDropdownIsOpen(false);
-                setSearchDropdownIsOpen(false);
                 setNotificationDropdownIsOpen(true);
                 setProfilePicDropdownIsOpen(false);
             }
@@ -152,7 +128,6 @@
                 setRecentDropdownIsOpen(false);
                 setStarredDropdownIsOpen(false);
                 setCreateDropdownIsOpen(false);
-                setSearchDropdownIsOpen(false);
                 setMoreDropdownIsOpen(false);
                 setPlusDropdownIsOpen(false);
                 setNotificationDropdownIsOpen(false);
@@ -171,7 +146,6 @@
                 setCreateDropdownIsOpen(false);
                 setMoreDropdownIsOpen(true);
                 setPlusDropdownIsOpen(false);
-                setSearchDropdownIsOpen(false);
                 setNotificationDropdownIsOpen(false);
                 setProfilePicDropdownIsOpen(false);
             }
@@ -188,7 +162,6 @@
                 setMoreDropdownIsOpen(false);
                 setCreateDropdownIsOpen(true);
                 setPlusDropdownIsOpen(true);
-                setSearchDropdownIsOpen(false);
                 setNotificationDropdownIsOpen(false);
                 setProfilePicDropdownIsOpen(false);
             }
@@ -205,7 +178,6 @@
             CreateDropdownIsOpen,
             MoreDropdownIsOpen,
             PlusDropdownIsOpen,
-            SearchDropdownIsOpen,
             NotificationDropdownIsOpen,
             ProfilePicIsOpen,
             setWorkspaceDropdownIsOpen,
@@ -214,7 +186,6 @@
             setCreateDropdownIsOpen,
             setMoreDropdownIsOpen,
             setPlusDropdownIsOpen,
-            setSearchDropdownIsOpen,
             setNotificationDropdownIsOpen,
             setProfilePicDropdownIsOpen,
             toggleDropdownWorkspace,
@@ -223,7 +194,6 @@
             toggleDropdownCreate,
             toggleDropdownMore,
             toggleDropdownPlus,
-            toggleDropdownSearch,
             toggleDropdownNotification,
             toggleDropdownProfilePic
         }
@@ -283,10 +253,6 @@
                     </div>
 
                     <div className='flex items-center mx-2'>
-                
-                        <Searchbar 
-                        width = {window.innerWidth}
-                        />
 
                         <NotificationButton/>
 

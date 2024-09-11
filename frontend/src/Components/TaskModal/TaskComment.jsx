@@ -10,6 +10,7 @@ const TaskComment = () => {
   const [comments, setComments] = useState([]);
   const [editingCommentId, setEditingCommentId] = useState(null); // Track the comment being edited
   const [editedComment, setEditedComment] = useState(''); // Track the content of the edited comment
+  const [isCommentInputFocused, setIsCommentInputFocused] = useState(false); // Track focus of comment input
 
 
   const handleInputChange = (e) => {
@@ -19,7 +20,6 @@ const TaskComment = () => {
   const handleEditedInputChange = (e) => {
     setEditedComment(e.target.value);
   };
-
 
   const getComments = async () => {
     try {
@@ -37,13 +37,12 @@ const TaskComment = () => {
     getComments();
   }, [taskId]);
 
-
-
   const handleSave = async () => {
     try {
       if (comment.trim()) {
-        await postData('http://localhost:5157/backend/comment/CreateComment',{ content: comment, taskId });
+        await postData('http://localhost:5157/backend/comment/CreateComment', { content: comment, taskId });
         setComment('');
+        setIsCommentInputFocused(false); // Hide buttons after saving
         getComments();
       }
     } catch (error) {
@@ -51,11 +50,10 @@ const TaskComment = () => {
     }
   };
 
-
   const handleSaveEdit = async (commentId) => {
     try {
       if (editedComment.trim()) {
-        await putData('http://localhost:5157/backend/comment/UpdateComment',{ commentId, content: editedComment });
+        await putData('http://localhost:5157/backend/comment/UpdateComment', { commentId, content: editedComment });
         setEditingCommentId(null);
         setEditedComment('');
         getComments();
@@ -65,11 +63,9 @@ const TaskComment = () => {
     }
   };
 
-
-
   const handleDelete = async (commentId) => {
     try {
-      await deleteData('http://localhost:5157/backend/comment/DeleteComment',{ commentId });
+      await deleteData('http://localhost:5157/backend/comment/DeleteComment', { commentId });
       getComments();
     } catch (error) {
       console.error('Error deleting comment: ', error);
@@ -81,23 +77,37 @@ const TaskComment = () => {
     setEditedComment('');
   };
 
+  const handleCancel = () => {
+    setComment('');
+    setIsCommentInputFocused(false); // Hide buttons after canceling
+  };
+
   return (
     <div>
       <div>
         <textarea
           value={comment}
           onChange={handleInputChange}
+          onFocus={() => setIsCommentInputFocused(true)} // Show buttons when input is focused
           placeholder="Write a comment..."
           className="bg-gray-900 bg-opacity-50 p-2 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 overflow-hidden w-[490px] h-[40px]"
         />
-        <div className="flex justify-start space-x-2 mt-2">
-          <button
-            className="bg-blue-500 hover:bg-blue-600 text-gray-800 font-semibold rounded px-3 py-1"
-            onClick={handleSave}
-          >
-            Save
-          </button>
-        </div>
+        {isCommentInputFocused && (
+          <div className="flex justify-start space-x-2 mt-2">
+            <button
+              className="bg-blue-500 hover:bg-blue-600 text-gray-800 font-semibold rounded px-3 py-1"
+              onClick={handleSave}
+            >
+              Save
+            </button>
+            <button
+              className="bg-gray-800 hover:bg-slate-700 text-gray-400 font-semibold rounded px-3 py-1"
+              onClick={handleCancel}
+            >
+              Cancel
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="mt-4 border-solid border-gray-500 border-opacity-45 border p-2 rounded-md">
@@ -117,7 +127,6 @@ const TaskComment = () => {
                     Commented on: {new Date(commentItem.dateAdded).toLocaleString()}
                   </span>
                 </div>
-
 
                 {editingCommentId === commentItem.commentId ? (
                   <div>
