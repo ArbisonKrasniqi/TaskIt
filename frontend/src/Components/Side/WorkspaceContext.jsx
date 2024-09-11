@@ -45,6 +45,7 @@ export const WorkspaceProvider = ({ children }) => {
     const [checklists, setChecklists] = useState([]);
     const [activities, setActivities]= useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [recentBoards, setRecentBoards] = useState([]);
 
 
         const getWorkspaces = async () => {
@@ -54,6 +55,16 @@ export const WorkspaceProvider = ({ children }) => {
                     const workspacesData = workspacesResponse.data;
                     if (workspacesData && Array.isArray(workspacesData) && workspacesData.length > 0) {
                         setWorkspaces(workspacesData);
+
+                        const recentBoards = workspacesData
+                        .flatMap(workspace => workspace.boards)
+                        .sort((a, b) => new Date(b.dateCreated) - new Date(a.dateCreated))
+                        .slice(0, 5);
+
+                        console.log("PARAAA RECENTTTT: ",recentBoards);
+                        
+
+                        setRecentBoards(recentBoards);
                     } else {
                         setWorkspaces([]);
                         console.log("There are no workspaces");
@@ -70,7 +81,7 @@ export const WorkspaceProvider = ({ children }) => {
         if (userId) {
             getWorkspaces();
         }
-    }, [userId, mainContext.userInfo]);
+    }, [userId, board ,mainContext.userInfo]);
         // const interval = setInterval(getWorkspaces, 5 * 1000);
         // return () => clearInterval(interval); //Get workspaces every 5 seconds
  
@@ -733,7 +744,9 @@ export const WorkspaceProvider = ({ children }) => {
             setClosedBoards, 
             countClosedBoards,
             ALLBoardsCount,
-            fetchChecklistItems
+            fetchChecklistItems,
+            recentBoards,
+            setRecentBoards
         }}>
             {children}
         </WorkspaceContext.Provider>
