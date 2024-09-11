@@ -596,6 +596,7 @@ public class ChecklistItemController : ControllerBase
         }
     }
     
+    [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpPut(template:"ChangeChecklistItemChecked")]
     public async Task<IActionResult> ChangeChecklistItemChecked(int checklistItemId)
     {
@@ -677,6 +678,7 @@ public class ChecklistItemController : ControllerBase
 
                 return Ok("ChecklistItem changed to: "+checklistItem.Checked);
             }
+            
             return StatusCode(401, "You are not authorized!");
             
         }
