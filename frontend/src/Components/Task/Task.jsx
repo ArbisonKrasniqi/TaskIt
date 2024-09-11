@@ -6,6 +6,7 @@ import { BoardContext } from "../BoardContent/Board";
 import { deleteData } from "../../Services/FetchService";
 import { useContext } from "react";
 import { WorkspaceContext } from "../Side/WorkspaceContext";
+import { useNavigate, useParams } from "react-router-dom";
 
 const Task = ({task}) => {
     const {
@@ -27,9 +28,12 @@ const Task = ({task}) => {
     const labels = task.labels;
     const members = task.taskMembers;
 
+    const {workspaceId, boardId, taskId} = useParams();
+    const navigate = useNavigate(); 
+
     
     return(
-        <div className={`flex justify-between items-center bg-gray-900 text-white hover:bg-slate-600 w-full border-black p-0 h-auto rounded-lg mb-2 ${isDragging ? 'opacity-0' : ''} group`}
+        <div onClick={() => {navigate(`/main/board/${workspaceId}/${boardId}/${task.taskId}`)}}className={`flex justify-between items-center bg-gray-900 text-white hover:bg-slate-600 w-full border-black p-0 h-auto rounded-lg mb-2 ${isDragging ? 'opacity-0' : ''} group`}
             ref={setNodeRef}
             {...attributes}
             style={{

@@ -24,6 +24,11 @@ public class TaskMemberRepository : ITaskMemberRepository
             .Where(tm => !tm.User.isDeleted)
             .ToListAsync();
     }
+
+    public async Task<TaskMember> GetTaskMemberByUserAndTask(string userId, int taskId)
+    {
+        return await _context.TaskMember.FirstOrDefaultAsync(tm => tm.UserId == userId && tm.TaskId == taskId);
+    }
     
     //GET BY ID
     public async Task<TaskMember?> GetTaskMemberByIdAsync(int taskMemberId)
@@ -90,7 +95,9 @@ public class TaskMemberRepository : ITaskMemberRepository
             UserId = addTaskMemberDto.UserId,
             User = user,
             TaskId = addTaskMemberDto.TaskId,
-            DateJoined = DateTime.Now
+            DateJoined = DateTime.Now,
+            FirstName = user.FirstName,
+            LastName = user.LastName
         };
         
         task.TaskMembers.Add(taskMember);

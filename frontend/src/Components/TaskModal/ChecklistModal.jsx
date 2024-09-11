@@ -7,6 +7,7 @@ import { useParams } from 'react-router-dom';
 function ChecklistModal() {
   const { toggleChecklistModal, setIsChecklistModalOpen } = useContext(TaskModalsContext);
   const { setChecklists, getChecklistsByTask } = useContext(WorkspaceContext);
+  const { getTaskById} = useContext(TaskModalsContext);
   const [checklistTitle, setCheklistTitle] = useState('');
   const {taskId} = useParams();
   
@@ -35,7 +36,6 @@ function ChecklistModal() {
       };
 
       const response = await postData('http://localhost:5157/backend/checklist/CreateChecklist', data);
-
       getChecklistsByTask();
     } catch (error) {
       console.error('Error creating checklist: ', error.message);

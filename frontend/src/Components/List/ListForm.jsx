@@ -2,12 +2,13 @@ import React, { useContext, useState } from "react";
 import { MainContext } from "../../Pages/MainContext";
 import { postData } from "../../Services/FetchService";
 import { BoardContext } from "../BoardContent/Board";
+import { useParams } from "react-router-dom";
 
 const ListForm = ({ }) => {
     const mainContext = useContext(MainContext);
     const boardContext = useContext(BoardContext);
     const [listTitle, setListTitle] = useState("");
-    const [boardId, setBoardId] = useState(mainContext ? mainContext.boardId : "");
+    const {workspaceId, boardId, taskId} = useParams();
     const [errorMessage, setErrorMessage] = useState("");
 
     const handleTitleChange = (e) => {

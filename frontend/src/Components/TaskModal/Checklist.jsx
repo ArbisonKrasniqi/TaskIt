@@ -9,7 +9,7 @@ import { useParams } from 'react-router-dom';
 
 
 const Checklist = () => {
-  const { checklists, checklistItems, setChecklistItems, setChecklists, fetchChecklistItems } = useContext(WorkspaceContext);
+  const { checklists, checklistItems, setChecklistItems, setChecklists, fetchChecklistItems, getChecklistsByTask } = useContext(WorkspaceContext);
   const {setIsChecklistModalOpen} = useContext(TaskModalsContext);
   const [checklistItemDotsOpen, setChecklistItemDotsOpen] = useState(null);
   const [addingItem, setAddingItem] = useState(null);
@@ -65,11 +65,8 @@ const Checklist = () => {
     try {
       const items = await getDataWithId('http://localhost:5157/backend/checklistItems/GetChecklistItemByChecklistId?checklistId', checklistId);;
 
-      if (items.length > 0) {
-        await deleteData('http://localhost:5157/backend/checklistItems/DeleteChecklistItembyChecklistId', { checklistId }); 
-      }
       await deleteData('http://localhost:5157/backend/checklist/DeleteChecklist', { checklistId });
-
+      getChecklistsByTask();
       const updatedChecklists = checklists.filter(
         (checklist) => checklist.checklistId !== checklistId
       );

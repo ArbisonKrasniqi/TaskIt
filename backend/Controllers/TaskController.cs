@@ -256,7 +256,7 @@ public class  TaskController : ControllerBase{
 
                 //Updated BoardActivity
                     var boardActivity = new BoardActivity{
-                        BoardId = taskModel.TaskId,
+                        BoardId = board.BoardId,
                         UserId = userId,
                         ActionType = "updated",
                         EntityName = "task " + taskDto.Title,
@@ -343,7 +343,7 @@ public class  TaskController : ControllerBase{
 
                     //Deleted BoardActivity
                     var boardActivity = new BoardActivity{
-                        BoardId = taskModel.TaskId,
+                        BoardId = board.BoardId,
                         UserId = userId,
                         ActionType = "deleted",
                         EntityName = "task " + taskIdDto.TaskId,
@@ -355,7 +355,7 @@ public class  TaskController : ControllerBase{
                 }
                 return StatusCode(401, "You are not authorized!");
         }catch(Exception e){
-            return StatusCode(500, "Internal Server Error "+e.Message);
+            return StatusCode(500, "Internal Server Error "+e);
         }
     }
 
@@ -406,7 +406,7 @@ public class  TaskController : ControllerBase{
 
                 //Created BoardActivity
                     var boardActivity = new BoardActivity{
-                        BoardId = taskModel.TaskId,
+                        BoardId = board.BoardId,
                         UserId = userId,
                         ActionType = "created",
                         EntityName = "task " + taskDto.Title,

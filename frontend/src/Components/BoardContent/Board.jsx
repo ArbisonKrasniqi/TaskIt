@@ -5,7 +5,7 @@ import {DndContext, KeyboardSensor, PointerSensor, closestCenter, closestCorners
 import List from "../List/List.jsx";
 import {SortableContext, horizontalListSortingStrategy, arrayMove, sortableKeyboardCoordinates} from "@dnd-kit/sortable";
 import { getDataWithId, putData } from "../../Services/FetchService.jsx";
-import { useAsyncError, useParams } from "react-router-dom";
+import { useAsyncError, useNavigate, useParams } from "react-router-dom";
 import Task from "../Task/Task.jsx";
 import { DragOverlay } from '@dnd-kit/core';
 import DummyList from "../List/DummyList.jsx";
@@ -21,6 +21,7 @@ export const BoardContext = createContext();
 const Board = () => {
   const workspaceContext = useContext(WorkspaceContext);
   const {workspaceId, boardId, taskId} = useParams();
+  const navigate = useNavigate();
   
   const [lists, setLists] = useState([]);
   const [tasks, setTasks] = useState([]);

@@ -240,8 +240,8 @@ public class TaskMemberController : ControllerBase
                 };
 
                 await _taskActivityRepo.CreateTaskActivityAsync(taskActivity);
-                await _taskMemberRepo.AddTaskMemberAsync(addTaskMemberDto);
-                return StatusCode(200, "Member added to Task!");
+                var newMember = await _taskMemberRepo.AddTaskMemberAsync(addTaskMemberDto);
+                return Ok(newMember);
             }
 
             return StatusCode(401, "You are not authorized!");
@@ -390,6 +390,8 @@ public async Task<IActionResult> UpdateTaskMember(UpdateTaskMemberDto updateTask
             {
                 return NotFound("User not found!");
             }
+
+            var removedTaskMember = await _taskMemberRepo.GetTaskMemberByUserAndTask(removeTaskMemberDto.UserId, removeTaskMemberDto.TaskId);
             if (isMember || userTokenRole == "Admin")
             {
                 if (isTaskMember)
@@ -426,7 +428,7 @@ public async Task<IActionResult> UpdateTaskMember(UpdateTaskMemberDto updateTask
                     await _taskActivityRepo.CreateTaskActivityAsync(taskActivity);
                     await _taskMemberRepo.RemoveTaskMemberAsync(removeTaskMemberDto.TaskId, removeTaskMemberDto.UserId);
 
-                    return Ok("Member removed from Task");
+                    return Ok(removedTaskMember);
                 }
 
                 return BadRequest("User is not a Task member!");

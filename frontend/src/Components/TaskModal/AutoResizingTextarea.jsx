@@ -5,6 +5,7 @@ import { putData } from "../../Services/FetchService";
 const AutoResizingTextarea = ({ taskDescription }) => {
   const { taskData} = useContext(TaskModalsContext);
   const [description, setDescription] = useState(taskDescription);
+  const taskModalsContext = useContext(TaskModalsContext);
 
   const [isEditing, setIsEditing] = useState(false);
   const [tempDescription, setTempDescription] = useState(taskData.description);
@@ -30,6 +31,7 @@ const AutoResizingTextarea = ({ taskDescription }) => {
       };
       await putData('http://localhost:5157/backend/task/UpdateTask', data);
       setDescription(tempDescription);
+      taskModalsContext.setTaskData({ ...taskData, description: tempDescription });
       setIsEditing(false);
     } catch (error) {
       console.error(error);

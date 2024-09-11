@@ -160,7 +160,7 @@ public class ChecklistController : ControllerBase
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
             
-            var isMember = await _membersRepo.IsAMember(userId, checklistDto.TaskId);
+            var isMember = await _membersRepo.IsAMember(userId, workspace.WorkspaceId);
             var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspace.WorkspaceId);
             if (board.IsClosed && !isOwner && userTokenRole != "Admin")
             {
@@ -202,13 +202,9 @@ public class ChecklistController : ControllerBase
                 await _taskActivityRepo.CreateTaskActivityAsync(taskActivity);
                 
                 
-                
-                
-
-
                 //Created BoardActivity
                 var boardActivity = new BoardActivity{
-                    BoardId = checklistModel.ChecklistId,
+                    BoardId = board.BoardId,
                     UserId = userId,
                     ActionType = "created",
                     EntityName = "checklist " + checklistDto.Title,
@@ -224,7 +220,7 @@ public class ChecklistController : ControllerBase
         }
         catch (Exception e)
         {
-            return StatusCode(500, "Internal Server Error!" + e.Message);
+            return StatusCode(500, "Internal Server Error!" + e);
         }
     }
 
@@ -420,7 +416,7 @@ public class ChecklistController : ControllerBase
 
                 //Deleted BoardActivity
                 var boardActivity = new BoardActivity{
-                    BoardId = checklistModel.ChecklistId,
+                    BoardId = board.BoardId,
                     UserId = userId,
                     ActionType = "deleted",
                     EntityName = "checklist " + checklist.Title,

@@ -171,7 +171,7 @@ public class ChecklistItemController : ControllerBase
                 return NotFound("Workspace not found");
             }
             
-            var isMember = await _membersRepo.IsAMember(userId, checklistItemDto.ChecklistId);
+            var isMember = await _membersRepo.IsAMember(userId, workspace.WorkspaceId);
             var isOwner = await _userRepo.UserOwnsWorkspace(userId, workspace.WorkspaceId);
             if (board.IsClosed && !isOwner && userTokenRole != "Admin")
             {
@@ -216,7 +216,7 @@ public class ChecklistItemController : ControllerBase
 
                 //Created BoardActivity
                 var boardActivity = new BoardActivity{
-                    BoardId = checklistItemModel.ChecklistItemId,
+                    BoardId = board.BoardId,
                     UserId = userId,
                     ActionType = "created",
                     EntityName = "checklistItem " + checklistItemDto.Content,
@@ -444,7 +444,7 @@ public class ChecklistItemController : ControllerBase
 
                 //Deleted BoardActivity
                 var boardActivity = new BoardActivity{
-                    BoardId = checklistItemModel.ChecklistItemId,
+                    BoardId = board.BoardId,
                     UserId = userId,
                     ActionType = "deleted",
                     EntityName = "checklistItem " + checklistItemIdDto,
@@ -597,6 +597,7 @@ public class ChecklistItemController : ControllerBase
     }
     
     [HttpPut(template:"ChangeChecklistItemChecked")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public async Task<IActionResult> ChangeChecklistItemChecked(int checklistItemId)
     {
         if (!ModelState.IsValid)
@@ -667,7 +668,7 @@ public class ChecklistItemController : ControllerBase
 
                 await _taskActivityRepo.CreateTaskActivityAsync(taskActivity);
                 var boardActivity = new BoardActivity{
-                    BoardId = checklistItem.ChecklistItemId,
+                    BoardId = board.BoardId,
                     UserId = userId,
                     ActionType = "checked",
                     EntityName = "checklistItem " + checklistItemId,

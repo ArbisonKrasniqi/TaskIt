@@ -61,37 +61,37 @@ namespace backend.Repositories
             var label1 = new Label
             {
                 Name = String.Empty,
-                Color = "#FF0000",
+                Color = "#B71C1C",
                 BoardId = boardId
             };
             var label2 = new Label
             {
                 Name = String.Empty,
-                Color = "#00FF00",
+                Color = "#388E3C",
                 BoardId = boardId
             };
             var label3 = new Label
             {
                 Name = String.Empty,
-                Color = "#0000FF",
+                Color = "#1565C0",
                 BoardId = boardId
             };
             var label4 = new Label
             {
                 Name = String.Empty,
-                Color = "#FFFF00",
+                Color = "#F9A825",
                 BoardId = boardId
             };
             var label5 = new Label
             {
                 Name = String.Empty,
-                Color = "#00FFFF",
+                Color = "#8E24AA",
                 BoardId = boardId
             };
             var label6 = new Label
             {
                 Name = String.Empty,
-                Color = "#FF00FF",
+                Color = "#00838F",
                 BoardId = boardId
             };
 

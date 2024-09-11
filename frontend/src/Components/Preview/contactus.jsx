@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './contactus.css'
+//import './contactus.css'
 import Swal from 'sweetalert2'
 import { IconBase } from 'react-icons';
 

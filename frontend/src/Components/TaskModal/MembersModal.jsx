@@ -3,15 +3,17 @@ import { TaskModalsContext } from "./TaskModal";
 import { WorkspaceContext } from "../Side/WorkspaceContext";
 import { MainContext } from "../../Pages/MainContext";
 import { deleteData, getDataWithId, postData } from "../../Services/FetchService";
+import { BoardContext } from "../BoardContent/Board";
+import { useParams } from "react-router-dom";
 
-
-const MembersModal = ({ taskId }) => {
+const MembersModal = () => {
     const { toggleMembersModal, assignedMembers, setAssignedMembers } = useContext(TaskModalsContext);
     const { memberDetails, getInitials } = useContext(WorkspaceContext);
     const [searchTerm, setSearchTerm] = useState("");
     const [originalBoardMembers, setOriginalBoardMembers] = useState(memberDetails || []);  // Per me i rujt members mos me i prek direkt
     const [filteredBoardMembers, setFilteredBoardMembers] = useState([]);
-
+    const boardContext = useContext(BoardContext);
+    const {workspaceId, boardId, taskId} = useParams();
     useEffect(() => {
         const updatedBoardMembers = originalBoardMembers.filter(boardMember =>
             !assignedMembers.some(taskMember => taskMember.id === boardMember.id)
@@ -23,12 +25,13 @@ const MembersModal = ({ taskId }) => {
         try {
             const data = {
                 userId: member.id,
-                taskId: 1,
+                taskId: taskId,
             };
-            await postData('http://localhost:5157/backend/TaskMembers/AddTaskMember', data);
+            var addedMember = await postData('http://localhost:5157/backend/TaskMembers/AddTaskMember', data);
             
             // Shtoje anetarin ne assignedMembers edhe largoje prej filteredBoardMembers
             setAssignedMembers([...assignedMembers, member]);
+            boardContext.getTasks();
         } catch (error) {
             console.error("Error adding member to task", error);
         }
@@ -37,10 +40,11 @@ const MembersModal = ({ taskId }) => {
     const removeMemberFromTask = async (member) => {
         try {
             const userId = member.id;
-            await deleteData(`http://localhost:5157/backend/TaskMembers/RemoveTaskMember?userId=${userId}&taskId=1`);
+            await deleteData(`http://localhost:5157/backend/TaskMembers/RemoveTaskMember?userId=${userId}&taskId=${taskId}`);
             
             // Largoje prej assignedMembers edhe shto prap ne filteredBoardMembers
             setAssignedMembers(assignedMembers.filter(m => m.id !== member.id));
+            boardContext.getTasks();
         } catch (error) {
             console.error("Error removing member from task", error);
         }

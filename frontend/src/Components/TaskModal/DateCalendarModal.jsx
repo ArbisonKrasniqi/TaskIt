@@ -5,7 +5,7 @@ import { TaskModalsContext } from './TaskModal';
 import { putData } from '../../Services/FetchService';
 
 const DateCalendarModal = () => {
-    const { closeCalendar, taskData } = useContext(TaskModalsContext);
+    const { closeCalendar, taskData, getTaskById } = useContext(TaskModalsContext);
     const [date, setDate] = useState(new Date());
 
     const SaveDueDate = async () => {
@@ -26,7 +26,7 @@ const DateCalendarModal = () => {
             };
 
             const response = await putData('http://localhost:5157/backend/task/UpdateTask', data);
-            console.log("UPDATED: ", response.data);
+            getTaskById();
         } catch (error) {
             console.error("Error updating the due date of the task: ", error);
         }
