@@ -173,127 +173,165 @@ const TaskModal = () => {
 
     return (
         <TaskModalsContext.Provider value={values}>
-            <div className="z-30 inset-0 flex justify-center transition-colors visible bg-black">
-                <div className="absolute top-12 flex flex-col bg-gray-800 rounded-md w-[750px] h-[90%] overflow-y-auto scroll "
-                style={{ scrollbarWidth: 'thin', msOverflowStyle: 'none' }}>
-                    <div className="flex flex-row items-center justify-between mx-2 mt-3 text-gray-400 h-[60px]">
-                        <TbAlignBoxLeftTopFilled className="bg-gray-800 text-2xl ml-5"/>
-                        <div className="flex flex-col w-[550px] -ml-16">
-                            <h2 className="w-[100%] font-bold text-xl">{taskData.title} <span className='ml-[50px] text-sm font-semibold'>Due Date: <span className='text-red-400 text-opacity-75'>{(formatDateTime(taskData.dueDate) === formatDateTime(specificDate))? '' : (formatDateTime(taskData.dueDate))}</span></span></h2>
-                            <div className='flex text-xs justify-between'>
-                                <span> in list {listData.title}</span>
-                            </div>
+          <div className="fixed z-30 inset-0 flex justify-center transition-colors visible bg-black bg-opacity-55">
+            <div
+              className="absolute top-12 flex flex-col bg-gray-800 rounded-md w-full max-w-[750px] h-[90%] overflow-y-auto"
+              style={{ scrollbarWidth: 'thin', msOverflowStyle: 'none' }}
+            >
+                <div className="flex flex-row items-start justify-between mx-2 mt-3 text-gray-400">
+                    <div className="flex items-center justify-around space-x-3">
+                        <TbAlignBoxLeftTopFilled className="bg-gray-800 text-2xl ml-5" />
+                        <div className="flex flex-col w-full md:w-[550px]">
+                        <h2 className="font-bold text-xl">
+                            {taskData.title}{' '}
+                            <span className="ml-[47px]  text-[12px]">
+                            Due Date:{' '}
+                            <span className="text-red-400 text-opacity-75">
+                                {formatDateTime(taskData.dueDate) === formatDateTime(specificDate)
+                                ? ''
+                                : formatDateTime(taskData.dueDate)}
+                            </span>
+                            </span>
+                        </h2>
+                        <div className="flex text-xs">
+                            <span> in list {listData.title}</span>
                         </div>
-                        <button className="mx-2 hover:bg-gray-600 hover:rounded-full transition w-6 rounded-full flex justify-center">X</button>
-                    </div>
-
-                    <div className="flex text-gray-400">
-                        <div className="w-3/4 flex flex-col flex-wrap">
-                            <div className='flex'>
-                                <div className='flex flex-col flex-wrap ml-[70px]'>
-                                    <p className='w-[82px] text-xs font-semibold'>Members</p>
-                                    <div className='flex flex-wrap h-auto items-center justify-start'>
-                                        {assignedMembers.length > 0 ? (
-                                            assignedMembers.map((member) => (
-                                                <button className='rounded-full m-1'>
-                                                    <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-sm text-white bg-gradient-to-r from-orange-400 to-orange-600">
-                                                        {getInitials(member.firstName, member.lastName)}
-                                                    </div>
-                                                </button>
-                                            ))
-                                        ) : (
-                                            <span></span>
-                                        )}
-                                        <button onClick={toggleMembersModal} className='w-10 h-10 rounded-full flex justify-center items-center m-1 bg-gray-700 bg-opacity-50 hover:bg-gray-700 text-xl'>
-                                            <PiPlus/>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className='flex flex-col flex-wrap ml-3'>
-                                    <p className='w-[100px] text-xs font-semibold'>Labels</p>
-                                    <div className='flex flex-wrap h-auto items-center justify-start'>
-                                        {taskData?.labels?.length > 0 ? (
-                                            taskData.labels.map((label) => (
-                                                <button
-                                                    key={label.labelId}
-                                                    className="rounded-[4px] m-1 px-2 py-2 text-gray-100 font-semibold"
-                                                    style={{ backgroundColor: label.color }}
-                                                >
-                                                    {label.name}
-                                                </button>
-                                            ))
-                                        ) : (
-                                            <span className="text-gray-500 text-xs">No labels assigned</span>
-                                        )}
-
-                                        <button
-                                            className='w-8 h-8 rounded flex justify-center items-center m-1 bg-gray-700 bg-opacity-50 hover:bg-gray-700 text-xl text-gray-400'
-                                            onClick={toggleLabelsModal}>
-                                            <PiPlus />
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className='flex flex-row'>
-                                <div className='w-1/12 h-6 justify-center flex items-center mt-3 ml-4 mr-3 text-2xl '>
-                                    <MdOutlineSubject/>
-                                </div>
-                                <div className='flex flex-col w-11/12'>
-                                    <span className='h-10 items-center flex font-semibold'>Description</span>
-                                    <AutoResizingTextarea
-                                    taskDescription={taskData.description}
-                                    />
-                                </div>
-                            </div>
-                            <div>
-                                <Checklist/>
-                            </div>
-                            <div>
-                                <TaskActivityLog/>
-                            </div>
-                        </div>
-
-                        {/*djathtas*/}
-                        <div className="w-1/4">
-                            <div className="flex flex-col">
-                                <span className="text-xs mx-3">Add to cart</span>
-                                <div className="flex flex-col text-sm font-bold m-2 p-1">
-                                    <button
-                                        className="flex w-full justify-start items-center bg-gray-600 bg-opacity-30 rounded-sm h-8 my-1 hover:bg-opacity-80"
-                                        onClick={toggleMembersModal}>
-                                        <BsPerson className="mx-2 text-lg" /> Members
-                                    </button>
-                                    
-                                    <button className="flex justify-start items-center bg-gray-600 bg-opacity-30 rounded-sm h-8 my-1 hover:bg-opacity-80"
-                                        onClick={toggleLabelsModal}>
-                                        <CgTag className="mx-2 rotate-[135deg] text-lg"/> Labels
-                                    </button>
-                                    <button className="flex justify-start items-center bg-gray-600 bg-opacity-30 rounded-sm h-8 my-1 hover:bg-opacity-80"
-                                        onClick={toggleChecklistModal}>
-                                        <IoMdCheckboxOutline className="mx-2 text-lg"/> Checklist
-                                    </button>
-                                    <button
-                                        onClick={openCalendar} 
-                                        className="flex justify-start items-center bg-gray-600 bg-opacity-30 rounded-sm h-8 my-1 hover:bg-opacity-80">
-                                        <LuClock4 className="mx-2 text-lg"/> Dates
-                                    </button>
-                                </div>
-                            </div>
-                            
                         </div>
                     </div>
-                    {isMembersModalOpen && <MembersModal />}
-                    {isLabelModalOpen && <LabelsModal/>}
-                    {isChecklistModalOpen && <ChecklistModal/>}
-                    {isEditLabelModalOpen && <EditLabelModal/>}
-                    {isCalendarOpen && <DateCalendarModal/>}
-                    
+                    <button className="mt-2 md:mt-0 mx-2 hover:bg-gray-600 hover:rounded-full transition w-6 h-6 rounded-full flex items-center justify-center">
+                        X
+                    </button>
                 </div>
+
+      
+              <div className="flex flex-col sm:flex-col md:flex-row text-gray-400">
+                <div className="w-full md:w-3/4 flex flex-col flex-wrap">
+                  <div className="flex">
+                    {/* Members */}
+                    <div className="flex flex-col flex-wrap ml-[70px]">
+                      <p className="w-[82px] text-xs font-semibold">Members</p>
+                      <div className="flex flex-wrap h-auto items-center justify-start">
+                        {assignedMembers.length > 0 ? (
+                          assignedMembers.map((member) => (
+                            <button className="rounded-full m-1">
+                              <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-sm text-white bg-gradient-to-r from-orange-400 to-orange-600">
+                                {getInitials(member.firstName, member.lastName)}
+                              </div>
+                            </button>
+                          ))
+                        ) : (
+                          <span></span>
+                        )}
+                        <button
+                          onClick={toggleMembersModal}
+                          className="w-10 h-10 rounded-full flex justify-center items-center m-1 bg-gray-700 bg-opacity-50 hover:bg-gray-700 text-xl"
+                        >
+                          <PiPlus />
+                        </button>
+                      </div>
+                    </div>
+      
+                    {/* Labels */}
+                    <div className="flex flex-col flex-wrap ml-3">
+                      <p className="w-[100px] text-xs font-semibold">Labels</p>
+                      <div className="flex flex-wrap h-auto items-center justify-start">
+                        {taskData?.labels?.length > 0 ? (
+                          taskData.labels.map((label) => (
+                            <button
+                              key={label.labelId}
+                              className="rounded-[4px] m-1 px-2 py-2 text-gray-100 font-semibold"
+                              style={{ backgroundColor: label.color }}
+                            >
+                              {label.name}
+                            </button>
+                          ))
+                        ) : (
+                          <span className="text-gray-500 text-xs">
+                            No labels assigned
+                          </span>
+                        )}
+      
+                        <button
+                          className="w-8 h-8 rounded flex justify-center items-center m-1 bg-gray-700 bg-opacity-50 hover:bg-gray-700 text-xl text-gray-400"
+                          onClick={toggleLabelsModal}
+                        >
+                          <PiPlus />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+      
+                  {/* Description */}
+                  <div className="flex flex-row">
+                    <div className="w-1/12 h-6 justify-center flex items-center mt-3 ml-4 mr-3 text-2xl ">
+                      <MdOutlineSubject />
+                    </div>
+                    <div className="flex flex-col w-11/12">
+                      <span className="h-10 items-center flex font-semibold">
+                        Description
+                      </span>
+                      <AutoResizingTextarea taskDescription={taskData.description} />
+                    </div>
+                  </div>
+      
+                  {/* Checklist */}
+                  <div>
+                    <Checklist />
+                  </div>
+      
+                  {/* Task Activity Log */}
+                  <div>
+                    <TaskActivityLog />
+                  </div>
+                </div>
+      
+                {/*djathas*/}
+                <div className="w-full md:w-1/4 sm:w-full">
+                  <div className="flex flex-col">
+                    <span className="text-xs mx-3">Add to card</span>
+                    <div className="flex flex-col text-sm font-bold m-2 p-1">
+                      <button
+                        className="flex w-full justify-start items-center bg-gray-600 bg-opacity-30 rounded-sm h-8 my-1 hover:bg-opacity-80"
+                        onClick={toggleMembersModal}
+                      >
+                        <BsPerson className="mx-2 text-lg" /> Members
+                      </button>
+      
+                      <button
+                        className="flex justify-start items-center bg-gray-600 bg-opacity-30 rounded-sm h-8 my-1 hover:bg-opacity-80"
+                        onClick={toggleLabelsModal}
+                      >
+                        <CgTag className="mx-2 rotate-[135deg] text-lg" /> Labels
+                      </button>
+      
+                      <button
+                        className="flex justify-start items-center bg-gray-600 bg-opacity-30 rounded-sm h-8 my-1 hover:bg-opacity-80"
+                        onClick={toggleChecklistModal}
+                      >
+                        <IoMdCheckboxOutline className="mx-2 text-lg" /> Checklist
+                      </button>
+      
+                      <button
+                        onClick={openCalendar}
+                        className="flex justify-start items-center bg-gray-600 bg-opacity-30 rounded-sm h-8 my-1 hover:bg-opacity-80"
+                      >
+                        <LuClock4 className="mx-2 text-lg" /> Dates
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+      
+              {isMembersModalOpen && <MembersModal />}
+              {isLabelModalOpen && <LabelsModal />}
+              {isChecklistModalOpen && <ChecklistModal />}
+              {isEditLabelModalOpen && <EditLabelModal />}
+              {isCalendarOpen && <DateCalendarModal />}
             </div>
+          </div>
         </TaskModalsContext.Provider>
-    );
+      );
+      
 }
 
 export default TaskModal;

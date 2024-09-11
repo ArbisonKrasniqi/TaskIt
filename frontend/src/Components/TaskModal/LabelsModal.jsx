@@ -83,57 +83,57 @@ function LabelsModal() {
     }
 
     return (
-        <div className="absolute  inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-            <div className="bg-gray-900 w-1/3 p-5 rounded-md shadow-lg">
-                <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-sm font-semibold text-gray-400">Labels</h2>
-                    <button
-                        onClick={toggleLabelsModal}
-                        className="text-gray-500 hover:bg-gray-800 w-6 h-6 rounded-full flex justify-center items-center"
-                    >
-                        X
-                    </button>
-                </div>
-
-                <input
-                    type="search"
-                    value={searchLabel}
-                    onChange={(e) => setSearchLabel(e.target.value)}
-                    placeholder="Search labels"
-                    className="w-full p-3 mb-4 bg-gray-900 border border-gray-700 rounded-sm text-white"
-                />
-
-                {filterLabels.length > 0 && (
-                    <div className="mb-4">
-                        <h3 className="text-xs font-semibold text-gray-400 mb-">Labels:</h3>
-                        {filterLabels.map(labels => (
-                            <div key={labels.labelId} className="flex items-center py-2 h-[50px] rounded-md mb-1">
-                                <input 
-                                    type="checkbox"
-                                    className='w-6 h-6'
-                                    checked={secondAssignedLabels.includes(labels.labelId)}
-                                    onChange={() => handleAssignLabelCheckbox(labels)}
-                                    />
-                                <span 
-                                    className="text-sm font-medium rounded-sm text-white w-full h-full flex items-center pl-2 mx-1"
-                                    style={{ backgroundColor: labels.color }}
-                                    title={`Color: ${labels.color}, Title: "${labels.name.length === 0 ? '' : labels.name}"`}
-                                >
-                                    {labels.name.length === 0 ? '' : labels.name}
-                                </span>
-                                <button
-                                    className="ml-auto text-xl text-gray-500 rounded-xs w-8 h-8 flex justify-center items-center hover:bg-gray-800"
-                                    onClick={() => toggleEditLabelModal(labels)}
-                                >
-                                    <MdOutlineEdit/>
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-                )}
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+          <div className="bg-gray-900 w-[300px] max-w-md p-5 rounded-md shadow-lg overflow-y-auto" style={{ maxHeight: '80vh' }}>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-sm font-semibold text-gray-400">Labels</h2>
+              <button
+                onClick={toggleLabelsModal}
+                className="text-gray-500 hover:bg-gray-800 w-6 h-6 rounded-full flex justify-center items-center"
+              >
+                X
+              </button>
             </div>
+    
+            <input
+              type="search"
+              value={searchLabel}
+              onChange={(e) => setSearchLabel(e.target.value)}
+              placeholder="Search labels"
+              className="w-full p-3 mb-4 bg-gray-900 border border-gray-700 rounded-sm text-white"
+            />
+    
+            {filterLabels.length > 0 && (
+              <div className="mb-4">
+                <h3 className="text-xs font-semibold text-gray-400 mb-">Labels:</h3>
+                {filterLabels.map(labels => (
+                  <div key={labels.labelId} className="flex items-center py-2 h-[50px] rounded-md mb-1">
+                    <input 
+                      type="checkbox"
+                      className='w-6 h-6'
+                      checked={secondAssignedLabels.includes(labels.labelId)}
+                      onChange={() => handleAssignLabelCheckbox(labels)}
+                    />
+                    <span 
+                      className="text-sm font-medium rounded-sm text-white w-full h-full flex items-center pl-2 mx-1"
+                      style={{ backgroundColor: labels.color }}
+                      title={`Color: ${labels.color}, Title: "${labels.name.length === 0 ? '' : labels.name}"`}
+                    >
+                      {labels.name.length === 0 ? '' : labels.name}
+                    </span>
+                    <button
+                      className="ml-auto text-xl text-gray-500 rounded-xs w-8 h-8 flex justify-center items-center hover:bg-gray-800"
+                      onClick={() => toggleEditLabelModal(labels)}
+                    >
+                      <MdOutlineEdit/>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-    );
+      );
 }
 
 export default LabelsModal;

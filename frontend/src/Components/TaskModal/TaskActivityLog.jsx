@@ -35,7 +35,7 @@ const TaskActivityLog = () => {
             }
         };
         getTaskActivities();
-    },[taskActivities]);
+    },[taskId]);
 
     const formatDateTime = (dateString) => {
         const date = new Date(dateString);
