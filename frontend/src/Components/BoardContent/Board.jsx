@@ -15,6 +15,9 @@ import MemberProfilePic from "../ProfilePic/MemberProfilepic.jsx";
 import LoadingModal from "../Modal/LoadingModal.jsx";
 import { deleteData } from "../../Services/FetchService.jsx";
 import TaskModal from "../TaskModal/TaskModal.jsx";
+import { useNavigate } from "react-router-dom";
+import { IoIosSettings } from "react-icons/io";
+import StarButton from "../ContentFromSide/StarButton.jsx";
 
 export const BoardContext = createContext();
 
@@ -29,6 +32,8 @@ const Board = () => {
   const [activeTask, setActiveTask] = useState(null);
   const [activeList, setActiveList] = useState(null);
   const [backgroundUrl, setBackgroundUrl] = useState('');
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchBackground = async () => {
@@ -366,24 +371,25 @@ const getLists = async () => {
       <div className="max-w-full max-h-screen h-screen" style={{backgroundImage: `url(${backgroundUrl})`,backgroundSize: 'cover',
                                                                 backgroundPosition: 'center',
                                                               }} >
-      <header className="flex items-center justify-between w-full w-max-full p-4 bg-opacity-70 text-white shadow-lg" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
-                <div className="flex items-center">
-                    <h2 className="text-xl font-semibold text-slate-200 mr-4">{workspaceContext.board.title}</h2>
-                    <button
-                        className="text-slate-200 text-2xl focus:outline-none"
-                        onClick={() => workspaceContext.handleStarBoard(workspaceContext.board)}
-                        aria-label={workspaceContext.board.isStarred ? "Unstar board" : "Star board"}
-                    >
-                        {workspaceContext.board.isStarred ? <MdOutlineStarPurple500 /> : <MdOutlineStarOutline />}
-                    </button>
-                </div>
+            <header className="flex items-center justify-between p-4 bg-opacity-70 text-white shadow-lg w-full" style={{ backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)' }}>
+              <div className="flex items-center">
+                  <h2 className="text-xl font-semibold text-slate-200 mr-4">{workspaceContext.board.title}</h2>
+            
+                  <StarButton board={workspaceContext.board} />
 
-                <div className="flex w-auto items-center space-x-4">
-                    <DropdownContext.Provider value={pfpValues}>
-                        <MemberProfilePic/>
-                    </DropdownContext.Provider>
-                </div>
-            </header>
+
+              </div>
+
+              <div className="flex items-center space-x-4">
+                  <DropdownContext.Provider value={pfpValues}>
+                      <MemberProfilePic />
+                  </DropdownContext.Provider>
+                  <button onClick={() => navigate(`/main/boardSettings/${workspaceId}/${workspaceContext.board.boardId}/`)}>
+                      <IoIosSettings className="text-gray-500 text-3xl" />
+                  </button>
+              </div>
+          </header>
+
         
         <div className="m-0 p-5 h-full flex flex-start space-x-4 items-baseline min-h-screen max-h-screen overflow-x-auto max-w-full">
             <DndContext sensors={sensors} onDragStart={handleDragStart} onDragMove={handleDragMove} onDragEnd={handleDragEnd}>
