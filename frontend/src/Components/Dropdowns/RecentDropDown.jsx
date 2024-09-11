@@ -31,9 +31,7 @@ const RecentDropdown = (props) => {
     };
 
     const dropdownContext = useContext(DropdownContext);
-    const {recentBoards} = useContext(WorkspaceContext); // Default to empty array if undefined
-
-    console.log("RECENTTTT: ",recentBoards);
+    const {recentBoards} = useContext(WorkspaceContext);
     
     return (
         <div className={`relative ${props.width <= 960 && 'hidden'}`}>
