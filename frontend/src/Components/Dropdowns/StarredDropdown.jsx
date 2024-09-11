@@ -2,11 +2,13 @@ import React, { useState, useEffect, useContext } from 'react'
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { DropdownContext } from '../Navbar/Navbar';
 import { WorkspaceContext } from '../Side/WorkspaceContext';
+import { useNavigate } from 'react-router-dom';
 
 const StarredDropdown = (props) => {
 
     const [width, setWidth] = useState(window.innerWidth);
-    const { boards, starredBoards } = useContext(WorkspaceContext);
+    const { boards, starredBoards, workspace } = useContext(WorkspaceContext);
+    const navigate = useNavigate();
 
     function handleResize() {
         setWidth(window.innerWidth);
@@ -43,7 +45,7 @@ const StarredDropdown = (props) => {
 
             {dropdownContext.StarredDropdownIsOpen && (
                 <div className={dynamicClassName()}>
-                    {boards.length === 0 ? (
+                    {(boards.length === 0 && starredBoards.length === 0) ? (
                         <div className='block w-full text-left px-4 py-2 bg-gray-800 text-gray-400 rounded-lg'>
                             No boards created
                         </div>
@@ -55,7 +57,8 @@ const StarredDropdown = (props) => {
                         starredBoards.map((board, index) => (
                             <div
                                 key={index}
-                                className='block w-full text-left px-4 py-2 bg-gray-800 text-gray-400 rounded-lg'>
+                                className='block w-full text-left px-4 py-2 bg-gray-800 text-gray-400 rounded-lg hover:bg-gray-700 cursor-pointer'
+                                onClick={() => navigate(`/main/board/${workspace.workspaceId}/${board.boardId}`)}>
                                 {board.title}
                             </div>
                         ))

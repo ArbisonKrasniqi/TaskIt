@@ -23,7 +23,7 @@ export const TaskModalsContext = createContext();
 
 const TaskModal = () => {
 
-    const {getInitials} = useContext(WorkspaceContext);
+    const {getInitials, board} = useContext(WorkspaceContext);
 
     const [isMembersModalOpen, setIsMembersModalOpen] = useState(false);
     const [isLabelModalOpen, setIsLabelModalOpen] = useState(false);
@@ -61,7 +61,7 @@ const TaskModal = () => {
         if (taskId) {
             getTaskById();
         }
-    },[taskId,taskData]);
+    },[taskId,board]);
 
     useEffect(() => {
         const getListById = async () => {
@@ -74,7 +74,7 @@ const TaskModal = () => {
             }
         };
             //getListById();
-    },[taskId,taskData]);
+    },[taskId,board]);
 
     useEffect(() => {
         const fetchAssignedLabels = async () => {
