@@ -18,8 +18,8 @@ const AboutUs = () => {
                 <button  onClick={() => navigate(`/Preview`)} style={{ textAlign: 'left', padding: 30, color: 'dark-blue', fontSize: '40px', fontWeight: 'bold' }}>TaskIt</button>
                 {/* Desktop Menu */}
                 <div className="hidden md:flex md:space-x-8">
-                    <button  onClick={() => navigate(`/AboutUs`)} className="py-2 px-3  hover:bg-black-100 rounded md:hover:bg-transparent md:border-0 dark:text-gray-400 md:dark:hover:text-black dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent ">About Us</button>
-                    <button  onClick={() => navigate(`/ContactUs`)} className="py-2 px-3  hover:bg-black-100 rounded md:hover:bg-transparent md:border-0 dark:text-gray-400 md:dark:hover:text-black dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent ">Contact Us</button>
+                    <button  onClick={() => navigate(`/AboutUs`)} className="py-2 px-3 hover:bg-black-100 rounded dark:text-gray-400 dark:hover:text-black dark:hover:bg-gray-700 dark:hover:text-white">About Us</button>
+                    <button  onClick={() => navigate(`/ContactUs`)} className="py-2 px-3 hover:bg-black-100 rounded dark:text-gray-400 dark:hover:text-black dark:hover:bg-gray-700 dark:hover:text-white">Contact Us</button>
                 </div>
 
    
