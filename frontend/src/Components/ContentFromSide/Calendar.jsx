@@ -52,7 +52,7 @@ const Calendar = () => {
                                             <p key={i}  className="truncate text-black">{task.taskTitle}</p>
                                         ))
                                     ) : (
-                                        <p className="truncate text-black">No tasks</p>
+                                        <p className="truncate">No tasks</p>
                                     )}
                                 </div>
                             </div>

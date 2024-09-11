@@ -172,7 +172,11 @@ const WorkspaceSettings = () => {
             </div>
 
             {/* Activity List */}
-            <div className="mt-10 ml-10 max-h-[500px] overflow-y-auto">
+            <div className="mt-10 ml-10 max-h-[500px] overflow-y-auto"
+             style={{
+             scrollbarWidth: 'thin', 
+             scrollbarColor: 'rgba(0, 0, 0, 0.2) transparent', 
+            }}>
                 {filteredActivities
                     .sort((a, b) => new Date(b.actionDate) - new Date(a.actionDate))
                     .slice(0, visibleActivities)

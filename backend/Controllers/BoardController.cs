@@ -502,7 +502,7 @@ namespace backend.Controllers
                     var boardActivity = new BoardActivity{
                         BoardId = board.BoardId,
                         UserId = userId,
-                        ActionType = "reopen",
+                        ActionType = "Reopened",
                         EntityName = "board " + board.Title,
                         ActionDate = DateTime.Now
                     };

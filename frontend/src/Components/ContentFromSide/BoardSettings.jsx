@@ -1,10 +1,15 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, createContext } from "react";
 import { WorkspaceContext } from "../Side/WorkspaceContext";
 import { putData, getData, getDataWithId } from "../../Services/FetchService";
 import MessageModal from "./MessageModal";
 import { RxActivityLog } from "react-icons/rx";
+import BoardLabelsModal from "./BoardLabelsModal";
+import EditBoardLabelModal from "./EditBoardLabelModal";
+// board settings contexti
+export  const BoardSettingsContext = createContext();
 
-const BoardSettings = () => {
+
+ const BoardSettings = ({ children }) => {
   const { board, setBoard, getBackgroundImageUrl, getInitials } = useContext(WorkspaceContext);
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState('');
@@ -17,7 +22,28 @@ const BoardSettings = () => {
   const [activeBackgroundUrls, setActiveBackgroundUrls] = useState({});
   const [selectedBackgroundId, setSelectedBackgroundId] = useState(board?.backgroundId || null);
   const [labels, setLabels] = useState([]);
+  const [isLabelModalOpen, setIsLabelModalOpen] = useState(false);
+  const [isEditLabelModalOpen, setIsEditLabelModalOpen] = useState(false);
+  const [selectedLabel, setSelectedLabel] = useState(null);
 
+
+  const toggleLabelsModal = () => {
+    if (!isLabelModalOpen) {
+        setIsLabelModalOpen(true);
+        setIsEditLabelModalOpen(false);
+    } else {
+        setIsLabelModalOpen(false);
+    }
+};
+const toggleEditLabelModal = (label) => {
+  if (!isEditLabelModalOpen) {
+      setSelectedLabel(label);
+      setIsLabelModalOpen(false);
+      setIsEditLabelModalOpen(true);
+  } else {
+      setIsEditLabelModalOpen(false);
+  }
+}
   useEffect(() => {
     const fetchBackground = async () => {
       if (board && board.backgroundId) {
@@ -217,8 +243,16 @@ const BoardSettings = () => {
     return "Loading...";
   }
 
+  const values = {
+    toggleEditLabelModal,
+    toggleLabelsModal,
+    labels,
+    selectedLabel,
+    setIsLabelModalOpen
+  };
 
   return (
+    <BoardSettingsContext.Provider value={values}>
     <div className="min-h-screen h-full overflow-y-auto" style={{ backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)' }}>
       <div className="font-semibold font-sans text-gray-400 ml-20 pt-10">
         <h1 className="text-3xl">Board Settings</h1>
@@ -320,10 +354,13 @@ const BoardSettings = () => {
         <div className="mt-3 mb-5">
           <button 
             className="bg-gray-800 text-white px-4 py-2 rounded-md"
+            onClick={toggleLabelsModal}
           >
             Edit Labels
           </button>
         </div>
+        
+
      </div> 
     </div>
              <br/>
@@ -344,7 +381,11 @@ const BoardSettings = () => {
 {/* Activity List */}
 
   
-    <div className="mt-3 ml-10 max-h-[500px] overflow-y-auto">
+    <div className="mt-3 ml-10 max-h-[500px] overflow-y-auto"
+     style={{
+      scrollbarWidth: 'thin',
+      scrollbarColor: 'rgba(0, 0, 0, 0.2) transparent',
+    }}>
                 {filteredBoardActivities
                     .sort((a, b) => new Date(b.actionDate) - new Date(a.actionDate))
                     .slice(0, visibleActivities)
@@ -374,8 +415,10 @@ const BoardSettings = () => {
    
     <br/>
     <br/>
-    
+    {isLabelModalOpen && <BoardLabelsModal/>}
+    {isEditLabelModalOpen && <EditBoardLabelModal/>}
     </div>
+    </BoardSettingsContext.Provider>
   );
 };
 

@@ -10,10 +10,12 @@ namespace backend.Repositories;
 public class ChecklistRepository : IChecklistRepository
 {
     private readonly ApplicationDBContext _context;
+    private readonly IChecklistItemRepository _checklistItemRepo;
 
-    public ChecklistRepository(ApplicationDBContext context)
+    public ChecklistRepository(ApplicationDBContext context, IChecklistItemRepository checklistItemRepo)
     {
         _context = context;
+        _checklistItemRepo = checklistItemRepo;
     }
 
     public async Task<List<Checklist>> GetAllChecklistsAsync()
@@ -59,11 +61,9 @@ public class ChecklistRepository : IChecklistRepository
             return null;
         }
 
-        if (checklistModel.ChecklistItems != null)
-        {
-            _context.ChecklistItem.RemoveRange(checklistModel.ChecklistItems);
-        }
+       
         _context.Checklist.Remove(checklistModel);
+        await _checklistItemRepo.DeleteChecklistItemByChecklistIdAsync(checklistId);
         await _context.SaveChangesAsync();
         return checklistModel;
     }
@@ -79,7 +79,10 @@ public class ChecklistRepository : IChecklistRepository
     {
         var checklists = await _context.Checklist.Where(c => c.TaskId == taskId).ToListAsync();
         
-        _context.Checklist.RemoveRange(checklists);
+         foreach (var checklist in checklists)
+                {
+                    await _checklistItemRepo.DeleteChecklistItemByChecklistIdAsync(checklist.ChecklistId);
+                 }
         await _context.SaveChangesAsync();
         return checklists;
     }

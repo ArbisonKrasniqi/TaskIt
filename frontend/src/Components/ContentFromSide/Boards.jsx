@@ -51,7 +51,7 @@ const Boards = () =>{
 return (
     <div className="min-h-screen h-full overflow-y-auto" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
       <SideMenusHeader />
-      <div className="font-semibold font-sans text-gray-400 flex justify-normal mt-10 flex-col ml-20 mr-20 flex-wrap">
+      <div className="font-semibold font-sans text-gray-400 flex justify-normal mt-10 flex-col ml-20 mr-20 flex-wrap overflow-y-auto">
         <h2 className="text-2xl ">Boards {boardCount}/10 (+{countClosedBoards} Closed Boards) </h2>
 
         <div className="flex flex-row flex-wrap gap-10">
@@ -178,7 +178,9 @@ return (
       
         <ClosedBoardsModal open={openClosedBoardsModal} onClose={()=> {setOpenClosedBoardsModal(false);
           setOpenCloseModal(false);}}></ClosedBoardsModal>
+         
       </div>
+      <br/><br/><br/>
     </div>
    
 );

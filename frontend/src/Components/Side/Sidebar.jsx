@@ -24,6 +24,9 @@ const Sidebar = () => {
     const mainContext = useContext(MainContext);
     const navigate = useNavigate();
     const location = useLocation();
+
+    const [selectedBoardId, setSelectedBoardId] = useState(null);
+
     const { 
         workspace, open, setOpen, workspaceTitle, setHover, hover, openCloseModal,
         setOpenSortModal, setOpenCloseModal, openSortModal, setOpenModal, openModal, 
@@ -54,8 +57,13 @@ const WorkspaceViews = [
 
   const handleMenuClick = (path) => {
     navigate(path); 
+    setSelectedBoardId(null); 
   };
 
+  const handleBoardClick = (board) => {
+    setSelectedBoardId(board.boardId); 
+    navigate(`/main/board/${workspace.workspaceId}/${board.boardId}`);
+};
     return(
         <div className="flex min-h-screen">
             <div className={`${open ? 'w-72' : 'w-8'} duration-100 h-full p-5 pt-8 relative border-r border-r-solid border-r-gray-500`} style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
@@ -122,8 +130,8 @@ const WorkspaceViews = [
                 {
                     starredBoards.map((board, index) => (
                         <li key={index} 
-                            onClick={() => navigate(`/main/board/${workspace.workspaceId}/${board.boardId}`)}
-                            className={`flex justify-between text-gray-400 text-lg font-semibold items-center mt-2 p-1 cursor-pointer hover:bg-gray-500 ${!open && "scale-0"}`}
+                           onClick={() => handleBoardClick(board)}
+                            className={`flex justify-between text-gray-400 text-lg font-semibold items-center mt-2 p-1 cursor-pointer hover:bg-gray-500  ${selectedBoardId === board.boardId ? 'bg-gray-600' : ''} ${!open && "scale-0"}`}
                             onMouseEnter={() => setHoveredSIndex(index)}
                             onMouseLeave={() => setHoveredSIndex(null)}
                             
@@ -134,7 +142,7 @@ const WorkspaceViews = [
                                     style={{ 
                                         width: '1.5em', 
                                         height: '1.5em', 
-                                        backgroundImage: `url(${backgroundUrls[board.boardId] || '/path/to/default/image.jpg'})`,  
+                                        backgroundImage: `url(${backgroundUrls[board.boardId] || 'backgrund.jpg'})`,  
                                         backgroundSize: 'cover', 
                                         backgroundPosition: 'center' 
                                     }}
@@ -151,8 +159,10 @@ const WorkspaceViews = [
                                             setBoardToClose(board);
                                             setOpenCloseModal(prev => !prev);
                                             setSelectedBoardTitle(board.title);
+                                            setSelectedBoardId(board.boardId); 
                                             setOpenSortModal(false);
                                             setOpenClosedBoardsModal(false);
+                                            setHoveredSIndex(index);
                                         }} 
                                         className={`text-gray-400 cursor-pointer ${!open && "scale-0"} mr-3`}
                                     >
@@ -178,8 +188,8 @@ const WorkspaceViews = [
     ) : (
         boards.map((board, index) => (
             <li key={index} 
-            onClick={() => navigate(`/main/board/${workspace.workspaceId}/${board.boardId}`)}
-            className={`flex justify-between text-gray-400 text-lg font-semibold items-center mt-2 p-1 cursor-pointer hover:bg-gray-500 ${!open && "scale-0"}`}
+            onClick={() => handleBoardClick(board)}
+            className={`flex justify-between text-gray-400 text-lg font-semibold items-center mt-2 p-1 cursor-pointer ${selectedBoardId === board.boardId ? 'bg-gray-600' : ''} ${!open && "scale-0"}`}
              onMouseEnter={() => setHoveredIndex(index)}
             onMouseLeave={() => setHoveredIndex(null)}
           >
@@ -190,7 +200,7 @@ const WorkspaceViews = [
         style={{ 
           width: '1.5em', 
           height: '1.5em', 
-          backgroundImage: `url(${backgroundUrls[board.boardId] || '/path/to/default/image.jpg'})`, 
+          backgroundImage: `url(${backgroundUrls[board.boardId] || 'background.jpg'})`, 
           backgroundSize: 'cover', 
           backgroundPosition: 'center' 
         }}
@@ -209,8 +219,10 @@ const WorkspaceViews = [
                 setBoardToClose(board);
                 setOpenCloseModal(prev => !prev);
                 setSelectedBoardTitle(board.title);
+                setSelectedBoardId(board.boardId); 
                 setOpenSortModal(false);
                 setOpenClosedBoardsModal(false);
+                setHoveredIndex(index);
             }} 
                 className={`text-gray-400 cursor-pointer ${!open && "scale-0"} mr-3`}><FaEllipsisH />
                 </button>
