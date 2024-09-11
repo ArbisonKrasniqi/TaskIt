@@ -13,7 +13,7 @@ import MembersModal from './MembersModal';
 import LabelsModal from './LabelsModal';
 import ChecklistModal from './ChecklistModal';
 import EditLabelModal from './EditLabelModal';
-import { getDataWithId } from '../../Services/FetchService';
+import { getDataWithId, putData } from '../../Services/FetchService';
 import { useParams } from 'react-router-dom';
 import { WorkspaceContext } from '../Side/WorkspaceContext';
 import DateCalendarModal from './DateCalendarModal';
@@ -23,152 +23,183 @@ export const TaskModalsContext = createContext();
 
 const TaskModal = () => {
 
-    const {getInitials, board} = useContext(WorkspaceContext);
+  const { getInitials, board } = useContext(WorkspaceContext);
+  const [isMembersModalOpen, setIsMembersModalOpen] = useState(false);
+  const [isLabelModalOpen, setIsLabelModalOpen] = useState(false);
+  const [isChecklistModalOpen, setIsChecklistModalOpen] = useState(false);
+  const [isCreateLabelModalOpen, setIsCreateLabelModalOpen] = useState(false);
+  const [isEditLabelModalOpen, setIsEditLabelModalOpen] = useState(false);
+  const [selectedLabel, setSelectedLabel] = useState(null);
+  const { taskId } = useParams();
+  const [assignedLabels, setAssignedLabels] = useState([]);
+  const [taskData, setTaskData] = useState({});
+  const [listData, setListData] = useState({});
+  const [assignedMembers, setAssignedMembers] = useState([]);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
 
-    const [isMembersModalOpen, setIsMembersModalOpen] = useState(false);
-    const [isLabelModalOpen, setIsLabelModalOpen] = useState(false);
-    const [isChecklistModalOpen, setIsChecklistModalOpen] = useState(false);
-    const [isCreateLabelModalOpen, setIsCreateLabelModalOpen] = useState(false);
-    const [isEditLabelModalOpen, setIsEditLabelModalOpen] = useState(false);
-    const [selectedLabel, setSelectedLabel] = useState(null);
-    const {taskId} = useParams();
-    const [assignedLabels, setAssignedLabels] = useState([]);
-    const [taskData, setTaskData] = useState([]);
-    const [listData, setListData] = useState([]);
-    const [assignedMembers, setAssignedMembers] = useState([]);
-    const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-
-    const specificDate = new Date('0001-01-01T00:00:00Z');
+  const specificDate = new Date('0001-01-01T00:00:00Z');
 
   const openCalendar = () => {
-    setIsCalendarOpen(true);
+      setIsCalendarOpen(true);
   };
 
   const closeCalendar = () => {
-    setIsCalendarOpen(!isCalendarOpen);
+      setIsCalendarOpen(!isCalendarOpen);
   };
 
   const getTaskById = async () => {
-    try {
-        const response = await getDataWithId('http://localhost:5157/backend/task/GetTaskById?taskId',taskId);
-        setTaskData(response.data);
-    } catch (error) {
-        console.error("Error fetching task by id: ",error);
-    }
-};
-    useEffect(() => {   
-   
-        if (taskId) {
-            getTaskById();
-        }
-    },[taskId,board]);
+      try {
+          const response = await getDataWithId('http://localhost:5157/backend/task/GetTaskById?taskId', taskId);
+          setTaskData(response.data);
+      } catch (error) {
+          console.error("Error fetching task by id: ", error);
+      }
+  };
 
-    useEffect(() => {
-        const getListById = async () => {
-            try {
-                const response = await getDataWithId('http://localhost:5157/backend/list/GetListById?listId',taskData.listId);
-                setListData(response.data);
-                
-            } catch (error) {
-                console.error("Error fetching list by id: ",error);
-            }
-        };
-            //getListById();
-    },[taskId,board]);
+  useEffect(() => {
+      if (taskId) {
+          getTaskById();
+      }
+  }, [taskId, board]);
 
-    useEffect(() => {
-        const fetchAssignedLabels = async () => {
-            try {
-                const response = await getDataWithId('http://localhost:5157/backend/label/GetLabelsByTaskId?taskId',taskId);
-                setAssignedLabels(response.data);
-            } catch (error) {
-                console.error("Error fetching assigned labels: ",error);
-                
-            }
-        };
-        if (taskId) {
-            fetchAssignedLabels();
-        }
-    },[taskId,assignedLabels]);
+  const [newTitle, setNewTitle] = useState(taskData.title);
 
-    useEffect(() => {
-        const fetchTaskMembers = async () => {
-            try {
-                const response = await getDataWithId(`http://localhost:5157/backend/TaskMembers/GetAllTaskMembersByTaskId?taskId`, 1);
-                const data = response.data;
+  useEffect(() => {
+      const getListById = async () => {
+          try {
+              const response = await getDataWithId('http://localhost:5157/backend/list/GetListById?listId', taskData.listId);
+              setListData(response.data);
+          } catch (error) {
+              console.error("Error fetching list by id: ", error);
+          }
+      };
+      if (taskData.listId) {
+          getListById();
+      }
+  }, [taskData.listId, board]);
 
-                const taskMembers = await Promise.all(data.map(async (taskMember) => {
-                    const responseTaskMemberDetail = await getDataWithId('http://localhost:5157/backend/user/adminUserID?userId', taskMember.userId);
-                    return responseTaskMemberDetail.data;
-                }));
+  useEffect(() => {
+      const fetchAssignedLabels = async () => {
+          try {
+              const response = await getDataWithId('http://localhost:5157/backend/label/GetLabelsByTaskId?taskId', taskId);
+              setAssignedLabels(response.data);
+          } catch (error) {
+              console.error("Error fetching assigned labels: ", error);
+          }
+      };
+      if (taskId) {
+          fetchAssignedLabels();
+      }
+  }, [taskId]);
 
-                setAssignedMembers(taskMembers);
-            } catch (error) {
-                console.error("Error fetching task members:", error);
-            }
-        };
+  useEffect(() => {
+      const fetchTaskMembers = async () => {
+          try {
+              const response = await getDataWithId(`http://localhost:5157/backend/TaskMembers/GetAllTaskMembersByTaskId?taskId`, 1);
+              const data = response.data;
 
-        fetchTaskMembers();
-    }, [taskId]);
+              const taskMembers = await Promise.all(data.map(async (taskMember) => {
+                  const responseTaskMemberDetail = await getDataWithId('http://localhost:5157/backend/user/adminUserID?userId', taskMember.userId);
+                  return responseTaskMemberDetail.data;
+              }));
 
+              setAssignedMembers(taskMembers);
+          } catch (error) {
+              console.error("Error fetching task members:", error);
+          }
+      };
 
-    const formatDateTime = (dateString) => {
-        const date = new Date(dateString);
-        const formattedDate = date.toLocaleDateString('en-US');
-        return `${formattedDate}`;
-    };
+      fetchTaskMembers();
+  }, [taskId]);
 
+  const handleTitleChange = (e) => {
+      setNewTitle(e.target.value);
+  };
 
-    const toggleMembersModal = () => {
-        setIsMembersModalOpen(!isMembersModalOpen);
-    };
+  const handleSaveTitle = async () => {
+      try {
+          if (newTitle.trim()) {
+              const data = {
+                  taskId: taskId,
+                  title: newTitle,
+                  description: taskData.description,
+                  dateAdded: taskData.dateAdded,
+                  dueDate: taskData.dueDate
+              };
+              await putData('http://localhost:5157/backend/task/UpdateTask', data);
+              setTaskData((prevData) => ({
+                  ...prevData,
+                  title: newTitle,
+              }));
+              setIsEditingTitle(false);
+          }
+      } catch (error) {
+          console.error('Error updating task title: ', error);
+      }
+  };
 
-    const toggleLabelsModal = () => {
-        if (!isLabelModalOpen) {
-            setIsLabelModalOpen(true);
-            setIsCreateLabelModalOpen(false);
-            setIsEditLabelModalOpen(false);
-        } else {
-            setIsLabelModalOpen(false);
-        }
-    };
+  const handleCancelEdit = () => {
+      setNewTitle(taskData.title); // Revert to the original title
+      setIsEditingTitle(false);
+  };
 
-    const toggleChecklistModal = () => {
-        setIsChecklistModalOpen(!isChecklistModalOpen);
-    };
+  const formatDateTime = (dateString) => {
+      const date = new Date(dateString);
+      const formattedDate = date.toLocaleDateString('en-US');
+      return `${formattedDate}`;
+  };
 
-    const toggleEditLabelModal = (label) => {
-        if (!isEditLabelModalOpen) {
-            setSelectedLabel(label);
-            setIsLabelModalOpen(false);
-            setIsEditLabelModalOpen(true);
-        } else {
-            setIsEditLabelModalOpen(false);
-        }
-    }
+  const toggleMembersModal = () => {
+      setIsMembersModalOpen(!isMembersModalOpen);
+  };
 
-    const values = {
-        isMembersModalOpen,
-        toggleMembersModal,
-        isLabelModalOpen,
-        toggleLabelsModal,
-        isChecklistModalOpen,
-        toggleChecklistModal,
-        isCreateLabelModalOpen,
-        isEditLabelModalOpen,
-        toggleEditLabelModal,
-        selectedLabel,
-        setIsChecklistModalOpen,
-        setIsLabelModalOpen,
-        assignedLabels,
-        setAssignedLabels,
-        taskData,
-        setTaskData,
-        assignedMembers,
-        setAssignedMembers,
-        closeCalendar,
-        getTaskById
-    };
+  const toggleLabelsModal = () => {
+      if (!isLabelModalOpen) {
+          setIsLabelModalOpen(true);
+          setIsCreateLabelModalOpen(false);
+          setIsEditLabelModalOpen(false);
+      } else {
+          setIsLabelModalOpen(false);
+      }
+  };
+
+  const toggleChecklistModal = () => {
+      setIsChecklistModalOpen(!isChecklistModalOpen);
+  };
+
+  const toggleEditLabelModal = (label) => {
+      if (!isEditLabelModalOpen) {
+          setSelectedLabel(label);
+          setIsLabelModalOpen(false);
+          setIsEditLabelModalOpen(true);
+      } else {
+          setIsEditLabelModalOpen(false);
+      }
+  };
+
+  const values = {
+      isMembersModalOpen,
+      toggleMembersModal,
+      isLabelModalOpen,
+      toggleLabelsModal,
+      isChecklistModalOpen,
+      toggleChecklistModal,
+      isCreateLabelModalOpen,
+      isEditLabelModalOpen,
+      toggleEditLabelModal,
+      selectedLabel,
+      setIsChecklistModalOpen,
+      setIsLabelModalOpen,
+      assignedLabels,
+      setAssignedLabels,
+      taskData,
+      setTaskData,
+      assignedMembers,
+      setAssignedMembers,
+      closeCalendar,
+      getTaskById
+  };
     
 
     return (
@@ -183,8 +214,39 @@ const TaskModal = () => {
                         <TbAlignBoxLeftTopFilled className="bg-gray-800 text-2xl ml-5" />
                         <div className="flex flex-col w-full md:w-[550px]">
                         <h2 className="font-bold text-xl">
-                            {taskData.title}{' '}
-                            <span className="ml-[47px]  text-[12px]">
+                        {isEditingTitle ? (
+                                        <div className="flex items-center space-x-2">
+                                            <input
+                                                type="text"
+                                                value={newTitle}
+                                                onChange={handleTitleChange}
+                                                className="border rounded p-1 bg-gray-800"
+                                                autoFocus
+                                            />
+                                            <button
+                                                className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded px-3 py-1"
+                                                onClick={handleSaveTitle}
+                                            >
+                                                Save
+                                            </button>
+                                            <button
+                                                className="bg-gray-800 hover:bg-slate-700 text-gray-400 font-semibold rounded px-3 py-1"
+                                                onClick={handleCancelEdit}
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="flex items-center space-x-2">
+                                            <span className='cursor-pointer'
+                                             onClick={() => setIsEditingTitle(true)}>{taskData.title}</span>
+                                            
+                                        </div>
+                                    )}
+                        </h2>
+                        <div className="flex text-xs">
+                            <span> in list {listData.title}</span>
+                            <span className="ml-[100px]  text-[12px]">
                             Due Date:{' '}
                             <span className="text-red-400 text-opacity-75">
                                 {formatDateTime(taskData.dueDate) === formatDateTime(specificDate)
@@ -192,9 +254,6 @@ const TaskModal = () => {
                                 : formatDateTime(taskData.dueDate)}
                             </span>
                             </span>
-                        </h2>
-                        <div className="flex text-xs">
-                            <span> in list {listData.title}</span>
                         </div>
                         </div>
                     </div>
