@@ -24,8 +24,8 @@ const Sidebar = () => {
     const mainContext = useContext(MainContext);
     const navigate = useNavigate();
     const location = useLocation();
-
-    const [selectedBoardId, setSelectedBoardId] = useState(null);
+    const [hoveredBoardIndex, setHoveredBoardIndex]=useState('');
+    const [hoveredSBoardIndex, setHoveredSBoardIndex]=useState('');
 
     const { 
         workspace, open, setOpen, workspaceTitle, setHover, hover, openCloseModal,
@@ -33,7 +33,7 @@ const Sidebar = () => {
         handleCreateBoard, setHoveredIndex, hoveredIndex, hoveredSIndex, setHoveredSIndex, setSelectedBoardTitle, 
          selectedBoardTitle, boards, selectedSort, handleSortChange, 
         handleStarBoard,handleStarButtonClick,backgroundUrls,handleCloseBoard,setOpenClosedBoardsModal, 
-        showLimitModal, setShowLimitModal, boardCount, roli, starredBoards,ALLBoardsCount } = useContext(WorkspaceContext);
+        showLimitModal, setShowLimitModal, boardCount, roli, starredBoards,ALLBoardsCount,setSelectedBoardId, selectedBoardId } = useContext(WorkspaceContext);
 
         const [boardToClose, setBoardToClose] = useState(null);
      
@@ -66,7 +66,11 @@ const WorkspaceViews = [
 };
     return(
         <div className="flex min-h-screen">
-            <div className={`${open ? 'w-72' : 'w-8'} duration-100 h-full p-5 pt-8 relative border-r border-r-solid border-r-gray-500`} style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
+            <div className={`${open ? 'w-72' : 'w-8'} duration-100 h-full p-5 pt-8 relative border-r border-r-solid border-r-gray-500 overflow-y-auto`}  
+            style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)', 
+            scrollbarWidth: 'thin', 
+             scrollbarColor: 'rgba(0, 0, 0, 0.2) transparent', 
+            }}>
             
         
 
@@ -130,30 +134,29 @@ const WorkspaceViews = [
                 {
                     starredBoards.map((board, index) => (
                         <li key={index} 
-                           onClick={() => handleBoardClick(board)}
-                            className={`flex justify-between text-gray-400 text-lg font-semibold items-center mt-2 p-1 cursor-pointer hover:bg-gray-500  ${selectedBoardId === board.boardId ? 'bg-gray-600' : ''} ${!open && "scale-0"}`}
-                            onMouseEnter={() => setHoveredSIndex(index)}
-                            onMouseLeave={() => setHoveredSIndex(null)}
-                            
+                        onClick={() => handleBoardClick(board)}
+                        onMouseEnter={() => setHoveredSBoardIndex(index)}
+                        onMouseLeave={() => setHoveredSBoardIndex(null)}
+                        className={`flex justify-between text-gray-400 text-lg font-semibold items-center mt-2 p-1 cursor-pointer  ${selectedBoardId === board.boardId ? 'bg-gray-600' : ''} ${!open && "scale-0"}`}
                         >
-                            <div className="flex items-center gap-x-2">
+                            <div className="flex items-center overflow-hidden gap-x-2">
                                 <div
-                                    className="relative flex items-center justify-center" 
+                                    className="relative flex items-center ml-1 justify-center" 
                                     style={{ 
                                         width: '1.5em', 
                                         height: '1.5em', 
-                                        backgroundImage: `url(${backgroundUrls[board.boardId] || 'backgrund.jpg'})`,  
+                                        backgroundImage: `url(${backgroundUrls[board.boardId] || 'background.jpg'})`,  
                                         backgroundSize: 'cover', 
                                         backgroundPosition: 'center' 
                                     }}
                                 >
                                     <FiSquare className="text-4xl absolute" />
                                 </div>
-                                <span>{board.title}</span>
+                                <span className="truncate overflow-hidden flex flex-1">{board.title}</span>
                             </div>
+                          
                             <div className="flex justify-between">
-                                      
-                                    <button 
+                            {(hoveredSBoardIndex === index) ?   <button 
                                         onClick={(e) => {
                                             e.stopPropagation(); 
                                             setBoardToClose(board);
@@ -162,16 +165,25 @@ const WorkspaceViews = [
                                             setSelectedBoardId(board.boardId); 
                                             setOpenSortModal(false);
                                             setOpenClosedBoardsModal(false);
-                                            setHoveredSIndex(index);
+                                        
                                         }} 
-                                        className={`text-gray-400 cursor-pointer ${!open && "scale-0"} mr-3`}
-                                    >
-                                        <FaEllipsisH />
-                                    </button>
+                                        className={`text-gray-400 cursor-pointer ${!open && "scale-0"} p-1 mr-1 border border-transparent hover:bg-gray-500 rounded-full `}><FaEllipsisH />
+                                    
+                                       
+                                    </button> :<></>}
+                                   
                                
+                           
                                 <CloseBoardModal open={openCloseModal} boardTitle={selectedBoardTitle} onClose={() => setOpenCloseModal(false)} role={roli} boardId={boardToClose?.boardId} userId={mainContext.userInfo.userId} onBoardClosed={handleCloseBoard} />
-                                <button className={`text-gray-400 cursor-pointer text-lg ${!open && "scale-0"}`}   onClick={(e) => handleStarButtonClick(e, board)}>
-                                  <MdOutlineStarPurple500 />
+                                <button    
+                                onMouseEnter={() => setHoveredSIndex(index)}
+                                onMouseLeave={() => setHoveredSIndex(null)}
+                                className={`text-gray-400 cursor-pointer text-lg transition-transform duration-200 ${hoveredSIndex === index ? "scale-125" : ""} ${!open && "scale-0"}`}   
+                                onClick={(e) => handleStarButtonClick(e, board)}>
+                               {(hoveredSIndex === index) ? 
+                                 <MdOutlineStarOutline className="text-xl ml-1" /> : 
+                                 <MdOutlineStarPurple500 className="text-xl ml-1" />
+                                    }
                                 </button>
                             </div>
                         </li>
@@ -189,14 +201,15 @@ const WorkspaceViews = [
         boards.map((board, index) => (
             <li key={index} 
             onClick={() => handleBoardClick(board)}
+            onMouseEnter={() => setHoveredBoardIndex(index)}
+            onMouseLeave={() => setHoveredBoardIndex(null)}
             className={`flex justify-between text-gray-400 text-lg font-semibold items-center mt-2 p-1 cursor-pointer ${selectedBoardId === board.boardId ? 'bg-gray-600' : ''} ${!open && "scale-0"}`}
-             onMouseEnter={() => setHoveredIndex(index)}
-            onMouseLeave={() => setHoveredIndex(null)}
+         
           >
-                <div className="flex items-center gap-x-2 ">
+                <div className="flex items-center overflow-hidden gap-x-2 ">
           
                 <div 
-        className="relative flex items-center justify-center" 
+        className="relative flex items-center justify-center ml-1" 
         style={{ 
           width: '1.5em', 
           height: '1.5em', 
@@ -208,44 +221,48 @@ const WorkspaceViews = [
         <FiSquare className="text-4xl absolute" />
       </div>
                 
-                <span>{board.title}</span>
+      <p className="truncate flex flex-1">{board.title}</p>
                 </div>
-                <div className="flex justify-between">
+             {(hoveredBoardIndex===index) ? 
+              <div className="flex justify-between items-center relative">
 
                 
-                <button 
-              onClick={(e) => {
-                e.stopPropagation(); // Prevent event from propagating
-                setBoardToClose(board);
-                setOpenCloseModal(prev => !prev);
-                setSelectedBoardTitle(board.title);
-                setSelectedBoardId(board.boardId); 
-                setOpenSortModal(false);
-                setOpenClosedBoardsModal(false);
-                setHoveredIndex(index);
-            }} 
-                className={`text-gray-400 cursor-pointer ${!open && "scale-0"} mr-3`}><FaEllipsisH />
-                </button>
-                
+              <button 
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent event from propagating
+              setBoardToClose(board);
+              setOpenCloseModal(prev => !prev);
+              setSelectedBoardTitle(board.title);
+              setSelectedBoardId(board.boardId); 
+              setOpenSortModal(false);
+              setOpenClosedBoardsModal(false);
         
-                    <CloseBoardModal open={openCloseModal} boardTitle={selectedBoardTitle} onClose={()=> setOpenCloseModal(false)} role={roli} boardId={boardToClose?.boardId} userId={mainContext.userInfo.userId} onBoardClosed={handleCloseBoard}></CloseBoardModal>
-
-                     
-                          
-                <button className={`text-gray-400 cursor-pointer text-lg ${!open && "scale-0"}`}   onClick={(e) => handleStarButtonClick(e, board)} >{(hoveredIndex===index ) ?<MdOutlineStarPurple500 />: <MdOutlineStarOutline/> }</button>
-                
-                
-           
+          }} 
+              className={`text-gray-400 cursor-pointer flex-shrink-0 ${!open && "scale-0"} p-1 border border-transparent hover:bg-gray-500 rounded-full `}><FaEllipsisH />
+              </button>
+              
+      
+                  <CloseBoardModal open={openCloseModal} boardTitle={selectedBoardTitle} onClose={()=> setOpenCloseModal(false)} role={roli} boardId={boardToClose?.boardId} userId={mainContext.userInfo.userId} onBoardClosed={handleCloseBoard}></CloseBoardModal>
 
                    
-
-                 
-                  </div>
+                        
+              <button    
+              onMouseEnter={() => setHoveredIndex(index)}
+              onMouseLeave={() => setHoveredIndex(null)}
+              className={`text-gray-400 cursor-pointer flex flex-shrink-0 text-lg transition-transform duration-200 ${hoveredIndex === index ? "scale-125" : ""}`} 
+              onClick={(e) => handleStarButtonClick(e, board)} >
+                 <MdOutlineStarOutline className="text-xl ml-1" />
+              </button>
+              
+                          
+                </div> 
+           : <></> }
+              
             </li>
         ))
     )}
 </ul>
-
+<br/><br/>
             </div>
         </div>
 

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { WorkspaceContext } from './WorkspaceContext';
 
 const CloseBoardModal = ({ open, boardTitle, onClose, role, boardId, onBoardClosed }) => {
-    const { WorkspaceId } = useContext(WorkspaceContext);
+    const { WorkspaceId, setSelectedBoardId } = useContext(WorkspaceContext);
     const [modalContent, setModalContent] = useState(" ");
     const [clicked, setClicked] = useState(false);
     const navigate = useNavigate();
@@ -29,6 +29,7 @@ const CloseBoardModal = ({ open, boardTitle, onClose, role, boardId, onBoardClos
 
     const closeModal = () => {
         setClicked(false);
+        setSelectedBoardId(null);
         onClose();
     };
 
@@ -40,8 +41,8 @@ const CloseBoardModal = ({ open, boardTitle, onClose, role, boardId, onBoardClos
     if (!open) return null;
 
     return (
-        <div
-        className="absolute top-20 z-50 flex flex-col bg-white border border-gray-300 rounded-lg shadow-lg w-80 max-w-lg mx-4 sm:mx-auto"
+         <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-20" // Less intense background
             onClick={(e) => {
                 if (e.target.className.includes('bg-black')) {
                     e.stopPropagation();

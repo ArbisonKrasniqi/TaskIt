@@ -5,7 +5,15 @@ const SortModal = ({ open, onClose, selectedSort, onSortChange }) => {
   if (!open) return null;
 
   return (
-    <div className="fixed z-50 inset-0 flex items-center justify-start p-4 ml-60 zIndex: 1000 text-black">
+    <div className="fixed z-50 inset-0 flex items-center justify-start p-4 ml-60 zIndex: 1000 text-black bg-black bg-opacity-0"
+  
+            onClick={(e) => {
+                if (e.target.className.includes('bg-black')) {
+                    e.stopPropagation();
+                    onClose();
+                }
+            }}
+        >
       <div className="bg-white border border-gray-300 rounded-lg shadow-lg w-50">
         <div className="p-3 flex justify-between items-center">
           <h3 className="text-gray-700 font-semibold">Sort Options</h3>

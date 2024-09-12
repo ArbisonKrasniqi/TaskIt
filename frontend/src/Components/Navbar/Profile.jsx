@@ -124,7 +124,7 @@ return (
         
 
         <button className="mt-10 p-2 bg-blue-500 text-white rounded shadow-lg w-full max-w-md"
-          onClick={() => setIsPasswordModalOpen(true)}>Update Password</button>
+          onClick={() => setIsPasswordModalOpen(true)}>Change Password</button>
 
 <MessageModal
                 message={modalMessage}

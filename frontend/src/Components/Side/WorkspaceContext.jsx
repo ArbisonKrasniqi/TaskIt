@@ -643,6 +643,9 @@ export const WorkspaceProvider = ({ children }) => {
 
         const countClosedBoards = closedBoards.length;
         const ALLBoardsCount = boardCount+countClosedBoards;
+  
+        const [selectedBoardId, setSelectedBoardId] = useState(null);
+
     return (
         <WorkspaceContext.Provider value={{
             WorkspaceId,
@@ -743,7 +746,9 @@ export const WorkspaceProvider = ({ children }) => {
             countClosedBoards,
             ALLBoardsCount,
             fetchChecklistItems,
-            handleStarButtonClick
+            handleStarButtonClick,
+            selectedBoardId,
+            setSelectedBoardId
         }}>
             {children}
         </WorkspaceContext.Provider>

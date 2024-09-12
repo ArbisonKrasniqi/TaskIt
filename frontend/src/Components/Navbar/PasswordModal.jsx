@@ -38,18 +38,22 @@ const PasswordModal = ({isOpen, onClose, user})=>{
           
             const updatePasswordData = {
                 id: user.id,
+                oldPassword: oldPassword,
                 password: newPassword
             };
             console.log(updatePasswordData);
-            const response = await putData("http://localhost:5157/backend/user/adminUpdatePassword", updatePasswordData);
+            const response = await putData("/backend/user/changePassword", updatePasswordData);
             setOldPassword('');
             setNewPassword('');
             setConfirmPassword('');
             setModalMessage('Password updated successfully');
             setIsModalOpen(true);
         }catch (error) {
-            console.error("Error changing password ",error.message)
-            setModalMessage('Failed to update password',error.response.data);
+            if(error.response){
+                setModalMessage('Failed to update password! '+ error.response.data);
+            }else{
+                setModalMessage('Failed to update password');
+            }
             setIsModalOpen(true);
         }
     };
@@ -94,14 +98,14 @@ const PasswordModal = ({isOpen, onClose, user})=>{
                         type="submit"
                         className="p-2 bg-blue-500 text-white rounded"
                     >
-                        Update Password
+                        Change Password
                     </button>
                     <button
                         type="button"
                         onClick={onClose}
                         className="p-2 bg-gray-500 text-white rounded"
                     >
-                        Close
+                        Cancel
                     </button>
                    </div>
                 </form>
