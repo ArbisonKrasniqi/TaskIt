@@ -157,35 +157,40 @@ export const WorkspaceProvider = ({ children }) => {
         const getBoards = async () => {
             try {
                 if (WorkspaceId && workspace && userId) {
-                const boardsResponse = await getDataWithId('http://localhost:5157/backend/board/GetBoardsByWorkspaceId?workspaceId', WorkspaceId);
-                const allBoards = boardsResponse.data;
-            
-                const starredResponse = await getDataWithId('http://localhost:5157/backend/starredBoard/GetStarredBoardsByWorkspaceId?workspaceId', WorkspaceId);
-                const starredBoards = starredResponse.data;
-
-                const starredBoardsIds = new Set(starredBoards.map(board=>board.boardId));
-
-                const nonStarred = allBoards.filter(board=> !starredBoardsIds.has(board.boardId));
-                const starred = allBoards.filter(board=>starredBoardsIds.has(board.boardId));
-
-                let sortedNonStarred = nonStarred;
-                if (selectedSort === 'Alphabetically') {
-                    sortedNonStarred = sortAlphabetically(nonStarred);
-                }
+                    const boardsResponse = await getDataWithId('http://localhost:5157/backend/board/GetBoardsByWorkspaceId?workspaceId', WorkspaceId);
+                    const allBoards = boardsResponse.data;
+                    
+                        //largoj closed boards
+                    const openBoards = allBoards.filter(board => !board.isClosed);
+    
+                    const starredResponse = await getDataWithId('http://localhost:5157/backend/starredBoard/GetStarredBoardsByWorkspaceId?workspaceId', WorkspaceId);
+                    const starredBoards = starredResponse.data;
+    
+                    const starredBoardsIds = new Set(starredBoards.map(board => board.boardId));
+    
+                    //filtrimi per starred bords dhe jo starred
+                    const nonStarred = openBoards.filter(board => !starredBoardsIds.has(board.boardId));
+                    const starred = openBoards.filter(board => starredBoardsIds.has(board.boardId));
+    
+                    // sortimi nese klikohet alafabetikisht
+                    let sortedNonStarred = nonStarred;
+                    if (selectedSort === 'Alphabetically') {
+                        sortedNonStarred = sortAlphabetically(nonStarred);
+                    }
+    
                     setBoards(sortedNonStarred);
                     setStarredBoards(starred);
                 }
-                } catch (error) {
-                    if(error.response) {
-                        console.error(error.response.data);
-                    }
-                    setBoards([]);
-                    setStarredBoards([]);
+            } catch (error) {
+                if (error.response) {
+                    console.error(error.response.data);
                 }
+                setBoards([]);
+                setStarredBoards([]);
+            }
         };
+    
         getBoards();
-        // console.log("Starred boards: ",starredBoards);
-        // console.log("All boards",boards);
     }, [WorkspaceId, userId, workspace, selectedSort, mainContext.userInfo.accessToken]);
 
 
