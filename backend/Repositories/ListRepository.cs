@@ -58,19 +58,14 @@ public class ListRepository : IListRepository
             return null;
         }
 
-        if (listModel.index == 0)
-        {
-            await _taskRepo.DeleteTaskByListIdAsync(ListId);
-            _context.List.Remove(listModel);
-            await _context.SaveChangesAsync();
-        }
+
+        await _taskRepo.DeleteTaskByListIdAsync(ListId);
+        _context.List.Remove(listModel);
         
         var listsToUpdate = _context.List
             .Where(l => l.BoardId == listModel.BoardId && l.index > listModel.index)
             .OrderBy(l => l.index)
             .ToList();
-            
-        _context.List.Remove(listModel);
             
         foreach (var list in listsToUpdate)
         {

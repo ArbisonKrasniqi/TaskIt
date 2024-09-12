@@ -60,7 +60,7 @@ public class TaskMemberRepository : ITaskMemberRepository
                 FirstName = tm.User.FirstName,
                 LastName = tm.User.LastName, 
                 DateJoined = tm.DateJoined,
-                TaskId = tm.TaskId
+                TaskId = tm.TaskId,
             })
             .ToList();
 

@@ -72,27 +72,22 @@ public async Task<Tasks> CreateTaskAsync(Tasks taskModel){
             return null;
         }
 
-        if (taskModel.index == 0)
-        {
-            _context.Tasks.Remove(taskModel);
-            await _context.SaveChangesAsync();
-        }
-
-        var tasksToUpdate = _context.Tasks
-            .Where(t => t.ListId == taskModel.ListId && t.index > taskModel.index).OrderBy(t => t.index).ToList();
-
-        _context.Tasks.Remove(taskModel);
-
-        foreach (var task in tasksToUpdate)
-        {
-            task.index -= 1;
-        }
-
         await _checklistRepo.DeleteChecklistByTaskIdAsync(taskId);
         await _taskMemberRepo.DeleteTaskMemberByIdAsync(taskId);
         await _taskLabelRepo.DeleteTaskLabelsByTaskId(taskId);
         await _commentRepo.DeleteCommentsByTaskIdAsync(taskId);
         await _taskActivityRepo.DeleteTaskActivitiesByTaskId(taskId);
+        _context.Tasks.Remove(taskModel);
+        await _context.SaveChangesAsync();
+
+        var tasksToUpdate = _context.Tasks
+            .Where(t => t.ListId == taskModel.ListId && t.index > taskModel.index).OrderBy(t => t.index).ToList();
+        
+        foreach (var task in tasksToUpdate)
+        {
+            task.index -= 1;
+        }
+        
         await _context.SaveChangesAsync();
         
         return taskModel;

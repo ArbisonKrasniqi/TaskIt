@@ -30,7 +30,7 @@ public static class TaskMappers{
             BoardTitle = taskModel.BoardTitle,
             DueDate = taskModel.DueDate,
             Labels = labels,
-            TaskMembers = taskMembers
+            TaskMembers = taskMembers,
         };
     } 
 
