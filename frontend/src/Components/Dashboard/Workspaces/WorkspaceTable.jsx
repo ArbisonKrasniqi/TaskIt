@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import MembersList from '../Members/MembersList';
 import InvitesList from '../Invites/InvitesList';
 import BoardsList from '../Boards/BoardsList';
+import WorkspaceActivityList from './WorkspaceActivityList';
 import { useParams } from 'react-router-dom';
 
 const WorkspaceTable = () => {
@@ -21,6 +22,9 @@ const WorkspaceTable = () => {
                 <button
                     className={`flex-1 px-4 py-2 border ${activeList === 'invites' ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-200 text-gray-800 border-gray-300'}`}
                     onClick={() => setActiveList('invites')}>Invites</button>
+                <button
+                    className={`flex-1 px-4 py-2 border ${activeList === 'activities' ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-200 text-gray-800 border-gray-300'}`}
+                    onClick={() => setActiveList('activities')}>Activities</button>
             </div>
 
             {/* Render the selected list */}
@@ -28,6 +32,7 @@ const WorkspaceTable = () => {
                 {activeList === 'boards' && <BoardsList />}
                 {activeList === 'members' && <MembersList />}
                 {activeList === 'invites' && <InvitesList />}
+                {activeList === 'activities' && <WorkspaceActivityList/>}
             </div>
         </div>
     );
