@@ -15,7 +15,6 @@ import MemberProfilePic from "../ProfilePic/MemberProfilepic.jsx";
 import LoadingModal from "../Modal/LoadingModal.jsx";
 import { deleteData } from "../../Services/FetchService.jsx";
 import TaskModal from "../TaskModal/TaskModal.jsx";
-import { useNavigate } from "react-router-dom";
 import { IoIosSettings } from "react-icons/io";
 import StarButton from "../ContentFromSide/StarButton.jsx";
 
@@ -33,8 +32,6 @@ const Board = () => {
   const [activeTask, setActiveTask] = useState(null);
   const [activeList, setActiveList] = useState(null);
   const [backgroundUrl, setBackgroundUrl] = useState('');
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchBackground = async () => {
