@@ -746,7 +746,8 @@ export const WorkspaceProvider = ({ children }) => {
             ALLBoardsCount,
             fetchChecklistItems,
             recentBoards,
-            setRecentBoards
+            setRecentBoards,
+            getChecklistsByTask
         }}>
             {children}
         </WorkspaceContext.Provider>

@@ -132,6 +132,7 @@ const TaskModal = () => {
                   ...prevData,
                   title: newTitle,
               }));
+              getTaskActivities();
               setIsEditingTitle(false);
           }
       } catch (error) {
@@ -143,6 +144,28 @@ const TaskModal = () => {
       setNewTitle(taskData.title); // Revert to the original title
       setIsEditingTitle(false);
   };
+
+  const [taskActivities, setTaskActivities] = useState([]);
+
+ 
+        const getTaskActivities = async () => {
+            try {
+                if (taskId) {
+                    const taskActivityResponse = await getDataWithId('http://localhost:5157/GetTaskActivityByTaskId?TaskId', taskId);
+                    const taskActivityData = taskActivityResponse.data;
+                    if (taskActivityData && Array.isArray(taskActivityData) && taskActivityData.length > 0) {
+                        setTaskActivities(taskActivityData);
+                        console.log("ACTIVITYYYYYY: ",taskActivityData);
+                        
+                    } else {
+                        setTaskActivities([]);
+                        console.log("There is no task activity");   
+                    }
+                }
+            } catch (error) {
+                console.error("There has been an error fetching taskId");
+            }
+        };
 
   const formatDateTime = (dateString) => {
       const date = new Date(dateString);
@@ -198,7 +221,9 @@ const TaskModal = () => {
       assignedMembers,
       setAssignedMembers,
       closeCalendar,
-      getTaskById
+      getTaskById,
+      taskActivities,
+      getTaskActivities
   };
     
 
@@ -239,7 +264,9 @@ const TaskModal = () => {
                                     ) : (
                                         <div className="flex items-center space-x-2">
                                             <span className='cursor-pointer'
-                                             onClick={() => setIsEditingTitle(true)}>{taskData.title}</span>
+                                             onClick={() => {setIsEditingTitle(true)
+                                              setNewTitle(taskData.title);
+                                             }}>{taskData.title}</span>
                                             
                                         </div>
                                     )}

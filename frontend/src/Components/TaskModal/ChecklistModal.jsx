@@ -5,7 +5,7 @@ import { WorkspaceContext } from '../Side/WorkspaceContext';
 import { useParams } from 'react-router-dom';
 
 function ChecklistModal() {
-  const { toggleChecklistModal, setIsChecklistModalOpen } = useContext(TaskModalsContext);
+  const { toggleChecklistModal, setIsChecklistModalOpen, getTaskActivities } = useContext(TaskModalsContext);
   const { setChecklists, getChecklistsByTask } = useContext(WorkspaceContext);
   const [checklistTitle, setCheklistTitle] = useState('');
   const {taskId} = useParams();
@@ -34,8 +34,9 @@ function ChecklistModal() {
         taskId: taskId,
       };
 
-      const response = await postData('http://localhost:5157/backend/checklist/CreateChecklist', data);
+      await postData('http://localhost:5157/backend/checklist/CreateChecklist', data);
 
+      getTaskActivities();
       getChecklistsByTask();
     } catch (error) {
       console.error('Error creating checklist: ', error.message);

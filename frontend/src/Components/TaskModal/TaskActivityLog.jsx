@@ -12,29 +12,9 @@ const TaskActivityLog = () => {
     const {taskId} = useParams();
     const {getInitials, getInitialsFromFullName} = useContext(WorkspaceContext);
     const {userInfo} = useContext(MainContext);
-    const [taskActivities, setTaskActivities] = useState([]);
-
- 
-
+    const {taskActivities, getTaskActivities} = useContext(TaskModalsContext);
+    
     useEffect(() => {
-        const getTaskActivities = async () => {
-            try {
-                if (taskId) {
-                    const taskActivityResponse = await getDataWithId('http://localhost:5157/GetTaskActivityByTaskId?TaskId', taskId);
-                    const taskActivityData = taskActivityResponse.data;
-                    if (taskActivityData && Array.isArray(taskActivityData) && taskActivityData.length > 0) {
-                        setTaskActivities(taskActivityData);
-                        console.log("ACTIVITYYYYYY: ",taskActivityData);
-                        
-                    } else {
-                        setTaskActivities([]);
-                        console.log("There is no task activity");   
-                    }
-                }
-            } catch (error) {
-                console.error("There has been an error fetching taskId");
-            }
-        };
         getTaskActivities();
     },[taskId]);
 

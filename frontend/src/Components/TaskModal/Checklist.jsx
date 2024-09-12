@@ -9,8 +9,8 @@ import { useParams } from 'react-router-dom';
 
 
 const Checklist = () => {
-  const { checklists, checklistItems, setChecklistItems, setChecklists, fetchChecklistItems } = useContext(WorkspaceContext);
-  const {setIsChecklistModalOpen} = useContext(TaskModalsContext);
+  const { checklists, checklistItems, setChecklistItems, setChecklists, getChecklistsByTask } = useContext(WorkspaceContext);
+  const {setIsChecklistModalOpen, getTaskActivities} = useContext(TaskModalsContext);
   const [checklistItemDotsOpen, setChecklistItemDotsOpen] = useState(null);
   const [addingItem, setAddingItem] = useState(null);
   const [newItemContent, setNewItemContent] = useState('');
@@ -19,7 +19,6 @@ const Checklist = () => {
 
   const [editingChecklistId, setEditingChecklistId] = useState(null);
   const [editedChecklistTitle, setEditedChecklistTitle] = useState('');
-  const {taskId} = useParams();
 
   
   // Reference to the input element for focusing
@@ -40,13 +39,15 @@ const Checklist = () => {
 
     try {
       await putData(`http://localhost:5157/backend/checklistItems/ChangeChecklistItemChecked?checklistItemId=${checklistItemId}`, {});
+      getTaskActivities();
+      getChecklistsByTask();
       setAddingItem(null);
       setEditingItemId(null);
       setEditingChecklistId(null);
       setChecklistItemDotsOpen(null);
       setIsChecklistModalOpen(false);
     } catch (error) {
-      console.error("Error updating checklist item:", error.message);
+      console.log("Error updating checklist item:", error.message);
     }
   };
 
@@ -66,9 +67,13 @@ const Checklist = () => {
       const items = await getDataWithId('http://localhost:5157/backend/checklistItems/GetChecklistItemByChecklistId?checklistId', checklistId);;
 
       if (items.length > 0) {
-        await deleteData('http://localhost:5157/backend/checklistItems/DeleteChecklistItembyChecklistId', { checklistId }); 
+        await deleteData('http://localhost:5157/backend/checklistItems/DeleteChecklistItembyChecklistId', { checklistId });
+        getTaskActivities();
+        getChecklistsByTask();
       }
       await deleteData('http://localhost:5157/backend/checklist/DeleteChecklist', { checklistId });
+      getTaskActivities();
+      getChecklistsByTask();
 
       const updatedChecklists = checklists.filter(
         (checklist) => checklist.checklistId !== checklistId
@@ -109,6 +114,7 @@ const Checklist = () => {
         return updatedItems;
       });
 
+      getTaskActivities();
       setNewItemContent('');
       setAddingItem(null);
     } catch (error) {
@@ -161,6 +167,7 @@ const Checklist = () => {
         return updatedItems;
       });
 
+      getTaskActivities();
       setEditingItemId(null);
       setEditedContent('');
     } catch (error) {
@@ -206,7 +213,9 @@ const Checklist = () => {
       const updatedChecklists = checklists.map((checklist) =>
         checklist.checklistId === checklistId ? { ...checklist, title: editedChecklistTitle } : checklist
       );
+
       setChecklists(updatedChecklists);
+      getTaskActivities();
       setEditingChecklistId(null);
       setEditedChecklistTitle('');
     } catch (error) {
