@@ -93,4 +93,12 @@ public class LabelRepository : ILabelRepository{
             .ToListAsync();
         return labels;
     }
+    //DELETE LABELS BY BOARD ID
+    public async Task<List<Label>> DeleteLabelsByBoardId(int boardId)
+    {
+        var labels = await _context.Label.Where(label => label.BoardId == boardId).ToListAsync();
+        _context.Label.RemoveRange(labels);
+        await _context.SaveChangesAsync();
+        return labels;
+    }
 }

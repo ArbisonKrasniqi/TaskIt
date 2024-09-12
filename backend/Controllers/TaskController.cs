@@ -254,30 +254,27 @@ public class  TaskController : ControllerBase{
                     return NotFound("Task not found");
                 }
 
-                //Updated BoardActivity
+                //WORKSPACE ACTIVITY
+                var workspaceActivity = new WorkspaceActivity{
+                    WorkspaceId = workspaceId,
+                    UserId = userId,
+                    ActionType = "Updated",
+                    EntityName = "task "+task.Title+" in list " + list.Title+" in board "+board.Title,
+                    ActionDate = DateTime.Now
+                };
+                await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
+
+              // BOARD ACTIVITY
                     var boardActivity = new BoardActivity{
                         BoardId = board.BoardId,
                         UserId = userId,
-                        ActionType = "updated",
-                        EntityName = "task " + taskDto.Title,
+                        ActionType = "Updated",
+                        EntityName = "task "+task.Title+" in list " + list.Title+" in board "+board.Title,
                         ActionDate = DateTime.Now
                     };
                 await _boardActivityRepo.CreateBoardActivityAsync(boardActivity);
                 
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
+                //TASK ACTIVITY
                 var taskActivity = new TaskActivity
                 {
                     TaskId = taskModel.TaskId,
@@ -341,7 +338,17 @@ public class  TaskController : ControllerBase{
                         return NotFound("Task dose not exists");
                     }
 
-                    //Deleted BoardActivity
+                    //WORKSPACE ACTIVITY
+                    var workspaceActivity = new WorkspaceActivity{
+                        WorkspaceId = workspaceId,
+                        UserId = userId,
+                        ActionType = "Deleted",
+                        EntityName = "task "+task.Title+" in list " + list.Title+" in board "+board.Title,
+                        ActionDate = DateTime.Now
+                    };
+                    await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
+
+                    // BOARD ACTIVITY
                     var boardActivity = new BoardActivity{
                         BoardId = board.BoardId,
                         UserId = userId,
@@ -403,48 +410,40 @@ public class  TaskController : ControllerBase{
                 var taskModel = taskDto.ToTaskFromCreate();
                 await _taskRepo.CreateTaskAsync(taskModel);
 
+                //WORKSPACE ACTIVITY
+                var workspaceActivity = new WorkspaceActivity{
+                    WorkspaceId = workspaceId,
+                    UserId = userId,
+                    ActionType = "Created",
+                    EntityName = "task "+taskDto.Title+" in list " + list.Title+" in board "+board.Title,
+                    ActionDate = DateTime.Now
+                };
+                await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
 
-                //Created BoardActivity
+                // BOARD ACTIVITY
                     var boardActivity = new BoardActivity{
                         BoardId = board.BoardId,
                         UserId = userId,
-                        ActionType = "created",
-                        EntityName = "task " + taskDto.Title,
+                        ActionType = "Created",
+                        EntityName = "task "+taskDto.Title+" in list " + list.Title+" in board "+board.Title,
                         ActionDate = DateTime.Now
                     };
                     await _boardActivityRepo.CreateBoardActivityAsync(boardActivity);
 
+                    // TASK ACTIVITY
+                    var taskActivity = new TaskActivity
+                    {
+                        TaskId = taskModel.TaskId,
+                        UserId = userId,
+                        ActionType = "Created",
+                        EntityName = "task " + taskDto.Title + " in list " + list.Title + " in board " + board.Title,
+                        ActionDate = DateTime.Now
+                    };
 
-
-
-
+                    await _taskActivityRepo.CreateTaskActivityAsync(taskActivity);
+                    
                 var labels = new List<Models.Label>();
                 var taskMembers = new List<TaskMemberDto>();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                var taskActivity = new TaskActivity
-                {
-                    TaskId = taskModel.TaskId,
-                    UserId = userId,
-                    ActionType = "Created",
-                    EntityName = "task " + taskDto.Title + " in list " + list.Title + " in board " + board.Title,
-                    ActionDate = DateTime.Now
-                };
-
-                await _taskActivityRepo.CreateTaskActivityAsync(taskActivity);
                 
                 return CreatedAtAction(nameof(GetTaskById), new { id = taskModel.TaskId }, taskModel.ToTaskDto(null,null));
             }
@@ -606,6 +605,38 @@ public class  TaskController : ControllerBase{
                 var successful = await _taskRepo.handleDragNDrop(dragNDropTaskDto);
                 if (successful)
                 {
+                    //WORKSPACE ACTIVITY
+                    var workspaceActivity = new WorkspaceActivity{
+                        WorkspaceId = workspace.WorkspaceId,
+                        UserId = userId,
+                        ActionType = "Moved",
+                        EntityName = "task "+task.Title+" from list "+ list.Title+" to list "+newList.Title,
+                        ActionDate = DateTime.Now
+                    };
+                    await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
+
+                    // BOARD ACTIVITY
+                    var boardActivity = new BoardActivity{
+                        BoardId = board.BoardId,
+                        UserId = userId,
+                        ActionType = "Moved",
+                        EntityName = "task "+task.Title+" from list "+ list.Title+" to list "+newList.Title,
+                        ActionDate = DateTime.Now
+                    };
+                    await _boardActivityRepo.CreateBoardActivityAsync(boardActivity);
+
+                    // TASK ACTIVITY
+                    var taskActivity = new TaskActivity
+                    {
+                        TaskId = task.TaskId,
+                        UserId = userId,
+                        ActionType = "Moved",
+                        EntityName = "task "+task.Title+" from list "+ list.Title+" to list "+newList.Title,
+                        ActionDate = DateTime.Now
+                    };
+
+                    await _taskActivityRepo.CreateTaskActivityAsync(taskActivity);
+
                     return Ok("Task reordered");
                 }
 

@@ -4,6 +4,7 @@ import { WorkspaceContext } from '../Side/WorkspaceContext';
 import { putData } from "../../Services/FetchService";
 import DeleteWorkspaceModal from "./DeleteWorkspaceModal";
 import MessageModal from "./MessageModal";
+import { RxActivityLog } from "react-icons/rx";
 
 const WorkspaceSettings = () => {
     const { workspace, setWorkspace, roli, setShowDeleteWorkspaceModal, showDeleteWorkspaceModal, activities, getInitials } = useContext(WorkspaceContext);
@@ -157,7 +158,7 @@ const WorkspaceSettings = () => {
                 />
             </div>
 
-            <h1 className="text-3xl mt-10 ml-20 mb-10 font-semibold font-sans text-gray-400">Workspace Activity</h1>
+            <h1 className="text-3xl mt-10 ml-20 mb-10 font-semibold font-sans text-gray-400 flex flex-row items center "> <RxActivityLog className="mt-1 mr-3"/>Workspace Activity</h1>
 
             {/* Search Bar */}
             <div className="ml-20 mb-6">
@@ -171,7 +172,11 @@ const WorkspaceSettings = () => {
             </div>
 
             {/* Activity List */}
-            <div className="mt-10 ml-10 max-h-[500px] overflow-y-auto">
+            <div className="mt-10 ml-10 max-h-[500px] overflow-y-auto"
+             style={{
+             scrollbarWidth: 'thin', 
+             scrollbarColor: 'rgba(0, 0, 0, 0.2) transparent', 
+            }}>
                 {filteredActivities
                     .sort((a, b) => new Date(b.actionDate) - new Date(a.actionDate))
                     .slice(0, visibleActivities)
@@ -197,7 +202,7 @@ const WorkspaceSettings = () => {
                 )}
             </div>
             <hr className="w-full border-gray-400 mt-5"></hr>
-
+                <br/><br/>
             
         </div>
     );

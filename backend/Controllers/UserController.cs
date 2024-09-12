@@ -380,6 +380,68 @@ namespace backend.Controllers;
         }
 
        
+        [HttpPut("changePassword")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<IActionResult> ChangePassword(ChangePasswordDto changePasswordDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Wrong Parameters");
+
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+            var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+            if (userId != changePasswordDto.Id)
+            {
+                return StatusCode(401, "You are not authorized");
+            }
+            
+            try
+            {
+                    
+                    //Check if user first exists.
+                    var user = await _userManager.FindByIdAsync(changePasswordDto.Id);
+                    if (user == null) return BadRequest("User does not exist!");
+                        
+                    
+                    var oldHash = _userManager.PasswordHasher.HashPassword(user, changePasswordDto.OldPassword);
+                    var result = await _signInManager.CheckPasswordSignInAsync(user, changePasswordDto.OldPassword, false);
+                    if (!result.Succeeded) return StatusCode(403, "The old password is incorrect. Please try again.");
+
+                    //Check if new password is valid
+                
+                    bool isValidPassword = Regex.IsMatch(changePasswordDto.Password,
+                        @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W).{8,}$");
+
+                    if (isValidPassword)
+                    {
+                        var newHash = _userManager.PasswordHasher.HashPassword(user, changePasswordDto.Password);
+                        if (user.PasswordHash != newHash)
+                        {
+                            user.PasswordHash = newHash;
+                        }
+                        else
+                        {
+                            return StatusCode(403, "Please enter a new password different from the current one.");
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest("New password is not secure!");
+                    }
+
+                    //Apply changes
+                    var editResult = await _userManager.UpdateAsync(user);
+                    if (editResult.Succeeded)
+                    {
+                        return Ok("Password successfully udpated!");
+                    }
+
+                    return StatusCode(500, "Password could not be changed!");
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e);
+            }
+        }
 
 
         [HttpPut("adminUpdateRole")]

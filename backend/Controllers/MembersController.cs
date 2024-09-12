@@ -19,17 +19,59 @@ public class MembersController: ControllerBase
     private readonly IWorkspaceRepository _workspaceRepo;
     private readonly IMapper _mapper;
     private readonly IUserRepository _userRepo;
-    private readonly IBoardActivityRepository _boardActivityRepo;
+    private readonly IWorkspaceActivityRepository _workspaceActivityRepo;
     private readonly UserManager<User> _userManager;
-
-    public MembersController(UserManager<User> userManager, IMembersRepository userWorkspaceRepo, IWorkspaceRepository workspaceRepo, IMapper mapper, IUserRepository userRepo, IBoardActivityRepository boardActivityRepo)
+    public MembersController(IMembersRepository userWorkspaceRepo, IWorkspaceRepository workspaceRepo, IMapper mapper, IUserRepository userRepo, IWorkspaceActivityRepository workspaceActivityRepo, UserManager<User> userManager)
     {
         _userManager = userManager;
         _membersRepo = userWorkspaceRepo;
         _workspaceRepo = workspaceRepo;
         _mapper = mapper;
         _userRepo = userRepo;
-        _boardActivityRepo = boardActivityRepo;
+        _workspaceActivityRepo = workspaceActivityRepo;
+        _userManager = userManager;
+    }
+    
+    
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    [HttpPost("AddMember")]
+    public async Task<IActionResult> AddMember(AddMemberDto addMemberDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        try
+        {
+            if (!await _workspaceRepo.WorkspaceExists(addMemberDto.WorkspaceId))
+            {
+                return NotFound("Workspace Not found!");
+            }
+
+            if (!await _userRepo.UserExists(addMemberDto.UserId))
+            {
+                return NotFound("User does not exists!");
+            }
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+            var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+            
+            if (string.IsNullOrEmpty(userId))
+            {
+                return NotFound("User Not Found!");
+            }
+            var ownsWorkspace = await _userRepo.UserOwnsWorkspace(userId, addMemberDto.WorkspaceId);
+            if (ownsWorkspace || userTokenRole == "Admin")
+            {
+                await _membersRepo.AddMemberAsync(addMemberDto);
+                return StatusCode(200, "Member added!");
+            }
+            return StatusCode(401, "You are not authorized!");
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, "Internal server error: "+e.Message);
+        }
+        
     }
 
     [Authorize(AuthenticationSchemes = "Bearer")]
@@ -90,9 +132,7 @@ public class MembersController: ControllerBase
         }
     }
     
-    
-
-    [Authorize(AuthenticationSchemes = "Bearer")]
+      [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpDelete("RemoveMember")]
     public async Task<IActionResult> RemoveMember(RemoveMemberDto removeMemberDto)
     {
@@ -137,16 +177,27 @@ public class MembersController: ControllerBase
              var isMember = await _membersRepo.IsAMember(userId, removeMemberDto.WorkspaceId);
             if (isMember || userTokenRole == "Admin")
             {
+                
+                var workspace = await _workspaceRepo.GetWorkspaceByIdAsync(removeMemberDto.WorkspaceId);
+                if (workspace == null)
+                {
+                    return NotFound("Workspace Not found!");
+                }
+                
+                var workspaceActivity = new WorkspaceActivity
+                {
+                    WorkspaceId = removeMemberDto.WorkspaceId,
+                    UserId = userId,
+                    ActionType = "Removed",
+                    EntityName = " "+removedMember.Email+" from workspace "+workspace.Title,
+                    ActionDate = DateTime.Now
+                };
+                await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
                 var result = await _membersRepo.RemoveMemberAsync(removeMemberDto.WorkspaceId, removeMemberDto.UserId);
                 if (result == null)
                 {
                     return StatusCode(500, "User could not be removed");
                 }
-
-
-                
-
-
                 return Ok("Member removed!");
             }
             return StatusCode(401, "You are not authorized!");
@@ -156,7 +207,8 @@ public class MembersController: ControllerBase
             return StatusCode(500, "Internal server error: "+ e.Message);  
         }
     }
-
+    
+    
     [HttpDelete("DeleteMember")]
     [Authorize(AuthenticationSchemes = "Bearer")]
     [Authorize(Policy = "AdminOnly")]

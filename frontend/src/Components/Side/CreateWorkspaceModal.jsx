@@ -57,7 +57,7 @@ const CreateWorkspaceModal = ({open, onClose, onWorkspaceCreated, children}) => 
             setErrorMessage('An unknown error occurred.');
         }
     } else {
-        setErrorMessage('An error occurred while updating the workspace.');
+        setErrorMessage('An error occurred while creating the workspace.');
     }
     console.log('Error response data: ', error.response?.data || error.message);
 }

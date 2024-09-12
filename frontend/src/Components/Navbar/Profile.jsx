@@ -72,11 +72,11 @@ const handleSubmit = async (e)=>{
         };
         //console.log(updatedUserData);
         const response = await putData("http://localhost:5157/backend/user/adminUpdateUser", updatedUserData);
-        setModalMessage('User successfully updated');
+        setModalMessage('Profile successfully updated');
         setIsModalOpen(true);
     }catch (error) {
     console.error("Error updating user data:", error);
-    setModalMessage('Failed to update user');
+    setModalMessage('Failed to update profile');
     setIsModalOpen(true);
 }
 };
@@ -124,7 +124,7 @@ return (
         
 
         <button className="mt-10 p-2 bg-blue-500 text-white rounded shadow-lg w-full max-w-md"
-          onClick={() => setIsPasswordModalOpen(true)}>Update Password</button>
+          onClick={() => setIsPasswordModalOpen(true)}>Change Password</button>
 
 <MessageModal
                 message={modalMessage}

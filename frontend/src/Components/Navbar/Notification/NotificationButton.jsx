@@ -11,19 +11,26 @@ const NotificationButton = (props) => {
     const [inviterDetails, setInviterDetails] = useState([]);
     const [workspaceTitles, setWorkspaceTitles] = useState([]);
     const navigate = useNavigate();
-   
-    const formatDate = (dateString) => {
+
+    const formatDateTime = (dateString) => {
         const date = new Date(dateString);
-        // Format date to 'MM/DD/YYYY' or any other format you prefer
-        return date.toLocaleDateString('en-US');
+        const formattedDate = date.toLocaleDateString('en-US');
+        const formattedTime = date.toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true 
+        });
+        return `${formattedDate} - ${formattedTime}`;
     };
     
     const getInvites = async () => {
         try {
             const response = await getDataWithId('http://localhost:5157/backend/invite/GetPendingInvitesByInvitee?inviteeId', userId);
-            const data = response.data;
+            let data = response.data;
             console.log("Invites fetched: ", data);
 
+                // Sorto ftesat sipas datës (nga më e reja tek më e vjetra)
+                data = data.sort((a, b) => new Date(b.dateSent) - new Date(a.dateSent));
             setInvites(data);
 
             // Fetch inviter details for each invite
@@ -110,7 +117,7 @@ const NotificationButton = (props) => {
                                     <p className="text-sm mt-2">
                                         invited you to join the workspace  <span className="font-bold"> {workspaceTitles[index]}</span>.
                                         <br/>
-                                        <span>{formatDate(invite.dateSent)}</span>
+                                        <span>{formatDateTime(invite.dateSent)}</span>
                                     </p>
                                     <div className="mt-3 flex space-x-2">
                                         <button

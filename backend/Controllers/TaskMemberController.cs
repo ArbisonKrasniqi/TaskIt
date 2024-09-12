@@ -4,6 +4,7 @@ using backend.DTOs.TaskMember.Output;
 using backend.Interfaces;
 using backend.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,7 +22,8 @@ public class TaskMemberController : ControllerBase
     private readonly IListRepository _listRepo;
     private readonly IBoardRepository _boardRepo;
     private readonly IWorkspaceRepository _workspaceRepo;
-
+    private readonly IWorkspaceActivityRepository _workspaceActivityRepo;
+    private readonly IBoardActivityRepository _boardActivityRepo;
     private readonly UserManager<User> _userManager;
     private readonly ITaskActivityRepository _taskActivityRepo;
 
@@ -34,7 +36,9 @@ public class TaskMemberController : ControllerBase
         IBoardRepository boardRepo,
         IWorkspaceRepository workspaceRepo,
         UserManager<User> userManager,
-        ITaskActivityRepository taskActivityRepo)
+        ITaskActivityRepository taskActivityRepo,
+        IWorkspaceActivityRepository workspaceActivityRepo, 
+        IBoardActivityRepository boardActivityRepo)
     {
         _taskMemberRepo = taskMemberRepo;
         _mapper = mapper;
@@ -44,7 +48,8 @@ public class TaskMemberController : ControllerBase
         _listRepo = listRepo;
         _boardRepo = boardRepo;
         _workspaceRepo = workspaceRepo;
-
+        _workspaceActivityRepo = workspaceActivityRepo;
+        _boardActivityRepo = boardActivityRepo;
         _userManager = userManager;
         _taskActivityRepo = taskActivityRepo;
     }
@@ -152,7 +157,7 @@ public class TaskMemberController : ControllerBase
 
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
-
+            
             var task = await _taskRepo.GetTaskByIdAsync(addTaskMemberDto.TaskId);
             if (task == null)
             {
@@ -212,23 +217,19 @@ public class TaskMemberController : ControllerBase
             if (isMember || userTokenRole == "Admin")
             {
                 
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
+                //WORKSPACE ACTIVITY
+                var workspaceActivity = new WorkspaceActivity
+                {
+                    WorkspaceId = workspace.WorkspaceId,
+                    UserId = userId,
+                    ActionType = "Assigned",
+                    EntityName = taskMember.Email+" to task "+task.Title,
+                    ActionDate = DateTime.Now
+                };
+                    
+                await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
+
+              //TASK ACTIVITY
 
                 var taskActivity = new TaskActivity
                 {
@@ -240,6 +241,18 @@ public class TaskMemberController : ControllerBase
                 };
 
                 await _taskActivityRepo.CreateTaskActivityAsync(taskActivity);
+                
+                //BOARD ACTIVITY
+                var boardActivity = new BoardActivity
+                {
+                    BoardId = board.BoardId,
+                    UserId = userId,
+                    ActionType = "Assigned",
+                    EntityName = taskMember.Email + " to task " + task.Title,
+                    ActionDate = DateTime.Now
+                };
+                await _boardActivityRepo.CreateBoardActivityAsync(boardActivity);
+                
                 var newMember = await _taskMemberRepo.AddTaskMemberAsync(addTaskMemberDto);
                 return Ok(newMember);
             }
@@ -397,35 +410,39 @@ public async Task<IActionResult> UpdateTaskMember(UpdateTaskMemberDto updateTask
                 if (isTaskMember)
                 {
                     
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
+                    //TASK ACTIVITY
                     var taskActivity = new TaskActivity
                     {
                         TaskId = task.TaskId,
                         UserId = userId,
-                        ActionType = "Assigned",
+                        ActionType = "Removed",
                         EntityName = taskMember.Email+" to task "+task.Title,
                         ActionDate = DateTime.Now
                     };
 
                     await _taskActivityRepo.CreateTaskActivityAsync(taskActivity);
+                    //WORKSPACE ACTIVITY
+                    var workspaceActivity = new WorkspaceActivity
+                    {
+                        WorkspaceId = workspace.WorkspaceId,
+                        UserId = userId,
+                        ActionType = "Removed",
+                        EntityName = taskMember.Email+" to task "+task.Title,
+                        ActionDate = DateTime.Now
+                    };
+                    
+                    await _workspaceActivityRepo.CreateWorkspaceActivityAsync(workspaceActivity);
+                    //BOARD ACTIVITY
+                    var boardActivity = new BoardActivity
+                    {
+                        BoardId = board.BoardId,
+                        UserId = userId,
+                        ActionType = "Removed",
+                        EntityName = taskMember.Email + " to task " + task.Title,
+                        ActionDate = DateTime.Now
+                    };
+                    await _boardActivityRepo.CreateBoardActivityAsync(boardActivity);
+
                     await _taskMemberRepo.RemoveTaskMemberAsync(removeTaskMemberDto.TaskId, removeTaskMemberDto.UserId);
 
                     return Ok(removedTaskMember);

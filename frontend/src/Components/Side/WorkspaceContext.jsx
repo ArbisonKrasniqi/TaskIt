@@ -97,19 +97,23 @@ export const WorkspaceProvider = ({ children }) => {
                         setActivities(activityData);
                     } else {
                         setActivities([]);
-                        console.log("There is no activity");
+                        console.log("There is no workspace activity");
                     }
                 }
                 //Waiting for userIdn
             } catch (error) {
-                console.error("There has been an error fetching workspaces")
-                setWorkspaces([]);
+                console.error("There has been an error fetching workspace activities")
+                setActivities([]);
             }
         };
         getActivities();
         //console.log("Activity fetched ",activities);
     },[workspace]);
     
+
+
+
+
     useEffect(() => {
         const getWorkspace = async () => {
             try {
@@ -343,6 +347,11 @@ export const WorkspaceProvider = ({ children }) => {
             console.error("Error starring/unstarring the board:", error.message);
         }
     };
+
+    const handleStarButtonClick = (event, board) => {
+        event.stopPropagation();  //se len mu hap bordi kur te behet star
+        handleStarBoard(board);
+    };
     const getBackgroundImageUrl = async (board) => {
         if (!board.backgroundId) {
             console.error("Board does not have a valid backgroundId");
@@ -446,13 +455,13 @@ export const WorkspaceProvider = ({ children }) => {
     };
 
 
-    useEffect(()=>{
-        if (WorkspaceId) {
-            getTasks();
-            console.log("Workspace id ",WorkspaceId);
-            console.log("Tasks fetched: ",tasks);
-        }
-    }, [WorkspaceId]);
+    // useEffect(()=>{
+    //     if (WorkspaceId) {
+    //         getTasks();
+    //         console.log("Workspace id ",WorkspaceId);
+    //         console.log("Tasks fetched: ",tasks);
+    //     }
+    // }, [WorkspaceId]);
     
         const getInitials = (firstName, lastName) => {
             if (!firstName || !lastName) {
@@ -645,6 +654,9 @@ export const WorkspaceProvider = ({ children }) => {
 
         const countClosedBoards = closedBoards.length;
         const ALLBoardsCount = boardCount+countClosedBoards;
+  
+        const [selectedBoardId, setSelectedBoardId] = useState(null);
+
     return (
         <WorkspaceContext.Provider value={{
             WorkspaceId,
@@ -747,7 +759,10 @@ export const WorkspaceProvider = ({ children }) => {
             fetchChecklistItems,
             recentBoards,
             setRecentBoards,
-            getChecklistsByTask
+            getChecklistsByTask,
+            handleStarButtonClick,
+            selectedBoardId,
+            setSelectedBoardId
         }}>
             {children}
         </WorkspaceContext.Provider>

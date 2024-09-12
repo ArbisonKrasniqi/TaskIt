@@ -1,6 +1,6 @@
-import {useContext} from 'react';
+import {useContext, useEffect} from 'react';
 import { WorkspaceContext } from '../Side/WorkspaceContext';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate, useParams} from 'react-router-dom';
 const Table = () =>{
 
     const formatDate = (dateString) => {
@@ -8,10 +8,17 @@ const Table = () =>{
         return date.toLocaleDateString('en-US');
     };
 
-    const {tasks, getInitials, WorkspaceId} = useContext(WorkspaceContext);
+    const {opened}=useParams();
+    const {tasks, getInitials, WorkspaceId, getTasks} = useContext(WorkspaceContext);
+    useEffect(()=>{
+       
+            getTasks();
+    
+    }, [opened]);
+
     const navigate = useNavigate();
     return(
-        <div className="min-h-screen h-full" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
+        <div className="min-h-screen h-full overflow-y-auto" style={{backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)'}}>
          <div className="font-semibold font-sans text-gray-400 flex justify-normal flex-col">
          <h2 className="text-2xl mt-5 ml-5">Table</h2>
          <table className="table-auto w-full text-left text-gray-400 mt-10">
@@ -79,7 +86,7 @@ const Table = () =>{
     )}
 </td>
 
-                        <td className="px-4 py-2">{formatDate(task.dueDate)}</td>
+                        <td className="px-4 py-2">{(formatDate(task.dueDate) != '1/1/1' )? (formatDate(task.dueDate)) : ""} </td>
                     </tr>
                 ))}
             </tbody>

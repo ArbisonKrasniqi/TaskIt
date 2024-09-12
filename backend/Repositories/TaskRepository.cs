@@ -110,17 +110,25 @@ public async Task<Tasks> CreateTaskAsync(Tasks taskModel){
         await _context.SaveChangesAsync();
         return taskModel;
     }
-
     public async Task<List<Tasks>> DeleteTaskByListIdAsync (int ListId){
         var tasks = await _context.Tasks.Where(x => x.ListId == ListId).ToListAsync();
         if (tasks.Count == 0){
             return null;
         }
+
+        foreach (var task in tasks)
+        {
+            
+            await _checklistRepo.DeleteChecklistByTaskIdAsync(task.TaskId);
+            await _taskMemberRepo.DeleteTaskMembersByTaskIdAsync(task.TaskId);
+            await _taskLabelRepo.DeleteTaskLabelsByTaskId(task.TaskId);
+            await _commentRepo.DeleteCommentsByTaskIdAsync(task.TaskId);
+            await _taskActivityRepo.DeleteTaskActivitiesByTaskId(task.TaskId);
+        }
         _context.Tasks.RemoveRange(tasks);
         await _context.SaveChangesAsync();
         return tasks;
     }
-
     public async Task<List<Tasks>> GetTaskByListId (int ListId){
         return await _context.Tasks.Where(x => x.ListId == ListId).ToListAsync();
     }
