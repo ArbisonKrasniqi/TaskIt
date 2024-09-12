@@ -63,53 +63,56 @@ function EditLabelModal() {
     };
 
     return (
-        <div className="absolute inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-            <div className="bg-gray-900 w-1/3 p-5 rounded-md shadow-lg">
-                <div className="flex justify-between items-center mb-4">
-                    <button className="text-gray-500 hover:bg-gray-800 w-6 h-6 rounded-full flex justify-center items-center"
-                        onClick={toggleLabelsModal}>
-                        <FaAngleLeft />
-                    </button>
-                    <h2 className="text-sm font-semibold text-gray-400">Edit Label</h2>
-                    <button
-                        className="text-gray-500 hover:bg-gray-800 w-6 h-6 rounded-full flex justify-center items-center"
-                        onClick={toggleEditLabelModal}
-                    >
-                        X
-                    </button>
-                </div>
-
-                <h3 className='text-gray-400 text-sm font-semibold'>Title</h3>
-                <input
-                    type="text"
-                    ref={inputRef}
-                    value={labelName}
-                    onChange={(e) => setLabelName(e.target.value)}
-                    className="w-full pl-[5px] py-1 mb-4 bg-gray-900 border border-gray-700 rounded-sm text-white"
-                />
-
-                {/* Show label color */}
-                <h3 className='text-gray-400 text-sm font-semibold'>Color</h3>
-                <div 
-                    className={`w-[100%] h-8 mb-4 rounded-sm`} 
-                    style={{ backgroundColor: selectedLabel.color }}>
-                </div>
-
-                <div className='flex justify-between'>
-                    <button 
-                        onClick={handleSave} 
-                        className='w-1/3 h-8 rounded-sm bg-blue-600 text-gray-900 font-semibold hover:bg-opacity-50'>
-                        Save
-                    </button>
-                    <button 
-                        className='w-1/3 h-8 rounded-sm bg-red-600 bg-opacity-85 text-gray-900 font-semibold hover:bg-opacity-50'
-                        onClick={handleDelete}>
-                        Delete
-                    </button>
-                </div>
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+          <div className="bg-gray-900 w-[300px] max-w-md p-5 rounded-md shadow-lg overflow-y-auto" style={{ maxHeight: '80vh' }}>
+            <div className="flex justify-between items-center mb-4">
+              <button
+                className="text-gray-500 hover:bg-gray-800 w-6 h-6 rounded-full flex justify-center items-center"
+                onClick={toggleLabelsModal}
+              >
+                <FaAngleLeft />
+              </button>
+              <h2 className="text-sm font-semibold text-gray-400">Edit Label</h2>
+              <button
+                className="text-gray-500 hover:bg-gray-800 w-6 h-6 rounded-full flex justify-center items-center"
+                onClick={toggleEditLabelModal}
+              >
+                X
+              </button>
             </div>
+    
+            <h3 className='text-gray-400 text-sm font-semibold mb-2'>Title</h3>
+            <input
+              type="text"
+              ref={inputRef}
+              value={labelName}
+              onChange={(e) => setLabelName(e.target.value)}
+              className="w-full pl-2 py-1 mb-4 bg-gray-900 border border-gray-700 rounded-sm text-white"
+            />
+    
+            <h3 className='text-gray-400 text-sm font-semibold mb-2'>Color</h3>
+            <div
+              className="w-full h-8 mb-4 rounded-sm"
+              style={{ backgroundColor: selectedLabel.color }}
+            ></div>
+    
+            <div className='flex justify-between'>
+              <button
+                onClick={handleSave}
+                className='w-[120px] h-8 rounded-sm bg-blue-600 text-gray-900 font-semibold hover:bg-blue-700'
+              >
+                Save
+              </button>
+              <button
+                className='w-[120px] h-8 rounded-sm bg-red-600 text-gray-900 font-semibold hover:bg-red-700'
+                onClick={handleDelete}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
         </div>
-    );
+      );
 }
 
 export default EditLabelModal;

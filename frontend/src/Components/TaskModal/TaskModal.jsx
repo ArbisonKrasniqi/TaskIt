@@ -13,7 +13,7 @@ import MembersModal from './MembersModal';
 import LabelsModal from './LabelsModal';
 import ChecklistModal from './ChecklistModal';
 import EditLabelModal from './EditLabelModal';
-import { getDataWithId } from '../../Services/FetchService';
+import { getDataWithId, putData } from '../../Services/FetchService';
 import { useNavigate, useParams } from 'react-router-dom';
 import { WorkspaceContext } from '../Side/WorkspaceContext';
 import DateCalendarModal from './DateCalendarModal';
@@ -23,32 +23,32 @@ import { BoardContext } from '../BoardContent/Board';
 export const TaskModalsContext = createContext();
 
 const TaskModal = () => {
+  const boardContext = useContext(BoardContext);
+  const navigate = useNavigate();
 
-    const boardContext = useContext(BoardContext);
-    const navigate = useNavigate();
-    const {getInitials, board} = useContext(WorkspaceContext);
+  const { getInitials, board } = useContext(WorkspaceContext);
+  const [isMembersModalOpen, setIsMembersModalOpen] = useState(false);
+  const [isLabelModalOpen, setIsLabelModalOpen] = useState(false);
+  const [isChecklistModalOpen, setIsChecklistModalOpen] = useState(false);
+  const [isCreateLabelModalOpen, setIsCreateLabelModalOpen] = useState(false);
+  const [isEditLabelModalOpen, setIsEditLabelModalOpen] = useState(false);
+  const [selectedLabel, setSelectedLabel] = useState(null);
+  const { taskId, workspaceId, boardId } = useParams();
+  const [assignedLabels, setAssignedLabels] = useState([]);
+  const [taskData, setTaskData] = useState({});
+  const [listData, setListData] = useState({});
+  const [assignedMembers, setAssignedMembers] = useState([]);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
 
-    const [isMembersModalOpen, setIsMembersModalOpen] = useState(false);
-    const [isLabelModalOpen, setIsLabelModalOpen] = useState(false);
-    const [isChecklistModalOpen, setIsChecklistModalOpen] = useState(false);
-    const [isCreateLabelModalOpen, setIsCreateLabelModalOpen] = useState(false);
-    const [isEditLabelModalOpen, setIsEditLabelModalOpen] = useState(false);
-    const [selectedLabel, setSelectedLabel] = useState(null);
-    const {taskId, workspaceId, boardId} = useParams();
-    const [assignedLabels, setAssignedLabels] = useState([]);
-    const [taskData, setTaskData] = useState([]);
-    const [listData, setListData] = useState([]);
-    const [assignedMembers, setAssignedMembers] = useState([]);
-    const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-
-    const specificDate = new Date('0001-01-01T00:00:00Z');
+  const specificDate = new Date('0001-01-01T00:00:00Z');
 
   const openCalendar = () => {
     setIsCalendarOpen(true);
   };
 
   const closeCalendar = () => {
-    setIsCalendarOpen(!isCalendarOpen);
+      setIsCalendarOpen(!isCalendarOpen);
   };
 
   const getTaskById = async () => {
@@ -107,13 +107,66 @@ const TaskModal = () => {
 
                 setAssignedMembers(taskMembers);
             } catch (error) {
+              console.error("Error fetching task members:", error);
+          }
+      };
+
+      fetchTaskMembers();
+  }, [taskId]);
             
-            }
-        };
+  const handleTitleChange = (e) => {
+    setNewTitle(e.target.value);
+};
 
-        fetchTaskMembers();
-    }, [taskId]);
+const handleSaveTitle = async () => {
+    try {
+        if (newTitle.trim()) {
+            const data = {
+                taskId: taskId,
+                title: newTitle,
+                description: taskData.description,
+                dateAdded: taskData.dateAdded,
+                dueDate: taskData.dueDate
+            };
+            await putData('http://localhost:5157/backend/task/UpdateTask', data);
+            setTaskData((prevData) => ({
+                ...prevData,
+                title: newTitle,
+            }));
+            getTaskActivities();
+            setIsEditingTitle(false);
+        }
+    } catch (error) {
+        console.error('Error updating task title: ', error);
+    }
+};
 
+const handleCancelEdit = () => {
+    setNewTitle(taskData.title); // Revert to the original title
+    setIsEditingTitle(false);
+};
+
+const [taskActivities, setTaskActivities] = useState([]);
+
+
+      const getTaskActivities = async () => {
+          try {
+              if (taskId) {
+                  const taskActivityResponse = await getDataWithId('http://localhost:5157/GetTaskActivityByTaskId?TaskId', taskId);
+                  const taskActivityData = taskActivityResponse.data;
+                  if (taskActivityData && Array.isArray(taskActivityData) && taskActivityData.length > 0) {
+                      setTaskActivities(taskActivityData);
+                      console.log("ACTIVITYYYYYY: ",taskActivityData);
+                      
+                  } else {
+                      setTaskActivities([]);
+                      console.log("There is no task activity");   
+                  }
+              }
+          } catch (error) {
+              console.error("There has been an error fetching taskId");
+          }
+      };
 
     const formatDateTime = (dateString) => {
         const date = new Date(dateString);
@@ -125,30 +178,30 @@ const TaskModal = () => {
     const toggleMembersModal = () => {
         setIsMembersModalOpen(!isMembersModalOpen);
     };
+  const toggleLabelsModal = () => {
+      if (!isLabelModalOpen) {
+          setIsLabelModalOpen(true);
+          setIsCreateLabelModalOpen(false);
+          setIsEditLabelModalOpen(false);
+      } else {
+          setIsLabelModalOpen(false);
+      }
+  };
 
-    const toggleLabelsModal = () => {
-        if (!isLabelModalOpen) {
-            setIsLabelModalOpen(true);
-            setIsCreateLabelModalOpen(false);
-            setIsEditLabelModalOpen(false);
-        } else {
-            setIsLabelModalOpen(false);
-        }
-    };
+  const toggleChecklistModal = () => {
+      setIsChecklistModalOpen(!isChecklistModalOpen);
+  };
 
-    const toggleChecklistModal = () => {
-        setIsChecklistModalOpen(!isChecklistModalOpen);
-    };
+  const toggleEditLabelModal = (label) => {
+      if (!isEditLabelModalOpen) {
+          setSelectedLabel(label);
+          setIsLabelModalOpen(false);
+          setIsEditLabelModalOpen(true);
+      } else {
+          setIsEditLabelModalOpen(false);
+      }
+  };
 
-    const toggleEditLabelModal = (label) => {
-        if (!isEditLabelModalOpen) {
-            setSelectedLabel(label);
-            setIsLabelModalOpen(false);
-            setIsEditLabelModalOpen(true);
-        } else {
-            setIsEditLabelModalOpen(false);
-        }
-    }
 
     const values = {
         isMembersModalOpen,
@@ -165,13 +218,15 @@ const TaskModal = () => {
         setIsLabelModalOpen,
         assignedLabels,
         setAssignedLabels,
-        fetchAssignedLabels,
         taskData,
         setTaskData,
         assignedMembers,
         setAssignedMembers,
         closeCalendar,
-        getTaskById
+        getTaskById,
+        taskActivities,
+        getTaskActivities,
+        fetchAssignedLabels,
     };
     
 
@@ -187,8 +242,41 @@ const TaskModal = () => {
                         <TbAlignBoxLeftTopFilled className="bg-gray-800 text-2xl ml-5" />
                         <div className="flex flex-col w-full md:w-[550px]">
                         <h2 className="font-bold text-xl">
-                            {taskData.title}{' '}
-                            <span className="ml-[47px]  text-[12px]">
+                        {isEditingTitle ? (
+                                        <div className="flex items-center space-x-2">
+                                            <input
+                                                type="text"
+                                                value={newTitle}
+                                                onChange={handleTitleChange}
+                                                className="border rounded p-1 bg-gray-800"
+                                                autoFocus
+                                            />
+                                            <button
+                                                className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded px-3 py-1"
+                                                onClick={handleSaveTitle}
+                                            >
+                                                Save
+                                            </button>
+                                            <button
+                                                className="bg-gray-800 hover:bg-slate-700 text-gray-400 font-semibold rounded px-3 py-1"
+                                                onClick={handleCancelEdit}
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="flex items-center space-x-2">
+                                            <span className='cursor-pointer'
+                                             onClick={() => {setIsEditingTitle(true)
+                                              setNewTitle(taskData.title);
+                                             }}>{taskData.title}</span>
+                                            
+                                        </div>
+                                    )}
+                        </h2>
+                        <div className="flex text-xs">
+                            <span> in list {listData.title}</span>
+                            <span className="ml-[100px]  text-[12px]">
                             Due Date:{' '}
                             <span className="text-red-400 text-opacity-75">
                                 {formatDateTime(taskData.dueDate) === formatDateTime(specificDate)
@@ -196,14 +284,10 @@ const TaskModal = () => {
                                 : formatDateTime(taskData.dueDate)}
                             </span>
                             </span>
-                        </h2>
-                        <div className="flex text-xs">
-                            <span> in list {listData.title}</span>
                         </div>
                         </div>
                     </div>
-                    <button className="mt-2 md:mt-0 mx-2 hover:bg-gray-600 hover:rounded-full transition w-6 h-6 rounded-full flex items-center justify-center"
-                    onClick={() => {navigate(`/main/board/${workspaceId}/${boardId}`)}}>
+                    <button onClick={() => {navigate(`/main/board/${workspaceId}/${boardId}`)}} className="mt-2 md:mt-0 mx-2 hover:bg-gray-600 hover:rounded-full transition w-6 h-6 rounded-full flex items-center justify-center">
                         X
                     </button>
                 </div>

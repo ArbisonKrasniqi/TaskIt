@@ -27,6 +27,7 @@ const DateCalendarModal = () => {
 
             const response = await putData('http://localhost:5157/backend/task/UpdateTask', data);
             getTaskById();
+            closeCalendar();
         } catch (error) {
             console.error("Error updating the due date of the task: ", error);
         }
@@ -63,7 +64,7 @@ const DateCalendarModal = () => {
                         <p>Selected Date: {date.toDateString()}</p>
                     </div>
                     <button 
-                        className='bg-blue-400 w-full m-1 text-white py-2 rounded'
+                        className='bg-blue-500 hover:bg-blue-400 w-full m-1 text-white py-2 rounded'
                         onClick={SaveDueDate}
                     >Save</button>
                 </div>
