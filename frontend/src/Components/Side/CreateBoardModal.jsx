@@ -10,6 +10,7 @@ const CreateBoardModal = ({ open, onClose, onBoardCreated, children }) => {
     const [workspaceId, setWorkspaceId] = useState(mainContext.workspaceId);
     const [clicked, setClicked] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    const [chooseBackgroundError, setChooseBackgroundError] = useState('');
     const navigate = useNavigate();
     const {activeBackgrounds,activeBackgroundUrls, getActiveBackgrounds} = useContext(WorkspaceContext)
    
@@ -23,18 +24,39 @@ const CreateBoardModal = ({ open, onClose, onBoardCreated, children }) => {
 
     const handleTitleChange = (e) => {
         setBoardTitle(e.target.value);
+        console.log("lengthh: ",boardTitle.length);
+        
+        if (boardTitle.length > 0 && boardTitle.length<21) {
+            setErrorMessage('');
+        }
     };
 
     const handleBackgroundClick = (id) => {
         setBackgroundId(id);
         setClicked(!clicked);
+        setChooseBackgroundError('');
     };
 
     const handleCreateBoard = async () => {
+        var isError = false;
+
+
+        if (!backgroundId) {
+            setChooseBackgroundError('You must choose a background.');
+        } else {
+            setChooseBackgroundError('');
+        }
+
         if (boardTitle.length < 2 || boardTitle.length > 20) {
             setErrorMessage('Board title must be between 2 and 20 characters.');
-            return;
+            isError = true;
+        } else {
+            setErrorMessage('');
         }
+
+    
+        if (isError) return;
+
     
         const newBoard = {
             title: boardTitle,
@@ -71,7 +93,7 @@ const CreateBoardModal = ({ open, onClose, onBoardCreated, children }) => {
     return (
         <div className={`fixed z-30 inset-0 flex justify-center items-center transition-colors ${open ? "visible bg-black/20" : "invisible"}`}>
             <div className={`bg-white rounded-xl shadow p-6 transition-all w-80 text-center ${open ? "scale-100 opacity-100" : "scale-125 opacity-0"}`}>
-                <button onClick={onClose} className="absolute top-1 right-2 p-1 rounded-lg text-gray-400 bg-white hover:bg-gray-50 hover:text-gray-600">X</button>
+                <button onClick={() => {onClose(); setBoardTitle(''); setBackgroundId(null); setChooseBackgroundError(''); setErrorMessage('');} } className="absolute top-1 right-2 p-1 rounded-lg text-gray-400 bg-white hover:bg-gray-50 hover:text-gray-600">X</button>
                 <p className="w-full font-sans text-gray-500 font-bold text-l">Create Board</p>
                 <hr className="w-full border-gray-400 mt-3"></hr>
 
@@ -87,6 +109,7 @@ const CreateBoardModal = ({ open, onClose, onBoardCreated, children }) => {
 ))}
 
                 </div>
+                {chooseBackgroundError && <p className='text-red-500 text-sm'>{chooseBackgroundError}</p>}
 
                 <p className="w-full font-sans text-gray-500 font-semibold text-l mt-5">Board Title</p>
                 <input
@@ -97,7 +120,7 @@ const CreateBoardModal = ({ open, onClose, onBoardCreated, children }) => {
                     value={boardTitle}
                     onChange={handleTitleChange}
                 />
-                {errorMessage && <p className="text-red-500 text-sm">{errorMessage}</p>}
+                {errorMessage &&  <p className="text-red-500 text-sm">{errorMessage}</p>}
 
                 <button className="bg-gray-800 font-bold text-white px-4 py-2 rounded-md w-[60%] mt-5 hover:text-white hover:bg-gray-900 transition-colors duration-300 ease-in-out" onClick={handleCreateBoard}>
                     Create
