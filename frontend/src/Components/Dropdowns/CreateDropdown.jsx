@@ -5,12 +5,17 @@ import CreateWorkspaceModal from '../Side/CreateWorkspaceModal';
 import { WorkspaceContext } from '../Side/WorkspaceContext.jsx';
 
 const CreateDropdown = (props) => {
-
     const dropdownContext = useContext(DropdownContext);
     const { handleCreateWorkspace, handleCreateBoard } = useContext(WorkspaceContext);
 
     const [openBoardModal, setOpenBoardModal] = useState(false);
     const [openWorkspaceModal, setOpenWorkspaceModal] = useState(false);
+
+    const closeDropdownAndModals = () => {
+        setOpenBoardModal(false);
+        setOpenWorkspaceModal(false);
+        dropdownContext.toggleDropdownCreate(); // close the dropdown
+    };
 
     return (
         <div className='relative'>
@@ -22,17 +27,40 @@ const CreateDropdown = (props) => {
             </button>
 
             {dropdownContext.CreateDropdownIsOpen && (
-                <div className='absolute left-0 z-10 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg p-3'>
-                   <button onClick={()=>setOpenBoardModal(true)} className={`block w-full text-left px-4 py-2 bg-gray-800 text-gray-400 rounded-lg hover:bg-gray-700 `}>
-                        Create Boards
-                    </button>
-                    <CreateBoardModal open={openBoardModal} onClose={()=> setOpenBoardModal(false)} onBoardCreated={handleCreateBoard}></CreateBoardModal>
+                <>
+                    {/* adding overlay to close the dropdown when you click outside  */}
+                    <div 
+                        className="fixed inset-0 z-10" 
+                        onClick={closeDropdownAndModals}
+                    ></div>
 
-                    <button onClick={()=>setOpenWorkspaceModal(true)} className='block w-full text-left px-4 py-2 bg-gray-800 text-gray-400 rounded-lg hover:bg-gray-700'>
-                        Create Workspaces
-                    </button>
-                    <CreateWorkspaceModal open={openWorkspaceModal} onClose={() => setOpenWorkspaceModal(false)} onWorkspaceCreated={handleCreateWorkspace} ></CreateWorkspaceModal>
-                </div>
+                    <div className='absolute left-0 z-20 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg p-3'>
+                        <button
+                            onClick={() => setOpenBoardModal(true)}
+                            className={`block w-full text-left px-4 py-2 bg-gray-800 text-gray-400 rounded-lg hover:bg-gray-700 `}
+                        >
+                            Create Boards
+                        </button>
+                        <CreateBoardModal
+                            open={openBoardModal}
+                            onClose={() => setOpenBoardModal(false)}
+                            onBoardCreated={handleCreateBoard}
+                        />
+
+                        <button
+                            onClick={() => setOpenWorkspaceModal(true)}
+                            className='block w-full text-left px-4 py-2 bg-gray-800 text-gray-400 rounded-lg hover:bg-gray-700'
+                        >
+                            Create Workspaces
+                        </button>
+
+                        <CreateWorkspaceModal
+                            open={openWorkspaceModal}
+                            onClose={() => setOpenWorkspaceModal(false)}
+                            onWorkspaceCreated={handleCreateWorkspace}
+                        />
+                    </div>
+                </>
             )}
         </div>
     );
