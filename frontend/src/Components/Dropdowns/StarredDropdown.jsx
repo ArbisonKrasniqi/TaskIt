@@ -2,13 +2,11 @@ import React, { useState, useEffect, useContext } from 'react'
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { DropdownContext } from '../Navbar/Navbar';
 import { WorkspaceContext } from '../Side/WorkspaceContext';
-import { useNavigate } from 'react-router-dom';
 
 const StarredDropdown = (props) => {
 
     const [width, setWidth] = useState(window.innerWidth);
-    const { boards, starredBoards, workspace } = useContext(WorkspaceContext);
-    const navigate = useNavigate();
+    const { boards, starredBoards } = useContext(WorkspaceContext);
 
     function handleResize() {
         setWidth(window.innerWidth);
@@ -35,6 +33,16 @@ const StarredDropdown = (props) => {
     };
 
     return (
+        // <div
+        // className="fixed inset-0 z-50 felx items-center justify-center bg-black bg-opacity-0"
+        // onClick={(e) =>{
+        //     if (e.target.className.includes('bg-black')) {
+        //         e.stopPropagation();
+        //         onClose();
+
+        //     }
+        // }}
+        // >
         <div className={`relative ${props.width <= 1070 && 'hidden'}`}>
             <button
                 onClick={dropdownContext.toggleDropdownStarred}
@@ -45,7 +53,7 @@ const StarredDropdown = (props) => {
 
             {dropdownContext.StarredDropdownIsOpen && (
                 <div className={dynamicClassName()}>
-                    {(boards.length === 0 && starredBoards.length === 0) ? (
+                    {boards.length === 0 ? (
                         <div className='block w-full text-left px-4 py-2 bg-gray-800 text-gray-400 rounded-lg'>
                             No boards created
                         </div>
@@ -57,8 +65,7 @@ const StarredDropdown = (props) => {
                         starredBoards.map((board, index) => (
                             <div
                                 key={index}
-                                className='block w-full text-left px-4 py-2 bg-gray-800 text-gray-400 rounded-lg hover:bg-gray-700 cursor-pointer truncate'
-                                onClick={() => navigate(`/main/board/${workspace.workspaceId}/${board.boardId}`)}>
+                                className='block w-full text-left px-4 py-2 bg-gray-800 text-gray-400 rounded-lg'>
                                 {board.title}
                             </div>
                         ))
@@ -66,6 +73,7 @@ const StarredDropdown = (props) => {
                 </div>
             )}
         </div>
+        //</div>
     );
 }
 

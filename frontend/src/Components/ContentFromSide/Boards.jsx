@@ -11,7 +11,7 @@ import { MdOutlineStarPurple500 } from "react-icons/md";
 import LimitModal from "./LimitModal.jsx";
 import SideMenusHeader from "./SideMenusHeader.jsx";
 import { useNavigate, useParams } from "react-router-dom";
-
+import StarButton from "./StarButton.jsx";
 
 const Boards = () =>{
     const { workspace,openClosedBoardsModal, showLimitModal, setShowLimitModal, 
@@ -114,12 +114,7 @@ return (
                 }}>
               <h2 className="ml-3"  onClick={() => navigate(`/main/board/${workspaceId}/${board.boardId}`)} >{board.title}</h2>
 
-
-              <button
-                className="absolute right-2 top-2 text-white font-bold text-3xl transition ease-in-out duration-300"
-                style={{textShadow: '0 0 10px rgba(255, 255, 255, 0.6), 0 0 20px rgba(255, 255, 255, 0.4)'}}
-                onClick={()=>handleStarBoard(board)}>
-                <MdOutlineStarPurple500 /></button>
+              <StarButton board={board} />
 
 
             </div>
