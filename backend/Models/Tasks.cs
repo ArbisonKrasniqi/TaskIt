@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 using backend.DTOs.TaskMember.Output;
@@ -33,6 +34,7 @@ namespace backend.Models
         public List<Checklist>? Checklists { get; set; }
         
         public List<TaskLabel> TaskLabels { get; set; }
+        [NotMapped]
         public List<Label>? Labels { get; set; }
 
     }

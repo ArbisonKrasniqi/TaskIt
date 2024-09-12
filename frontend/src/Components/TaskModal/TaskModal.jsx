@@ -40,6 +40,7 @@ const TaskModal = () => {
   const [assignedMembers, setAssignedMembers] = useState([]);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [newTitle, setNewTitle] = useState('');
 
   const specificDate = new Date('0001-01-01T00:00:00Z');
 
