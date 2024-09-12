@@ -397,7 +397,7 @@ const getLists = async () => {
                 {lists.map((list) => (
                   <List key={list.listId} list={list}>
                     <SortableContext items={tasks.filter(task => task.listId == list.listId).map(task => task.uniqueId)}>
-                      <div className="flex items-start flex-col">
+                      <div className="flex items-start flex-col overflow-y-auto max-h-[650px] scrollbar-thin">
                         {tasks.filter(task => task.listId == list.listId).map((task) => (
                           <Task key={task.uniqueId} task={task} />
                         ))}

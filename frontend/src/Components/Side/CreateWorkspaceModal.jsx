@@ -62,8 +62,19 @@ const CreateWorkspaceModal = ({open, onClose, onWorkspaceCreated, children}) => 
     console.log('Error response data: ', error.response?.data || error.message);
 }
   };
-
+  if(!open) return null;
   return(
+
+    <div
+        className="fixed inset-0 z-50 felx items-center justify-center bg-black bg-opacity-0"
+        onClick={(e) =>{
+            if (e.target.className.includes('bg-black')) {
+                e.stopPropagation();
+                onClose();
+                
+            }
+        }}
+        >
     <div className={`
       fixed inset-0 flex justify-center items-center transition-colors 
       ${open ? "visible bg-black/20" : "invisible"}
@@ -113,6 +124,7 @@ const CreateWorkspaceModal = ({open, onClose, onWorkspaceCreated, children}) => 
 
         </div>
 
+    </div>
     </div>
   );
 

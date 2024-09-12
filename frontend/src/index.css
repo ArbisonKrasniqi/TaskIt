@@ -23,3 +23,22 @@
 .react-calendar__tile--due-date:hover {
     background-color: #ea6b6b !important; /* Darker blue on hover */
 }
+/* custom sroll bar  */
+.scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.5) rgba(49, 51, 72, 0);
+}
+
+.scrollbar-thin ::-webkit-scrollbar {
+    width: 8px;
+}
+
+.scrollbar-thin ::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.scrollbar-thin ::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.8); 
+    border-radius: 20px;
+    border: 1px solid rgba(49, 51, 72, 0.5);
+}

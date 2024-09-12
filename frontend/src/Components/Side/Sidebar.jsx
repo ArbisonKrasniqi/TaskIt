@@ -67,7 +67,9 @@ const WorkspaceViews = [
             ></SlArrowLeft>
 
            <div className="flex gap-x-3 items-center">
-           <button className={`w-10 h-10 text-black bg-gradient-to-r from-blue-400 to-indigo-500 font-bold text-xl rounded-lg text-center px-3 items-center dark:bg-blue-600 dark:focus:ring-blue-800 duration-200 ${!open && "scale-0"}`}>{workspaceTitle? workspaceTitle.charAt(0): ''}</button>
+           <button className={`w-10 h-10 text-black bg-gradient-to-r from-blue-400 to-indigo-500 font-bold text-xl rounded-lg text-center px-3 items-center dark:bg-blue-600 dark:focus:ring-blue-800 duration-200 ${!open && "scale-0"}`}
+            onClick={() => navigate(`/main/boards/${workspace.workspaceId}`)}
+           >{workspaceTitle? workspaceTitle.charAt(0): ''}</button>
            <h1 className={`w-full origin-left font-sans text-gray-400 font-bold text-xl duration-200 ${!open && "scale-0"}`}>{workspaceTitle}</h1> 
            </div> 
            

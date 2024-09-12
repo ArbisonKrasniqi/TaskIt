@@ -3,6 +3,7 @@ import { postData, getData } from './../../Services/FetchService';
 import { MainContext } from '../../Pages/MainContext';
 import { WorkspaceContext } from './WorkspaceContext';
 import { useNavigate } from 'react-router-dom';
+import CloseBoardModal from './CloseBoardModal';
 const CreateBoardModal = ({ open, onClose, onBoardCreated, children }) => {
     const mainContext = useContext(MainContext);
     const [boardTitle, setBoardTitle] = useState('');
@@ -69,6 +70,17 @@ const CreateBoardModal = ({ open, onClose, onBoardCreated, children }) => {
     if(!open) return null;
 
     return (
+        <div
+        className="fixed inset-0 z-50 felx items-center justify-center bg-black bg-opacity-0"
+        onClick={(e) =>{
+            if (e.target.className.includes('bg-black')) {
+                e.stopPropagation();
+                onClose();
+                
+            }
+        }}
+        >
+
         <div className={`fixed z-30 inset-0 flex justify-center items-center transition-colors ${open ? "visible bg-black/20" : "invisible"}`}>
             <div className={`bg-white rounded-xl shadow p-6 transition-all w-80 text-center ${open ? "scale-100 opacity-100" : "scale-125 opacity-0"}`}>
                 <button onClick={onClose} className="absolute top-1 right-2 p-1 rounded-lg text-gray-400 bg-white hover:bg-gray-50 hover:text-gray-600">X</button>
@@ -84,7 +96,7 @@ const CreateBoardModal = ({ open, onClose, onBoardCreated, children }) => {
         className={`relative w-16 h-16 rounded-lg bg-cover bg-center ${backgroundId === background.backgroundId ? 'border-4 border-blue-500' : 'border-2 border-transparent'}`}
         style={{ backgroundImage: `url(${activeBackgroundUrls[background.backgroundId] || 'background.jpg'})` }} // Use backgroundId here as well
     />
-))}
+                ))}
 
                 </div>
 
@@ -105,6 +117,7 @@ const CreateBoardModal = ({ open, onClose, onBoardCreated, children }) => {
 
                 {children}
             </div>
+        </div>
         </div>
     );
 }
