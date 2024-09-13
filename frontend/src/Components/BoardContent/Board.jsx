@@ -24,7 +24,7 @@ const Board = () => {
   const workspaceContext = useContext(WorkspaceContext);
   const {workspaceId, boardId, taskId} = useParams();
   const navigate = useNavigate();
-  
+  const {open} = workspaceContext;
   const [lists, setLists] = useState([]);
   const [tasks, setTasks] = useState([]);
    
@@ -366,27 +366,35 @@ const getLists = async () => {
   }
   return (
     <BoardContext.Provider value={contextValue}>
+        <header
+  className={`flex items-center justify-between p-4 bg-opacity-70 text-white shadow-lg flex-wrap transition-all duration-300 ease-in-out ${
+    open ? 'mr-72' : 'mr-8'
+  }`}
+  style={{
+    backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)',
+    width: `calc(100% - ${open ? '18rem' : '2rem'})`, // Adjust width based on sidebar
+  }}
+>
+  <div className="flex items-center gap-4 flex-1 min-w-0">
+    <h2 className="text-xl font-semibold text-slate-200">{workspaceContext.board.title}</h2>
+    <StarButton board={workspaceContext.board} />
+  </div>
+  <div className="flex items-center space-x-4">
+    <DropdownContext.Provider value={pfpValues}>
+      <MemberProfilePic />
+    </DropdownContext.Provider>
+    <button
+      onClick={() => navigate(`/main/boardSettings/${workspaceId}/${workspaceContext.board.boardId}/`)}
+      className="text-gray-500 text-3xl"
+    >
+      <IoIosSettings />
+    </button>
+  </div>
+</header>
+
       <div className="max-w-full max-h-screen h-screen" style={{backgroundImage: `url(${backgroundUrl})`,backgroundSize: 'cover',
                                                                 backgroundPosition: 'center',
                                                               }} >
-            <header className="flex items-center justify-between p-4 bg-opacity-70 text-white shadow-lg w-full" style={{ backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)' }}>
-              <div className="flex items-center">
-                  <h2 className="text-xl font-semibold text-slate-200 mr-4">{workspaceContext.board.title}</h2>
-            
-                  <StarButton board={workspaceContext.board} />
-
-
-              </div>
-
-              <div className="flex items-center space-x-4">
-                  <DropdownContext.Provider value={pfpValues}>
-                      <MemberProfilePic />
-                  </DropdownContext.Provider>
-                  <button onClick={() => navigate(`/main/boardSettings/${workspaceId}/${workspaceContext.board.boardId}/`)}>
-                      <IoIosSettings className="text-gray-500 text-3xl" />
-                  </button>
-              </div>
-          </header>
 
         
         <div className="m-0 p-5 h-full flex flex-start space-x-4 items-baseline min-h-screen max-h-screen overflow-x-auto max-w-full">
