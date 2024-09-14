@@ -38,8 +38,8 @@ const TaskForm = ({ listId, onClose }) => {
             setTaskTitle('');
             onClose(); // Close the form after task creation
         } catch (error) {
-            console.log("Error response data:", error.message); 
-            setErrorMessage("error.message");
+            console.log("Theres been an error creating a task"); 
+            setErrorMessage("Theres been an error creating task");
         }
     };
 

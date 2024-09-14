@@ -19,7 +19,7 @@ const BackgroundsList = () => {
             const data = await getData("http://localhost:5157/backend/background/GetAllBackgrounds");
             setBackgrounds(data.data);
         } catch (error) {
-            setErrorMessage(error.message);
+            setErrorMessage("Theres been an error fetching backgrounds");
             setShowBackgroundsErrorModal(true);
         }
     };

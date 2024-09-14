@@ -82,9 +82,7 @@ export const WorkspaceProvider = ({ children }) => {
             getWorkspaces();
         }
     }, [userId, board ,mainContext.userInfo]);
-        // const interval = setInterval(getWorkspaces, 5 * 1000);
-        // return () => clearInterval(interval); //Get workspaces every 5 seconds
- 
+
 
     useEffect(()=>{
         const getActivities = async () =>{
@@ -206,7 +204,7 @@ export const WorkspaceProvider = ({ children }) => {
                     //console.log('Members fetched: ',members);
                 }                    
             } catch (error) {
-                console.error("Error fetching members: ",error.message);
+                console.error("Error fetching members");
 
             }
         };
@@ -227,7 +225,7 @@ export const WorkspaceProvider = ({ children }) => {
             getMembers();
             
         } catch (error) {
-            console.error("Error removing member: ",error.message);
+            console.error("Error removing member");
         }
         
     }
@@ -253,7 +251,7 @@ export const WorkspaceProvider = ({ children }) => {
             const response = await getDataWithId('http://localhost:5157/backend/board/GetClosedBoards?workspaceId', WorkspaceId);
             setClosedBoards(response.data);
         }catch(error){
-            console.error("Error fetching closed boards: ",error);
+            console.error("Error fetching closed boards");
         }
     };
 
@@ -344,7 +342,7 @@ export const WorkspaceProvider = ({ children }) => {
                 setStarredBoards(starred);
                 setBoards(sortedNonStarred);
         } catch (error) {
-            console.error("Error starring/unstarring the board:", error.message);
+            console.error("Error starring/unstarring the board");
         }
     };
 
@@ -369,7 +367,7 @@ export const WorkspaceProvider = ({ children }) => {
             return url;
             }
         } catch (error) {
-            console.error("Error fetching background image:", error);
+            console.error("Error fetching background image");
             return myImage;  // Return a default image in case of error
         }
     };
@@ -412,7 +410,7 @@ export const WorkspaceProvider = ({ children }) => {
                 console.error("No active backgrounds found.");
             }
         } catch (error) {
-            console.error("Error fetching backgrounds:", error.message);
+            console.error("Error fetching backgrounds");
         }
     };
 
@@ -426,7 +424,7 @@ export const WorkspaceProvider = ({ children }) => {
             navigate('/main/workspaces');
         }
         catch(error){
-            console.error('Error deleting workspace:', error.message);
+            console.error('Error deleting workspace');
         }
 
      };
@@ -438,7 +436,7 @@ export const WorkspaceProvider = ({ children }) => {
             navigate(`/main/workspaces`);
         }
         catch(error){
-            console.error('Error deleting workspace:', error.message);
+            console.error('Error deleting workspace');
         }
      };
 
@@ -450,7 +448,8 @@ export const WorkspaceProvider = ({ children }) => {
             console.log("Tasks data: ",tasksData);
             setTasks(tasksData);
         }catch (error) {
-            console.error(error.message);
+            console.error("Theres been an error fetching the tasks");
+            //console.error(error.message);
         }
     };
 
@@ -519,18 +518,18 @@ export const WorkspaceProvider = ({ children }) => {
                 setInviteeDetails(invited);
                 setWorkspaceTitles(workspaceTitlesData);
             } catch (error) {
-                console.log("Error fetching invites: ", error.message);
+                console.log("Error fetching invites");
             }
         };
 
         
     
         useEffect(() => {
-            if (WorkspaceId) {
+            if (workspace) {
                 getSentInvites();
             }
             
-        }, [WorkspaceId, workspace]);
+        }, [workspace]);
     
     
         const handleDeleteInvite = async(inviteId) => {
@@ -541,7 +540,7 @@ export const WorkspaceProvider = ({ children }) => {
                 getSentInvites();
             }
             catch(error){
-                console.error("Error deleting invite ",error.message);
+                console.error("Error deleting invite");
             }
         };
 
@@ -585,7 +584,7 @@ export const WorkspaceProvider = ({ children }) => {
                 }
               }
             } catch (error) {
-              console.error("Error fetching checklists: ", error.message);
+              console.error("Error fetching checklists");
             }
           };
           
@@ -616,7 +615,7 @@ export const WorkspaceProvider = ({ children }) => {
                 );
                 items[checklist.checklistId] = response.data; // Store items by checklist ID
               } catch (error) {
-                console.error(`Error fetching items for checklist ${checklist.checklistId}: `, error.message);
+                console.error(`Error fetching items for checklist ${checklist.checklistId}`);
               }
             }
           

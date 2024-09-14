@@ -58,7 +58,7 @@ function EditLabelModal() {
             toggleEditLabelModal();
             setIsLabelModalOpen(true);
         } catch (error) {
-            
+            console.error("Couldn't delete label");
         }
     };
 

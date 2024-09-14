@@ -84,7 +84,7 @@ public class ApplicationDBContext : IdentityDbContext<User>
             .HasOne(tl => tl.Task)
             .WithMany(t => t.TaskLabels)
             .HasForeignKey(tl => tl.TaskId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.NoAction);
         
             
     }

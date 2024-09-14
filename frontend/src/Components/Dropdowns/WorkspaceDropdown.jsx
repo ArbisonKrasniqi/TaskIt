@@ -47,7 +47,7 @@ const WorkspaceDropdown = (props) => {
         <>
           {/* Overlay */}
           <div
-            className="fixed inset-0 z-10 bg-black opacity-25"
+            className="fixed inset-0 z-10 opacity-25"
             onClick={() => dropdownContext.toggleDropdownWorkspace()}
           ></div>
 

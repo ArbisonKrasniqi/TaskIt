@@ -46,7 +46,7 @@ const Dashboard = () => {
               return;
             } 
         } catch (error) {
-          console.log("Token error. Log in again.");
+          console.error("Token error. Log in again.");
           document.cookie = "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
           document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
           navigate('/login');

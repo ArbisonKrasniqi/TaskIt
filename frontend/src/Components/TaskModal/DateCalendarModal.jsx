@@ -29,7 +29,7 @@ const DateCalendarModal = () => {
             getTaskById();
             closeCalendar();
         } catch (error) {
-            console.error("Error updating the due date of the task: ", error);
+            console.error("Error updating the due date of the task");
         }
     };
 

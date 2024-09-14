@@ -44,7 +44,7 @@ const Workspaces = () =>{
 
             }
         } catch (error) {
-            console.log(error);
+            console.log("There has been an error filtering your workspaces");
         }
     },[OwnedWorkspaces, MemberWorkspaces])
 

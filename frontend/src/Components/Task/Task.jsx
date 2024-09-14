@@ -48,7 +48,8 @@ const Task = ({task}) => {
                         <div
                         key={index}
                         className="h-[8px] w-[40px] rounded-[4px] m-0 mr-1 mb-1"
-                        style={{ backgroundColor: label.color }} // Assuming each label has a color property
+                        style={{ backgroundColor: label.color }}
+                        title={label.name} 
                         />
                     ))}
                 </div>
@@ -57,7 +58,8 @@ const Task = ({task}) => {
                     {members && members.map((member, index) => (
                         <div
                         key={member.id}
-                        className="flex-shrink-0 w-8 h-8 rounded-full overflow-hidden mb-2 mr-2 bg-gradient-to-r from-pink-400 to-purple-600 flex items-center justify-center text-white text-sm"
+                        className="flex-shrink-0 w-6 h-6 rounded-full overflow-hidden mb-2 mr-2 bg-gradient-to-r from-pink-400 to-purple-600 flex items-center justify-center text-white text-sm"
+                        title={`${member.firstName} ${member.lastName}`}
                     >
                         {workspaceContext.getInitials(member.firstName, member.lastName)}
                     </div>

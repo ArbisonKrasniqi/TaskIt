@@ -38,7 +38,7 @@ const Table = () =>{
                         <td className="px-4 py-2" colSpan="6">No tasks available</td>
                     </tr>
                 ) : tasks.map((task, index)=>(
-                    <tr key={index} className="hover:bg-gray-700 hover:cursor-pointer"
+                    <tr key={index} className="hover:bg-gray-700 hover:cursor-pointer border-gray-800 border-t-2 border-b-2"
                     // onClick={() => navigate(`/main/board/${WorkspaceId}/${task.boardId}/${task.taskId}`)}
                     >
                         <td className="px-4 py-2">{task.taskTitle}</td>

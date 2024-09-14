@@ -40,7 +40,7 @@ function ChecklistModal() {
       getTaskActivities();
       getChecklistsByTask();
     } catch (error) {
-      console.error('Error creating checklist: ', error.message);
+      console.error('Error creating checklist');
     }
   };
 

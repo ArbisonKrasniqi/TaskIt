@@ -33,7 +33,7 @@ const MembersModal = () => {
             setAssignedMembers([...assignedMembers, member]);
             boardContext.getTasks();
         } catch (error) {
-            console.error("Error adding member to task", error);
+            console.error("Error adding member to task");
         }
     };
 
@@ -46,7 +46,7 @@ const MembersModal = () => {
             setAssignedMembers(assignedMembers.filter(m => m.id !== member.id));
             boardContext.getTasks();
         } catch (error) {
-            console.error("Error removing member from task", error);
+            console.error("Error removing member from task");
         }
     };
 

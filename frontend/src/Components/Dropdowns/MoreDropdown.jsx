@@ -10,7 +10,7 @@ const MoreDropdown = (props) => {
     const dropdownContext = useContext(DropdownContext);
 
     return(
-        <div className={`relative ${props.width>=1070 && 'hidden'}`}>
+        <div className={`relative ${props.width>=1070 && 'hidden'} z-50`}>
             <button
                 onClick={dropdownContext.toggleDropdownMore}
                 className='bg-gray-800 text-gray-400 px-4 py-2 rounded focus:outline-none hover:bg-gray-700 flex items-center'>

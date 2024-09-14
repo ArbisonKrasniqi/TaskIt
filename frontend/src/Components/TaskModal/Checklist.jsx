@@ -47,7 +47,7 @@ const Checklist = () => {
       setChecklistItemDotsOpen(null);
       setIsChecklistModalOpen(false);
     } catch (error) {
-      console.log("Error updating checklist item:", error.message);
+      console.log("Error updating checklist item");
     }
   };
 
@@ -73,7 +73,7 @@ const Checklist = () => {
       );
       setChecklists(updatedChecklists);
     } catch (error) {
-      console.error("Error deleting checklist: ", error.message);
+      console.error("Error deleting checklist");
     }
   };
 
@@ -111,7 +111,7 @@ const Checklist = () => {
       setNewItemContent('');
       setAddingItem(null);
     } catch (error) {
-      console.error("Error adding checklist item:", error.message);
+      console.error("Error adding checklist item");
     }
   };
 
@@ -164,7 +164,7 @@ const Checklist = () => {
       setEditingItemId(null);
       setEditedContent('');
     } catch (error) {
-      console.error('Error updating checklist item:', error.message);
+      console.error('Error updating checklist item');
     }
   };
 
@@ -212,7 +212,7 @@ const Checklist = () => {
       setEditingChecklistId(null);
       setEditedChecklistTitle('');
     } catch (error) {
-      console.error("Error updating checklist title: ",error.message);
+      console.error("Error updating checklist title");
       
       
     }

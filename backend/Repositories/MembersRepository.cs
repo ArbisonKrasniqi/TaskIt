@@ -71,12 +71,18 @@ public class MembersRepository : IMembersRepository
             .Include(w => w.Members)
             .ThenInclude(m => m.User)
             .FirstOrDefaultAsync(x => x.WorkspaceId == workspaceId);
+
         if (workspace == null)
         {
-            throw new ArgumentNullException( "Workspace not found!");
+            throw new ArgumentNullException("Workspace not found!");
         }
 
-        return workspace.Members.ToList();
+        // Filter out members whose associated user has `isDeleted` set to true
+        var activeMembers = workspace.Members
+            .Where(m => !m.User.isDeleted)
+            .ToList();
+
+        return activeMembers;
     }
     
     //Remove member from workspace

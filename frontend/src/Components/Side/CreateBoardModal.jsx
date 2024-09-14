@@ -77,7 +77,7 @@ const CreateBoardModal = ({ open, onClose, onBoardCreated, children }) => {
                 navigate(`/main/board/${workspaceId}/${response.data.boardId}`);
          
         } catch (error) {
-            console.log('Error creating board: ', error.message);
+            console.log('Error creating board');
             if(error.response){
                 console.error("response status ",error.response.status);
                 console.error("response data ",error.response.data);

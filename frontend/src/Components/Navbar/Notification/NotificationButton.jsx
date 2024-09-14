@@ -46,7 +46,7 @@ const NotificationButton = (props) => {
             setInviterDetails(inviters);
             setWorkspaceTitles(workspaceTitlesData);
         } catch (error) {
-            console.log("Error fetching invites: ", error.message);
+            console.log("Theres been an error fetching invites");
         }
     };
 
@@ -70,7 +70,7 @@ const NotificationButton = (props) => {
                 navigate(`/main/boards/${workspaceId}`);
             }
         }catch(error){
-            console.error("Error updating invite status: ", error.message);
+            console.error("Error updating invite status");
         }
    };
 

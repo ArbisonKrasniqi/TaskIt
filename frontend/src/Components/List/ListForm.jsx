@@ -34,7 +34,7 @@ const ListForm = ({ }) => {
             boardContext.setLists([... boardContext.lists, response.data]);
             setListTitle("");
         } catch (error) {
-            console.log("Error response data: ", error.message);
+            console.log("Theres been an error creating a list");
         }
     };
 

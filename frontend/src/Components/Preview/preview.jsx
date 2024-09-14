@@ -13,7 +13,6 @@ const Preview = () =>{
   };
 
   const navigate = useNavigate();
-  
 
   return(
 

@@ -34,7 +34,8 @@ const AutoResizingTextarea = ({ taskDescription }) => {
       taskModalsContext.setTaskData({ ...taskData, description: tempDescription });
       setIsEditing(false);
     } catch (error) {
-      console.error(error);
+      console.error("Thers been an error saving task");
+      taskModalsContext.getTaskById();
     }
   };
 
