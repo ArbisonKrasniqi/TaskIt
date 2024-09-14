@@ -5,12 +5,14 @@ import Button from '../Sign-up/Button.jsx';
 import { StoreTokens } from '../../Services/TokenService.jsx';
 import { postData } from '../../Services/FetchService.jsx';
 import { useNavigate } from 'react-router-dom';
-//import jwtDecode from 'jwt-decode';
 import { jwtDecode } from 'jwt-decode'; 
-// po e boj koment se nuk pom bon me kllapa e qishtu pomm punon 
+
+
+
 
 const LogInForm =  () =>{
 
+    
     const navigate = useNavigate();
     const [formData,setFormData] = useState({
         email:'',
@@ -42,6 +44,7 @@ const LogInForm =  () =>{
                 navigate(`/main/workspaces`);
             }
         } catch (error) {
+            setError("Incorrect email and/or password!");
             console.error("Login failed please try again");
         }
         validateForm();

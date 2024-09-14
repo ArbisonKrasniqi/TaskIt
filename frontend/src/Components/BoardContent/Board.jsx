@@ -24,7 +24,7 @@ const Board = () => {
   const workspaceContext = useContext(WorkspaceContext);
   const {workspaceId, boardId, taskId} = useParams();
   const navigate = useNavigate();
-  
+  const {open} = workspaceContext;
   const [lists, setLists] = useState([]);
   const [tasks, setTasks] = useState([]);
    
