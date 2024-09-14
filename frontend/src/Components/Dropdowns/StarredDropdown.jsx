@@ -53,7 +53,7 @@ const StarredDropdown = (props) => {
 
             {dropdownContext.StarredDropdownIsOpen && (
                 <div className={dynamicClassName()}>
-                    {boards.length === 0 ? (
+                    {(boards.length === 0 && starredBoards.length === 0) ? (
                         <div className='block w-full text-left px-4 py-2 bg-gray-800 text-gray-400 rounded-lg'>
                             No boards created
                         </div>
