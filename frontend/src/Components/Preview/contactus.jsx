@@ -47,6 +47,7 @@ const ContactUs = () => {
                 <div className="hidden md:flex md:space-x-8">
                     <button onClick={() => navigate(`/AboutUs`)} className="py-2 px-3 hover:bg-black-100 rounded dark:text-gray-400 dark:hover:text-black dark:hover:bg-gray-700 dark:hover:text-white">About Us</button>
                     <button onClick={() => navigate(`/ContactUs`)} className="py-2 px-3 hover:bg-black-100 rounded dark:text-gray-400 dark:hover:text-black dark:hover:bg-gray-700 dark:hover:text-white">Contact Us</button>
+                    <button onClick={() => navigate('/PrivacyPolicy')} className="py-2 px-3 hover:bg-black-100 rounded dark:text-gray-400 dark:hover:text-black dark:hover:bg-gray-700 dark:hover:text-white">Privacy Policy</button>
                 </div>
 
                 {/* Desktop Login Button */}
@@ -72,6 +73,7 @@ const ContactUs = () => {
                     <ul className="flex flex-col items-start p-4 space-y-4 rounded-lg">
                         <li><button onClick={() => navigate(`/AboutUs`)} className="text-gray-400">About Us</button></li>
                         <li><button onClick={() => navigate('/ContactUs')} className="text-gray-400">Contact Us</button></li>
+                        <li><button onClick={() => navigate('/PrivacyPolicy')} className="text-gray-400">Privacy Policy</button></li>
                         <li>
                             <button onClick={() => navigate(`/Login`)} className="w-full py-3 px-5 text-center text-white rounded-md bg-gradient-to-r from-gray-800 to-gray-900">
                                 Login
