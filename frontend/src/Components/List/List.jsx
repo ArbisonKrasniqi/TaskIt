@@ -74,7 +74,7 @@ const List = ({ list, children }) => {
       {...attributes}
       {...listeners}
       style={style}
-      className={`flex-shrink-0 bg-gray-800 p-2.5 rounded-lg shadow-lg w-[275px] h-auto max-h-screen ${isDragging ? 'opacity-0' : ''}`}
+      className={`flex-shrink-0 bg-gray-800 p-2.5 rounded-lg shadow-lg w-[275px] h-auto max-h-[calc(100vh-120px)] overflow-y-auto ${isDragging ? 'opacity-0' : ''}`}
     >
        <header className="flex justify-between items-center">
 
