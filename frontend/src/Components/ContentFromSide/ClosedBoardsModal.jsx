@@ -47,7 +47,7 @@ const ClosedBoardsModal = ({ open, onClose }) => {
             console.log("Updated boards:", [...boards, reopenedBoard]);
             console.log("Updated closedBoards:", closedBoards);
         }catch(error){
-            console.error("Error reopening board:", error);
+            console.error("Error reopening board");
         }
 
     }
@@ -68,7 +68,7 @@ const ClosedBoardsModal = ({ open, onClose }) => {
           setBoards(dataResponse.data);
       
         } catch (error) {
-          console.error('Error deleting board:', error);
+          console.error('Error deleting board');
         }
       };
       

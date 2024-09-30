@@ -17,7 +17,7 @@ import Calendar from '../Components/ContentFromSide/Calendar.jsx';
 import LoadingModal from '../Components/Modal/LoadingModal.jsx';
 import Members from '../Components/ContentFromSide/Members.jsx';
 import WithAuth from "../Services/WithAuth.jsx";
-import PrivacyPolicy from '../Components/Navbar/PrivacyPolicy.jsx';
+import PrivacyPolicy from '../Components/Preview/PrivacyPolicy.jsx';
 import Profile from '../Components/Navbar/Profile.jsx';
 import TaskModal from '../Components/TaskModal/TaskModal.jsx';
 import Board from '../Components/BoardContent/Board.jsx';
@@ -55,7 +55,7 @@ const Main = () => {
                     return;
                 }
             } catch (error) {
-                console.log("There has been an error, please log in again.");
+                console.error("There has been an error, please log in again.");
                 document.cookie = "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
                 document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
                 navigate('/login');
@@ -80,12 +80,12 @@ const Main = () => {
                     <Navbar />
                     
                     {/* Container for Sidebar and Boards */}
-                    <div className="flex flex-grow h-full p-0">
+                    <div className="w-screen flex flex-grow h-full p-0">
                         {/* Sidebar on the left */}
                         {opened !== 'workspaces' && opened !== 'privacyPolicy'  && opened !== 'profile' && <Sidebar />}
 
                         {/* Conditional rendering based on the value of `opened` */}
-                        <div className='w-full flex-grow h-full p-0 m-0'>
+                        <div className='w-screen flex-grow h-full p-0 m-0'>
                             {opened === 'boards' && <Boards />}
                             {opened === 'board' && <Board />}
                             {opened === 'workspaceSettings' && <WorkspaceSettings/>}

@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { WorkspaceContext } from "../Side/WorkspaceContext";
 import ListForm from "../List/ListForm.jsx";
-import {DndContext, KeyboardSensor, PointerSensor, closestCenter, closestCorners, useSensor, useSensors} from "@dnd-kit/core";
+import {DndContext, KeyboardSensor, PointerSensor, closestCenter, closestCorners, useSensor, useSensors, TouchSensor} from "@dnd-kit/core";
 import List from "../List/List.jsx";
 import {SortableContext, horizontalListSortingStrategy, arrayMove, sortableKeyboardCoordinates} from "@dnd-kit/sortable";
 import { getDataWithId, putData } from "../../Services/FetchService.jsx";
@@ -24,7 +24,7 @@ const Board = () => {
   const workspaceContext = useContext(WorkspaceContext);
   const {workspaceId, boardId, taskId} = useParams();
   const navigate = useNavigate();
-  
+  const {open} = workspaceContext;
   const [lists, setLists] = useState([]);
   const [tasks, setTasks] = useState([]);
    
@@ -125,7 +125,7 @@ const getLists = async () => {
       const response = await putData('/backend/list/DragNDropList', data);
       console.log(response.data);
     } catch (error) {
-      console.log(error.message);
+      console.log("Theres been an error moving the list");
       getLists();
       getTasks();
     }
@@ -141,7 +141,7 @@ const getLists = async () => {
       const taskResponse = await putData("/backend/task/DragNDropTask", data);
       console.log(taskResponse.data);
     } catch (error) {
-      console.log(error.message);
+      console.log("Theres been an error moving the task");
       getLists();
       getTasks();
     }
@@ -158,7 +158,7 @@ const getLists = async () => {
         }
 
     } catch (error) {
-        console.error(error);
+        console.error("There was an error deleting the task");
         getLists();
         getTasks();
     }
@@ -190,7 +190,7 @@ const getLists = async () => {
         setActiveTask(draggingTask);
       }
     } catch (error) {
-      console.log(error);
+      console.log("There was an error!");
       setActiveId(null);
       setActiveList(null);
       setActiveTask(null);
@@ -297,8 +297,9 @@ const getLists = async () => {
       }
 
     }
+
   } catch (error) {
-      console.log(error);
+      console.log("There was an error");
       setActiveId(null);
       setActiveList(null);
       setActiveTask(null);
@@ -344,7 +345,7 @@ const getLists = async () => {
         }
         
     } catch (error) {
-      console.error(error.message);
+      console.error("There was an error");
     } finally {
       setActiveId(null);
       setActiveTask(null);
@@ -354,9 +355,16 @@ const getLists = async () => {
   }
 
   const sensors = useSensors(
+    
     useSensor(PointerSensor, {
       activationConstraint: {
         distance: 3
+      }
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250,
+        tolerance: 10,
       }
     })
   );
@@ -366,30 +374,31 @@ const getLists = async () => {
   }
   return (
     <BoardContext.Provider value={contextValue}>
-      <div className="max-w-full max-h-screen h-screen" style={{backgroundImage: `url(${backgroundUrl})`,backgroundSize: 'cover',
-                                                                backgroundPosition: 'center',
-                                                              }} >
-            <header className="flex items-center justify-between p-4 bg-opacity-70 text-white shadow-lg w-full" style={{ backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)' }}>
+      <header className="flex flex-wrap items-center justify-between p-4 bg-opacity-70 text-white shadow-lg" style={{ backgroundImage: 'linear-gradient(115deg, #1a202c, #2d3748)', width: workspaceContext.open ? 'calc(100vw - 288px)' : 'calc(100vw - 41px)'  }}>
               <div className="flex items-center">
                   <h2 className="text-xl font-semibold text-slate-200 mr-4">{workspaceContext.board.title}</h2>
             
                   <StarButton board={workspaceContext.board} />
-
-
               </div>
 
-              <div className="flex items-center space-x-4">
+              <div className="ml-5 flex items-center flex-row flex-wrap">
+                  <button className="mr-4" onClick={() => navigate(`/main/boardSettings/${workspaceId}/${workspaceContext.board.boardId}/`)}>
+                      <IoIosSettings className="text-gray-500 text-3xl" />
+                  </button>
                   <DropdownContext.Provider value={pfpValues}>
                       <MemberProfilePic />
                   </DropdownContext.Provider>
-                  <button onClick={() => navigate(`/main/boardSettings/${workspaceId}/${workspaceContext.board.boardId}/`)}>
-                      <IoIosSettings className="text-gray-500 text-3xl" />
-                  </button>
               </div>
-          </header>
+
+              
+        </header>
+      <div className="max-w-full max-h-screen h-screen" style={{backgroundImage: `url(${backgroundUrl})`,backgroundSize: 'cover',
+                                                                backgroundPosition: 'center',
+                                                              }} >
+            
 
         
-        <div className="m-0 p-5 h-full flex flex-start space-x-4 items-baseline min-h-screen max-h-screen overflow-x-auto max-w-full">
+        <div className="m-0 p-5 h-screen flex flex-start space-x-4 items-baseline min-h-screen max-h-screen overflow-x-auto max-w-full">
             <DndContext sensors={sensors} onDragStart={handleDragStart} onDragMove={handleDragMove} onDragEnd={handleDragEnd}>
               <SortableContext items={lists.map(list => list.listId)}>
                 {lists.map((list) => (

@@ -24,7 +24,7 @@ const InviteModal = ({ isOpen, onClose, onInviteSent  }) => {
                     setSearchResults(response.data);
                 }
                 catch(error){
-                    console.error("Error searching users: ",error);
+                    console.error("Error searching users");
                 }
             };
             searchUsers();
@@ -39,7 +39,7 @@ const InviteModal = ({ isOpen, onClose, onInviteSent  }) => {
             const response = await getData(`http://localhost:5157/backend/invite/Check-pending-invite?inviterId=${inviterId}&inviteeId=${inviteeId}&workspaceId=${workspaceId}`);
             return response.data.exists; 
         } catch (error) {
-            console.error("Error checking pending invites: ", error);
+            console.error("Error checking pending invites");
             setErrorMessage("Failed to check for existing invites. Please try again.");
             return false;
         }
@@ -71,7 +71,7 @@ const InviteModal = ({ isOpen, onClose, onInviteSent  }) => {
             onClose();
             getSentInvites();
         }catch (error) {
-            console.error("Error sending invites: ", error);
+            console.error("Error sending invites");
             setErrorMessage("Failed to send invites. Please try again.");
         }
 };

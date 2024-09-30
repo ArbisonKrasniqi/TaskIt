@@ -9,7 +9,7 @@ import { useRef } from "react";
 const EditBoardLabelModal = ()=>{
 
 
-    const { toggleEditLabelModal, toggleLabelsModal, selectedLabel, setIsLabelModalOpen, setAssignedLabels } = useContext(BoardSettingsContext);
+    const { toggleEditLabelModal, toggleLabelsModal, selectedLabel, setIsLabelModalOpen, setAssignedLabels, fetchLabels, getBoardActivities } = useContext(BoardSettingsContext);
     const inputRef = useRef(null);
     const [labelName, setLabelName] = useState(selectedLabel ? selectedLabel.name : '');
 
@@ -28,6 +28,8 @@ const EditBoardLabelModal = ()=>{
                 };
 
                 await putData('http://localhost:5157/backend/label/UpdateLabel', updatedLabel);
+                fetchLabels();
+                getBoardActivities();
             } else {
                 console.log("Name should be between 2 and 280 characters");
                 
@@ -36,7 +38,7 @@ const EditBoardLabelModal = ()=>{
             setIsLabelModalOpen(true);
 
         } catch (error) {
-            console.error("Error updating label:", error);
+            console.error("Error updating label");
         }
     };
 
@@ -49,7 +51,9 @@ const EditBoardLabelModal = ()=>{
                 };
 
                 await putData('http://localhost:5157/backend/label/UpdateLabel', updateLabel);
-  }
+                fetchLabels();
+                getBoardActivities();
+            }
             toggleEditLabelModal();
             setIsLabelModalOpen(true);
         } catch (error) {

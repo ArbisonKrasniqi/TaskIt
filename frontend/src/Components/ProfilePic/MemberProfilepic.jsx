@@ -39,7 +39,7 @@ const MemberProfilePic = () => {
     }, [ProfilePicIsOpen]);
 
     return (
-        <div className="relative flex items-baseline overflow-visible z-10 w-auto h-auto box-border">
+        <div className="relative flex items-baseline z-10 w-auto h-auto box-border">
             {memberDetails.map((member, key) => (
                 <button
                     className="flex items-center focus:outline-none relative mr-2 max-w-full max-h-full"

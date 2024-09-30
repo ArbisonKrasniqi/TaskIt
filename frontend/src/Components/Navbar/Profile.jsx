@@ -28,7 +28,7 @@ const getUser = async ()=>{
           email: responseUser.data.email,
       });
     }catch(error){
-        console.error("Error fetching user data ", error.response.data);
+        console.error("Error fetching user data ", error.response?.data);
     }
 };
 
@@ -75,7 +75,7 @@ const handleSubmit = async (e)=>{
         setModalMessage('Profile successfully updated');
         setIsModalOpen(true);
     }catch (error) {
-    console.error("Error updating user data:", error);
+    console.error("Error updating user data");
     setModalMessage('Failed to update profile');
     setIsModalOpen(true);
 }

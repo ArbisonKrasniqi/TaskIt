@@ -57,7 +57,7 @@ const TaskModal = () => {
         const response = await getDataWithId('http://localhost:5157/backend/task/GetTaskById?taskId',taskId);
         setTaskData(response.data);
     } catch (error) {
-        console.error("Error fetching task by id: ",error);
+        console.error("Error fetching task by id");
     }
 };
     useEffect(() => {   
@@ -74,7 +74,7 @@ const TaskModal = () => {
                 setListData(response.data);
                 
             } catch (error) {
-                console.error("Error fetching list by id: ",error);
+                console.error("Error fetching list by id");
             }
         };
             //getListById();
@@ -85,7 +85,7 @@ const TaskModal = () => {
             const response = await getDataWithId('http://localhost:5157/backend/label/GetLabelsByTaskId?taskId',taskId);
             setAssignedLabels(response.data);
         } catch (error) {
-            console.error("Error fetching assigned labels: ",error);
+            console.error("Error fetching assigned labels");
             
         }
     };
@@ -108,7 +108,7 @@ const TaskModal = () => {
 
                 setAssignedMembers(taskMembers);
             } catch (error) {
-              console.error("Error fetching task members:", error);
+              console.error("Error fetching task members");
           }
       };
 
@@ -138,7 +138,7 @@ const handleSaveTitle = async () => {
             setIsEditingTitle(false);
         }
     } catch (error) {
-        console.error('Error updating task title: ', error);
+        console.error('Error updating task title');
     }
 };
 
@@ -303,7 +303,8 @@ const [taskActivities, setTaskActivities] = useState([]);
                       <div className="flex flex-wrap h-auto items-center justify-start">
                         {assignedMembers.length > 0 ? (
                           assignedMembers.map((member) => (
-                            <button className="rounded-full m-1">
+                            <button className="rounded-full m-1"
+                            title={`${member.firstName} ${member.lastName}`}>
                               <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-sm text-white bg-gradient-to-r from-orange-400 to-orange-600">
                                 {getInitials(member.firstName, member.lastName)}
                               </div>

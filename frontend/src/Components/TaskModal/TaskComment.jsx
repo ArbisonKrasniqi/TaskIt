@@ -29,7 +29,7 @@ const TaskComment = () => {
       );
       setComments(sortedComments);
     } catch (error) {
-      console.error('Error fetching comments: ', error);
+      console.error('Error fetching comments');
     }
   };
 
@@ -46,7 +46,7 @@ const TaskComment = () => {
         getComments();
       }
     } catch (error) {
-      console.error('Error creating a comment: ', error);
+      console.error('Error creating a comment');
     }
   };
 
@@ -59,7 +59,7 @@ const TaskComment = () => {
         getComments();
       }
     } catch (error) {
-      console.error('Error editing comment: ', error);
+      console.error('Error editing comment');
     }
   };
 
@@ -68,7 +68,7 @@ const TaskComment = () => {
       await deleteData('http://localhost:5157/backend/comment/DeleteComment', { commentId });
       getComments();
     } catch (error) {
-      console.error('Error deleting comment: ', error);
+      console.error('Error deleting comment');
     }
   };
 

@@ -37,26 +37,6 @@ export async function postData(apiEndpoint, data) {
     throw error;
   }
 }
-// export async function deleteData(endpoint, params) {
-//   let url = endpoint;
-//   if (params && Object.keys(params).length > 0) {
-//     const queryString = new URLSearchParams(params).toString();
-//     url = `${endpoint}?${queryString}`;
-//   }
-
-//   try {
-//     const response = await api.delete(url, {
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//     });
-
-//     return response.data; // Axios automatically parses JSON responses
-//   } catch (error) {
-//     console.error('Error:', error);
-//     throw error;
-//   }
-// }
 
 export async function deleteData(endpoint, data) {
   try {
@@ -90,7 +70,7 @@ export async function getDataWithIds(apiEndpoint, id1, id2) {
     const response = await api.get(`${apiEndpoint}?${queryString}`);
     return response.data; // Return response.data to get the data directly
   } catch (error) {
-    console.error('Error fetching data with IDs:', error);
+    console.error('Error fetching data with IDs');
     throw error;
   }
 }

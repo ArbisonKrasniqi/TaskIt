@@ -23,7 +23,10 @@ function LabelsModal() {
                     setLabels(labelsResponse.data);
                 }
             } catch (error) {
+              if (error.response) {
                 console.error(error.response.data);
+              }
+              console.error("Internal server error");
                 
             }
         };
@@ -35,7 +38,7 @@ function LabelsModal() {
           const assignedLabelResponse = await getDataWithId('http://localhost:5157/backend/label/GetLabelsByTaskId?taskId',taskId);
           setSecondAssignedLabels(assignedLabelResponse.data.map(label => label.labelId));
       } catch (error) {
-          console.error("Error fetching assigned labels: ",error);
+          console.error("Error fetching assigned labels");
           
       }
     }
@@ -70,7 +73,7 @@ function LabelsModal() {
                 boardContext.getTasks();
                 
             } catch (error) {
-                console.error("Error unassigning label: ",error);
+                console.error("Error unassigning label");
                 
             }
         } else {
@@ -85,7 +88,7 @@ function LabelsModal() {
                 setSecondAssignedLabels(prev => [...prev, label.labelId]);
                 boardContext.getTasks();
             } catch (error) {
-                console.error("Error assigning label: ",error);
+                console.error("Error assigning label");
                 
             }
         }

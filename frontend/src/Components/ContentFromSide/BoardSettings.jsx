@@ -51,7 +51,7 @@ const toggleEditLabelModal = (label) => {
           const imageUrl = await getBackgroundImageUrl(board);
           setCurrentbgUrl(imageUrl);  // Set the background URL after fetching
         } catch (error) {
-          console.error("Error fetching background image:", error);
+          console.error("Error fetching background image");
           setCurrentbgUrl(''); // Handle the error by resetting the URL
         }
       } else {
@@ -61,7 +61,7 @@ const toggleEditLabelModal = (label) => {
     };
 
     fetchBackground();
-  }, [board, getBackgroundImageUrl]);
+  }, [board]);
 
   // Fetch active backgrounds once
   useEffect(() => {
@@ -83,7 +83,7 @@ const toggleEditLabelModal = (label) => {
           console.error("No active backgrounds found.");
         }
       } catch (error) {
-        console.error("Error fetching backgrounds:", error.message);
+        console.error("Error fetching backgrounds:");
       }
     };
 
@@ -91,19 +91,18 @@ const toggleEditLabelModal = (label) => {
   }, []);
 
   // Fetch labels for the board
-  useEffect(() => {
-    const fetchLabels = async () => {
-      try {
-        if (board && board.boardId) {
-          const labelsResponse = await getData(`http://localhost:5157/backend/label/GetLabelsByBoardId?boardId=${board.boardId}`);
-          const labelsData = labelsResponse.data;
-          setLabels(labelsData);
-        }
-      } catch (error) {
-        console.error("Error fetching labels:", error.message);
+  const fetchLabels = async () => {
+    try {
+      if (board && board.boardId) {
+        const labelsResponse = await getData(`http://localhost:5157/backend/label/GetLabelsByBoardId?boardId=${board.boardId}`);
+        const labelsData = labelsResponse.data;
+        setLabels(labelsData);
       }
-    };
-
+    } catch (error) {
+      console.error("Error fetching labels");
+    }
+  };
+  useEffect(() => {
     fetchLabels();
   }, [board]);
 
@@ -130,7 +129,7 @@ const toggleEditLabelModal = (label) => {
       setIsBackgroundModalOpen(false);
 
     } catch (error) {
-      console.error('Error updating background:', error.response?.data || error.message);
+      console.error('Error updating background');
     }
   };
 
@@ -164,14 +163,13 @@ const toggleEditLabelModal = (label) => {
         ...prevBoard,
         title: title
       }));
-
       setErrorMessage('');
       setIsEditing(false);
       setMessage("Title updated successfully!");
       setIsMessageModalOpen(true);
 
     } catch (error) {
-      console.error('Error updating title:', error.response?.data || error.message);
+      console.error('Error updating title');
     }
   };
 
@@ -193,29 +191,26 @@ const toggleEditLabelModal = (label) => {
   const [boardActivities, setBoardActivities] = useState([]);
   const [visibleActivities, setVisibleActivities] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
- 
+  const getBoardActivities = async () =>{
+    try{        
+            const activityResponse = await getDataWithId("http://localhost:5157/GetBoardActivityByBoardId?BoardId", board.boardId);
+            console.log("Te dhenat e Board aktivitetit ",activityResponse.data)
+            const activityData = activityResponse.data;
+            if (activityData && Array.isArray(activityData) && activityData.length > 0) {
+                setBoardActivities(activityData);
+            } else {
+                setBoardActivities([]);
+                console.log("There is no board activity");
+            }
+      
+        //Waiting for userIdn
+    } catch (error) {
+        console.error("There has been an error fetching board activities")
+        setBoardActivities([]);
+    }
+  };
    useEffect(()=>{
-     const getBoardActivities = async () =>{
-         try{
-            
-                 const activityResponse = await getDataWithId("http://localhost:5157/GetBoardActivityByBoardId?BoardId", board.boardId);
-                 console.log("Te dhenat e Board aktivitetit ",activityResponse.data)
-                 const activityData = activityResponse.data;
-                 if (activityData && Array.isArray(activityData) && activityData.length > 0) {
-                     setBoardActivities(activityData);
-                 } else {
-                     setBoardActivities([]);
-                     console.log("There is no board activity");
-                 }
-           
-             //Waiting for userIdn
-         } catch (error) {
-             console.error("There has been an error fetching board activities")
-             setBoardActivities([]);
-         }
-     };
      getBoardActivities();
-     //console.log("Activity fetched ",activities);
  },[board]);
  
  
@@ -248,7 +243,9 @@ const toggleEditLabelModal = (label) => {
     toggleLabelsModal,
     labels,
     selectedLabel,
-    setIsLabelModalOpen
+    setIsLabelModalOpen,
+    fetchLabels,
+    getBoardActivities
   };
 
   return (
