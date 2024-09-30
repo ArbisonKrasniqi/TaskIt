@@ -234,6 +234,7 @@
                         <div>
                         <StarredDropdown
                             width = {window.innerWidth}
+                            onClose ={() => setStarredDropdownIsOpen(false)}
                         />
                         </div>
 
