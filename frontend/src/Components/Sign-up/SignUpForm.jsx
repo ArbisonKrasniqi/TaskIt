@@ -104,7 +104,7 @@ const SignUpForm = () =>{
                 setShowModalWelcome(true);
             } catch (error) {
             if (error.response) {
-                setError(error.response.data[1].description);
+                setError(error.response.data[1]);
             } else {
                 setError("There has been an internal server error! Try again later");
             }            
