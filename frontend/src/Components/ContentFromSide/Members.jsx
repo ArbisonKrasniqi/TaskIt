@@ -87,7 +87,7 @@ const Members = () => {
                     <div className='w-2/3 p-4'>
                         <div> 
                             <h2 className=' h-8 font-bold text-lg  '>Workspace members ({members.length})</h2>
-                            <p className='m-3'>Workspace members can vew and join all Workspace visible boards and create new boards in the Workspace.</p>
+                            <p className='m-3'>Workspace members can view and join all Workspace visible boards and create new boards in the Workspace.</p>
                             <hr className='border-gray-400'/>
                             <br />
                             <h2 className='h-8 font-bold text-lg'>Invite members to join you</h2>
