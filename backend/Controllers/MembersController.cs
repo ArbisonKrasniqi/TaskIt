@@ -154,7 +154,7 @@ public class MembersController: ControllerBase
             var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var userTokenRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
 
-            var isOwner = await _userRepo.UserOwnsWorkspace(removeMemberDto.UserId, removeMemberDto.WorkspaceId);
+            var isOwner = await _userRepo.UserOwnsWorkspace(userId, removeMemberDto.WorkspaceId);
             
             if (userId == removeMemberDto.UserId && isOwner)
             {

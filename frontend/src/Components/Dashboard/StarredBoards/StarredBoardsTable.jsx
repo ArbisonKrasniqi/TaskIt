@@ -25,7 +25,7 @@ const StarredBoardsTable = () => {
                 starredContext.setStarredBoards(updatedStarredBoards);
             } catch (error) {
                 dashboardContext.setDashboardErrorMessage(error.message + id);
-                dashboardContext.setDashboardErrorModal(true);
+                dashboardContext.setShowDashboardErrorModal(true);
                 starredContext.getStarredBoards(); // për të përditësuar listën
             }
         }

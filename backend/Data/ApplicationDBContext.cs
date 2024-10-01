@@ -86,7 +86,11 @@ public class ApplicationDBContext : IdentityDbContext<User>
             .HasForeignKey(tl => tl.TaskId)
             .OnDelete(DeleteBehavior.NoAction);
         
-            
+        builder.Entity<Board>()
+            .HasOne(b => b.Background)
+            .WithMany(bg => bg.Boards)
+            .HasForeignKey(b => b.BackgroundId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
     
     

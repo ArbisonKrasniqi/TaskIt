@@ -183,6 +183,7 @@ export const WorkspaceProvider = ({ children }) => {
                 if (error.response) {
                     console.error(error.response.data);
                 }
+                navigate('/main/workspaces');
                 setBoards([]);
                 setStarredBoards([]);
             }

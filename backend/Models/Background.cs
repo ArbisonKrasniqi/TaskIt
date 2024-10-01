@@ -17,5 +17,6 @@ namespace backend.Models
 
         public bool IsActive { get; set; } = true;
         public DateTime DateCreated { get; set; } = DateTime.Now;
+        public List<Board> Boards { get; set; }
     }
 }
