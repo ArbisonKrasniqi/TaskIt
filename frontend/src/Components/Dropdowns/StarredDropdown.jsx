@@ -1,12 +1,14 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { DropdownContext } from '../Navbar/Navbar';
 import { WorkspaceContext } from '../Side/WorkspaceContext';
+import { useNavigate } from 'react-router-dom';
 
 const StarredDropdown = (props) => {
-
     const [width, setWidth] = useState(window.innerWidth);
     const { boards, starredBoards } = useContext(WorkspaceContext);
+    const navigate = useNavigate();
+    const dropdownRef = useRef(null); // Add ref for dropdown
 
     function handleResize() {
         setWidth(window.innerWidth);
@@ -14,13 +16,28 @@ const StarredDropdown = (props) => {
 
     useEffect(() => {
         window.addEventListener("resize", handleResize);
-
         return () => {
             window.removeEventListener("resize", handleResize);
         };
     }, []);
 
     const dropdownContext = useContext(DropdownContext);
+
+    // Function to close dropdown if click is outside of it
+    const handleClickOutside = (event) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+            if (dropdownContext.StarredDropdownIsOpen) {
+                dropdownContext.toggleDropdownStarred();
+            }
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener("mousedown", handleClickOutside); // Detect click outside
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside); // Clean up
+        };
+    }, [dropdownContext.StarredDropdownIsOpen]);
 
     const dynamicClassName = () => {
         if (width > 1070) {
@@ -33,17 +50,7 @@ const StarredDropdown = (props) => {
     };
 
     return (
-        // <div
-        // className="fixed inset-0 z-50 felx items-center justify-center bg-black bg-opacity-0"
-        // onClick={(e) =>{
-        //     if (e.target.className.includes('bg-black')) {
-        //         e.stopPropagation();
-        //         onClose();
-
-        //     }
-        // }}
-        // >
-        <div className={`relative ${props.width <= 1070 && 'hidden'}`}>
+        <div className={`relative ${props.width <= 1070 && 'hidden'}`} ref={dropdownRef}>
             <button
                 onClick={dropdownContext.toggleDropdownStarred}
                 className={`bg-gray-800 px-4 py-2 rounded focus:outline-none hover:bg-gray-700 flex items-center  
@@ -65,7 +72,8 @@ const StarredDropdown = (props) => {
                         starredBoards.map((board, index) => (
                             <div
                                 key={index}
-                                className='block w-full text-left px-4 py-2 bg-gray-800 text-gray-400 rounded-lg'>
+                                className='block w-full text-left px-4 py-2 bg-gray-800 text-gray-400 rounded-lg hover:bg-gray-700'
+                                onClick={() => navigate(`/main/board/${board.workspaceId}/${board.boardId}`)}>
                                 {board.title}
                             </div>
                         ))
@@ -73,7 +81,6 @@ const StarredDropdown = (props) => {
                 </div>
             )}
         </div>
-        //</div>
     );
 }
 
