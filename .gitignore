@@ -6,3 +6,11 @@
 /frontend/node_modules/
 
 .fake
+
+onion/backend/obj/
+onion/backend/bin/
+onion/backend/appsettings.json
+onion/backend/.idea/
+onion/backend/Migrations/
+onion/frontend/node_modules/
+

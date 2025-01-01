@@ -1,0 +1,45 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+.loader {
+    border-top-color: #3498db;
+    animation: spinner 0.6s linear infinite;
+}
+
+@keyframes spinner {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* In DateCalendarModal.css */
+.react-calendar__tile--due-date {
+    background-color: #ee9898 !important; /* Tailwind's bg-blue-500 */
+    color: black !important; /* Tailwind's text-white */
+    border: solid 2px red !important;
+    border-radius: 100% !important;
+}
+
+.react-calendar__tile--due-date:hover {
+    background-color: #ea6b6b !important; /* Darker blue on hover */
+}
+/* custom sroll bar  */
+.scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.5) rgba(49, 51, 72, 0);
+}
+
+.scrollbar-thin ::-webkit-scrollbar {
+    width: 8px;
+}
+
+.scrollbar-thin ::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.scrollbar-thin ::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.8); 
+    border-radius: 20px;
+    border: 1px solid rgba(49, 51, 72, 0.5);
+}
+
