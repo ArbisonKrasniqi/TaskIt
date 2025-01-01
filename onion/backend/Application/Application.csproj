@@ -12,10 +12,12 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Dtos\" />
       <Folder Include="Factories\" />
       <Folder Include="Handlers\" />
-      <Folder Include="Services\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Domain\Domain.csproj" />
     </ItemGroup>
 
 </Project>
