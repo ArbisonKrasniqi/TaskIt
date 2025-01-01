@@ -14,3 +14,8 @@ onion/backend/.idea/
 onion/backend/Migrations/
 onion/frontend/node_modules/
 
+/onion/backend/Application/obj
+/onion/backend/Domain/obj
+/onion/backend/Infrastructure/obj
+/onion/backend/Startup/obj
+/onion/backend/UI/obj
