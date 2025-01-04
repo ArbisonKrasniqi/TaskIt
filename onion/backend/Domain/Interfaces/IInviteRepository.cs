@@ -5,7 +5,7 @@ namespace Domain.Interfaces;
 public interface IInviteRepository
 {
     Task<IEnumerable<Invite>> GetInvites(
-        string inviteId = null,
+        int? inviteId = null,
         int? workspaceId = null,
         string inviterId = null,
         string inviteeId = null,

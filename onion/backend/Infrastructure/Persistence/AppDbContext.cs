@@ -12,6 +12,10 @@ public class AppDbContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<Tasks> Tasks { get; set; }
     
+    public DbSet<Workspace> Workspaces { get; set; }
+    public DbSet<Invite> Invites { get; set; }
+    public DbSet<Members> Members { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
