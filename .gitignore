@@ -19,3 +19,9 @@ onion/frontend/node_modules/
 /onion/backend/Infrastructure/obj
 /onion/backend/Startup/obj
 /onion/backend/UI/obj
+
+/onion/backend/Application/bin
+/onion/backend/Domain/bin
+/onion/backend/Infrastructure/bin
+/onion/backend/Startup/bin
+/onion/backend/UI/bin

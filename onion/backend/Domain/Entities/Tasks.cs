@@ -34,7 +34,7 @@ public class Tasks
         TaskId = taskId;
         Index = index;
         Title = title;
-        Description = Description;
+        Description = description;
         DateCreated = dateCreated;
         DueDate = dueDate;
         ListId = listId;

@@ -1,11 +1,12 @@
+using Application.Dtos.TokenDtos;
 using Application.Dtos.UserDtos;
 
 namespace Application.Services.User;
 
 public interface IUserService
 {
-    //Task<RefreshTokenDto> Register(RegisterDto registerDto);
-    //Task<RefreshTokenDto> Login(LoginDto loginDto);
+    Task<GetUserDto> Register(RegisterDto registerDto);
+    Task<RefreshTokenDto> Login(LoginDto loginDto);
     Task<List<GetUserDto>> GetAllUsers();
     Task<GetUserDto> GetUserById(string userId);
     Task<GetUserDto> GetUserByEmail(string email);

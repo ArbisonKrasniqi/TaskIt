@@ -53,7 +53,7 @@ public class UserRepository : IUserRepository
 
     public async Task<User> UpdateUser(User user)
     {
-        var existingUser = await _context.Users.FindAsync(user.Id);
+        var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == user.Id);
 
         if (existingUser == null)
             throw new Exception("User not found");
