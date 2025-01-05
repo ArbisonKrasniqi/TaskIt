@@ -11,6 +11,8 @@ public class AppDbContext : DbContext
     
     public DbSet<User> Users { get; set; }
     public DbSet<Tasks> Tasks { get; set; }
+    public DbSet<Board> Boards { get; set; }
+    public DbSet<StarredBoard> StarredBoards { get; set; }
     
     protected override void OnModelCreating(ModelBuilder builder)
     {
