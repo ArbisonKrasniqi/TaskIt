@@ -94,14 +94,16 @@ public class UserService : IUserService
 
     public async Task<List<UserInfoDto>> SearchUsers(string query)
     {
-        //SOSHT EFFICIENT AMO KRYN PUN MA MIR MOS ME NDRRU REPOSITORY
+        //SOSHT EFIKASE HIQ AMO KRYN PUN MA MIR MOS ME NDRRU REPOSITORY
         var usersFromSearch1 = await _userRepository.GetUsers(firstName: query, isDeleted:false);
         var usersFromSearch2 = await _userRepository.GetUsers(lastName: query, isDeleted:false);
         var usersFromSearch3 = await _userRepository.GetUsers(email: query, isDeleted:false);
         
+        //Boji 3 listat bashk edhe hiq duplikatet
         var allUsers = usersFromSearch1.Concat(usersFromSearch2).Concat(usersFromSearch3);
         var distinctUsers = allUsers.GroupBy(u => u.Id).Select(g => g.First());
 
+        //Kthe secilin user ne DTO
         var userInfoList = new List<UserInfoDto>();
         foreach (var user in distinctUsers)
         {
@@ -111,42 +113,75 @@ public class UserService : IUserService
         return userInfoList;
     }
 
-    public async Task<GetUserDto> EditUser(UserInfoDto userInfoDto)
+    public async Task<GetUserDto> EditUser(EditUserInfoDto editUserInfoDto)
     {
-        var users = await _userRepository.GetUsers(userId: userInfoDto.Id);
+        var users = await _userRepository.GetUsers(userId: editUserInfoDto.Id);
         var user = users.FirstOrDefault();
         if (user == null) throw new Exception("User not found");
         if (user.IsDeleted) throw new Exception("User is deleted");
 
-        var emailUsers = await _userRepository.GetUsers(email: userInfoDto.Email);
+        var emailUsers = await _userRepository.GetUsers(email: editUserInfoDto.Email);
         var emailUser = emailUsers.FirstOrDefault();
         if (emailUser != null) throw new Exception("New email already in use");
         
-        user.FirstName = userInfoDto.FirstName;
-        user.LastName = userInfoDto.LastName;
-        user.Email = userInfoDto.Email;
+        user.FirstName = editUserInfoDto.FirstName;
+        user.LastName = editUserInfoDto.LastName;
+        user.Email = editUserInfoDto.Email;
         
         var updatedUser = await _userRepository.UpdateUser(user);
         return new GetUserDto(updatedUser);
     }
 
-    public Task<GetUserDto> UpdatePassword(EditUserPasswordDto editUserPasswordDto)
+    public async Task<GetUserDto> UpdatePassword(EditUserPasswordDto editUserPasswordDto)
     {
-        throw new NotImplementedException();
+        var users = await _userRepository.GetUsers(userId: editUserPasswordDto.Id);
+        var user = users.FirstOrDefault();
+        if (user == null) throw new Exception("User not found");
+
+        var newHash = _utilityService.GenerateHash(editUserPasswordDto.Password);
+        user.PasswordHash = newHash;
+
+        var updatedUser = await _userRepository.UpdateUser(user);
+        return new GetUserDto(updatedUser);
     }
 
-    public Task<GetUserDto> ChangePassword(ChangeUserPasswordDto changeUserPasswordDto)
+    public async Task<GetUserDto> ChangePassword(ChangeUserPasswordDto changeUserPasswordDto)
     {
-        throw new NotImplementedException();
+        var users = await _userRepository.GetUsers(userId: changeUserPasswordDto.Id);
+        var user = users.FirstOrDefault();
+        if (user == null) throw new Exception("User not found");
+        
+        var passwordValid = _utilityService.VerifyHash(changeUserPasswordDto.OldPassword, user.PasswordHash);
+        if (!passwordValid) throw new Exception("Old password is incorrect");
+        
+        var newHash = _utilityService.GenerateHash(changeUserPasswordDto.Password);
+        user.PasswordHash = newHash;
+
+        var updatedUser = await _userRepository.UpdateUser(user);
+        return new GetUserDto(updatedUser);
     }
 
-    public Task<GetUserDto> UpdateRole(EditUserRoleDto editUserRoleDto)
+    public async Task<GetUserDto> UpdateRole(EditUserRoleDto editUserRoleDto)
     {
-        throw new NotImplementedException();
+        var users = await _userRepository.GetUsers(userId: editUserRoleDto.Id);
+        var user = users.FirstOrDefault();
+        if (user == null) throw new Exception("User not found");
+        
+        user.Role = editUserRoleDto.IsAdmin ? "Admin" : "User";
+
+        var updatedUser = await _userRepository.UpdateUser(user);
+        return new GetUserDto(updatedUser);
     }
 
-    public Task<GetUserDto> DeleteUser(UserIdDto userIdDto)
+    public async Task<GetUserDto> DeleteUser(UserIdDto userIdDto)
     {
-        throw new NotImplementedException();
+        var users = await _userRepository.GetUsers(userId: userIdDto.Id);
+        var user = users.FirstOrDefault();
+        if (user == null) throw new Exception("User not found");
+
+        user.IsDeleted = !user.IsDeleted;
+        var updatedUser = await _userRepository.UpdateUser(user);
+        
+        return new GetUserDto(updatedUser);
     }
 }

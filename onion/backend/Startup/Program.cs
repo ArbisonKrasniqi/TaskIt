@@ -82,6 +82,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("AdminOnly", policy => policy.RequireClaim("Role", "Admin"));
     //[Authorize(Policy = "AdminOnly")]
 });
+builder.Services.AddHttpContextAccessor();
 
 //Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
