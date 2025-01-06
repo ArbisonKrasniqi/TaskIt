@@ -12,9 +12,9 @@ public class Board
     public DateTime DateCreated { get; set; }
     
     //Navigation
-    //public Workspace Workspace { get; set; }
-    //public List<List> Lists { get; set; }
-    //public List<StarredBoard> StarredBoards { get; set; }
+    public Workspace Workspace { get; set; }
+    public List<List> Lists { get; set; }
+    public List<StarredBoard> StarredBoards { get; set; }
     
     public Board(){}
 

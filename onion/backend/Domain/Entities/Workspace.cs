@@ -14,11 +14,11 @@ public class Workspace
     //Navigation
     public User User { get; set; }
     
-    // public List<Board> Boards { get; set; }
+    public List<Board> Boards { get; set; }
     public List<Members> Members { get; set; }
     public List<Invite> Invites { get; set; }
-    // public List<WorkspaceActivity> Activity { get; set; }
-    // public List<StarredBoard> StarredBoards {get; set;}
+    public List<WorkspaceActivity> Activity { get; set; }
+    public List<StarredBoard> StarredBoards {get; set;}
 
     //Constructors
     public Workspace() { }

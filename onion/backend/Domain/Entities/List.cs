@@ -11,7 +11,8 @@ public class List
     public DateTime DateCreated { get; set; } 
     public int BoardId { get; set; }
     
-    //public List<Tasks> Tasks { get; set; } = new List<Tasks>();
+    public Board Board { get; set; } = null;
+    public List<Tasks> Tasks { get; set; } = new List<Tasks>();
     
     public List(){}
 }

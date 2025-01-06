@@ -15,8 +15,8 @@ public class Tasks
     public int ListId { get; set; }
 
     //Navigation
-    // public List List { get; set; }
-    // public List<Comment> Comments { get; set; } = new List<Comment>();
+    public List List { get; set; }
+    public List<Comment> Comments { get; set; } = new List<Comment>();
     
     //Constructors
     public Tasks(){}

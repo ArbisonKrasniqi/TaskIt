@@ -12,8 +12,8 @@ public class WorkspaceActivity
     public string EntityName { get; set; } // "Bordi" "Workspace"
     public DateTime ActionDate { get; set; }
     
-    // public Workspace Workspace { get; set; }
-    // public User User { get; set; }
+    public Workspace Workspace { get; set; }
+    public User User { get; set; }
     
     public WorkspaceActivity(){}
 }
