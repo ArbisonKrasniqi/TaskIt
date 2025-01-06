@@ -11,6 +11,9 @@ public class AppDbContext : DbContext
     
     public DbSet<User> Users { get; set; }
     public DbSet<Tasks> Tasks { get; set; }
+    public DbSet<List> Lists { get; set; }
+    public DbSet<Comment> Comments { get; set; }
+    public DbSet<WorkspaceActivity> WorkspaceActivities { get; set; }
     
     protected override void OnModelCreating(ModelBuilder builder)
     {
