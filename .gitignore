@@ -10,6 +10,7 @@
 onion/backend/obj/
 onion/backend/bin/
 onion/backend/appsettings.json
+onion/backend/Infrastructure/infrastructureSettings.json
 onion/backend/.idea/
 onion/backend/Migrations/
 onion/frontend/node_modules/
