@@ -14,7 +14,8 @@ public class AppDbContext : DbContext
     public DbSet<List> Lists { get; set; }
     public DbSet<Comment> Comments { get; set; }
     public DbSet<WorkspaceActivity> WorkspaceActivities { get; set; }
-    
+    public DbSet<Board> Boards { get; set; }
+    public DbSet<StarredBoard> StarredBoards { get; set; }
     public DbSet<Workspace> Workspaces { get; set; }
     public DbSet<Invite> Invites { get; set; }
     public DbSet<Members> Members { get; set; }
