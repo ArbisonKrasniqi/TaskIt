@@ -1,0 +1,7 @@
+{
+  "JWT": {
+    "Issuer": "http://localhost:5127/",
+    "Audience": "http://localhost:5127/",
+    "SigningKey": "2V3DXp7SYRyNM64MjNnQzHJxy1nGFdiK2gKPQgqiLm82V3DXp7SYRyNM64MjNnQzHJxy1nGFdiK2gKPQgqiLm8="
+  }
+}

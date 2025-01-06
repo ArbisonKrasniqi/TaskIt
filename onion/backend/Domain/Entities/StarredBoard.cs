@@ -11,9 +11,9 @@ public class StarredBoard
     public int WorkspaceId { get; set; }
     
     //Navigation
-    //public Board Board { get; set; }
-    //public Uset User { get; set; }
-    //public Workspace Workspace { get; set; }
+    public Board Board { get; set; }
+    public User User { get; set; }
+    public Workspace Workspace { get; set; }
     
     public StarredBoard(){}
 

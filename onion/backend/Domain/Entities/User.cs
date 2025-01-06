@@ -17,12 +17,12 @@ public class User
     public string RefreshToken { get; set; }
     
     //Navigation
-    // public List<Workspace> Workspaces { get; set; } = new List<Workspace>();
-    // public List<Comment> Comments { get; set; } = new List<Comment>();
-    // public List<WorkspaceActivity> Activity { get; set; } = new List<WorkspaceActivity>();
-    // public List<Invite> SentInvites { get; set; } = new List<Invite>();
-    // public List<Invite> ReceivedInvites { get; set; } = new List<Invite>();
-    // public List<StarredBoard> StarredBoards { get; set; } = new List<StarredBoard>();
+    public List<Workspace> Workspaces { get; set; } = new List<Workspace>();
+    public List<Comment> Comments { get; set; } = new List<Comment>();
+    public List<WorkspaceActivity> Activity { get; set; } = new List<WorkspaceActivity>();
+    public List<Invite> SentInvites { get; set; } = new List<Invite>();
+    public List<Invite> ReceivedInvites { get; set; } = new List<Invite>();
+    public List<StarredBoard> StarredBoards { get; set; } = new List<StarredBoard>();
     
     //Constructors
     public User(){}

@@ -15,8 +15,8 @@ public class Tasks
     public int ListId { get; set; }
 
     //Navigation
-    // public List List { get; set; }
-    // public List<Comment> Comments { get; set; } = new List<Comment>();
+    public List List { get; set; }
+    public List<Comment> Comments { get; set; } = new List<Comment>();
     
     //Constructors
     public Tasks(){}
@@ -34,7 +34,7 @@ public class Tasks
         TaskId = taskId;
         Index = index;
         Title = title;
-        Description = Description;
+        Description = description;
         DateCreated = dateCreated;
         DueDate = dueDate;
         ListId = listId;

@@ -9,6 +9,7 @@ public class UserInfoDto
     public string LastName { get; set; }
     public string Email { get; set; }
 
+    //Qiky construtor po paraqet problem ne UserController.cs
     public UserInfoDto(User user)
     {
         Id = user.Id;

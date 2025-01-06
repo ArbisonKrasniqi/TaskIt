@@ -29,7 +29,6 @@
     <ItemGroup>
       <Folder Include="DTOs\Members\" />
       <Folder Include="DTOs\Board\Output\" />
-      <Folder Include="Migrations\" />
     </ItemGroup>
 
 </Project>

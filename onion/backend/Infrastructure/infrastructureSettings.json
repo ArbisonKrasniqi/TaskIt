@@ -1,5 +1,0 @@
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Server=192.168.1.3,1433;Database=taskit_test;User Id=SA;Password=Password123!;TrustServerCertificate=True;"
-  }
-}
