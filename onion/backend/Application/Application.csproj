@@ -12,11 +12,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Factories\" />
-      <Folder Include="Handlers\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\Domain\Domain.csproj" />
     </ItemGroup>
 
