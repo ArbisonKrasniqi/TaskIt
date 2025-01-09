@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Application;
 using Application.Dtos.TokenDtos;
 using Application.Dtos.UserDtos;
 using Application.Services.Token;
@@ -17,20 +18,12 @@ public class UserController : ControllerBase
     private readonly IUserService _userService;
     private readonly ITokenService _tokenService;
     
-    //qito vin prej jwt kur e thirr API
-    private readonly string? _userId;
-    private readonly string? _userTokenRole;
-    
-    public UserController(IUserService userService, ITokenService tokenService, IHttpContextAccessor httpContextAccessor)
+    public UserController(IUserService userService, ITokenService tokenService, UserContext userContext)
     {
         _userService = userService;
         _tokenService = tokenService;
-        
-        //Merri te dhenat prej JWT
-        var user = httpContextAccessor.HttpContext?.User;
-        _userId = user?.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
-        _userTokenRole = user?.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
     }
+    
 
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterDto registerDto)
@@ -140,8 +133,7 @@ public class UserController : ControllerBase
         try
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            if (_userId != editUserInfoDto.Id && _userTokenRole != "Admin") return StatusCode(401, "You are not authorized");
-    
+            
             var user = await _userService.EditUser(editUserInfoDto);
     
             return Ok(user);
@@ -159,7 +151,6 @@ public class UserController : ControllerBase
         try
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            if (_userId != editUserPasswordDto.Id && _userTokenRole != "Admin") return StatusCode(401, "You are not authorized");
 
             var user = await _userService.UpdatePassword(editUserPasswordDto);
 
@@ -179,7 +170,6 @@ public class UserController : ControllerBase
         try
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            if (_userId != changeUserPasswordDto.Id && _userTokenRole != "Admin") return StatusCode(401, "You are not authorized");
 
             var user = await _userService.ChangePassword(changeUserPasswordDto);
 
