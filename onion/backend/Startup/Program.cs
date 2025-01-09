@@ -3,6 +3,7 @@ using Application.Services.Tasks;
 using Application.Services.Token;
 using Application.Services.User;
 using Application.Services.Utility;
+using Application.Services.Workspace;
 using Domain.Interfaces;
 using Infrastructure.Persistence;
 using Infrastructure.Repositories;
@@ -87,12 +88,15 @@ builder.Services.AddHttpContextAccessor();
 //Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITasksRepository, TasksRepository>();
-
+builder.Services.AddScoped<IWorkspaceRepository, WorkspaceRepository>();
+builder.Services.AddScoped<IInviteRepository, InviteRepository>();
+builder.Services.AddScoped<IMembersRepository, MembersRepository>(); 
 //Services
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<IUtilityService, UtilityService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IWorkspaceService, WorkspaceService>();
 
 var app = builder.Build();
 

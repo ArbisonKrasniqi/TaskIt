@@ -1,3 +1,5 @@
+using Domain.Entities;
+
 namespace Application.Dtos.InviteDtos;
 
 public class InviteInfoDto
@@ -10,13 +12,13 @@ public class InviteInfoDto
     public DateTime DateSent { get; set; }
     
     //Constructor
-    public InviteInfoDto(int inviteId, int workspaceId, string inviterId, string inviteeId, string inviteStatus, DateTime dateSent)
+    public InviteInfoDto(Invite invite)
     {
-        InviteId = inviteId;
-        WorkspaceId = workspaceId;
-        InviterId = inviterId;
-        InviteeId = inviteeId;
-        InviteStatus = inviteStatus;
-        DateSent = dateSent;
+        InviteId = invite.InviteId;
+        WorkspaceId = invite.WorkspaceId;
+        InviterId = invite.InviterId;
+        InviteeId = invite.InviteeId;
+        InviteStatus = invite.InviteStatus;
+        DateSent = invite.DateSent;
     }
 }
