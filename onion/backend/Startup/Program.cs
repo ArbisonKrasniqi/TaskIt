@@ -1,4 +1,6 @@
 using System.Reflection;
+using Application;
+using Application.Services.Comment;
 using Application.Services.Tasks;
 using Application.Services.Token;
 using Application.Services.User;
@@ -82,11 +84,20 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("AdminOnly", policy => policy.RequireClaim("Role", "Admin"));
     //[Authorize(Policy = "AdminOnly")]
 });
+builder.Services.AddScoped<UserContext>();
 builder.Services.AddHttpContextAccessor();
 
 //Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITasksRepository, TasksRepository>();
+builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+builder.Services.AddScoped<IListRepository, ListRepository>();
+builder.Services.AddScoped<IBoardRepository, BoardRepository>();
+builder.Services.AddScoped<IWorkspaceRepository, WorkspaceRepository>();
+builder.Services.AddScoped<IMembersRepository, MembersRepository>();
+builder.Services.AddScoped<IStarredBoardRepository, StarredBoardRepository>();
+builder.Services.AddScoped<IWorkspaceActivityRepository, WorkspaceActivityRepository>();
+builder.Services.AddScoped<IInviteRepository, InviteRepository>();
 
 //Services
 builder.Services.AddScoped<IUserService, UserService>();
@@ -95,6 +106,33 @@ builder.Services.AddScoped<IUtilityService, UtilityService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
 var app = builder.Build();
+
+app.Use(async (context, next) =>
+{
+    var userContext = context.RequestServices.GetRequiredService<UserContext>();
+    var httpContextAccessor = context.RequestServices.GetRequiredService<IHttpContextAccessor>();
+
+    var httpContext = httpContextAccessor.HttpContext;
+    if (httpContext != null && httpContext.Request.Headers.ContainsKey("Authorization"))
+    {
+        var authHeader = httpContext.Request.Headers["Authorization"].ToString();
+        if (authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+        {
+            var token = authHeader.Substring("Bearer ".Length).Trim();
+            // Decode JWT token and extract claims here (you can use a library like System.IdentityModel.Tokens.Jwt)
+            var handler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
+
+            // Assuming your JWT contains these claims
+            userContext.Id = jwtToken.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+            userContext.Name = jwtToken.Claims.FirstOrDefault(c => c.Type == "Name")?.Value;
+            userContext.Email = jwtToken.Claims.FirstOrDefault(c => c.Type == "Email")?.Value;
+            userContext.Role = jwtToken.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+        }
+    }
+
+    await next.Invoke();
+});
 
 if (app.Environment.IsDevelopment())
 {

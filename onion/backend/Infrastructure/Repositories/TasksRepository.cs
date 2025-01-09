@@ -1,6 +1,7 @@
 using Domain.Entities;
 using Domain.Interfaces;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories
 {
@@ -13,12 +14,28 @@ namespace Infrastructure.Repositories
             _context = context;
         }
 
-        public Task<IEnumerable<Tasks>> GetTasks(int? taskId = null, int? index = null, DateTime? dateCreated = null, DateTime? dueDate = null,
+        public async Task<IEnumerable<Tasks>> GetTasks(int? taskId = null, int? index = null, DateTime? dateCreated = null, DateTime? dueDate = null,
             int? listId = null, int? boardId = null, int? workspaceId = null)
         {
-            throw new NotImplementedException();
-            //Masi kerkon boardId dhe workspaceId duhet me i prit modelet tjera qe me mujt me i kthy tasks sipas board dhe workspace
-            //Logjika do tjet e njejt me UserRepository
+            // Start with all tasks
+            var query = _context.Tasks.AsQueryable();
+            
+            if (taskId.HasValue)
+                query = query.Where(t => t.TaskId == taskId);
+            if (index.HasValue)
+                query = query.Where(t => t.Index == index);
+            if (dateCreated.HasValue)
+                query = query.Where(t => t.DateCreated.Date == dateCreated.Value.Date);
+            if (dueDate.HasValue)
+                query = query.Where(t => t.DueDate.Date == dueDate.Value.Date);
+            if (listId.HasValue)
+                query = query.Where(t => t.ListId == listId);
+            if (boardId.HasValue)
+                query = query.Where(t => t.List.BoardId == boardId);
+            if (workspaceId.HasValue)
+                query = query.Where(t => t.List.Board.WorkspaceId == workspaceId);
+            
+            return await query.ToListAsync();
         }
 
         public async Task<Tasks> CreateTask(Tasks task)

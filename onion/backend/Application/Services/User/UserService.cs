@@ -13,12 +13,14 @@ public class UserService : IUserService
     private readonly IUserRepository _userRepository;
     private readonly IUtilityService _utilityService;
     private readonly ITokenService _tokenService;
+    private readonly UserContext _userContext;
 
-    public UserService(IUtilityService utilityService, IUserRepository userRepository, ITokenService tokenService)
+    public UserService(IUtilityService utilityService, IUserRepository userRepository, ITokenService tokenService, UserContext userContext)
     {
         _utilityService = utilityService;
         _userRepository = userRepository;
         _tokenService = tokenService;
+        _userContext = userContext;
     }
 
     public async Task<GetUserDto> Register(RegisterDto registerDto)
@@ -115,6 +117,8 @@ public class UserService : IUserService
 
     public async Task<GetUserDto> EditUser(EditUserInfoDto editUserInfoDto)
     {
+        if (_userContext.Id != editUserInfoDto.Id && _userContext.Role != "Admin") throw new Exception("You are not authorized");
+
         var users = await _userRepository.GetUsers(userId: editUserInfoDto.Id);
         var user = users.FirstOrDefault();
         if (user == null) throw new Exception("User not found");
@@ -134,6 +138,9 @@ public class UserService : IUserService
 
     public async Task<GetUserDto> UpdatePassword(EditUserPasswordDto editUserPasswordDto)
     {
+        
+        if (_userContext.Id != editUserPasswordDto.Id && _userContext.Role != "Admin") throw new Exception ("You are not authorized");
+        
         var users = await _userRepository.GetUsers(userId: editUserPasswordDto.Id);
         var user = users.FirstOrDefault();
         if (user == null) throw new Exception("User not found");
@@ -147,6 +154,8 @@ public class UserService : IUserService
 
     public async Task<GetUserDto> ChangePassword(ChangeUserPasswordDto changeUserPasswordDto)
     {
+        if (_userContext.Id != changeUserPasswordDto.Id && _userContext.Role != "Admin") throw new Exception( "You are not authorized");
+        
         var users = await _userRepository.GetUsers(userId: changeUserPasswordDto.Id);
         var user = users.FirstOrDefault();
         if (user == null) throw new Exception("User not found");
