@@ -1,10 +1,12 @@
 using System.Reflection;
 using Application;
 using Application.Services.Comment;
+using Application.Services.List;
 using Application.Services.Tasks;
 using Application.Services.Token;
 using Application.Services.User;
 using Application.Services.Utility;
+using Application.Services.WorkspaceActivity;
 using Domain.Interfaces;
 using Infrastructure.Persistence;
 using Infrastructure.Repositories;
@@ -104,6 +106,9 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<IUtilityService, UtilityService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IListService, ListService>();
+builder.Services.AddScoped<ICommentService, CommentService>();
+builder.Services.AddScoped<IWorkspaceActivityService, WorkspaceActivityService>();
 
 var app = builder.Build();
 
