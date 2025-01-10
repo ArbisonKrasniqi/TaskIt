@@ -1,4 +1,5 @@
 using Application.Dtos.TasksDtos;
+using Application.Handlers;
 using Domain.Interfaces;
 
 namespace Application.Services.Tasks;
@@ -7,11 +8,13 @@ public class TaskService : ITaskService
 {
     private readonly ITasksRepository _tasksRepository;
     private readonly IListRepository _listRepository;
+    private readonly ITaskDeleteHandler _deleteHandler;
 
-    public TaskService(ITasksRepository tasksRepository, IListRepository listRepository)
+    public TaskService(ITasksRepository tasksRepository, IListRepository listRepository, ITaskDeleteHandler deleteHandler)
     {
         _tasksRepository = tasksRepository;
         _listRepository = listRepository;
+        _deleteHandler = deleteHandler;
     }
     public async Task<List<TaskDto>> GetAllTasks()
     {
@@ -90,7 +93,14 @@ public class TaskService : ITaskService
 
     public async Task<TaskDto> DeleteTask(TaskIdDto taskIdDto)
     {
-        throw new NotImplementedException();
+        var task = (await _tasksRepository.GetTasks(taskId: taskIdDto.TaskId)).FirstOrDefault();
+        if (task == null) throw new Exception("Task not found");
+        
+        await _deleteHandler.HandleDeleteRequest(task.TaskId);
+        
+        //Create workspace activity
+
+        return new TaskDto(task);
     }
 
     public async Task<TaskDto> CreateTask(CreateTaskDto createTaskDto)
@@ -106,7 +116,9 @@ public class TaskService : ITaskService
                                                 createTaskDto.Title,
                                                 DateTime.Now,
                                                 createTaskDto.ListId);
+        
         //CREATE NEW ACTIVITY
+        
         return new TaskDto(newTask);
     }
 
