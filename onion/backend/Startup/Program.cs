@@ -1,7 +1,11 @@
 using System.Reflection;
 using Application;
 using Application.Handlers;
+using Application.Handlers.Board;
+using Application.Handlers.StarredBoard;
+using Application.Services;
 using Application.Services.Comment;
+using Application.Services.StarredBoard;
 using Application.Services.Tasks;
 using Application.Services.Token;
 using Application.Services.User;
@@ -105,9 +109,13 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<IUtilityService, UtilityService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IBoardService, BoardService>();
+builder.Services.AddScoped<IStarredBoardService, StarredBoardService>();
 
 //DeleteHandlers
 builder.Services.AddScoped<ITaskDeleteHandler, TaskDeleteHandler>();
+builder.Services.AddScoped<IBoardDeleteHandler, BoardDeleteHandler>();
+builder.Services.AddScoped<IStarredBoardDeleteHandler, StarredBoardDeleteHandler>();
 
 var app = builder.Build();
 
