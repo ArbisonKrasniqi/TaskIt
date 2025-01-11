@@ -1,5 +1,6 @@
 using System.Reflection;
 using Application;
+using Application.Handlers;
 using Application.Services.Comment;
 using Application.Services.Tasks;
 using Application.Services.Token;
@@ -106,6 +107,9 @@ builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<IUtilityService, UtilityService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IWorkspaceService, WorkspaceService>();
+
+//DeleteHandlers
+builder.Services.AddScoped<ITaskDeleteHandler, TaskDeleteHandler>();
 
 var app = builder.Build();
 
