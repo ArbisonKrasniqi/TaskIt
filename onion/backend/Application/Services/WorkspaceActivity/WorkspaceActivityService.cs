@@ -12,8 +12,16 @@ public class WorkspaceActivityService : IWorkspaceActivityService
         _workspaceActivityRepo = workspaceActivityRepo;
     }
 
-    public Task<List<WorkspaceActivityDto>> GetActivityByWorkspaceId(int workspaceId)
+    public async Task<List<WorkspaceActivityDto>> GetActivityByWorkspaceId(int workspaceId)
     {
-        throw new NotImplementedException();
+        var workspaceActivities = await _workspaceActivityRepo.GetWorkspaceActivity(workspaceId: workspaceId);
+
+        var workspaceActivityDtos = new List<WorkspaceActivityDto>();
+        foreach (var workspaceActivity in workspaceActivities)
+        {
+            workspaceActivityDtos.Add(new WorkspaceActivityDto(workspaceActivity));
+        }
+
+        return workspaceActivityDtos;
     }
 }

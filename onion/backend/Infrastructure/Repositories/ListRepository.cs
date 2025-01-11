@@ -19,7 +19,7 @@ public class ListRepository : IListRepository
         var query = _context.Lists.AsQueryable();
         
         if(listId.HasValue)
-            query = query.Where(L=>L.ListId==listId);
+            query = query.Where(l=>l.ListId==listId);
         if (index.HasValue)
             query = query.Where(l => l.Index == index);
         if (boardId.HasValue)
