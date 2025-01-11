@@ -1,14 +1,16 @@
 using Application.Dtos.WorkspaceDtos;
+using Application.Handlers.Workspace;
 using Domain.Interfaces;
 namespace Application.Services.Workspace;
 
 public class WorkspaceService : IWorkspaceService
 {
     private readonly IWorkspaceRepository _workspaceRepository;
-
-    public WorkspaceService(IWorkspaceRepository workspaceRepository)
+    private readonly IWorkspaceDeleteHandler _workspaceDeleteHandler;
+    public WorkspaceService(IWorkspaceRepository workspaceRepository, IWorkspaceDeleteHandler workspaceDeleteHandler)
     {
         _workspaceRepository = workspaceRepository;
+        _workspaceDeleteHandler = workspaceDeleteHandler;
     }
 
     public async Task<List<WorkspaceDto>> GetAllWorkspaces()
@@ -63,19 +65,18 @@ public class WorkspaceService : IWorkspaceService
         var workspace = workspaces.FirstOrDefault();
         if (workspace == null)
             throw new Exception("Workspace not found");
-        _workspaceRepository.UpdateWorkspace(workspace);
+        await _workspaceRepository.UpdateWorkspace(workspace);
         return new WorkspaceDto(workspace);
 
     }
 
     public async Task<WorkspaceDto> DeleteWorkspace(WorkspaceIdDto workspaceIdDto)
     {
-        var workspaces = await _workspaceRepository.GetWorkspaces(workspaceId: workspaceIdDto.WorkspaceId);
-        var workspace = workspaces.FirstOrDefault();
+        var workspace = (await _workspaceRepository.GetWorkspaces(workspaceId: workspaceIdDto.WorkspaceId)).FirstOrDefault();
         if (workspace == null)
             throw new Exception("Workspace not found");
 
-        _workspaceRepository.DeleteWorkspace(workspaceIdDto.WorkspaceId);
+        await _workspaceDeleteHandler.HandleDeleteRequest(workspace.WorkspaceId);
         
         return new WorkspaceDto(workspace);
     }

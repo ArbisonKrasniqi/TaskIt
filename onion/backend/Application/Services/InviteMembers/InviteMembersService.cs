@@ -1,5 +1,7 @@
 using Application.Dtos.InviteDtos;
 using Application.Dtos.MembersDtos;
+using Application.Handlers.Invite;
+using Application.Handlers.Members;
 using Domain.Interfaces;
 
 namespace Application.Services.InviteMembers;
@@ -9,11 +11,15 @@ public class InviteMembersService: IInviteMembesService
 
     private readonly IInviteRepository _inviteRepository;
     private readonly IMembersRepository _membersRepository;
-
-    public InviteMembersService(IInviteRepository inviteRepository, IMembersRepository membersRepository)
+    private readonly IInviteDeleteHandler _inviteDeleteHandler;
+    private readonly IMembersDeleteHandler _membersDeleteHandler;
+    public InviteMembersService(IInviteRepository inviteRepository, IMembersRepository membersRepository,
+        IInviteDeleteHandler inviteDeleteHandler, IMembersDeleteHandler membersDeleteHandler)
     {
         _inviteRepository = inviteRepository;
         _membersRepository = membersRepository;
+        _inviteDeleteHandler = inviteDeleteHandler;
+        _membersDeleteHandler = membersDeleteHandler;
     }
     
     public async Task<List<InviteInfoDto>> GetAllInvites()
@@ -66,7 +72,7 @@ public class InviteMembersService: IInviteMembesService
         var invite = invites.FirstOrDefault();
         if (invite == null)
             throw new Exception("Invite not found");
-        _inviteRepository.UpdateInvite(invite);
+        await _inviteRepository.UpdateInvite(invite);
         return new InviteInfoDto(invite);
     }
 
@@ -76,18 +82,17 @@ public class InviteMembersService: IInviteMembesService
         var invite = invites.FirstOrDefault();
         if (invite == null)
             throw new Exception("Invite not found");
-        _inviteRepository.UpdateInvite(invite);
+       await _inviteRepository.UpdateInvite(invite);
         return new InviteInfoDto(invite);
     }
 
     public async Task<InviteInfoDto> DeleteInviteById(InviteIdDto inviteIdDto)
     {
-        var invites = await _inviteRepository.GetInvites(inviteId: inviteIdDto.InviteId);
-        var invite = invites.FirstOrDefault();
+        var invite = (await _inviteRepository.GetInvites(inviteId: inviteIdDto.InviteId)).FirstOrDefault();
         if (invite == null)
             throw new Exception("Invite not found");
 
-        _inviteRepository.DeleteInvite(inviteIdDto.InviteId);
+        await _inviteDeleteHandler.HandleDeleteRequest(invite.InviteId);
         
         return new InviteInfoDto(invite);
     }
@@ -122,22 +127,23 @@ public class InviteMembersService: IInviteMembesService
         var member = members.FirstOrDefault();
         if (member == null)
             throw new Exception("Member not found");
-        _membersRepository.UpdateMember(member);
+        await _membersRepository.UpdateMember(member);
         return new MemberDto(member);
     }
 
     public Task<MemberDto> RemoveMember(RemoveMemberDto removeMemberDto)
     {
-        throw new NotImplementedException();
+       var workspace = await 
     }
 
     public async Task<MemberDto> DeleteMember(MemberIdDto memberIdDto)
     {
-        var members = await _membersRepository.GetMembers(memberId: memberIdDto.MemberId);
-        var member = members.FirstOrDefault();
+        var member = (await _membersRepository.GetMembers(memberId: memberIdDto.MemberId)).FirstOrDefault();
         if (member == null)
             throw new Exception("Member not found");
-        _membersRepository.DeleteMember(memberIdDto.MemberId);
+
+        await _membersDeleteHandler.HandleDeleteRequest(member.MemberId);
+        
         return new MemberDto(member);
     }
 }
