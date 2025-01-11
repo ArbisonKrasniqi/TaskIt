@@ -1,5 +1,6 @@
 ﻿using Application.Dtos.CommentDtos;
 using Application.Dtos.ListDtos;
+using Application.Handlers.Comment;
 using Domain.Interfaces;
 
 namespace Application.Services.Comment;
@@ -9,12 +10,14 @@ public class CommentService : ICommentService
     private readonly ICommentRepository _commentRepo;
     private readonly ITasksRepository _tasksRepo;
     private readonly UserContext _userContext;
+    private readonly ICommentDeleteHandler _deleteHandler;
 
-    public CommentService(ICommentRepository commentRepo, ITasksRepository tasksRepo,UserContext userContext)
+    public CommentService(ICommentRepository commentRepo, ITasksRepository tasksRepo,UserContext userContext, ICommentDeleteHandler deleteHandler)
     {
         _commentRepo = commentRepo;
         _tasksRepo = tasksRepo;
         _userContext = userContext;
+        _deleteHandler = deleteHandler;
     }
 
     public async Task<List<CommentDto>> GetAllComments()
@@ -88,14 +91,13 @@ public class CommentService : ICommentService
 
     public async Task<CommentDto> DeleteComment(CommentIdDto commentIdDto)
     {
-        var comments = await _commentRepo.GetComments(commentId: commentIdDto.CommentId);
-        var comment = comments.FirstOrDefault();
+        var comment = (await _commentRepo.GetComments(commentId: commentIdDto.CommentId)).FirstOrDefault();
         if (comment == null)
         {
             throw new Exception("Comment not found");
         }
 
-        await _commentRepo.DeleteComment(commentIdDto.CommentId);
+        await _deleteHandler.HandleDeleteRequest(comment.CommentId);
         return new CommentDto(comment);
     }
 

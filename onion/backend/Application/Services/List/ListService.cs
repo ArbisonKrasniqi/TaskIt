@@ -1,4 +1,5 @@
 ﻿using Application.Dtos.ListDtos;
+using Application.Handlers.List;
 using Application.Services.Token;
 using Domain.Interfaces;
 
@@ -9,12 +10,14 @@ public class ListService : IListService
     private readonly IListRepository _listRepo;
     private readonly IBoardRepository _boardRepo;
     private readonly UserContext _userContext;
+    private readonly IListDeleteHandler _deleteHandler;
 
-    public ListService(IListRepository listRepo, IBoardRepository boardRepo,UserContext userContext)
+    public ListService(IListRepository listRepo, IBoardRepository boardRepo,UserContext userContext, IListDeleteHandler deleteHandler)
     {
         _listRepo = listRepo;
         _boardRepo = boardRepo;
         _userContext = userContext;
+        _deleteHandler = deleteHandler;
     }
 
     public async Task<List<ListDto>> GetAllLists()
@@ -83,14 +86,13 @@ public class ListService : IListService
 
     public async Task<ListDto> DeleteList(ListIdDto listIdDto)
     {
-        var lists = await _listRepo.GetLists(listId: listIdDto.ListId);
-        var list = lists.FirstOrDefault();
+        var list = (await _listRepo.GetLists(listId: listIdDto.ListId)).FirstOrDefault();
         if (list == null)
         {
             throw new Exception("List not found");
         }
 
-        await _listRepo.DeleteList(listIdDto.ListId);
+        await _deleteHandler.HandleDeleteRequest(list.ListId);
         return new ListDto(list);
     }
 
