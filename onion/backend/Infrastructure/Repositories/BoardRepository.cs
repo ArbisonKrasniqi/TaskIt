@@ -16,7 +16,11 @@ public class BoardRepository : IBoardRepository
 
     public async Task<IEnumerable<Board>> GetBoards(int? boardId = null, int? workspaceId = null, bool? isClosed = null)
     {
-        var query = _context.Boards.AsQueryable();
+        var query = _context.Boards
+            .Include(b => b.Lists)
+            .Include(b => b.StarredBoards)
+            .Include(b => b.Workspace)
+            .AsQueryable();
 
         if (boardId.HasValue)
             query = query.Where(b => b.BoardId == boardId);

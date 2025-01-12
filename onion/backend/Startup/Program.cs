@@ -11,6 +11,7 @@ using Application.Handlers.Workspace;
 using Application.Handlers.WorkspaceActivity;
 using Application.Services;
 using Application.Services.Authorization;
+using Application.Services.Board;
 using Application.Services.Comment;
 using Application.Services.InviteMembers;
 using Application.Services.List;

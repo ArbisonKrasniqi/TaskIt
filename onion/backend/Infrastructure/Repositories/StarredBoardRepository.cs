@@ -15,7 +15,11 @@ public class StarredBoardRepository : IStarredBoardRepository
     }
     public async Task<IEnumerable<StarredBoard>> GetStarredBoards(int? starredBoardId = null, int? boardId = null, string? userId = null, int? workspaceId = null)
     {
-        var query = _context.StarredBoards.AsQueryable();
+        var query = _context.StarredBoards
+            .Include(s => s.Workspace)
+            .Include(s => s.Board)
+            .Include(s => s.User)
+            .AsQueryable();
 
         if (starredBoardId.HasValue)
             query = query.Where(s => s.StarredBoardId == starredBoardId);

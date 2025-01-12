@@ -3,7 +3,7 @@ using Application.Handlers.Board;
 using Application.Services.Authorization;
 using Domain.Interfaces;
 
-namespace Application.Services;
+namespace Application.Services.Board;
 
 public class BoardService : IBoardService
 {
@@ -11,14 +11,16 @@ public class BoardService : IBoardService
     private readonly IBoardDeleteHandler _boardDeleteHandler;
     private readonly UserContext _userContext;
     private readonly IAuthorizationService _authorizationService;
+    private readonly IWorkspaceActivityRepository _workspaceActivityRepository;
 
 
-    public BoardService(IBoardRepository boardRepository, IBoardDeleteHandler boardDeleteHandler, IAuthorizationService authorizationService, UserContext userContext)
+    public BoardService(IBoardRepository boardRepository, IBoardDeleteHandler boardDeleteHandler, IAuthorizationService authorizationService, UserContext userContext, IWorkspaceActivityRepository workspaceActivityRepository)
     {
         _boardRepository = boardRepository;
         _boardDeleteHandler = boardDeleteHandler;
         _authorizationService = authorizationService;
         _userContext = userContext;
+        _workspaceActivityRepository = workspaceActivityRepository;
     }
     
     public async Task<List<BoardDto>> GetAllBoards()
@@ -92,6 +94,14 @@ public class BoardService : IBoardService
             DateTime.Now);
 
         var addedBoard = await _boardRepository.CreateBoard(newBoard);
+        
+        var newActivity = new Domain.Entities.WorkspaceActivity(addedBoard.WorkspaceId,
+            _userContext.Id,
+            "Created",
+            addedBoard.Title,
+            DateTime.Now);
+        await _workspaceActivityRepository.CreateWorkspaceActivity(newActivity);
+        
         return new BoardDto(addedBoard);
 
     }
@@ -112,6 +122,13 @@ public class BoardService : IBoardService
         board.Title = updateBoardDto.Title;
 
         var updatedBoard = await _boardRepository.UpdateBoard(board);
+        
+        var newActivity = new Domain.Entities.WorkspaceActivity(updateBoardDto.WorkspaceId,
+            _userContext.Id,
+            "Updated",
+            updateBoardDto.Title,
+            DateTime.Now);
+        await _workspaceActivityRepository.CreateWorkspaceActivity(newActivity);
 
         return new BoardDto(updatedBoard);
     }
@@ -132,6 +149,13 @@ public class BoardService : IBoardService
         board.IsClosed = true;
 
         var closedBoard = await _boardRepository.UpdateBoard(board);
+        
+        var newActivity = new Domain.Entities.WorkspaceActivity(closedBoard.WorkspaceId,
+            _userContext.Id,
+            "Closed",
+            closedBoard.Title,
+            DateTime.Now);
+        await _workspaceActivityRepository.CreateWorkspaceActivity(newActivity);
 
         return new BoardDto(closedBoard);
     }
@@ -152,6 +176,13 @@ public class BoardService : IBoardService
         board.IsClosed = false;
 
         var openedBoard = await _boardRepository.UpdateBoard(board);
+        
+        var newActivity = new Domain.Entities.WorkspaceActivity(openedBoard.WorkspaceId,
+            _userContext.Id,
+            "Opened",
+            openedBoard.Title,
+            DateTime.Now);
+        await _workspaceActivityRepository.CreateWorkspaceActivity(newActivity);
 
         return new BoardDto(openedBoard);
     }
@@ -168,6 +199,13 @@ public class BoardService : IBoardService
             throw new Exception("Board not found");
 
         await _boardDeleteHandler.HandleDeleteRequest(board.BoardId);
+        
+        var newActivity = new Domain.Entities.WorkspaceActivity(board.WorkspaceId,
+            _userContext.Id,
+            "Deleted",
+            board.Title,
+            DateTime.Now);
+        await _workspaceActivityRepository.CreateWorkspaceActivity(newActivity);
 
         return new BoardDto(board);
     }
