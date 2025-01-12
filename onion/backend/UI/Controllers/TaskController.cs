@@ -40,9 +40,6 @@ public class TaskController : ControllerBase
     {
         try
         {
-            //Check if user has access to task
-            //AuthenticationService
-            
             if (Int32.IsNegative(taskId)) return BadRequest("Task Id is invalid");
 
             var task = await _taskService.GetTaskById(taskId);
@@ -61,9 +58,6 @@ public class TaskController : ControllerBase
     {
         try
         {
-            //Check if user has access to workspace
-            //AuthenticationService
-        
             if (Int32.IsNegative(workspaceId)) return BadRequest("Workspace Id is invalid");
 
             var tasks = await _taskService.GetTasksByWorkspaceId(workspaceId);
@@ -82,9 +76,6 @@ public class TaskController : ControllerBase
     {
         try
         {
-            //Check if user has access to board
-            //AuthenticationService
-        
             if (Int32.IsNegative(boardId)) return BadRequest("Board Id is invalid");
 
             var tasks = await _taskService.GetTasksByBoardId(boardId);
@@ -103,9 +94,6 @@ public class TaskController : ControllerBase
     {
         try
         {
-            //Check if user has access to list
-            //AuthenticationService
-            
             if (Int32.IsNegative(listId)) return BadRequest("List Id is invalid");
 
             var tasks = await _taskService.GetTasksByListId(listId);
@@ -176,5 +164,24 @@ public class TaskController : ControllerBase
         {
             return StatusCode(500, e.Message);
         }
+    }
+
+    [Authorize(AuthenticationSchemes = "Bearear")]
+    [HttpPut("DragNDropTask")]
+    public async Task<IActionResult> DragNDropTask(DragNDropTaskDto dragNDropTaskDto)
+    {
+        try
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var task = await _taskService.DragNDropTask(dragNDropTaskDto);
+
+            return Ok(task);
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
+        }
+        
     }
 }

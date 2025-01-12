@@ -1,6 +1,7 @@
 ﻿using Domain.Entities;
 using Domain.Interfaces;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
@@ -13,9 +14,18 @@ public class ListRepository : IListRepository
         _context = context;
     }
 
-    public Task<IEnumerable<List>> GetLists(int? listId = null, int? index = null, int? boardId = null)
+    public async Task<IEnumerable<List>> GetLists(int? listId = null, int? index = null, int? boardId = null)
     {
-        throw new NotImplementedException();
+        var query = _context.Lists.AsQueryable();
+        
+        if(listId.HasValue)
+            query = query.Where(l=>l.ListId==listId);
+        if (index.HasValue)
+            query = query.Where(l => l.Index == index);
+        if (boardId.HasValue)
+            query = query.Where(l => l.BoardId == boardId);
+
+        return await query.ToListAsync();
     }
 
     public async Task<List> CreateList(List list)

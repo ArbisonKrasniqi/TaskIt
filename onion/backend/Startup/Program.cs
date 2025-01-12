@@ -1,15 +1,26 @@
 using System.Reflection;
 using Application;
 using Application.Handlers;
+using Application.Handlers.Comment;
+using Application.Handlers.List;
 using Application.Handlers.Board;
+using Application.Handlers.Invite;
+using Application.Handlers.Members;
 using Application.Handlers.StarredBoard;
+using Application.Handlers.Workspace;
+using Application.Handlers.WorkspaceActivity;
 using Application.Services;
+using Application.Services.Authorization;
 using Application.Services.Comment;
+using Application.Services.InviteMembers;
+using Application.Services.List;
 using Application.Services.StarredBoard;
 using Application.Services.Tasks;
 using Application.Services.Token;
 using Application.Services.User;
 using Application.Services.Utility;
+using Application.Services.WorkspaceActivity;
+using Application.Services.Workspace;
 using Domain.Interfaces;
 using Infrastructure.Persistence;
 using Infrastructure.Repositories;
@@ -109,13 +120,27 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<IUtilityService, UtilityService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
-builder.Services.AddScoped<IBoardService, BoardService>();
+builder.Services.AddScoped<IListService, ListService>();
+builder.Services.AddScoped<ICommentService, CommentService>();
+builder.Services.AddScoped<IWorkspaceActivityService, WorkspaceActivityService>();
+builder.Services.AddScoped<IWorkspaceService, WorkspaceService>();
+builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
 builder.Services.AddScoped<IStarredBoardService, StarredBoardService>();
+builder.Services.AddScoped<IBoardService, BoardService>();
+builder.Services.AddScoped<IInviteMembersService, InviteMembersService>();
+
 
 //DeleteHandlers
+builder.Services.AddScoped<InviteDeleteHandler>();
 builder.Services.AddScoped<ITaskDeleteHandler, TaskDeleteHandler>();
+builder.Services.AddScoped<IListDeleteHandler, ListDeleteHandler>();
+builder.Services.AddScoped<ICommentDeleteHandler, CommentDeleteHandler>();
 builder.Services.AddScoped<IBoardDeleteHandler, BoardDeleteHandler>();
 builder.Services.AddScoped<IStarredBoardDeleteHandler, StarredBoardDeleteHandler>();
+builder.Services.AddScoped<IWorkspaceDeleteHandler, WorkspaceDeleteHandler>();
+builder.Services.AddScoped<IInviteDeleteHandler, InviteDeleteHandler>();
+builder.Services.AddScoped<IMembersDeleteHandler, MembersDeleteHandler>();
+builder.Services.AddScoped<IWorkspaceActivityDeleteHandler, WorkspaceActivityDeleteHandler>();
 
 var app = builder.Build();
 

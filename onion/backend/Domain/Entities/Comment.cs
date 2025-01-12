@@ -15,4 +15,10 @@ public class Comment
     public Tasks Task { get; set; }
     
     public Comment(){}
+
+    public Comment(string content, int taskId)
+    {
+        Content = content;
+        TaskId = taskId;
+    }
 }

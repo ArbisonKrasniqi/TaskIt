@@ -13,7 +13,7 @@ public class CommentRepository : ICommentRepository
         _context = context;
     }
 
-    public Task<IEnumerable<Comment>> GetComments(int? commentId = null, int? taskId = null, int? userId = null)
+    public Task<IEnumerable<Comment>> GetComments(int? commentId = null, int? taskId = null, string? userId = null)
     {
         throw new NotImplementedException();
     }

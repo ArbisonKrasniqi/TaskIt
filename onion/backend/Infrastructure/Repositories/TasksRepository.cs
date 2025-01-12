@@ -17,7 +17,6 @@ namespace Infrastructure.Repositories
         public async Task<IEnumerable<Tasks>> GetTasks(int? taskId = null, int? index = null, DateTime? dateCreated = null, DateTime? dueDate = null,
             int? listId = null, int? boardId = null, int? workspaceId = null)
         {
-            // Start with all tasks
             var query = _context.Tasks.AsQueryable();
             
             if (taskId.HasValue)
