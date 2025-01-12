@@ -18,7 +18,7 @@ public class MembersRepository : IMembersRepository
     public async Task<IEnumerable<Members>> GetMembers(int? memberId = null,
         string userId = null, int? workspaceId = null, DateTime? dateJoined = null)
     {
-        var query = _context.Members.AsQueryable();
+        var query = _context.Members.Include(m=>m.Workspace).Include(m=>m.User).AsQueryable();
 
         if (memberId.HasValue)
             query = query.Where(m => m.MemberId == memberId);

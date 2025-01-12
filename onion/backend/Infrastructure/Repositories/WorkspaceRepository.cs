@@ -30,7 +30,7 @@ public class WorkspaceRepository : IWorkspaceRepository
         if (!string.IsNullOrEmpty(ownerId))
             query = query.Where(w => w.OwnerId == ownerId);
         if (!string.IsNullOrEmpty(memberId))
-            query = query.Where(w => w.Members.Any(m => m.UserId == memberId) || w.OwnerId == ownerId);
+            query = query.Where(w => w.Members.Any(m => m.UserId == memberId) || w.OwnerId == memberId);
 
         return await query.ToListAsync();
     }

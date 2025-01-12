@@ -3,6 +3,7 @@ using Application.Dtos.MembersDtos;
 using Application.Handlers.Invite;
 using Application.Handlers.Members;
 using Application.Services.Authorization;
+using Domain.Entities;
 using Domain.Interfaces;
 
 namespace Application.Services.InviteMembers;
@@ -68,6 +69,8 @@ public class InviteMembersService: IInviteMembersService
         var invite = invites.FirstOrDefault();
         if (invite == null)
             return false;
+        if (invite.InviteStatus != "Pending")
+            return false;
         return true;
     }
 
@@ -79,13 +82,15 @@ public class InviteMembersService: IInviteMembersService
         var newInvite = new Domain.Entities.Invite(
             createInviteDto.WorkspaceId,
             createInviteDto.InviterId,
-            createInviteDto.InviteeId);
+            createInviteDto.InviteeId,
+            "Pending");
         var invite = await _inviteRepository.CreateInvite(newInvite);
-        
+
+        var inviteNew = (await _inviteRepository.GetInvites(invite.InviteId)).FirstOrDefault();
         var newActivity = new Domain.Entities.WorkspaceActivity(createInviteDto.WorkspaceId,
             _userContext.Id,
             "Invited",
-            invite.Invitee.FirstName+" "+invite.Invitee.LastName,
+            inviteNew.Invitee.FirstName+" "+inviteNew.Invitee.LastName,
             DateTime.Now);
         await _workspaceActivityRepository.CreateWorkspaceActivity(newActivity);
 
@@ -94,6 +99,8 @@ public class InviteMembersService: IInviteMembersService
 
     public async Task<InviteInfoDto> UpdateInviteStatus(UpdateInviteDto updateInviteDto)
     {
+        
+        
         var invite = (await _inviteRepository.GetInvites(updateInviteDto.InviteId)).FirstOrDefault();
         
         if (invite == null)
@@ -104,8 +111,8 @@ public class InviteMembersService: IInviteMembersService
         
         
         invite.InviteId = updateInviteDto.InviteId;
-        invite.InviterId = updateInviteDto.InviteStatus;
-        
+        invite.InviteStatus = updateInviteDto.InviteStatus;
+
         var updatedInvite = await _inviteRepository.UpdateInvite(invite);
         
         var newActivity = new Domain.Entities.WorkspaceActivity(invite.WorkspaceId,
@@ -114,6 +121,16 @@ public class InviteMembersService: IInviteMembersService
             "the invite",
             DateTime.Now);
         await _workspaceActivityRepository.CreateWorkspaceActivity(newActivity);
+
+        var member = new Members(
+            updatedInvite.InviteeId, 
+            updatedInvite.WorkspaceId, 
+            DateTime.Now
+            );
+        if (updatedInvite.InviteStatus == "Accepted")
+        {
+           await _membersRepository.CreateMember(member);
+        }
 
         return new InviteInfoDto(updatedInvite);
     }

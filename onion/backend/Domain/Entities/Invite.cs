@@ -31,10 +31,11 @@ public class Invite
         DateSent = dateSent;
     }
 
-    public Invite(int workspaceId, string inviterId, string inviteeId)
+    public Invite(int workspaceId, string inviterId, string inviteeId, string inviteStatus)
     {
         WorkspaceId = workspaceId;
         InviterId = inviterId;
         InviteeId = inviteeId;
+        InviteStatus = inviteStatus;
     }
 }
