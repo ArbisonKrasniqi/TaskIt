@@ -16,7 +16,6 @@ public interface IInviteMembersService
     //Members
     Task<List<MemberDto>> GetAllMembers();
     Task<List<MemberDto>> GetAllMembersByWorkspace(int workspaceId);
-    Task<MemberDto> UpdateMember(UpdateMemberDto updateMemberDto);
     Task<MemberDto> RemoveMember(RemoveMemberDto removeMemberDto);
     Task<MemberDto> DeleteMember(MemberIdDto memberIdDto);
 

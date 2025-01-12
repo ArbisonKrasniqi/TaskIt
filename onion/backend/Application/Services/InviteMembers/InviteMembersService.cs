@@ -46,7 +46,7 @@ public class InviteMembersService: IInviteMembersService
 
     public async Task<List<InviteInfoDto>> GetInvitesByWorkspace(int workspaceId)
     {
-        if (!await _authorizationService.OwnsWorkspace(_userContext.Id, workspaceId ))
+        if (!await _authorizationService.IsMember(_userContext.Id, workspaceId ))
             throw new Exception("You are not authorized");
 
         var invites = await _inviteRepository.GetInvites(workspaceId: workspaceId);
@@ -78,6 +78,10 @@ public class InviteMembersService: IInviteMembersService
     {
         if (!await _authorizationService.IsMember(_userContext.Id, createInviteDto.WorkspaceId))
             throw new Exception("You are not authorized");
+
+        var existingInvite = await _inviteRepository.GetInvites(inviteeId: createInviteDto.InviteeId,workspaceId: createInviteDto.WorkspaceId);
+        if (existingInvite != null)
+            throw new Exception("An invite for this user in the specified workspace already exists.");
 
         var newInvite = new Domain.Entities.Invite(
             createInviteDto.WorkspaceId,
@@ -195,24 +199,6 @@ public class InviteMembersService: IInviteMembersService
 
         return membersDto;
     }
-
-    public async Task<MemberDto> UpdateMember(UpdateMemberDto updateMemberDto)
-    {
-        if (!await _authorizationService.IsAdmin(_userContext.Id))
-            throw new Exception("You are not authorized");
-
-        var member = (await _membersRepository.GetMembers(memberId: updateMemberDto.MemberId)).FirstOrDefault();
-   
-        if (member == null)
-            throw new Exception("Member not found");
-        
-        member.WorkspaceId = updateMemberDto.WorkspaceId;
-        member.UserId = updateMemberDto.UserId;
-        
-        var updateMember = await _membersRepository.UpdateMember(member);
-        return new MemberDto(updateMember);
-    }
-
     public async Task<MemberDto> RemoveMember(RemoveMemberDto removeMemberDto)
     {
         if (!await _authorizationService.IsMember(_userContext.Id, removeMemberDto.WorkspaceId))
@@ -221,7 +207,7 @@ public class InviteMembersService: IInviteMembersService
         if (await _authorizationService.OwnsWorkspace(removeMemberDto.UserId, removeMemberDto.WorkspaceId))
             throw new Exception("You cannot remove the owner");
         
-        var member = (await _membersRepository.GetMembers(memberId: removeMemberDto.WorkspaceId)).FirstOrDefault();
+        var member = (await _membersRepository.GetMembers(userId: removeMemberDto.UserId)).FirstOrDefault();
         if (member == null)
             throw new Exception("Member not found");
 
