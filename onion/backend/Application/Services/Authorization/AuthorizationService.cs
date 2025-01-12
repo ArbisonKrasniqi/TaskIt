@@ -30,19 +30,19 @@ public class AuthorizationService : IAuthorizationService
         var user = (await _userRepo.GetUsers(userId: userId)).FirstOrDefault();
 
         var comment = (await _commentRepo.GetComments(commentId: commentId)).FirstOrDefault();
-        if (user == null || comment == null) return false;
+        if (user == null || comment == null) throw new Exception("Comment not found");
         
         var task = (await _taskRepo.GetTasks(taskId: comment.TaskId)).FirstOrDefault();
-        if (user == null || task == null) return false;
+        if (user == null || task == null) throw new Exception("Task not found");
 
         var list = (await _listRepo.GetLists(listId: task.ListId)).FirstOrDefault();
-        if (list == null) return false;
+        if (list == null) throw new Exception("List not found");
 
         var board = (await _boardRepo.GetBoards(boardId: list.BoardId)).FirstOrDefault();
-        if (board == null) return false;
+        if (board == null) throw new Exception("Board not found");
 
         var workspace = (await _workspaceRepo.GetWorkspaces(workspaceId: board.WorkspaceId)).FirstOrDefault();
-        if (workspace == null) return false;
+        if (workspace == null) throw new Exception("Workspace not found");
 
         if (workspace.OwnerId == userId) return true;
 
@@ -58,16 +58,16 @@ public class AuthorizationService : IAuthorizationService
         var user = (await _userRepo.GetUsers(userId: userId)).FirstOrDefault();
         
         var task = (await _taskRepo.GetTasks(taskId: taskId)).FirstOrDefault();
-        if (user == null || task == null) return false;
+        if (user == null || task == null) throw new Exception("Task not found");
 
         var list = (await _listRepo.GetLists(listId: task.ListId)).FirstOrDefault();
-        if (list == null) return false;
+        if (list == null) throw new Exception("List not found");
 
         var board = (await _boardRepo.GetBoards(boardId: list.BoardId)).FirstOrDefault();
-        if (board == null) return false;
+        if (board == null) throw new Exception("Board not found");
 
         var workspace = (await _workspaceRepo.GetWorkspaces(workspaceId: board.WorkspaceId)).FirstOrDefault();
-        if (workspace == null) return false;
+        if (workspace == null) throw new Exception("Workspace not found");
 
         if (workspace.OwnerId == userId) return true;
 
@@ -80,14 +80,15 @@ public class AuthorizationService : IAuthorizationService
     public async Task<bool> CanAccessList(string userId, int listId)
     {
         var user = (await _userRepo.GetUsers(userId: userId)).FirstOrDefault();
+        
         var list = (await _listRepo.GetLists(listId: listId)).FirstOrDefault();
-        if (list == null) return false;
+        if (list == null) throw new Exception("List not found");
         
         var board = (await _boardRepo.GetBoards(boardId: list.BoardId)).FirstOrDefault();
-        if (board == null) return false;
+        if (board == null) throw new Exception("Board not found");
         
         var workspace = (await _workspaceRepo.GetWorkspaces(workspaceId: board.WorkspaceId)).FirstOrDefault();
-        if (workspace == null) return false;
+        if (workspace == null) throw new Exception("Workspace not found");
 
         if (workspace.OwnerId == userId) return true;
 
@@ -102,10 +103,10 @@ public class AuthorizationService : IAuthorizationService
         var user = (await _userRepo.GetUsers(userId: userId)).FirstOrDefault();
         
         var board = (await _boardRepo.GetBoards(boardId: boardId)).FirstOrDefault();
-        if (board == null) return false;
+        if (board == null) throw new Exception("Board not found");
         
         var workspace = (await _workspaceRepo.GetWorkspaces(workspaceId: board.WorkspaceId)).FirstOrDefault();
-        if (workspace == null) return false;
+        if (workspace == null) throw new Exception("Workspace not found");
 
         if (workspace.OwnerId == userId) return true;
 
@@ -120,7 +121,7 @@ public class AuthorizationService : IAuthorizationService
         var user = (await _userRepo.GetUsers(userId: userId)).FirstOrDefault();
         
         var workspace = (await _workspaceRepo.GetWorkspaces(workspaceId: workspaceId)).FirstOrDefault();
-        if (workspace == null) return false;
+        if (workspace == null) throw new Exception("Workspace not found");
 
         if (workspace.OwnerId == userId) return true;
 
@@ -133,9 +134,10 @@ public class AuthorizationService : IAuthorizationService
     public async Task<bool> OwnsWorkspace(string userId, int workspaceId)
     {
         var user = (await _userRepo.GetUsers(userId: userId)).FirstOrDefault();
+        
         var workspace = (await _workspaceRepo.GetWorkspaces(workspaceId: workspaceId)).FirstOrDefault();
-
-        if (workspace == null || user == null) return false;
+        if (workspace == null || user == null) throw new Exception("Workspace not found");
+        
         if (user.Id == workspace.OwnerId) return true;
 
         return false;

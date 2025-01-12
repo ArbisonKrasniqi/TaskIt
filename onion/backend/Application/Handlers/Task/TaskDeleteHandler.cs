@@ -25,12 +25,11 @@ public class TaskDeleteHandler : ITaskDeleteHandler
         {
             //Nese ka komente ne task, 
             //krijo nje for loop qe iteron ne te gjitha komentet
-            //dhe i fshin ato komente permes CommentDeleteHandler
-            /*
-             * foreach (comment in taskComments) {
-             *      await _commentDeleteHandler.HandleDeleteComment(comment.CommentId);
-             * }
-             */
+            foreach (var comment in taskComments)
+            {
+                await _commentDeleteHandler.HandleDeleteRequest(comment.CommentId);
+
+            }
         }
         await _tasksRepository.DeleteTask(taskId);
         

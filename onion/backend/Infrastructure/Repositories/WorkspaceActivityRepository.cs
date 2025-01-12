@@ -1,6 +1,7 @@
 ﻿using Domain.Entities;
 using Domain.Interfaces;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
@@ -13,9 +14,19 @@ public class WorkspaceActivityRepository : IWorkspaceActivityRepository
         _context = context;
     }
 
-    public Task<IEnumerable<WorkspaceActivity>> GetWorkspaceActivity(int? workspaceActivityId = null, int? workspaceId = null, int? userId = null)
+    public async Task<IEnumerable<WorkspaceActivity>> GetWorkspaceActivity(int? workspaceActivityId = null, int? workspaceId = null, string userId = null)
     {
-        throw new NotImplementedException();
+        var query = _context.WorkspaceActivities.AsQueryable();
+        
+        if (workspaceActivityId.HasValue)
+            query = query.Where(w => w.WorkspaceActivityId == workspaceActivityId);
+        if (workspaceId.HasValue)
+            query = query.Where(w => w.WorkspaceId == workspaceId);
+        if (!string.IsNullOrEmpty(userId))
+            query = query.Where(w => w.UserId == userId);
+
+        return await query.ToListAsync();
+
     }
 
     public async Task<WorkspaceActivity> CreateWorkspaceActivity(WorkspaceActivity workspaceActivity)

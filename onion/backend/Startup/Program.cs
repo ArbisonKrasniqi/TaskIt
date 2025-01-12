@@ -1,6 +1,8 @@
 using System.Reflection;
 using Application;
 using Application.Handlers;
+using Application.Handlers.Comment;
+using Application.Handlers.List;
 using Application.Services.Comment;
 using Application.Services.List;
 using Application.Services.Tasks;
@@ -113,6 +115,8 @@ builder.Services.AddScoped<IWorkspaceActivityService, WorkspaceActivityService>(
 
 //DeleteHandlers
 builder.Services.AddScoped<ITaskDeleteHandler, TaskDeleteHandler>();
+builder.Services.AddScoped<IListDeleteHandler, ListDeleteHandler>();
+builder.Services.AddScoped<ICommentDeleteHandler, CommentDeleteHandler>();
 
 var app = builder.Build();
 

@@ -16,4 +16,22 @@ public class WorkspaceActivity
     public User User { get; set; }
     
     public WorkspaceActivity(){}
+    public WorkspaceActivity(int workspaceId, string userId, string actionType, string entityName, DateTime actionDate)
+    {
+        WorkspaceId = workspaceId;
+        UserId = userId;
+        ActionType = actionType;
+        EntityName = entityName;
+        ActionDate = actionDate;
+    }
+    
+    public WorkspaceActivity(int workspaceActivityId, int workspaceId, string userId, string actionType, string entityName, DateTime actionDate)
+    {
+        WorkspaceActivityId = workspaceActivityId;
+        WorkspaceId = workspaceId;
+        UserId = userId;
+        ActionType = actionType;
+        EntityName = entityName;
+        ActionDate = actionDate;
+    }
 }
