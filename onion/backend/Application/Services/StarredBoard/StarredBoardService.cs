@@ -1,15 +1,20 @@
 ﻿using Application.Dtos.StarredBoardDtos;
+using Application.Handlers.StarredBoard;
 using Domain.Interfaces;
 
 namespace Application.Services.StarredBoard;
 
 public class StarredBoardService : IStarredBoardService
 {
-    private readonly IUserRepository _userRepository;
-    //private readonly IWorkspaceRepository _workspaceRepository;
     private readonly IStarredBoardRepository _starredBoardRepository;
-    //private readonly IMembersRepository _membersRepository;
-    
+    private readonly IStarredBoardDeleteHandler _starredBoardDeleteHandler;
+
+    public StarredBoardService(IStarredBoardRepository starredBoardRepository,
+        IStarredBoardDeleteHandler starredBoardDeleteHandler)
+    {
+        _starredBoardRepository = starredBoardRepository;
+        _starredBoardDeleteHandler = starredBoardDeleteHandler;
+    }
     public async Task<List<StarredBoardDto>> GetStarredBoardsByUserId(string userId)
     {
         var starredBoards = await _starredBoardRepository.GetStarredBoards(userId: userId);
@@ -52,7 +57,7 @@ public class StarredBoardService : IStarredBoardService
         if (starredBoard == null)
             throw new Exception("StarredBoard not found");
 
-        await _starredBoardRepository.DeleteStarredBoard(starredBoard.StarredBoardId);
+        await _starredBoardDeleteHandler.HandleDeleteRequest(starredBoard.StarredBoardId);
 
         return new StarredBoardDto(starredBoard);
     }

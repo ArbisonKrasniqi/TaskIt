@@ -3,8 +3,14 @@ using Application;
 using Application.Handlers;
 using Application.Handlers.Comment;
 using Application.Handlers.List;
+using Application.Handlers.Board;
+using Application.Handlers.StarredBoard;
+using Application.Services;
+using Application.Services.Authorization;
 using Application.Services.Comment;
+using Application.Services.InviteMembers;
 using Application.Services.List;
+using Application.Services.StarredBoard;
 using Application.Services.Tasks;
 using Application.Services.Token;
 using Application.Services.User;
@@ -114,11 +120,17 @@ builder.Services.AddScoped<IListService, ListService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IWorkspaceActivityService, WorkspaceActivityService>();
 builder.Services.AddScoped<IWorkspaceService, WorkspaceService>();
+builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
+builder.Services.AddScoped<IStarredBoardService, StarredBoardService>();
+builder.Services.AddScoped<IBoardService, BoardService>();
+
 
 //DeleteHandlers
 builder.Services.AddScoped<ITaskDeleteHandler, TaskDeleteHandler>();
 builder.Services.AddScoped<IListDeleteHandler, ListDeleteHandler>();
 builder.Services.AddScoped<ICommentDeleteHandler, CommentDeleteHandler>();
+builder.Services.AddScoped<IBoardDeleteHandler, BoardDeleteHandler>();
+builder.Services.AddScoped<IStarredBoardDeleteHandler, StarredBoardDeleteHandler>();
 
 var app = builder.Build();
 

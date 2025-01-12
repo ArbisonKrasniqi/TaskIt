@@ -1,4 +1,5 @@
 ﻿using Application.Dtos.BoardDtos;
+using Application.Handlers.Board;
 using Domain.Interfaces;
 
 namespace Application.Services;
@@ -6,15 +7,12 @@ namespace Application.Services;
 public class BoardService : IBoardService
 {
     private readonly IBoardRepository _boardRepository;
-    //private readonly IWorkspaceRepository _workspaceRepository;
-    private readonly IUserRepository _userRepository;
-    //private readonly IWorkspaceActivityRepository _workspaceActivityRepository;
-    //private readonly IMembersRepository _membersRepository;
+    private readonly IBoardDeleteHandler _boardDeleteHandler;
 
-    public BoardService(IBoardRepository boardRepository, IUserRepository userRepository)
+    public BoardService(IBoardRepository boardRepository, IBoardDeleteHandler boardDeleteHandler)
     {
         _boardRepository = boardRepository;
-        _userRepository = userRepository;
+        _boardDeleteHandler = boardDeleteHandler;
     }
     
     public async Task<List<BoardDto>> GetAllBoards()
@@ -130,7 +128,7 @@ public class BoardService : IBoardService
         if (board == null)
             throw new Exception("Board not found");
 
-        await _boardRepository.DeleteBoard(board.BoardId);
+        await _boardDeleteHandler.HandleDeleteRequest(board.BoardId);
 
         return new BoardDto(board);
     }
