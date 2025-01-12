@@ -133,7 +133,8 @@ public class InviteMembersService: IInviteMembesService
 
     public Task<MemberDto> RemoveMember(RemoveMemberDto removeMemberDto)
     {
-       var workspace = await 
+       //var workspace = await 
+       throw new NotImplementedException();
     }
 
     public async Task<MemberDto> DeleteMember(MemberIdDto memberIdDto)
