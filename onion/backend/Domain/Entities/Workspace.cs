@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Domain.Entities;
 
+namespace Domain.Entities;
 public class Workspace
 {
     
@@ -21,8 +20,7 @@ public class Workspace
     public List<StarredBoard> StarredBoards {get; set;}
 
     //Constructors
-    public Workspace() { }
-
+    public Workspace(){}
     
     public Workspace(int workspaceId, string title, string description, DateTime dateCreated, string ownerId)
     {
@@ -34,11 +32,10 @@ public class Workspace
      
     }
  
-    public Workspace(string title, string description, string ownerId)
+    public Workspace(string title, string description, DateTime dateCreated)
     {
         Title = title;
         Description = description;
-        OwnerId = ownerId;
     }
     
 

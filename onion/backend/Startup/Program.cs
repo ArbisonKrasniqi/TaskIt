@@ -10,6 +10,7 @@ using Application.Services.Token;
 using Application.Services.User;
 using Application.Services.Utility;
 using Application.Services.WorkspaceActivity;
+using Application.Services.Workspace;
 using Domain.Interfaces;
 using Infrastructure.Persistence;
 using Infrastructure.Repositories;
@@ -112,6 +113,7 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IListService, ListService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IWorkspaceActivityService, WorkspaceActivityService>();
+builder.Services.AddScoped<IWorkspaceService, WorkspaceService>();
 
 //DeleteHandlers
 builder.Services.AddScoped<ITaskDeleteHandler, TaskDeleteHandler>();

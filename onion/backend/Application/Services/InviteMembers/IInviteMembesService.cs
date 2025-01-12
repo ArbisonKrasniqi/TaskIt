@@ -7,7 +7,7 @@ public interface IInviteMembesService
 {
     //Invite
     Task<List<InviteInfoDto>> GetAllInvites();
-    Task<List<InviteInfoDto>> GetInvitesByWorkspace(int wokrspaceId);
+    Task<List<InviteInfoDto>> GetInvitesByWorkspace(int workspaceId);
     Task<bool> CheckPendingInvite(CreateInviteDto createInviteDto);
     Task<InviteInfoDto> Invite(CreateInviteDto createInviteDto);
     Task<InviteInfoDto> UpdateInviteStatus(UpdateInviteDto updateInviteDto);

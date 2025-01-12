@@ -1,6 +1,7 @@
 ﻿using Domain.Entities;
 using Domain.Interfaces;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
@@ -13,10 +14,18 @@ public class BoardRepository : IBoardRepository
         _context = context;
     }
 
-    public Task<IEnumerable<Board>> GetBoards(int? boardId = null, int? workspaceId = null, bool? isClosed = null)
+    public async Task<IEnumerable<Board>> GetBoards(int? boardId = null, int? workspaceId = null, bool? isClosed = null)
     {
-        throw new NotImplementedException();
-        //Masi kerkon workspaceId duhet me e prit modelin e Workspace per me mujt me i kthy boards edhe sipas workspaceId
+        var query = _context.Boards.AsQueryable();
+
+        if (boardId.HasValue)
+            query = query.Where(b => b.BoardId == boardId);
+        if (workspaceId.HasValue)
+            query = query.Where(b => b.WorkspaceId == workspaceId);
+        if (isClosed.HasValue)
+            query = query.Where(b => b.IsClosed == isClosed);
+
+        return await query.ToListAsync();
     }
 
     public async Task<Board> CreateBoard(Board board)

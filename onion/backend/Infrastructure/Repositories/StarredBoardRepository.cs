@@ -1,6 +1,7 @@
 ﻿using Domain.Entities;
 using Domain.Interfaces;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
@@ -12,10 +13,18 @@ public class StarredBoardRepository : IStarredBoardRepository
     {
         _context = context;
     }
-    public Task<IEnumerable<StarredBoard>> GetStarredBoards(int? starredBoardId = null, int? boardId = null, string? userId = null, int? workspaceId = null)
+    public async Task<IEnumerable<StarredBoard>> GetStarredBoards(int? starredBoardId = null, int? boardId = null, string? userId = null, int? workspaceId = null)
     {
-        throw new NotImplementedException();
-        //Masi kerkon workspaceId duhet me e prit modelin e Workspace per me mujt me i kthy starredBoards edhe sipas workspaceId
+        var query = _context.StarredBoards.AsQueryable();
+
+        if (starredBoardId.HasValue)
+            query = query.Where(s => s.StarredBoardId == starredBoardId);
+        if (boardId.HasValue)
+            query = query.Where(s => s.BoardId == boardId);
+        if (!string.IsNullOrEmpty(userId))
+            query = query.Where(s => EF.Functions.Like(s.UserId, $"^{userId}"));
+
+        return await query.ToListAsync();
     }
 
     public async Task<StarredBoard> CreateStarredBoard(StarredBoard starredBoard)

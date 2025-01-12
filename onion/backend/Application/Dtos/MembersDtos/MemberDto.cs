@@ -1,3 +1,5 @@
+using Domain.Entities;
+
 namespace Application.Dtos.MembersDtos;
 
 public class MemberDto
@@ -8,11 +10,11 @@ public class MemberDto
     public DateTime DateJoined { get; set; }
 
     //Constructor
-    public MemberDto(int memberId, string userId, int workspaceId, DateTime dateJoined)
+    public MemberDto(Members member)
     {
-        MemberId = memberId;
-        UserId = userId;
-        WorkspaceId = workspaceId;
-        DateJoined = dateJoined;
+        MemberId = member.MemberId;
+        UserId = member.UserId;
+        WorkspaceId = member.WorkspaceId;
+        DateJoined = member.DateJoined;
     }
 }
