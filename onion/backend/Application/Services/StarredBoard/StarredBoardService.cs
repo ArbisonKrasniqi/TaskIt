@@ -1,5 +1,6 @@
 ﻿using Application.Dtos.StarredBoardDtos;
 using Application.Handlers.StarredBoard;
+using Application.Services.Authorization;
 using Domain.Interfaces;
 
 namespace Application.Services.StarredBoard;
@@ -8,15 +9,21 @@ public class StarredBoardService : IStarredBoardService
 {
     private readonly IStarredBoardRepository _starredBoardRepository;
     private readonly IStarredBoardDeleteHandler _starredBoardDeleteHandler;
+    private readonly UserContext _userContext;
+    private readonly IAuthorizationService _authorizationService;
 
-    public StarredBoardService(IStarredBoardRepository starredBoardRepository,
-        IStarredBoardDeleteHandler starredBoardDeleteHandler)
+    public StarredBoardService(IStarredBoardRepository starredBoardRepository, IStarredBoardDeleteHandler starredBoardDeleteHandler, UserContext userContext, IAuthorizationService authorizationService)
     {
         _starredBoardRepository = starredBoardRepository;
         _starredBoardDeleteHandler = starredBoardDeleteHandler;
+        _userContext = userContext;
+        _authorizationService = authorizationService;
     }
     public async Task<List<StarredBoardDto>> GetStarredBoardsByUserId(string userId)
     {
+        if (userId != _userContext.Id && _userContext.Role != "Admin")
+            throw new Exception("You are not authorized");
+        
         var starredBoards = await _starredBoardRepository.GetStarredBoards(userId: userId);
         var starredBoardsDto = new List<StarredBoardDto>();
         foreach (var starredBoard in starredBoards)
@@ -27,9 +34,14 @@ public class StarredBoardService : IStarredBoardService
         return starredBoardsDto;
     }
 
-    public async Task<List<StarredBoardDto>> GetStarredBoardsByWorkspaceId(int workspaceid)
+    public async Task<List<StarredBoardDto>> GetStarredBoardsByWorkspaceId(int workspaceId)
     {
-        var starredBoards = await _starredBoardRepository.GetStarredBoards(workspaceId: workspaceid);
+        var isMember = await _authorizationService.IsMember(_userContext.Id, workspaceId);
+        var isOwner = await _authorizationService.OwnsWorkspace(_userContext.Id, workspaceId);
+        if (!isMember && !isOwner && _userContext.Role != "Admin")
+            throw new Exception("You are not authorized");
+        
+        var starredBoards = await _starredBoardRepository.GetStarredBoards(workspaceId: workspaceId);
         var starredBoardsDto = new List<StarredBoardDto>();
         foreach (var starredBoard in starredBoards)
         {
@@ -41,6 +53,9 @@ public class StarredBoardService : IStarredBoardService
 
     public async Task<StarredBoardDto> StarBoard(CreateStarredBoardDto createStarredBoardDto)
     {
+        if (!await _authorizationService.CanAccessBoard(_userContext.Id, createStarredBoardDto.BoardId))
+            throw new Exception("You are not authorized");
+        
         var newStarredBoard = new Domain.Entities.StarredBoard(
             createStarredBoardDto.BoardId,
             createStarredBoardDto.UserId,
@@ -52,6 +67,9 @@ public class StarredBoardService : IStarredBoardService
 
     public async Task<StarredBoardDto> UnstarBoard(StarredBoardIdDto starredBoardIdDto)
     {
+        if (!await _authorizationService.CanAccessBoard(_userContext.Id, starredBoardIdDto.StarredBoardId))
+            throw new Exception("You are not authorized");
+        
         var starredBoards = await _starredBoardRepository.GetStarredBoards(starredBoardId: starredBoardIdDto.StarredBoardId);
         var starredBoard = starredBoards.FirstOrDefault();
         if (starredBoard == null)
