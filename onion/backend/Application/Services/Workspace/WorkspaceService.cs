@@ -1,5 +1,6 @@
 using Application.Dtos.WorkspaceDtos;
 using Application.Handlers.Workspace;
+using Application.Services.Authorization;
 using Domain.Interfaces;
 namespace Application.Services.Workspace;
 
@@ -7,10 +8,19 @@ public class WorkspaceService : IWorkspaceService
 {
     private readonly IWorkspaceRepository _workspaceRepository;
     private readonly IWorkspaceDeleteHandler _workspaceDeleteHandler;
-    public WorkspaceService(IWorkspaceRepository workspaceRepository, IWorkspaceDeleteHandler workspaceDeleteHandler)
+    private readonly UserContext _userContext;
+    private readonly IAuthorizationService _authorizationService;
+    private readonly IWorkspaceActivityRepository _workspaceActivityRepository;
+    private readonly IMembersRepository _membersRepository;
+    public WorkspaceService(IWorkspaceRepository workspaceRepository, IWorkspaceDeleteHandler workspaceDeleteHandler,
+        UserContext userContext, IAuthorizationService authorizationService, IWorkspaceActivityRepository workspaceActivityRepository, IMembersRepository membersRepository)
     {
         _workspaceRepository = workspaceRepository;
         _workspaceDeleteHandler = workspaceDeleteHandler;
+        _userContext = userContext;
+        _authorizationService = authorizationService;
+        _workspaceActivityRepository = workspaceActivityRepository;
+        _membersRepository = membersRepository;
     }
 
     public async Task<List<WorkspaceDto>> GetAllWorkspaces()
@@ -39,6 +49,9 @@ public class WorkspaceService : IWorkspaceService
 
     public async Task<WorkspaceDto> GetWorkspaceById(int workspaceId)
     {
+        if (!await _authorizationService.IsMember(_userContext.Id, workspaceId:workspaceId))
+            throw new Exception("You are not authorized");
+
         var workspaces = await _workspaceRepository.GetWorkspaces(workspaceId: workspaceId);
         var workspace = workspaces.FirstOrDefault();
         if (workspace == null)
@@ -49,29 +62,68 @@ public class WorkspaceService : IWorkspaceService
 
     public async Task<WorkspaceDto> CreateWorkspace(CreateWorkspaceDto createWorkspaceDto)
     {
+
+
         var newWorkspace = new Domain.Entities.Workspace(
             createWorkspaceDto.Title,
             createWorkspaceDto.Description,
-            DateTime.Now
-            );
+            DateTime.Now,
+            _userContext.Id
+        );
+        var workspace = await _workspaceRepository.CreateWorkspace(newWorkspace); 
+        
+        var ownerMember = new Domain.Entities.Members
+        {
+            UserId = workspace.OwnerId,
+            DateJoined = DateTime.Now,
+            WorkspaceId = workspace.WorkspaceId
+        };
+        workspace.Members = new List<Domain.Entities.Members> { ownerMember };
 
-        var workspace = await _workspaceRepository.CreateWorkspace(newWorkspace);
-        return new WorkspaceDto(newWorkspace);
+       await _membersRepository.CreateMember(ownerMember);
+        
+        var newActivity = new Domain.Entities.WorkspaceActivity(workspace.WorkspaceId,
+        _userContext.Id,
+        "Created",
+        workspace.Title,
+        DateTime.Now);
+        await _workspaceActivityRepository.CreateWorkspaceActivity(newActivity);
+        
+        return new WorkspaceDto(workspace);
     }
 
     public async Task<WorkspaceDto> UpdateWorkspace(UpdateWorkspaceDto updateWorkspaceDto)
     {
-        var workspaces = await _workspaceRepository.GetWorkspaces(updateWorkspaceDto.WorkspaceId);
-        var workspace = workspaces.FirstOrDefault();
+        var isMember = await _authorizationService.IsMember(_userContext.Id, updateWorkspaceDto.WorkspaceId);
+        if (!isMember && _userContext.Role != "Admin") throw new Exception("You are not authorized");
+        
+        var workspace = (await _workspaceRepository.GetWorkspaces(updateWorkspaceDto.WorkspaceId)).FirstOrDefault();
+      
         if (workspace == null)
             throw new Exception("Workspace not found");
-        await _workspaceRepository.UpdateWorkspace(workspace);
-        return new WorkspaceDto(workspace);
+
+        workspace.Title = updateWorkspaceDto.Title;
+        workspace.Description = updateWorkspaceDto.Description;
+        workspace.OwnerId = updateWorkspaceDto.OwnerId;
+        
+        var updatedWorkspace = await _workspaceRepository.UpdateWorkspace(workspace);
+
+        var newActivity = new Domain.Entities.WorkspaceActivity(workspace.WorkspaceId,
+            _userContext.Id,
+            "Updated",
+            workspace.Title,
+            DateTime.Now);
+        await _workspaceActivityRepository.CreateWorkspaceActivity(newActivity);
+
+        return new WorkspaceDto(updatedWorkspace);
 
     }
 
     public async Task<WorkspaceDto> DeleteWorkspace(WorkspaceIdDto workspaceIdDto)
     {
+        var accessesWorkspace = await _authorizationService.OwnsWorkspace(_userContext.Id, workspaceIdDto.WorkspaceId);
+        if (!accessesWorkspace && _userContext.Role != "Admin") throw new Exception("You are not authorized");
+        
         var workspace = (await _workspaceRepository.GetWorkspaces(workspaceId: workspaceIdDto.WorkspaceId)).FirstOrDefault();
         if (workspace == null)
             throw new Exception("Workspace not found");
