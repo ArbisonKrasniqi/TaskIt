@@ -9,11 +9,11 @@ namespace UI.Controllers;
 [Route("backend/invite")]
 public class InviteController : ControllerBase
 {
-    private readonly IInviteMembesService _inviteMembesService;
+    private readonly IInviteMembersService _inviteMembersService;
 
-    public InviteController(IInviteMembesService inviteMembesService)
+    public InviteController(IInviteMembersService inviteMembersService)
     {
-        _inviteMembesService = inviteMembesService;
+        _inviteMembersService = inviteMembersService;
     }
 
     [Authorize(AuthenticationSchemes = "Bearer")]
@@ -23,7 +23,7 @@ public class InviteController : ControllerBase
     {
         try
         {
-            var invites = await _inviteMembesService.GetAllInvites();
+            var invites = await _inviteMembersService.GetAllInvites();
             return Ok(invites);
         }
         catch (Exception e)
@@ -40,7 +40,7 @@ public class InviteController : ControllerBase
         {
             if (Int32.IsNegative(workspaceId)) return BadRequest("Workspace Id is invalid");
 
-            var invites = await _inviteMembesService.GetInvitesByWorkspace(workspaceId);
+            var invites = await _inviteMembersService.GetInvitesByWorkspace(workspaceId);
 
             return Ok(invites);
         }
@@ -58,7 +58,7 @@ public class InviteController : ControllerBase
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var inviteExists = await _inviteMembesService.CheckPendingInvite(createInviteDto);
+            var inviteExists = await _inviteMembersService.CheckPendingInvite(createInviteDto);
 
             return Ok(inviteExists);
 
@@ -77,7 +77,7 @@ public class InviteController : ControllerBase
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var invite = await _inviteMembesService.Invite(createInviteDto);
+            var invite = await _inviteMembersService.Invite(createInviteDto);
 
             return Ok(invite);
         }
@@ -94,7 +94,7 @@ public class InviteController : ControllerBase
         try
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            var invite = await _inviteMembesService.UpdateInviteStatus(updateInviteDto);
+            var invite = await _inviteMembersService.UpdateInviteStatus(updateInviteDto);
 
             return Ok(invite);
         }
@@ -112,7 +112,7 @@ public class InviteController : ControllerBase
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var invite = await _inviteMembesService.UpdateInvite(updateInviteAdminDto);
+            var invite = await _inviteMembersService.UpdateInvite(updateInviteAdminDto);
 
             return Ok(invite);
         }
@@ -130,7 +130,7 @@ public class InviteController : ControllerBase
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var invite = await _inviteMembesService.DeleteInviteById(inviteIdDto);
+            var invite = await _inviteMembersService.DeleteInviteById(inviteIdDto);
 
             return Ok(invite);
         }

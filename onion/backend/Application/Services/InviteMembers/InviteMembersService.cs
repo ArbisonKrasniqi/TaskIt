@@ -6,7 +6,7 @@ using Domain.Interfaces;
 
 namespace Application.Services.InviteMembers;
 
-public class InviteMembersService: IInviteMembesService
+public class InviteMembersService: IInviteMembersService
 {
 
     private readonly IInviteRepository _inviteRepository;

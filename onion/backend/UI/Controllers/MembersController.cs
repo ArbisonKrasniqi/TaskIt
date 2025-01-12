@@ -9,11 +9,11 @@ namespace UI.Controllers;
 [Route("backend/members")]
 public class MembersController : ControllerBase
 {
-    private readonly IInviteMembesService _inviteMembesService;
+    private readonly IInviteMembersService _inviteMembersService;
 
-    public MembersController(IInviteMembesService inviteMembesService)
+    public MembersController(IInviteMembersService inviteMembersService)
     {
-        _inviteMembesService = inviteMembesService;
+        _inviteMembersService = inviteMembersService;
     }
 
     [Authorize(AuthenticationSchemes = "Bearer")]
@@ -23,7 +23,7 @@ public class MembersController : ControllerBase
     {
         try
         {
-            var members = await _inviteMembesService.GetAllMembers();
+            var members = await _inviteMembersService.GetAllMembers();
             
             return Ok(members);
         }
@@ -41,7 +41,7 @@ public class MembersController : ControllerBase
         {
             if (Int32.IsNegative(workspaceId)) return BadRequest("Workspace Id is invalid");
 
-            var members = await _inviteMembesService.GetAllMembersByWorkspace(workspaceId);
+            var members = await _inviteMembersService.GetAllMembersByWorkspace(workspaceId);
 
             return Ok(members);
         }
@@ -58,7 +58,7 @@ public class MembersController : ControllerBase
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var member = _inviteMembesService.UpdateMember(updateMemberDto);
+            var member = _inviteMembersService.UpdateMember(updateMemberDto);
 
             return Ok(member);
         }
@@ -76,7 +76,7 @@ public class MembersController : ControllerBase
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var member = await _inviteMembesService.RemoveMember(removeMemberDto);
+            var member = await _inviteMembersService.RemoveMember(removeMemberDto);
 
             return Ok(member);
         }
@@ -94,7 +94,7 @@ public class MembersController : ControllerBase
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var member = await _inviteMembesService.DeleteMember(memberIdDto);
+            var member = await _inviteMembersService.DeleteMember(memberIdDto);
            
             return Ok(member);
         }

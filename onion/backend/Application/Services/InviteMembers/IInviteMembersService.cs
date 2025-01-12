@@ -3,7 +3,7 @@ using Application.Dtos.MembersDtos;
 
 namespace Application.Services.InviteMembers;
 
-public interface IInviteMembesService
+public interface IInviteMembersService
 {
     //Invite
     Task<List<InviteInfoDto>> GetAllInvites();
