@@ -28,5 +28,6 @@ public class Members
     {
         UserId = userId;
         WorkspaceId = workspaceId;
+        DateJoined = dateJoined;
     }
 }

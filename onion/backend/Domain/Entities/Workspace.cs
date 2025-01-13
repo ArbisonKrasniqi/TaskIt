@@ -32,10 +32,12 @@ public class Workspace
      
     }
  
-    public Workspace(string title, string description, DateTime dateCreated)
+    public Workspace(string title, string description, DateTime dateCreated, string ownerId)
     {
         Title = title;
         Description = description;
+        DateCreated = dateCreated;
+        OwnerId = ownerId;
     }
     
 

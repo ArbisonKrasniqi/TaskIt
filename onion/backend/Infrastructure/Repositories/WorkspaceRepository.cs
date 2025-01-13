@@ -17,14 +17,20 @@ public class WorkspaceRepository : IWorkspaceRepository
     public async Task<IEnumerable<Workspace>> GetWorkspaces(int? workspaceId = null, 
         string ownerId = null, string memberId = null)
     {
-        var query = _context.Workspaces.AsQueryable();
-        
+        var query = _context.Workspaces
+            .Include(w => w.Members) 
+            .Include(w => w.Boards) 
+            .Include(w => w.Invites) 
+            .Include(w => w.Activity) 
+            .Include(w => w.StarredBoards) 
+            .Include(w => w.User) 
+            .AsQueryable();
         if(workspaceId.HasValue)
             query = query.Where(w=>w.WorkspaceId==workspaceId);
         if (!string.IsNullOrEmpty(ownerId))
             query = query.Where(w => w.OwnerId == ownerId);
         if (!string.IsNullOrEmpty(memberId))
-            query = query.Where(w => w.Members.Any(m => m.UserId == memberId) || w.OwnerId == ownerId);
+            query = query.Where(w => w.Members.Any(m => m.UserId == memberId) || w.OwnerId == memberId);
 
         return await query.ToListAsync();
     }

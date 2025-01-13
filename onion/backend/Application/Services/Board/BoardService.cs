@@ -1,18 +1,26 @@
 ﻿using Application.Dtos.BoardDtos;
 using Application.Handlers.Board;
+using Application.Services.Authorization;
 using Domain.Interfaces;
 
-namespace Application.Services;
+namespace Application.Services.Board;
 
 public class BoardService : IBoardService
 {
     private readonly IBoardRepository _boardRepository;
     private readonly IBoardDeleteHandler _boardDeleteHandler;
+    private readonly UserContext _userContext;
+    private readonly IAuthorizationService _authorizationService;
+    private readonly IWorkspaceActivityRepository _workspaceActivityRepository;
 
-    public BoardService(IBoardRepository boardRepository, IBoardDeleteHandler boardDeleteHandler)
+
+    public BoardService(IBoardRepository boardRepository, IBoardDeleteHandler boardDeleteHandler, IAuthorizationService authorizationService, UserContext userContext, IWorkspaceActivityRepository workspaceActivityRepository)
     {
         _boardRepository = boardRepository;
         _boardDeleteHandler = boardDeleteHandler;
+        _authorizationService = authorizationService;
+        _userContext = userContext;
+        _workspaceActivityRepository = workspaceActivityRepository;
     }
     
     public async Task<List<BoardDto>> GetAllBoards()
@@ -29,6 +37,11 @@ public class BoardService : IBoardService
 
     public async Task<List<BoardDto>> GetBoardsByWorkspaceId(int workspaceId)
     {
+        var isMember = await _authorizationService.IsMember(_userContext.Id, workspaceId);
+        var isOwner = await _authorizationService.OwnsWorkspace(_userContext.Id, workspaceId);
+        if (!isMember && !isOwner && _userContext.Role != "Admin")
+            throw new Exception("You are not authorized");
+        
         var boards = await _boardRepository.GetBoards(workspaceId: workspaceId);
         var boardsDto = new List<BoardDto>();
         foreach (var board in boards)
@@ -41,6 +54,9 @@ public class BoardService : IBoardService
 
     public async Task<BoardDto> GetBoardById(int boardId)
     {
+        if (!await _authorizationService.CanAccessBoard(_userContext.Id, boardId))
+            throw new Exception("You are not authorized");
+        
         var boards = await _boardRepository.GetBoards(boardId: boardId, isClosed: false);
         var board = boards.FirstOrDefault();
         if (board == null)
@@ -51,6 +67,11 @@ public class BoardService : IBoardService
 
     public async Task<List<BoardDto>> GetClosedBoards(int workspaceId)
     {
+        var isMember = await _authorizationService.IsMember(_userContext.Id, workspaceId);
+        var isOwner = await _authorizationService.OwnsWorkspace(_userContext.Id, workspaceId);
+        if (!isMember && !isOwner && _userContext.Role != "Admin")
+            throw new Exception("You are not authorized");
+        
         var boards = await _boardRepository.GetBoards(workspaceId: workspaceId, isClosed: true);
         var boardsDto = new List<BoardDto>();
         foreach (var board in boards)
@@ -63,18 +84,34 @@ public class BoardService : IBoardService
 
     public async Task<BoardDto> CreateBoard(CreateBoardDto createBoardDto)
     {
+        var accessesWorkspace = await _authorizationService.IsMember(_userContext.Id, createBoardDto.WorkspaceId);
+        if (!accessesWorkspace && _userContext.Role != "Admin")
+            throw new Exception("You are not authorized");
+        
         var newBoard = new Domain.Entities.Board(
             createBoardDto.Title,
             createBoardDto.WorkspaceId,
             DateTime.Now);
 
         var addedBoard = await _boardRepository.CreateBoard(newBoard);
+        
+        var newActivity = new Domain.Entities.WorkspaceActivity(addedBoard.WorkspaceId,
+            _userContext.Id,
+            "Created",
+            addedBoard.Title,
+            DateTime.Now);
+        await _workspaceActivityRepository.CreateWorkspaceActivity(newActivity);
+        
         return new BoardDto(addedBoard);
 
     }
 
     public async Task<BoardDto> UpdateBoard(UpdateBoardDto updateBoardDto)
     {
+        var accessesBoard = await _authorizationService.CanAccessBoard(_userContext.Id, updateBoardDto.BoardId);
+        if (!accessesBoard && _userContext.Role != "Admin")
+            throw new Exception("You are not authorized ");
+        
         var boards = await _boardRepository.GetBoards(boardId: updateBoardDto.BoardId);
         var board = boards.FirstOrDefault();
         if (board == null)
@@ -85,12 +122,23 @@ public class BoardService : IBoardService
         board.Title = updateBoardDto.Title;
 
         var updatedBoard = await _boardRepository.UpdateBoard(board);
+        
+        var newActivity = new Domain.Entities.WorkspaceActivity(updateBoardDto.WorkspaceId,
+            _userContext.Id,
+            "Updated",
+            updateBoardDto.Title,
+            DateTime.Now);
+        await _workspaceActivityRepository.CreateWorkspaceActivity(newActivity);
 
         return new BoardDto(updatedBoard);
     }
 
     public async Task<BoardDto> CloseBoard(BoardIdDto boardIdDto)
     {
+        var accessesBoard = await _authorizationService.CanAccessBoard(_userContext.Id, boardIdDto.BoardId);
+        if (!accessesBoard && _userContext.Role != "Admin")
+            throw new Exception("You are not authorized");
+        
         var boards = await _boardRepository.GetBoards(boardId: boardIdDto.BoardId);
         var board = boards.FirstOrDefault();
         if (board == null)
@@ -101,12 +149,23 @@ public class BoardService : IBoardService
         board.IsClosed = true;
 
         var closedBoard = await _boardRepository.UpdateBoard(board);
+        
+        var newActivity = new Domain.Entities.WorkspaceActivity(closedBoard.WorkspaceId,
+            _userContext.Id,
+            "Closed",
+            closedBoard.Title,
+            DateTime.Now);
+        await _workspaceActivityRepository.CreateWorkspaceActivity(newActivity);
 
         return new BoardDto(closedBoard);
     }
 
     public async Task<BoardDto> OpenBoard(BoardIdDto boardIdDto)
     {
+        var accessesBoard = await _authorizationService.CanAccessBoard(_userContext.Id, boardIdDto.BoardId);
+        if (!accessesBoard && _userContext.Role != "Admin")
+            throw new Exception("You are not authorized");
+        
         var boards = await _boardRepository.GetBoards(boardId: boardIdDto.BoardId);
         var board = boards.FirstOrDefault();
         if (board == null)
@@ -117,18 +176,36 @@ public class BoardService : IBoardService
         board.IsClosed = false;
 
         var openedBoard = await _boardRepository.UpdateBoard(board);
+        
+        var newActivity = new Domain.Entities.WorkspaceActivity(openedBoard.WorkspaceId,
+            _userContext.Id,
+            "Opened",
+            openedBoard.Title,
+            DateTime.Now);
+        await _workspaceActivityRepository.CreateWorkspaceActivity(newActivity);
 
         return new BoardDto(openedBoard);
     }
 
     public async Task<BoardDto> DeleteBoard(BoardIdDto boardIdDto)
     {
+        var accessesBoard = await _authorizationService.CanAccessBoard(_userContext.Id, boardIdDto.BoardId);
+        if (!accessesBoard && _userContext.Role != "Admin")
+            throw new Exception("You are not authorized");
+        
         var boards = await _boardRepository.GetBoards(boardId: boardIdDto.BoardId);
         var board = boards.FirstOrDefault();
         if (board == null)
             throw new Exception("Board not found");
 
         await _boardDeleteHandler.HandleDeleteRequest(board.BoardId);
+        
+        var newActivity = new Domain.Entities.WorkspaceActivity(board.WorkspaceId,
+            _userContext.Id,
+            "Deleted",
+            board.Title,
+            DateTime.Now);
+        await _workspaceActivityRepository.CreateWorkspaceActivity(newActivity);
 
         return new BoardDto(board);
     }

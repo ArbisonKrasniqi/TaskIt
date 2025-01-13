@@ -52,13 +52,14 @@ public class InviteController : ControllerBase
 
     [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpGet("CheckPendingInvite")]
-    public async Task<IActionResult> CheckPendingInvite(CreateInviteDto createInviteDto)
+    public async Task<IActionResult> CheckPendingInvite(int workspaceId, string inviterId, string inviteeId)
     {
         try
         {
+            var inviteDto = new CreateInviteDto(workspaceId, inviterId, inviteeId);
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var inviteExists = await _inviteMembersService.CheckPendingInvite(createInviteDto);
+            var inviteExists = await _inviteMembersService.CheckPendingInvite(inviteDto);
 
             return Ok(inviteExists);
 
@@ -83,7 +84,7 @@ public class InviteController : ControllerBase
         }
         catch (Exception e)
         {
-            return StatusCode(500, e.Message);
+            return StatusCode(500, e);
         }
     }
 
@@ -118,7 +119,7 @@ public class InviteController : ControllerBase
         }
         catch (Exception e)
         {
-            return StatusCode(500, e.Message);
+            return StatusCode(500, e);
         }
     }
 

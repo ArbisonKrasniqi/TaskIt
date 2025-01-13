@@ -2,6 +2,8 @@ using Application.Dtos.InviteDtos;
 using Application.Dtos.MembersDtos;
 using Application.Handlers.Invite;
 using Application.Handlers.Members;
+using Application.Services.Authorization;
+using Domain.Entities;
 using Domain.Interfaces;
 
 namespace Application.Services.InviteMembers;
@@ -13,13 +15,21 @@ public class InviteMembersService: IInviteMembersService
     private readonly IMembersRepository _membersRepository;
     private readonly IInviteDeleteHandler _inviteDeleteHandler;
     private readonly IMembersDeleteHandler _membersDeleteHandler;
+    private readonly UserContext _userContext;
+    private readonly IAuthorizationService _authorizationService;
+    private readonly IWorkspaceActivityRepository _workspaceActivityRepository;
+
     public InviteMembersService(IInviteRepository inviteRepository, IMembersRepository membersRepository,
-        IInviteDeleteHandler inviteDeleteHandler, IMembersDeleteHandler membersDeleteHandler)
+        IInviteDeleteHandler inviteDeleteHandler, IMembersDeleteHandler membersDeleteHandler,
+        UserContext userContext, IAuthorizationService authorizationService, IWorkspaceActivityRepository workspaceActivityRepository)
     {
         _inviteRepository = inviteRepository;
         _membersRepository = membersRepository;
         _inviteDeleteHandler = inviteDeleteHandler;
         _membersDeleteHandler = membersDeleteHandler;
+        _userContext = userContext;
+        _authorizationService = authorizationService;
+        _workspaceActivityRepository = workspaceActivityRepository;
     }
     
     public async Task<List<InviteInfoDto>> GetAllInvites()
@@ -36,6 +46,9 @@ public class InviteMembersService: IInviteMembersService
 
     public async Task<List<InviteInfoDto>> GetInvitesByWorkspace(int workspaceId)
     {
+        if (!await _authorizationService.IsMember(_userContext.Id, workspaceId ))
+            throw new Exception("You are not authorized");
+
         var invites = await _inviteRepository.GetInvites(workspaceId: workspaceId);
         var invitesDtos = new List<InviteInfoDto>();
         foreach (var invite in invites)
@@ -48,42 +61,101 @@ public class InviteMembersService: IInviteMembersService
 
     public async Task<bool> CheckPendingInvite(CreateInviteDto createInviteDto)
     {
+        if (!await _authorizationService.IsMember(_userContext.Id, createInviteDto.WorkspaceId))
+            throw new Exception("You are not authorized");
+
         var invites = await _inviteRepository.GetInvites(inviterId: createInviteDto.InviterId,
             inviteeId: createInviteDto.InviteeId, workspaceId: createInviteDto.WorkspaceId);
         var invite = invites.FirstOrDefault();
         if (invite == null)
+            return false;
+        if (invite.InviteStatus != "Pending")
             return false;
         return true;
     }
 
     public async Task<InviteInfoDto> Invite(CreateInviteDto createInviteDto)
     {
+        if (!await _authorizationService.IsMember(_userContext.Id, createInviteDto.WorkspaceId))
+            throw new Exception("You are not authorized");
+
+        var existingInvite = await _inviteRepository.GetInvites(inviteeId: createInviteDto.InviteeId,workspaceId: createInviteDto.WorkspaceId);
+        if (existingInvite != null)
+            throw new Exception("An invite for this user in the specified workspace already exists.");
+
         var newInvite = new Domain.Entities.Invite(
             createInviteDto.WorkspaceId,
             createInviteDto.InviterId,
-            createInviteDto.InviteeId);
+            createInviteDto.InviteeId,
+            "Pending");
         var invite = await _inviteRepository.CreateInvite(newInvite);
+
+        var inviteNew = (await _inviteRepository.GetInvites(invite.InviteId)).FirstOrDefault();
+        var newActivity = new Domain.Entities.WorkspaceActivity(createInviteDto.WorkspaceId,
+            _userContext.Id,
+            "Invited",
+            inviteNew.Invitee.FirstName+" "+inviteNew.Invitee.LastName,
+            DateTime.Now);
+        await _workspaceActivityRepository.CreateWorkspaceActivity(newActivity);
+
         return new InviteInfoDto(newInvite);
     }
 
     public async Task<InviteInfoDto> UpdateInviteStatus(UpdateInviteDto updateInviteDto)
     {
-        var invites = await _inviteRepository.GetInvites(updateInviteDto.InviteId);
-        var invite = invites.FirstOrDefault();
+        
+        
+        var invite = (await _inviteRepository.GetInvites(updateInviteDto.InviteId)).FirstOrDefault();
+        
         if (invite == null)
             throw new Exception("Invite not found");
-        await _inviteRepository.UpdateInvite(invite);
-        return new InviteInfoDto(invite);
+        
+        if (_userContext.Id != invite.InviteeId)
+            throw new Exception("You are not authorized");
+        
+        
+        invite.InviteId = updateInviteDto.InviteId;
+        invite.InviteStatus = updateInviteDto.InviteStatus;
+
+        var updatedInvite = await _inviteRepository.UpdateInvite(invite);
+        
+        var newActivity = new Domain.Entities.WorkspaceActivity(invite.WorkspaceId,
+            _userContext.Id,
+            updateInviteDto.InviteStatus,
+            "the invite",
+            DateTime.Now);
+        await _workspaceActivityRepository.CreateWorkspaceActivity(newActivity);
+
+        var member = new Members(
+            updatedInvite.InviteeId, 
+            updatedInvite.WorkspaceId, 
+            DateTime.Now
+            );
+        if (updatedInvite.InviteStatus == "Accepted")
+        {
+           await _membersRepository.CreateMember(member);
+        }
+
+        return new InviteInfoDto(updatedInvite);
     }
 
     public async Task<InviteInfoDto> UpdateInvite(UpdateInviteAdminDto updateInviteAdminDto)
     {
-        var invites = await _inviteRepository.GetInvites(updateInviteAdminDto.InviteId);
-        var invite = invites.FirstOrDefault();
+        if (!await _authorizationService.IsAdmin(_userContext.Id))
+            throw new Exception("You are not authorized");
+
+        var invite = (await _inviteRepository.GetInvites(updateInviteAdminDto.InviteId)).FirstOrDefault();
+      
         if (invite == null)
             throw new Exception("Invite not found");
-       await _inviteRepository.UpdateInvite(invite);
-        return new InviteInfoDto(invite);
+
+        invite.InviteId = updateInviteAdminDto.InviteId;
+        invite.InviterId = updateInviteAdminDto.InviterId;
+        invite.InviteeId = updateInviteAdminDto.InviteeId;
+        invite.InviteStatus = updateInviteAdminDto.InviteStatus;
+        
+       var updatedInvite = await _inviteRepository.UpdateInvite(invite);
+        return new InviteInfoDto(updatedInvite);
     }
 
     public async Task<InviteInfoDto> DeleteInviteById(InviteIdDto inviteIdDto)
@@ -91,6 +163,10 @@ public class InviteMembersService: IInviteMembersService
         var invite = (await _inviteRepository.GetInvites(inviteId: inviteIdDto.InviteId)).FirstOrDefault();
         if (invite == null)
             throw new Exception("Invite not found");
+
+        
+        if (!await _authorizationService.IsMember(_userContext.Id, invite.WorkspaceId ))
+            throw new Exception("You are not authorized");
 
         await _inviteDeleteHandler.HandleDeleteRequest(invite.InviteId);
         
@@ -111,6 +187,9 @@ public class InviteMembersService: IInviteMembersService
 
     public async Task<List<MemberDto>> GetAllMembersByWorkspace(int workspaceId)
     {
+        if (!await _authorizationService.IsMember(_userContext.Id, workspaceId ))
+            throw new Exception("You are not authorized");
+
         var members = await _membersRepository.GetMembers(workspaceId: workspaceId);
         var membersDto = new List<MemberDto>();
         foreach (var member in members)
@@ -120,25 +199,30 @@ public class InviteMembersService: IInviteMembersService
 
         return membersDto;
     }
-
-    public async Task<MemberDto> UpdateMember(UpdateMemberDto updateMemberDto)
+    public async Task<MemberDto> RemoveMember(RemoveMemberDto removeMemberDto)
     {
-        var members = await _membersRepository.GetMembers(memberId: updateMemberDto.MemberId);
-        var member = members.FirstOrDefault();
+        if (!await _authorizationService.IsMember(_userContext.Id, removeMemberDto.WorkspaceId))
+            throw new Exception("You are not authorized");
+
+        if (await _authorizationService.OwnsWorkspace(removeMemberDto.UserId, removeMemberDto.WorkspaceId))
+            throw new Exception("You cannot remove the owner");
+        
+        var member = (await _membersRepository.GetMembers(userId: removeMemberDto.UserId)).FirstOrDefault();
         if (member == null)
             throw new Exception("Member not found");
-        await _membersRepository.UpdateMember(member);
-        return new MemberDto(member);
-    }
 
-    public Task<MemberDto> RemoveMember(RemoveMemberDto removeMemberDto)
-    {
-       //var workspace = await 
-       throw new NotImplementedException();
+        
+        //kjo krijon aktivitetin
+        await _membersDeleteHandler.HandleDeleteRequest(member.MemberId);
+        
+        return new MemberDto(member);
     }
 
     public async Task<MemberDto> DeleteMember(MemberIdDto memberIdDto)
     {
+        if (!await _authorizationService.IsAdmin(_userContext.Id))
+            throw new Exception("You are not authorized");
+
         var member = (await _membersRepository.GetMembers(memberId: memberIdDto.MemberId)).FirstOrDefault();
         if (member == null)
             throw new Exception("Member not found");
