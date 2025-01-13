@@ -18,6 +18,12 @@ namespace Infrastructure.Repositories
             int? listId = null, int? boardId = null, int? workspaceId = null)
         {
             var query = _context.Tasks.AsQueryable();
+
+            query = query.Include(t => t.List) // Include the List associated with the Task
+                         .ThenInclude(l => l.Tasks) // Include the Tasks related to the List
+                         .Include(t => t.List.Board) // Include the Board related to the List
+                         .ThenInclude(b => b.Workspace) // Include the Workspace related to the Board
+                         .Include(t => t.Comments); 
             
             if (taskId.HasValue)
                 query = query.Where(t => t.TaskId == taskId);

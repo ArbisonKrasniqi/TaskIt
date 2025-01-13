@@ -111,12 +111,12 @@ public class TaskService : ITaskService
         var updatedTask = await _tasksRepository.UpdateTask(task);
         
         //Create activity
-        // var newActivity = new Domain.Entities.WorkspaceActivity(updatedTask.List.Board.Workspace.WorkspaceId,
-        //                                                         _userContext.Id,
-        //                                                         "Updated",
-        //                                                         updatedTask.Title,
-        //                                                         DateTime.Now);
-        // await _workspaceActivityRepository.CreateWorkspaceActivity(newActivity);
+        var newActivity = new Domain.Entities.WorkspaceActivity(updatedTask.List.Board.Workspace.WorkspaceId,
+                                                                 _userContext.Id,
+                                                                 "Updated",
+                                                                 updatedTask.Title,
+                                                                 DateTime.Now);
+        await _workspaceActivityRepository.CreateWorkspaceActivity(newActivity);
         
         return new TaskDto(updatedTask);
     }
@@ -152,13 +152,13 @@ public class TaskService : ITaskService
                                                 DateTime.Now,
                                                 createTaskDto.ListId);
         
-        //CREATE NEW ACTIVITY
-        // var newActivity = new Domain.Entities.WorkspaceActivity(newTask.List.Board.Workspace.WorkspaceId,
-        //     _userContext.Id,
-        //     "Created",
-        //     newTask.Title,
-        //     DateTime.Now);
-        // await _workspaceActivityRepository.CreateWorkspaceActivity(newActivity);
+        //Create activity
+         var newActivity = new Domain.Entities.WorkspaceActivity(newTask.List.Board.Workspace.WorkspaceId,
+             _userContext.Id,
+             "Created",
+             newTask.Title,
+             DateTime.Now);
+         await _workspaceActivityRepository.CreateWorkspaceActivity(newActivity);
         
         return new TaskDto(newTask);
     }
@@ -238,14 +238,15 @@ public class TaskService : ITaskService
             task.Index = newIndex;
             var updatedTask = await _tasksRepository.UpdateTask(task);
             
-            // var newActivity = new Domain.Entities.WorkspaceActivity(
-            //         task.List.Board.Workspace.WorkspaceId,
-            //         _userContext.Id,
-            //         "Moved",
-            //         "Task "+task.Title+" to list "+newList.Title,
-            //         DateTime.Now;
-            //     )
-            //await _workspaceActivityRepository.CreateWorkspaceActivity(newActivity);
+            //Create activity
+            var newActivity = new Domain.Entities.WorkspaceActivity(
+                     task.List.Board.Workspace.WorkspaceId,
+                     _userContext.Id,
+                     "Moved",
+                     "Task "+task.Title+" to list "+newList.Title,
+                     DateTime.Now
+                 );
+            await _workspaceActivityRepository.CreateWorkspaceActivity(newActivity);
             
             return new TaskDto(updatedTask);
         }

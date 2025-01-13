@@ -18,7 +18,7 @@ public class UserController : ControllerBase
     private readonly IUserService _userService;
     private readonly ITokenService _tokenService;
     
-    public UserController(IUserService userService, ITokenService tokenService, UserContext userContext)
+    public UserController(IUserService userService, ITokenService tokenService)
     {
         _userService = userService;
         _tokenService = tokenService;

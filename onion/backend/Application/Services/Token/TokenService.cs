@@ -25,6 +25,8 @@ public class TokenService : ITokenService
     }
     public string CreateToken(Domain.Entities.User user)
     {
+        if (user.IsDeleted) throw new Exception("User is deleted");
+        
         var claims = new List<Claim>
         {
             new Claim("Id", user.Id),
@@ -69,6 +71,7 @@ public class TokenService : ITokenService
         var users = await _userRepository.GetUsers(userId: userId);
         var user = users.FirstOrDefault();
         if (user == null) throw new Exception("Refresh Token is invalid");
+        if (user.IsDeleted) throw new Exception("User is deleted");
 
         var tokenValid = _utilityService.VerifyHash(requestRefreshDto.RefreshToken, user.RefreshToken);
         if (!tokenValid) throw new Exception("Refresh Token is invalid");

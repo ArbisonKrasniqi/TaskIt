@@ -14,7 +14,7 @@ public class TaskController : ControllerBase
     private readonly ITaskService _taskService;
     
 
-    public TaskController(ITaskService taskService, IHttpContextAccessor httpContextAccessor)
+    public TaskController(ITaskService taskService)
     {
         _taskService = taskService;
     }

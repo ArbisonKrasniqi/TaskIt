@@ -22,20 +22,19 @@ public class TaskDeleteHandler : ITaskDeleteHandler
     public async Task HandleDeleteRequest(int taskId)
     {
         var task = (await _tasksRepository.GetTasks(taskId: taskId)).FirstOrDefault();
-        var taskComments = task.Comments;
+        var taskComments = task.Comments.ToList();
         if (taskComments.Any())
         {
             foreach (var comment in taskComments)
             {
                 await _commentDeleteHandler.HandleDeleteRequest(comment.CommentId);
-
             }
         }
         await _tasksRepository.DeleteTask(taskId);
         
         var newActivity = new Domain.Entities.WorkspaceActivity(task.List.Board.Workspace.WorkspaceId,
             _userContext.Id,
-            "Updated",
+            "Deleted",
             task.Title,
             DateTime.Now);
         await _workspaceActivityRepository.CreateWorkspaceActivity(newActivity);
