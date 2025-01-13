@@ -1,6 +1,7 @@
 ﻿using Domain.Entities;
 using Domain.Interfaces;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
@@ -13,9 +14,31 @@ public class CommentRepository : ICommentRepository
         _context = context;
     }
 
-    public Task<IEnumerable<Comment>> GetComments(int? commentId = null, int? taskId = null, string? userId = null)
+    public async Task<IEnumerable<Comment>> GetComments(int? commentId = null, int? taskId = null, string userId = null,int? listId = null, int? boardId = null,int? workspaceId = null)
     {
-        throw new NotImplementedException();
+        var query = _context.Comments.AsQueryable();
+
+        query = query.Include(c => c.Task)
+            .ThenInclude(t => t.Comments)
+            .Include(c => c.Task.List)
+            .ThenInclude(l => l.Board)
+            .ThenInclude(w => w.Workspace);
+        
+        if (commentId.HasValue)
+            query = query.Where(c => c.CommentId == commentId);
+        if (taskId.HasValue)
+            query = query.Where(c => c.TaskId == taskId);
+        if (!string.IsNullOrEmpty(userId))
+            query = query.Where(c => c.UserId == userId);
+        if(listId.HasValue)
+            query = query.Where(c => c.Task.ListId == listId);
+        if (boardId.HasValue)
+            query = query.Where(c => c.Task.List.BoardId == boardId);
+        if (workspaceId.HasValue)
+            query = query.Where(c => c.Task.List.Board.WorkspaceId == workspaceId);
+
+        return await query.ToListAsync();
+
     }
 
     public async Task<Comment> CreateComment(Comment comment)

@@ -7,7 +7,8 @@ public interface IListRepository
     Task<IEnumerable<List>> GetLists(
         int? listId = null,
         int? index = null,
-        int? boardId= null
+        int? boardId= null,
+        int? workspaceId = null
     );
     Task<List> CreateList(List list);
     Task<List> UpdateList(List list);

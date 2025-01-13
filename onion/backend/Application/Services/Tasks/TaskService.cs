@@ -151,7 +151,6 @@ public class TaskService : ITaskService
                                                 createTaskDto.Title,
                                                 DateTime.Now,
                                                 createTaskDto.ListId);
-        
         //Create activity
          var newActivity = new Domain.Entities.WorkspaceActivity(newTask.List.Board.Workspace.WorkspaceId,
              _userContext.Id,
