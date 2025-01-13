@@ -22,12 +22,18 @@ public class BoardRepository : IBoardRepository
             .Include(b => b.Workspace)
             .AsQueryable();
 
+        query = query.Include(b => b.Workspace)
+            .ThenInclude(w => w.Boards)
+            .Include(b => b.Lists);
+        
         if (boardId.HasValue)
             query = query.Where(b => b.BoardId == boardId);
         if (workspaceId.HasValue)
             query = query.Where(b => b.WorkspaceId == workspaceId);
         if (isClosed.HasValue)
             query = query.Where(b => b.IsClosed == isClosed);
+        // if(listId.HasValue)
+        //     query = query.Where(b=>b.Lists);
 
         return await query.ToListAsync();
     }

@@ -14,9 +14,14 @@ public class ListRepository : IListRepository
         _context = context;
     }
 
-    public async Task<IEnumerable<List>> GetLists(int? listId = null, int? index = null, int? boardId = null)
+    public async Task<IEnumerable<List>> GetLists(int? listId = null, int? index = null, int? boardId = null,int? workspaceId = null)
     {
         var query = _context.Lists.AsQueryable();
+
+        query = query.Include(l => l.Board)
+            .ThenInclude(b => b.Lists)
+            .Include(l => l.Board.Workspace)
+            .Include(l => l.Tasks);
         
         if(listId.HasValue)
             query = query.Where(l=>l.ListId==listId);
@@ -24,6 +29,8 @@ public class ListRepository : IListRepository
             query = query.Where(l => l.Index == index);
         if (boardId.HasValue)
             query = query.Where(l => l.BoardId == boardId);
+        if (workspaceId.HasValue)
+            query = query.Where(l => l.Board.WorkspaceId == workspaceId);
 
         return await query.ToListAsync();
     }

@@ -1,6 +1,7 @@
 ﻿using Application.Dtos.CommentDtos;
 using Application.Dtos.ListDtos;
 using Application.Handlers.Comment;
+using Application.Services.Authorization;
 using Domain.Interfaces;
 
 namespace Application.Services.Comment;
@@ -11,13 +12,17 @@ public class CommentService : ICommentService
     private readonly ITasksRepository _tasksRepo;
     private readonly UserContext _userContext;
     private readonly ICommentDeleteHandler _deleteHandler;
+    private readonly IAuthorizationService _authorizationService;
+    private readonly IWorkspaceActivityRepository _workspaceActivityRepo;
 
-    public CommentService(ICommentRepository commentRepo, ITasksRepository tasksRepo,UserContext userContext, ICommentDeleteHandler deleteHandler)
+    public CommentService(ICommentRepository commentRepo, ITasksRepository tasksRepo,UserContext userContext, ICommentDeleteHandler deleteHandler,IAuthorizationService authorizationService, IWorkspaceActivityRepository workspaceActivityRepo)
     {
         _commentRepo = commentRepo;
         _tasksRepo = tasksRepo;
         _userContext = userContext;
         _deleteHandler = deleteHandler;
+        _authorizationService = authorizationService;
+        _workspaceActivityRepo = workspaceActivityRepo;
     }
 
     public async Task<List<CommentDto>> GetAllComments()
@@ -34,8 +39,10 @@ public class CommentService : ICommentService
 
     public async Task<CommentDto> GetCommentById(int commentId)
     {
-        var comments = await _commentRepo.GetComments(commentId: commentId);
-        var comment = comments.FirstOrDefault();
+        if (!await _authorizationService.CanAccessComment(_userContext.Id, commentId))
+            throw new Exception("You are not authorized");
+        
+        var comment = (await _commentRepo.GetComments(commentId: commentId)).FirstOrDefault();
         if (comment == null)
         {
             throw new Exception("Comment not found");
@@ -46,51 +53,56 @@ public class CommentService : ICommentService
 
     public async Task<List<CommentDto>> GetCommentByTaskId(int taskId)
     {
+        var accessTask = await _authorizationService.CanAccessTask(_userContext.Id, taskId);
+        if (!accessTask  && _userContext.Role != "Admin") throw new Exception("You are not authorized");
+        
         var comments = await _commentRepo.GetComments(taskId: taskId);
-        if (comments == null)
-        {
-            throw new Exception("Comment not found");
-        }
-
         var commentDtos = new List<CommentDto>();
         foreach (var comment in comments)
         {
             commentDtos.Add(new CommentDto(comment));            
         }
-
         return commentDtos;
     }
 
     public async Task<List<CommentDto>> GetCommentByUserId(string userId)
     {
+        
+        
         var comments = await _commentRepo.GetComments(userId: userId);
-        if (comments == null)
-        {
-            throw new Exception("Comment not found");
-        }
-
         var commentDtos = new List<CommentDto>();
         foreach (var comment in comments)
         {
             commentDtos.Add(new CommentDto(comment));            
         }
-
         return commentDtos;
     }
 
     public async Task<CommentDto> CreateComment(CreateCommentDto createCommentDto)
     {
+        var accessTask = await _authorizationService.CanAccessTask(_userContext.Id, createCommentDto.TaskId);
+        if (!accessTask && _userContext.Role != "Admin") throw new Exception("You are not authorized");
+        
         var newComment = new Domain.Entities.Comment(
             createCommentDto.Content,
             createCommentDto.TaskId
         );
-
-        var addedComment = await _commentRepo.CreateComment(newComment);
+        
+        var newActivity = new Domain.Entities.WorkspaceActivity(newComment.Task.List.Board.Workspace.WorkspaceId,
+            _userContext.Id,
+            "Created",
+            newComment.Content,
+            DateTime.Now);
+        await _workspaceActivityRepo.CreateWorkspaceActivity(newActivity);
+        
         return new CommentDto(newComment);
     }
 
     public async Task<CommentDto> DeleteComment(CommentIdDto commentIdDto)
     {
+        var accessComment = await _authorizationService.CanAccessComment(_userContext.Id, commentIdDto.CommentId);
+        if (!accessComment && _userContext.Role != "Admin") throw new Exception("You are not authorized");
+        
         var comment = (await _commentRepo.GetComments(commentId: commentIdDto.CommentId)).FirstOrDefault();
         if (comment == null)
         {
@@ -103,8 +115,10 @@ public class CommentService : ICommentService
 
     public async Task<CommentDto> UpdateComment(UpdateCommentDto updateCommentDto)
     {
-        var comments = await _commentRepo.GetComments(commentId: updateCommentDto.CommentId);
-        var comment = comments.FirstOrDefault();
+        var accessComment = await _authorizationService.CanAccessComment(_userContext.Id, updateCommentDto.CommentId);
+        if (!accessComment && _userContext.Role != "Admin") throw new Exception("You are not authorized");
+        
+        var comment = (await _commentRepo.GetComments(commentId: updateCommentDto.CommentId)).FirstOrDefault();
         if (comment == null)
         {
             throw new Exception("Comment not found");
@@ -114,6 +128,15 @@ public class CommentService : ICommentService
         comment.Content = updateCommentDto.Content;
 
         var updatedComment = await _commentRepo.UpdateComment(comment);
+        
+        var newActivity = new Domain.Entities.WorkspaceActivity(updatedComment.Task.List.Board.Workspace.WorkspaceId,
+            _userContext.Id,
+            "Updated",
+            updatedComment.Content,
+            DateTime.Now);
+        await _workspaceActivityRepo.CreateWorkspaceActivity(newActivity);
+        
+        
         return new CommentDto(updatedComment);
     }
 
