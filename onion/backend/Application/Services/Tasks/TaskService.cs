@@ -147,11 +147,12 @@ public class TaskService : ITaskService
         //Numri i tasks brenda listes - 1 eshte indexi i fundit
         var newIndex = list.Tasks.Count(); 
         
-        var newTask = new Domain.Entities.Tasks(newIndex,
+        var task = new Domain.Entities.Tasks(newIndex,
                                                 createTaskDto.Title,
                                                 DateTime.Now,
                                                 createTaskDto.ListId);
-        
+
+        var newTask = await _tasksRepository.CreateTask(task);
         //Create activity
          var newActivity = new Domain.Entities.WorkspaceActivity(newTask.List.Board.Workspace.WorkspaceId,
              _userContext.Id,
