@@ -50,23 +50,6 @@ public class MembersController : ControllerBase
             return StatusCode(500, e.Message);
         }
     }
-    [Authorize(AuthenticationSchemes = "Bearer")]
-    [HttpPut("UpdateMember")]
-    public async Task<IActionResult> UpdateMember(UpdateMemberDto updateMemberDto)
-    {
-        try
-        {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-
-            var member = _inviteMembersService.UpdateMember(updateMemberDto);
-
-            return Ok(member);
-        }
-        catch (Exception e)
-        {
-            return StatusCode(500, e.Message);
-        }
-    }
     
     [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpDelete("RemoveMember")]

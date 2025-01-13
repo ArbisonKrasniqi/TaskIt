@@ -18,7 +18,7 @@ public class InviteRepository : IInviteRepository
         int? workspaceId = null, string inviterId = null, string inviteeId = null,
         string inviteStatus = null)
     {
-        var query = _context.Invites.AsQueryable();
+        var query = _context.Invites.Include(i=>i.Workspace).Include(i=>i.Invitee).Include(i=>i.Inviter).AsQueryable();
         if (inviteId.HasValue)
             query = query.Where(i => i.InviteId==inviteId);
         if (workspaceId.HasValue)
