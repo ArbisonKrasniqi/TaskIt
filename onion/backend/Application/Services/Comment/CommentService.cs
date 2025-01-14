@@ -1,4 +1,5 @@
-﻿using Application.Dtos.CommentDtos;
+﻿using System.Runtime.InteropServices.JavaScript;
+using Application.Dtos.CommentDtos;
 using Application.Dtos.ListDtos;
 using Application.Handlers.Comment;
 using Application.Services.Authorization;
@@ -9,16 +10,14 @@ namespace Application.Services.Comment;
 public class CommentService : ICommentService
 {
     private readonly ICommentRepository _commentRepo;
-    private readonly ITasksRepository _tasksRepo;
     private readonly UserContext _userContext;
     private readonly ICommentDeleteHandler _deleteHandler;
     private readonly IAuthorizationService _authorizationService;
     private readonly IWorkspaceActivityRepository _workspaceActivityRepo;
 
-    public CommentService(ICommentRepository commentRepo, ITasksRepository tasksRepo,UserContext userContext, ICommentDeleteHandler deleteHandler,IAuthorizationService authorizationService, IWorkspaceActivityRepository workspaceActivityRepo)
+    public CommentService(ICommentRepository commentRepo,UserContext userContext, ICommentDeleteHandler deleteHandler,IAuthorizationService authorizationService, IWorkspaceActivityRepository workspaceActivityRepo)
     {
         _commentRepo = commentRepo;
-        _tasksRepo = tasksRepo;
         _userContext = userContext;
         _deleteHandler = deleteHandler;
         _authorizationService = authorizationService;
@@ -83,10 +82,13 @@ public class CommentService : ICommentService
         var accessTask = await _authorizationService.CanAccessTask(_userContext.Id, createCommentDto.TaskId);
         if (!accessTask && _userContext.Role != "Admin") throw new Exception("You are not authorized");
         
-        var newComment = new Domain.Entities.Comment(
+        var comment = new Domain.Entities.Comment(
             createCommentDto.Content,
-            createCommentDto.TaskId
+            createCommentDto.TaskId,
+            _userContext.Id,
+            DateTime.Now
         );
+        var newComment = await _commentRepo.CreateComment(comment);
         
         var newActivity = new Domain.Entities.WorkspaceActivity(newComment.Task.List.Board.Workspace.WorkspaceId,
             _userContext.Id,

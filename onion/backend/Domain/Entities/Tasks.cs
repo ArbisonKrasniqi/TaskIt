@@ -27,6 +27,7 @@ public class Tasks
         Title = title;
         DateCreated = dateCreated;
         ListId = listId;
+        Description = "";
     }
     
     public Tasks(int taskId, int index, string title, string description, DateTime dateCreated, DateTime dueDate, int listId)

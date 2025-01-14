@@ -16,7 +16,12 @@ public class WorkspaceActivityRepository : IWorkspaceActivityRepository
 
     public async Task<IEnumerable<WorkspaceActivity>> GetWorkspaceActivity(int? workspaceActivityId = null, int? workspaceId = null, string userId = null)
     {
-        var query = _context.WorkspaceActivities.AsQueryable();
+        var query = _context.WorkspaceActivities
+            .Include(wa => wa.User)
+            .Include(wa => wa.Workspace)
+            .AsQueryable();
+        
+        
         
         if (workspaceActivityId.HasValue)
             query = query.Where(w => w.WorkspaceActivityId == workspaceActivityId);

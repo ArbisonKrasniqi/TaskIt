@@ -16,9 +16,11 @@ public class Comment
     
     public Comment(){}
 
-    public Comment(string content, int taskId)
+    public Comment(string content, int taskId, string userId, DateTime dateCreated)
     {
+        UserId = userId;
         Content = content;
         TaskId = taskId;
+        DateCreated = dateCreated;
     }
 }
