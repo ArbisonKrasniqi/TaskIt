@@ -21,5 +21,7 @@ public class WorkspaceActivityDto
         ActionType = workspaceActivity.ActionType;
         EntityName = workspaceActivity.EntityName;
         ActionDate = workspaceActivity.ActionDate;
+        UserFirstName = workspaceActivity.User.FirstName;
+        UserLastName = workspaceActivity.User.LastName;
     }
 }
