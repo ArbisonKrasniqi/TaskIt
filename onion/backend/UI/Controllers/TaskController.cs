@@ -8,7 +8,7 @@ namespace UI.Controllers;
 
 
 [ApiController]
-[Route("backend/user")]
+[Route("backend/task")]
 public class TaskController : ControllerBase
 {
     private readonly ITaskService _taskService;
@@ -166,7 +166,7 @@ public class TaskController : ControllerBase
         }
     }
 
-    [Authorize(AuthenticationSchemes = "Bearear")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpPut("DragNDropTask")]
     public async Task<IActionResult> DragNDropTask(DragNDropTaskDto dragNDropTaskDto)
     {

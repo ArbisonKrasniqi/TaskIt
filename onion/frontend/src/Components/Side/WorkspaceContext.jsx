@@ -37,7 +37,7 @@ export const WorkspaceProvider = ({ children }) => {
     const userId = mainContext.userInfo.userId;
     const WorkspaceId = mainContext.workspaceId;
     const [board, setBoard] = useState(null);
-    const {boardId, listId, taskId }= useParams();
+    const {workspaceId, boardId, listId, taskId }= useParams();
     // const boardId = mainContext.boardId;
     const [lists, setLists] = useState([]); 
     const [list, setList] = useState(null);
@@ -88,7 +88,7 @@ export const WorkspaceProvider = ({ children }) => {
         const getActivities = async () =>{
             try{
                 if(workspace){
-                    const activityResponse = await getDataWithId("http://localhost:5127/GetWorkspaceActivityByWorkspaceId?WorkspaceId", WorkspaceId);
+                    const activityResponse = await getDataWithId("http://localhost:5127/backend/workspaceActivity/GetWorkspaceActivityByWorkspaceId?workspaceId", WorkspaceId);
                     //console.log("Te dhenat e aktivitetit ",activityResponse.data)
                     const activityData = activityResponse.data;
                     if (activityData && Array.isArray(activityData) && activityData.length > 0) {
@@ -198,7 +198,7 @@ export const WorkspaceProvider = ({ children }) => {
         const getMembers = async () => {
             try {   
                 if (workspace) {
-                    const response = await getDataWithId('/backend/Members/getAllMembersByWorkspace?workspaceId', WorkspaceId);
+                    const response = await getDataWithId('/backend/Members/GetAllMembersByWorkspace?workspaceId', workspaceId);
                     const data = response.data;
                     setMembers(data);
 
@@ -356,69 +356,8 @@ export const WorkspaceProvider = ({ children }) => {
         event.stopPropagation();  //se len mu hap bordi kur te behet star
         handleStarBoard(board);
     };
-    const getBackgroundImageUrl = async (board) => {
-        if (!board.backgroundId) {
-            console.error("Board does not have a valid backgroundId");
-            return myImage; // // Return a default image if backgroundId is not valid
-        }
-    
-        try {
-            const response = await getDataWithId('http://localhost:5127/backend/background/GetBackgroundByID?id', board.backgroundId);
-    
-            // Check if response contains image data
-            if (response.data && response.data.imageData) {
-                // Convert ImageData from byte array to Base64 format
-            const background =response.data;
-            const url = `data:image/jpeg;base64,${background.imageDataBase64}`;
-            return url;
-            }
-        } catch (error) {
-            console.error("Error fetching background image");
-            return myImage;  // Return a default image in case of error
-        }
-    };
-    
-      const [backgroundUrls, setBackgroundUrls] = useState({});
-
-        useEffect(() => {
-            const getBackgrounds = async () => {
-                const urls = {};
-                for (const board of [...boards, ...starredBoards]) {
-                    const url = await getBackgroundImageUrl(board);
-                    urls[board.boardId] = url;  // Store the URL for each board
-                }
-                setBackgroundUrls(urls);
-            };
-    
-            getBackgrounds();
-        }, [boards, starredBoards]);
-
-        
-    const [activeBackgrounds, setActiveBackgrounds] = useState([]);
-    const [activeBackgroundUrls, setActiveBackgroundUrls] = useState({});
   
-    const getActiveBackgrounds = async () => {
-        try {
-            const backgroundsResponse = await getData('http://localhost:5127/backend/background/GetActiveBackgrounds');
-            const backgroundsData = backgroundsResponse.data;
 
-            if (backgroundsData && Array.isArray(backgroundsData) && backgroundsData.length > 0) {
-                setActiveBackgrounds(backgroundsData);
-
-                // Create URLs for background images using backgroundId
-                const urls = {};
-                for (let background of backgroundsData) {
-                    const url = `data:image/jpeg;base64,${background.imageDataBase64}`;
-                    urls[background.backgroundId] = url; // Use backgroundId instead of id
-                }
-                setActiveBackgroundUrls(urls);
-            } else {
-                console.error("No active backgrounds found.");
-            }
-        } catch (error) {
-            console.error("Error fetching backgrounds");
-        }
-    };
 
 
     
@@ -555,7 +494,7 @@ export const WorkspaceProvider = ({ children }) => {
             const getBoard = async () =>{
                 try {
                     if(boardId){
-                        const boardResponse = await getDataWithId('/backend/board/GetBoardByID?id',boardId);
+                        const boardResponse = await getDataWithId('/backend/board/GetBoardById?boardId',boardId);
                         const boardData = boardResponse.data;
                         setBoard(boardData);
                     }
@@ -565,7 +504,7 @@ export const WorkspaceProvider = ({ children }) => {
                         console.log(error.response.data);
                     }
         
-                    navigate('/main/workspaces');
+                    //navigate('/main/workspaces');
                 }
             };
             getBoard();
@@ -696,7 +635,6 @@ export const WorkspaceProvider = ({ children }) => {
             sortByRecent,
             handleSortChange,
             handleStarBoard,
-            getBackgroundImageUrl,
             handleCloseBoard,
             setOpenClosedBoardsModal,
             openClosedBoardsModal,
@@ -752,10 +690,6 @@ export const WorkspaceProvider = ({ children }) => {
             setIsLoading,
             getWorkspaces,
             setList,
-            backgroundUrls,
-            activeBackgrounds,
-            activeBackgroundUrls,
-            getActiveBackgrounds,
             fetchClosedBoards,
             closedBoards,
             setClosedBoards, 

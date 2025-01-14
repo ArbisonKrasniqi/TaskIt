@@ -31,9 +31,8 @@ const Sidebar = () => {
         workspace, open, setOpen, workspaceTitle, setHover, hover, openCloseModal,
         setOpenSortModal, setOpenCloseModal, openSortModal, setOpenModal, openModal, 
         handleCreateBoard, setHoveredIndex, hoveredIndex, hoveredSIndex, setHoveredSIndex, setSelectedBoardTitle, 
-         selectedBoardTitle, boards, selectedSort, handleSortChange, 
-        handleStarBoard,handleStarButtonClick,backgroundUrls,handleCloseBoard,setOpenClosedBoardsModal, 
-        showLimitModal, setShowLimitModal, boardCount, roli, starredBoards,ALLBoardsCount,setSelectedBoardId, selectedBoardId } = useContext(WorkspaceContext);
+         selectedBoardTitle, boards, selectedSort, handleSortChange,handleStarButtonClick,handleCloseBoard,setOpenClosedBoardsModal, 
+        showLimitModal, setShowLimitModal, roli, starredBoards,ALLBoardsCount,setSelectedBoardId, selectedBoardId } = useContext(WorkspaceContext);
 
         const [boardToClose, setBoardToClose] = useState(null);
      
@@ -147,7 +146,7 @@ const WorkspaceViews = [
                                     style={{ 
                                         width: '1.5em', 
                                         height: '1.5em', 
-                                        backgroundImage: `url(${backgroundUrls[board.boardId] || 'background.jpg'})`,  
+                                        backgroundImage: `url(purple.jpg)`,  
                                         backgroundSize: 'cover', 
                                         backgroundPosition: 'center' 
                                     }}
@@ -215,7 +214,7 @@ const WorkspaceViews = [
         style={{ 
           width: '1.5em', 
           height: '1.5em', 
-          backgroundImage: `url(${backgroundUrls[board.boardId] || 'background.jpg'})`, 
+          backgroundImage: `url(purple.jpg)`, 
           backgroundSize: 'cover', 
           backgroundPosition: 'center' 
         }}

@@ -8,7 +8,7 @@ public interface IListService
     Task<ListDto> GetListById(int listId);
     Task<List<ListDto>> GetListByBoardId(int boardId);
     Task<ListDto> UpdateList(UpdateListDto updateListDto);
-    Task<ListDto> DragNDropList(DragNDropListDto dragNDropListDto);
+    Task<ListDto> DragNDroplist(DragNDropListDto dragNDropListDto);
     Task<ListDto> DeleteList(ListIdDto listIdDto);
     Task<ListDto> CreateList(CreateListDto createListDto);
     // Task<ListDto> DeleteListByBoardId(BoardIdDto boardIdDto);

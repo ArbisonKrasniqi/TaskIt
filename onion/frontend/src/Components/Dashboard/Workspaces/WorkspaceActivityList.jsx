@@ -16,7 +16,7 @@ const WorkspaceActivityList = () => {
         try {
             if (workspaceId) {
                 console.log(workspaceId);
-                const response = await getDataWithId("/GetWorkspaceActivityByWorkspaceId?WorkspaceId", workspaceId);
+                const response = await getDataWithId("/backend/workspaceActivity/GetWorkspaceActivityByWorkspaceId?workspaceId", workspaceId);
                 setActivities(response.data.sort((a, b) => new Date(b.actionDate) - new Date(a.actionDate)));
             }
         }

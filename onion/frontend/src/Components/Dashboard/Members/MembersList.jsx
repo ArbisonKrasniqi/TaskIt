@@ -16,7 +16,7 @@ const MembersList = () =>{
     const getMembers = async ()=>{
         try{
             if (workspaceId) {
-                const membersWithWorkspaceId = await getDataWithId('/backend/Members/getAllMembersByWorkspace?workspaceId', workspaceId);
+                const membersWithWorkspaceId = await getDataWithId('/backend/Members/GetAllMembersByWorkspace?workspaceId', workspaceId);
                 setMembers(membersWithWorkspaceId.data);
             } else {
                 const allMembers = await getData('http://localhost:5127/backend/Members/GetAllMembers');

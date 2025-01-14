@@ -15,7 +15,7 @@ public class WorkspaceActivityController : ControllerBase
         _activityService = activityService;
     }
 
-    [HttpGet("GetActivityByWorkspaceId")]
+    [HttpGet("GetWorkspaceActivityByWorkspaceId")]
     public async Task<IActionResult> GetActivityByWorkspaceId(int workspaceId)
     {
         try

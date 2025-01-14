@@ -137,4 +137,49 @@ public class ListService : IListService
         
         return new ListDto(newList);
     }
+
+    public async Task<ListDto> DragNDroplist(DragNDropListDto dragNDropListDto)
+    {
+        var accessList =
+            await _authorizationService.CanAccessList(_userContext.Id, dragNDropListDto.ListId);
+        if (!accessList && _userContext.Role != "Admin")
+        {
+            throw new Exception("You are not authorized");
+        }
+
+        var list = (await _listRepo.GetLists(listId: dragNDropListDto.ListId)).FirstOrDefault();
+        if (list == null) throw new Exception("List not found");
+        var board = list.Board;
+        var newIndex = dragNDropListDto.newIndex;
+
+
+        var lists = board.Lists;
+        var currentIndex = list.Index;
+        if (lists.Count < newIndex) throw new Exception("New index out of bound");
+
+        //Nese ska livrit hiq
+        if (currentIndex == newIndex) return new ListDto(list);
+        for (int i = Math.Min(currentIndex ,newIndex); i<=Math.Max(currentIndex ,newIndex); i++)
+        {
+            if(lists[i] == list) continue;
+            if (currentIndex < newIndex)
+            {
+                lists[i].Index -= 1;
+                await _listRepo.UpdateList(lists[i]);
+            }
+            if (currentIndex > newIndex)
+            {
+                lists[i].Index += 1;
+                await _listRepo.UpdateList(lists[i]);
+            }
+        }
+
+        list.Index = newIndex;
+        var updatedList = await _listRepo.UpdateList(list);
+
+        return new ListDto(updatedList);
+
+
+
+    }
 }

@@ -8,4 +8,5 @@ public class DragNDropListDto
     public int ListId { get; set; }
     [Required]
     public int newIndex { get; set; }
+    
 }

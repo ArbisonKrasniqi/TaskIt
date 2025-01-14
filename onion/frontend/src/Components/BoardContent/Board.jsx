@@ -31,25 +31,6 @@ const Board = () => {
   const [activeId, setActiveId] = useState(null);
   const [activeTask, setActiveTask] = useState(null);
   const [activeList, setActiveList] = useState(null);
-  const [backgroundUrl, setBackgroundUrl] = useState('');
-
-  useEffect(() => {
-    const fetchBackground = async () => {
-      if (workspaceContext.board && workspaceContext.board.backgroundId) {
-        try {
-          const imageUrl = await workspaceContext.getBackgroundImageUrl(workspaceContext.board);
-          setBackgroundUrl(imageUrl);  // Set the background URL after fetching
-        } catch (error) {
-          console.error("Error fetching background image:", error);
-        }
-      } else {
-        console.warn("Board or backgroundId is not defined.");
-        setBackgroundUrl('');  // Reset the background URL if board or backgroundId is undefined
-      }
-    };
-
-    fetchBackground();
-  }, [boardId, workspaceContext.board]);
 
   const [selectedListId, setSelectedListId] = useState(null);
   const [ProfilePicIsOpen, setProfilePicIsOpen] = useState(false);
@@ -97,7 +78,7 @@ const getLists = async () => {
                               uniqueId: `${task.taskId}-${task.listId}`
                           }))
                       };
-                  });
+                  }).sort((a,b) => a.index - b.index);
                   setLists(updatedLists);
               } else {
                   console.log("There are no lists");
@@ -115,11 +96,10 @@ const getLists = async () => {
     }
   },[workspaceContext.board, boardId]);
 
-  const updateListBackend = async (originalPos, newPos) => {
+  const updateListBackend = async (listId, newPos) => {
     try {
       const data = {
-        boardId: boardId,
-        oldIndex: originalPos,
+        listId: listId,
         newIndex: newPos
       }
       const response = await putData('/backend/list/DragNDropList', data);
@@ -320,8 +300,10 @@ const getLists = async () => {
             (list) => list.listId == over.id
           );
 
+          const activeList = lists.find((list) => list.listId == active.id);
+
           let newLists = [... lists];
-          updateListBackend(activeListIndex, overListIndex);
+          updateListBackend(active.id, overListIndex);
           newLists = arrayMove(newLists, activeListIndex, overListIndex);
           setLists(newLists);
         }
@@ -392,7 +374,7 @@ const getLists = async () => {
 
               
         </header>
-      <div className="max-w-full max-h-screen h-screen" style={{backgroundImage: `url(${backgroundUrl})`,backgroundSize: 'cover',
+    <div className="max-w-full max-h-screen h-screen" style={{backgroundImage: `url(purple.jpg)`,backgroundSize: 'cover',
                                                                 backgroundPosition: 'center',
                                                               }} >
             

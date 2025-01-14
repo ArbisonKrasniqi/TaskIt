@@ -82,7 +82,7 @@ const WorkspaceSettings = () => {
 
    //filtrimi i aktivitetit bazuar ne emrin ose mbiemrin e personit kush eka bo
     const filteredActivities = activities.filter((activity) => {
-        const fullName = `${activity.userName} ${activity.userLastName}`.toLowerCase(); //search ne baz te emrit dhe mbiemrit
+        const fullName = `${activity.userFirstName} ${activity.userLastName}`.toLowerCase(); //search ne baz te emrit dhe mbiemrit
         return fullName.includes(searchTerm.toLowerCase());
     });
 
@@ -183,10 +183,10 @@ const WorkspaceSettings = () => {
                     .map((activity, index) => (
                         <div key={index} className="flex items-center text-gray-300 mb-4">
                             <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-m text-white bg-gradient-to-r from-orange-400 to-orange-600">
-                                {getInitials(activity.userName, activity.userLastName)}
+                                {getInitials(activity.userFirstName, activity.userLastName)}
                             </div>
                             <div className="ml-2">
-                                <p><b>{activity.userName} {activity.userLastName} </b>{activity.actionType} {activity.entityName}</p>
+                                <p><b>{activity.userFirstName} {activity.userLastName} </b>{activity.actionType} {activity.entityName}</p>
                                 <p className="text-sm text-gray-500">{formatDateTime(activity.actionDate)}</p>
                             </div>
                         </div>

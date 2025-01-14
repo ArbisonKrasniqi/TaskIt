@@ -25,7 +25,7 @@ public class BoardDeleteHandler : IBoardDeleteHandler
     public async Task HandleDeleteRequest(int boardId)
     {
         var board = (await _boardRepository.GetBoards(boardId: boardId)).FirstOrDefault();
-        var boardLists = board.Lists;
+        var boardLists = board.Lists.ToList();
         if (boardLists.Any())
         {
               foreach (var list in boardLists) {

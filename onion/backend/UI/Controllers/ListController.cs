@@ -1,6 +1,7 @@
 ﻿using Application.Dtos.ListDtos;
 using Application.Services.List;
 using Application.Services.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,6 +19,8 @@ public class ListController : ControllerBase
     }
 
     [HttpGet("GetAllLists")]
+    [Authorize(Policy = "AdminOnly")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public async Task<IActionResult> GetAllLists()
     {
         try
@@ -33,6 +36,7 @@ public class ListController : ControllerBase
     }
 
     [HttpGet("GetListById")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public async Task<IActionResult> GetLisById(int listId)
     {
         try
@@ -52,7 +56,8 @@ public class ListController : ControllerBase
         }
     }
     
-    [HttpGet("GetLisByBoardId")]
+    [HttpGet("GetListByBoardId")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public async Task<IActionResult> GetLisByBoardId(int boardId)
     {
         try
@@ -73,6 +78,7 @@ public class ListController : ControllerBase
     }
 
     [HttpPost("CreateList")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public async Task<IActionResult> CreateList(CreateListDto createListDto)
     {
         try
@@ -92,6 +98,7 @@ public class ListController : ControllerBase
     }
 
     [HttpPut("UpdateList")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public async Task<IActionResult> UpdateList(UpdateListDto updateListDto)
     {
         try
@@ -112,6 +119,7 @@ public class ListController : ControllerBase
     }
 
     [HttpDelete("DeleteList")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public async Task<IActionResult> DeleteList(ListIdDto listIdDto)
     {
         try
@@ -129,5 +137,24 @@ public class ListController : ControllerBase
         {
             return StatusCode(500, e.Message);
         }
+    }
+    
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    [HttpPut("DragNDropList")]
+    public async Task<IActionResult> DragNDropList(DragNDropListDto dragNDropListDto)
+    {
+        try
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var list = await _listService.DragNDroplist(dragNDropListDto);
+
+            return Ok(list);
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
+        }
+        
     }
 }

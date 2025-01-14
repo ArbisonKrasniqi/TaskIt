@@ -22,7 +22,7 @@ public class CommentController : ControllerBase
         _userTokenRole = user?.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
     }
     
-    [HttpGet("GetCommentByTaskId")]
+    [HttpGet("GetCommentsByTaskId")]
     public async Task<IActionResult> GetCommentByTaskId(int taskId)
     {
         try

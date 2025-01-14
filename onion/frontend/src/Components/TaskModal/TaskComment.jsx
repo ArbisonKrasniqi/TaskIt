@@ -124,7 +124,7 @@ const TaskComment = () => {
                     {commentItem.firstName} {commentItem.lastName}
                   </span>
                   <span className="text-gray-500 text-xs ml-2">
-                    Commented on: {new Date(commentItem.dateAdded).toLocaleString()}
+                    Commented on: {new Date(commentItem.dateCreated).toLocaleString()}
                   </span>
                 </div>
 
