@@ -49,10 +49,7 @@ public class WorkspaceService : IWorkspaceService
 
     public async Task<WorkspaceDto> GetWorkspaceById(int workspaceId)
     {
-        if (!await _authorizationService.IsMember(_userContext.Id, workspaceId:workspaceId))
-            throw new Exception("You are not authorized");
-
-        var workspaces = await _workspaceRepository.GetWorkspaces(workspaceId: workspaceId);
+      var workspaces = await _workspaceRepository.GetWorkspaces(workspaceId: workspaceId);
         var workspace = workspaces.FirstOrDefault();
         if (workspace == null)
             throw new Exception("Workspace not found");

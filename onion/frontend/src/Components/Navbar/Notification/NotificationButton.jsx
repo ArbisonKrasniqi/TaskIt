@@ -38,15 +38,18 @@ const NotificationButton = (props) => {
                 const responseInviter = await getDataWithId('http://localhost:5127/backend/user/adminUserID?userId', invite.inviterId);
                 return responseInviter.data;
             }));
+        
             const workspaceTitlesData = await Promise.all(data.map(async invite => {
-                const responseWorkspace = await getDataWithId('http://localhost:5127/backend/workspace/getWorkspaceById?workspaceId', invite.workspaceId);
+                const responseWorkspace = await getDataWithId('http://localhost:5127/backend/workspace/GetWorkspaceById?workspaceId', invite.workspaceId);
                 return responseWorkspace.data.title; // Assuming the workspace object has a 'title' field
             }));
 
             setInviterDetails(inviters);
             setWorkspaceTitles(workspaceTitlesData);
         } catch (error) {
-            console.log("Theres been an error fetching invites");
+         console.error("There's been an error fetching invites:", error); // Printo objektin e plotë të gabimit
+    console.error("Error message:", error.message);
+  
         }
     };
 
@@ -54,6 +57,8 @@ const NotificationButton = (props) => {
         if (userId) {
             getInvites();
         }
+        console.log("INVITEEEEEERS".inviterDetails);
+        console.log("WORKSPACEEEE".workspaceTitles);
     }, [userId]);
 
     const handleInviteAction = async(inviteId, status,workspaceId)=>{
