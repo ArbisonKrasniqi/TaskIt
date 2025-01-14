@@ -39,6 +39,19 @@ public class StarredBoardRepository : IStarredBoardRepository
         await _context.SaveChangesAsync();
         return starredBoard;
     }
+    
+    public async Task<StarredBoard> UpdateStarredBoard(StarredBoard starredBoard)
+    {
+        var existingStarredBoard = await _context.StarredBoards.FindAsync(starredBoard.StarredBoardId);
+
+        if (existingStarredBoard == null)
+            throw new Exception("StarredBoard not found");
+        
+        _context.Entry(existingStarredBoard).CurrentValues.SetValues(starredBoard);
+        await _context.SaveChangesAsync();
+
+        return existingStarredBoard;
+    }
 
     public async Task<StarredBoard> DeleteStarredBoard(int starredBoardId)
     {

@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+﻿using Application.Dtos.ListDtos;
+using Domain.Entities;
 
 namespace Application.Dtos.BoardDtos;
 
@@ -9,7 +10,7 @@ public class BoardDto
     public bool IsClosed { get; set; }
     public int WorkspaceId { get; set; }
     public DateTime DateCreated { get; set; }
-    //public List<List> Lists { get; set; }
+    public List<ListDto> Lists { get; set; } = new List<ListDto>();
 
     public BoardDto(Board board)
     {
@@ -18,5 +19,13 @@ public class BoardDto
         IsClosed = board.IsClosed;
         WorkspaceId = board.WorkspaceId;
         DateCreated = board.DateCreated;
+
+        if (board.Lists != null)
+        {
+            foreach (var list in board.Lists)
+            {
+                Lists.Add(new ListDto(list));
+            }
+        }
     }
 }

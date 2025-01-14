@@ -11,5 +11,6 @@ public interface IStarredBoardRepository
         int? workspaceId = null);
 
     Task<StarredBoard> CreateStarredBoard(StarredBoard starredBoard);
+    Task<StarredBoard> UpdateStarredBoard(StarredBoard starredBoard);
     Task<StarredBoard> DeleteStarredBoard(int starredBoardId);
 }
