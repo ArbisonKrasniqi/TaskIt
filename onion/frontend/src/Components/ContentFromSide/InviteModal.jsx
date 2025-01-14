@@ -51,8 +51,6 @@ const InviteModal = ({ isOpen, onClose, onInviteSent  }) => {
             workspaceId: WorkspaceId,
             inviterId: userId,
             inviteeId: user.id,
-            inviteStatus: "Pending",
-            dateSent: new Date().toISOString()
            }));
 
            for(const invite of invites){

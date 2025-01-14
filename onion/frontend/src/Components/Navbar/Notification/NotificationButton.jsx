@@ -25,7 +25,7 @@ const NotificationButton = (props) => {
     
     const getInvites = async () => {
         try {
-            const response = await getDataWithId('http://localhost:5127/backend/invite/GetPendingInvitesByInvitee?inviteeId', userId);
+            const response = await getDataWithId('http://localhost:5127/backend/invite/CheckPendingInvite?inviteeId', userId);
             let data = response.data;
             console.log("Invites fetched: ", data);
 

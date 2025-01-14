@@ -37,5 +37,6 @@ public class Invite
         InviterId = inviterId;
         InviteeId = inviteeId;
         InviteStatus = inviteStatus;
+        DateSent = DateTime.Now;
     }
 }

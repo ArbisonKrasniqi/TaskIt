@@ -59,19 +59,19 @@ public class InviteMembersService: IInviteMembersService
         return invitesDtos;
     }
 
-    public async Task<bool> CheckPendingInvite(CreateInviteDto createInviteDto)
+    public async Task<List<InviteInfoDto>> CheckPendingInvite(string inviteeId)
     {
-        if (!await _authorizationService.IsMember(_userContext.Id, createInviteDto.WorkspaceId))
-            throw new Exception("You are not authorized");
+        var invites = await _inviteRepository.GetInvites(inviteeId:inviteeId);
+        var invitesDto = new List<InviteInfoDto>();
 
-        var invites = await _inviteRepository.GetInvites(inviterId: createInviteDto.InviterId,
-            inviteeId: createInviteDto.InviteeId, workspaceId: createInviteDto.WorkspaceId);
-        var invite = invites.FirstOrDefault();
-        if (invite == null)
-            return false;
-        if (invite.InviteStatus != "Pending")
-            return false;
-        return true;
+        foreach (var invite in invites)
+        {
+            if (invite == null) throw new Exception("No invite found");
+            if (invite.InviteStatus == "Pending")
+                invitesDto.Add(new InviteInfoDto(invite));
+
+        }
+        return invitesDto;
     }
 
     public async Task<InviteInfoDto> Invite(CreateInviteDto createInviteDto)
@@ -79,7 +79,7 @@ public class InviteMembersService: IInviteMembersService
         if (!await _authorizationService.IsMember(_userContext.Id, createInviteDto.WorkspaceId))
             throw new Exception("You are not authorized");
 
-        var existingInvite = await _inviteRepository.GetInvites(inviteeId: createInviteDto.InviteeId,workspaceId: createInviteDto.WorkspaceId);
+        var existingInvite = (await _inviteRepository.GetInvites(inviteeId: createInviteDto.InviteeId,workspaceId: createInviteDto.WorkspaceId)).FirstOrDefault();
         if (existingInvite != null)
             throw new Exception("An invite for this user in the specified workspace already exists.");
 
@@ -215,6 +215,8 @@ public class InviteMembersService: IInviteMembersService
         //kjo krijon aktivitetin
         await _membersDeleteHandler.HandleDeleteRequest(member.MemberId);
         
+        var invite = (await _inviteRepository.GetInvites(inviteeId: removeMemberDto.UserId, workspaceId: removeMemberDto.WorkspaceId)).FirstOrDefault();
+        await _inviteDeleteHandler.HandleDeleteRequest(invite.InviteId);
         return new MemberDto(member);
     }
 

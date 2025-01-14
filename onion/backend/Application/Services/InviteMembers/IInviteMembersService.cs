@@ -8,7 +8,7 @@ public interface IInviteMembersService
     //Invite
     Task<List<InviteInfoDto>> GetAllInvites();
     Task<List<InviteInfoDto>> GetInvitesByWorkspace(int workspaceId);
-    Task<bool> CheckPendingInvite(CreateInviteDto createInviteDto);
+    Task<List<InviteInfoDto>> CheckPendingInvite(string inviteeId);
     Task<InviteInfoDto> Invite(CreateInviteDto createInviteDto);
     Task<InviteInfoDto> UpdateInviteStatus(UpdateInviteDto updateInviteDto);
     Task<InviteInfoDto> UpdateInvite(UpdateInviteAdminDto updateInviteAdminDto);

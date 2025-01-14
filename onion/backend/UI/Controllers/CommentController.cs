@@ -10,16 +10,9 @@ public class CommentController : ControllerBase
 {
     private ICommentService _commentService;
     
-    private readonly string? _userId;
-    private readonly string? _userTokenRole;
-    
-    public CommentController(ICommentService commentService, IHttpContextAccessor httpContextAccessor)
+    public CommentController(ICommentService commentService)
     {
         _commentService = commentService;
-
-        var user = httpContextAccessor.HttpContext?.User;
-        _userId = user?.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
-        _userTokenRole = user?.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
     }
     
     [HttpGet("GetCommentsByTaskId")]

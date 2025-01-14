@@ -480,7 +480,7 @@ export const WorkspaceProvider = ({ children }) => {
         const handleDeleteInvite = async(inviteId) => {
             console.log("Deleting invite with id: ", inviteId);
             try{
-                const response = await deleteData(`http://localhost:5127/backend/invite/DeleteInviteById?InviteId=${inviteId}`);
+                const response = await deleteData(`http://localhost:5127/backend/invite/DeleteInviteById?InviteId'`, {inviteId});
                 console.log("Deleting invite response: ",response);
                 getSentInvites();
             }

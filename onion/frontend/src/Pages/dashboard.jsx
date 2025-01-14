@@ -7,19 +7,15 @@ import { checkAndRefreshToken, validateAdmin} from '../Services/TokenService.jsx
 import MembersList from "../Components/Dashboard/Members/MembersList.jsx"
 import InvitesList from "../Components/Dashboard/Invites/InvitesList.jsx";
 import WithAuth from "../Services/WithAuth.jsx";
-import BackgroundsList from "../Components/Dashboard/Backgrounds/BackgroundsList.jsx";
 import ListsList from "../Components/Dashboard/Lists/ListsList.jsx";
 import TasksList from "../Components/Dashboard/Tasks/TasksList.jsx";
 import { Route, Routes } from 'react-router-dom';
 import WorkspaceTable from "../Components/Dashboard/Workspaces/WorkspaceTable.jsx";
 import DashboardSideBar from "../Components/Dashboard/DashboardSidebar.jsx";
 import StarredBoardsList from "../Components/Dashboard/StarredBoards/StarredBoardsList.jsx";
-import ChecklistsList from "../Components/Dashboard/Checklists/ChecklistsList.jsx";
-import ChecklistItemsList from "../Components/Dashboard/ChecklistItems/ChecklistItemsList.jsx";
 import TaskTable from "../Components/Dashboard/Tasks/TaskTable.jsx";
 import LabelsList from "../Components/Dashboard/Labels/LabelsList.jsx";
 import UserTable from "../Components/Dashboard/Users/UserTable.jsx";
-import TaskMemberList from "../Components/Dashboard/TaskMember/TaskMemberList.jsx";
 import BoardTable from "../Components/Dashboard/Boards/BoardTable.jsx";
 
 export const DashboardContext = createContext();
@@ -74,14 +70,9 @@ const Dashboard = () => {
             <Route path="labels/:boardId?" element={<LabelsList/>}/>
             <Route path="members/:workspaceId?" element={<MembersList/>}/>
             <Route path="invites/:workspaceId?" element={<InvitesList/>}/>
-            <Route path="backgrounds" element={<BackgroundsList/>}/>
             <Route path="lists/:boardId?" element={<ListsList/>}/>
             <Route path="tasks/:listId?" element={<TasksList/>}/>
             <Route path="task/:taskId?" element={<TaskTable/>}/>
-            <Route path="taskMembers/:taskId?" element={<TaskMemberList/>}/>
-            <Route path="checklists/:taskId?" element={<ChecklistsList/>}/>
-            <Route path="checklistItems/:checklistId?" element={<ChecklistItemsList/>}/>
-            <Route path="backgrounds" element={<BackgroundsList/>}/>
           </Routes>
         </div>
       </div>

@@ -52,14 +52,13 @@ public class InviteController : ControllerBase
 
     [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpGet("CheckPendingInvite")]
-    public async Task<IActionResult> CheckPendingInvite(int workspaceId, string inviterId, string inviteeId)
+    public async Task<IActionResult> CheckPendingInvite(string inviteeId)
     {
         try
         {
-            var inviteDto = new CreateInviteDto(workspaceId, inviterId, inviteeId);
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var inviteExists = await _inviteMembersService.CheckPendingInvite(inviteDto);
+            var inviteExists = await _inviteMembersService.CheckPendingInvite(inviteeId);
 
             return Ok(inviteExists);
 

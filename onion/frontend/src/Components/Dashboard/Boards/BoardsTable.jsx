@@ -48,11 +48,10 @@ const BoardsTable = () => {
     const filteredBoards = boards.filter(board => {
         const boardIdMatch = board.boardId.toString().toLowerCase().includes(searchQuery);
         const titleMatch = board.title.toLowerCase().includes(searchQuery);
-        const backgroundIdMatch = board.backgroundId.toString().toLowerCase().includes(searchQuery);
         const workspaceIdMatch = board.workspaceId.toString().toLowerCase().includes(searchQuery);
         const dateCreatedMatch = board.dateCreated ? board.dateCreated.toLowerCase().includes(searchQuery) : false;
 
-        return boardIdMatch || titleMatch || backgroundIdMatch || workspaceIdMatch || dateCreatedMatch;
+        return boardIdMatch || titleMatch || workspaceIdMatch || dateCreatedMatch;
     });
 
     return (
@@ -76,7 +75,6 @@ const BoardsTable = () => {
                             <th className="px-6 py-3">Board ID</th>
                             <th className="px-6 py-3">Title</th>
                             <th className="px-6 py-3">Date Created</th>
-                            <th className="px-6 py-3">Background ID</th>
                             <th className="px-6 py-3">IsClosed</th>
                             <th className="px-6 py-3">Workspace ID</th>
                             <th className="px-6 py-3">Actions</th>
@@ -92,7 +90,6 @@ const BoardsTable = () => {
                                     <td className="px-6 py-4">{board.boardId}</td>
                                     <td className="px-6 py-4">{board.title}</td>
                                     <td className="px-6 py-4">{board.dateCreated}</td>
-                                    <td className="px-6 py-4">{board.backgroundId}</td>
                                     <td className="px-6 py-4">{board.isClosed+""}</td>
                                     <td className="px-6 py-4">{board.workspaceId}</td>
                                     <td className="px-6 py-4">

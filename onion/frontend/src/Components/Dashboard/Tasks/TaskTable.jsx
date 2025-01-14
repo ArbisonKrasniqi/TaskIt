@@ -1,8 +1,4 @@
 import { useState } from "react";
-import ChecklistsList from "../Checklists/ChecklistsList";
-import LabelsList from "../Labels/LabelsList";
-import TaskMemberList from "../TaskMember/TaskMemberList";
-import TaskActivityList from "./TaskActivityList";
 
 const TaskTable = () => {
 
@@ -26,12 +22,6 @@ const TaskTable = () => {
             </div>
 
             {/* Render the selected list */}
-            <div className="flex-grow overflow-auto">
-                {activeList === 'checklists' && <ChecklistsList />}
-                {activeList === 'labels' && <LabelsList />}
-                {activeList === 'taskMembers' && <TaskMemberList/>}
-                {activeList === 'activities' && <TaskActivityList/>}
-            </div>
         </div>
     )
 }
