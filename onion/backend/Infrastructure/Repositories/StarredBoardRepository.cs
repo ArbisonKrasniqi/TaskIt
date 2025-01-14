@@ -13,7 +13,7 @@ public class StarredBoardRepository : IStarredBoardRepository
     {
         _context = context;
     }
-    public async Task<IEnumerable<StarredBoard>> GetStarredBoards(int? starredBoardId = null, int? boardId = null, string? userId = null, int? workspaceId = null)
+    public async Task<IEnumerable<StarredBoard>> GetStarredBoards(int? starredBoardId = null, int? boardId = null, string userId = null, int? workspaceId = null)
     {
         var query = _context.StarredBoards
             .Include(s => s.Workspace)
@@ -26,7 +26,9 @@ public class StarredBoardRepository : IStarredBoardRepository
         if (boardId.HasValue)
             query = query.Where(s => s.BoardId == boardId);
         if (!string.IsNullOrEmpty(userId))
-            query = query.Where(s => EF.Functions.Like(s.UserId, $"^{userId}"));
+            query = query.Where(s => s.UserId == userId);
+        if (workspaceId.HasValue)
+            query = query.Where(s => s.WorkspaceId == workspaceId);
 
         return await query.ToListAsync();
     }
@@ -37,7 +39,7 @@ public class StarredBoardRepository : IStarredBoardRepository
         await _context.SaveChangesAsync();
         return starredBoard;
     }
-
+    
     public async Task<StarredBoard> UpdateStarredBoard(StarredBoard starredBoard)
     {
         var existingStarredBoard = await _context.StarredBoards.FindAsync(starredBoard.StarredBoardId);

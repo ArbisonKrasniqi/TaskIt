@@ -8,6 +8,4 @@ public class UpdateBoardDto
     public int BoardId { get; set; }
     [Required]
     public string Title { get; set; }
-    [Required]
-    public int WorkspaceId { get; set; }
 }

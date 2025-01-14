@@ -123,7 +123,7 @@ public class BoardService : IBoardService
 
         var updatedBoard = await _boardRepository.UpdateBoard(board);
         
-        var newActivity = new Domain.Entities.WorkspaceActivity(updateBoardDto.WorkspaceId,
+        var newActivity = new Domain.Entities.WorkspaceActivity(board.WorkspaceId,
             _userContext.Id,
             "Updated",
             updateBoardDto.Title,

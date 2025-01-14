@@ -53,8 +53,14 @@ public class StarredBoardService : IStarredBoardService
 
     public async Task<StarredBoardDto> StarBoard(CreateStarredBoardDto createStarredBoardDto)
     {
-        if (!await _authorizationService.CanAccessBoard(_userContext.Id, createStarredBoardDto.BoardId))
+        var isMember = await _authorizationService.IsMember(_userContext.Id, createStarredBoardDto.WorkspaceId);
+        if (!await _authorizationService.CanAccessBoard(_userContext.Id, createStarredBoardDto.BoardId) && !isMember)
             throw new Exception("You are not authorized");
+
+        var alreadyStarredBoard =
+            await _starredBoardRepository.GetStarredBoards(boardId: createStarredBoardDto.BoardId);
+        if (alreadyStarredBoard.Any())
+            throw new Exception("Board is already starred");
         
         var newStarredBoard = new Domain.Entities.StarredBoard(
             createStarredBoardDto.BoardId,
@@ -67,7 +73,10 @@ public class StarredBoardService : IStarredBoardService
 
     public async Task<StarredBoardDto> UnstarBoard(StarredBoardIdDto starredBoardIdDto)
     {
-        if (!await _authorizationService.CanAccessBoard(_userContext.Id, starredBoardIdDto.StarredBoardId))
+        var boards = await _starredBoardRepository.GetStarredBoards(starredBoardId: starredBoardIdDto.StarredBoardId);
+        var board = boards.FirstOrDefault();
+        
+        if (board.UserId != _userContext.Id && _userContext.Role != "Admin")
             throw new Exception("You are not authorized");
         
         var starredBoards = await _starredBoardRepository.GetStarredBoards(starredBoardId: starredBoardIdDto.StarredBoardId);
