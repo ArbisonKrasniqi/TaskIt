@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie';
 //import jwtDecode from 'jwt-decode';
 import { jwtDecode } from 'jwt-decode'
-import { postData } from './FetchService';
+import { putData } from './FetchService';
 
 
 export function validateAdmin() {
@@ -47,7 +47,7 @@ export const refreshTokens = async () => {
             refreshToken: refreshToken
         };
 
-        const response = await postData("/backend/token/refreshToken", data);
+        const response = await putData("/backend/user/refreshToken", data);
         const newAccessToken = response.data.accessToken;
         const newRefreshToken = response.data.refreshToken;
 

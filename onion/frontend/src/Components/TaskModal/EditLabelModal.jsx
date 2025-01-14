@@ -25,7 +25,7 @@ function EditLabelModal() {
                     name: labelName
                 };
 
-                await putData('http://localhost:5157/backend/label/UpdateLabel', updatedLabel);
+                await putData('http://localhost:5127/backend/label/UpdateLabel', updatedLabel);
             } else {
                 console.log("Name should be between 2 and 280 characters");
                 
@@ -46,13 +46,13 @@ function EditLabelModal() {
                     name: ''  
                 };
 
-                await putData('http://localhost:5157/backend/label/UpdateLabel', updateLabel);
+                await putData('http://localhost:5127/backend/label/UpdateLabel', updateLabel);
 
                 const labelData = {
                     labelId: selectedLabel.labelId,
                     taskId: taskId
                 }
-                await deleteData('http://localhost:5157/backend/taskLabel/RemoveLabelFromTask',labelData);
+                await deleteData('http://localhost:5127/backend/taskLabel/RemoveLabelFromTask',labelData);
                 setAssignedLabels(prev => prev.filter(id => id !== selectedLabel.labelId));
             }
             toggleEditLabelModal();

@@ -27,7 +27,7 @@ const EditBoardLabelModal = ()=>{
                     name: labelName
                 };
 
-                await putData('http://localhost:5157/backend/label/UpdateLabel', updatedLabel);
+                await putData('http://localhost:5127/backend/label/UpdateLabel', updatedLabel);
                 fetchLabels();
                 getBoardActivities();
             } else {
@@ -50,7 +50,7 @@ const EditBoardLabelModal = ()=>{
                     name: ''  
                 };
 
-                await putData('http://localhost:5157/backend/label/UpdateLabel', updateLabel);
+                await putData('http://localhost:5127/backend/label/UpdateLabel', updateLabel);
                 fetchLabels();
                 getBoardActivities();
             }

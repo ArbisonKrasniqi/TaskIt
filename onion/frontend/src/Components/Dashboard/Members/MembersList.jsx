@@ -19,7 +19,7 @@ const MembersList = () =>{
                 const membersWithWorkspaceId = await getDataWithId('/backend/Members/getAllMembersByWorkspace?workspaceId', workspaceId);
                 setMembers(membersWithWorkspaceId.data);
             } else {
-                const allMembers = await getData('http://localhost:5157/backend/Members/GetAllMembers');
+                const allMembers = await getData('http://localhost:5127/backend/Members/GetAllMembers');
                 setMembers(allMembers.data);
             }
             

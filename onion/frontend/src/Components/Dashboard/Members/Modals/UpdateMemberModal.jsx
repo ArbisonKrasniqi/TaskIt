@@ -25,7 +25,7 @@ const UpdateMemberModal = (props)=>{
                 dateJoined: dateJoined,
                 workspaceId: workspaceId
             };
-            const response = await putData('http://localhost:5157/backend/Members/UpdateMember', data);
+            const response = await putData('http://localhost:5127/backend/Members/UpdateMember', data);
             console.log(response.data);
             const updatedMembers = membersContext.members.map(member => {
                 if(member.memberId ===updateContext.memberId){

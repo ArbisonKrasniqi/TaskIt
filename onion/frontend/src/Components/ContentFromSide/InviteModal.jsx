@@ -20,7 +20,7 @@ const InviteModal = ({ isOpen, onClose, onInviteSent  }) => {
         if(query.length>1){
             const searchUsers = async()=>{
                 try{
-                    const response = await getData(`http://localhost:5157/backend/user/search?query=${query}`);
+                    const response = await getData(`http://localhost:5127/backend/user/search?query=${query}`);
                     setSearchResults(response.data);
                 }
                 catch(error){
@@ -36,7 +36,7 @@ const InviteModal = ({ isOpen, onClose, onInviteSent  }) => {
 
     const checkPendingInviteExists = async (inviterId, inviteeId, workspaceId) => {
         try {
-            const response = await getData(`http://localhost:5157/backend/invite/Check-pending-invite?inviterId=${inviterId}&inviteeId=${inviteeId}&workspaceId=${workspaceId}`);
+            const response = await getData(`http://localhost:5127/backend/invite/Check-pending-invite?inviterId=${inviterId}&inviteeId=${inviteeId}&workspaceId=${workspaceId}`);
             return response.data.exists; 
         } catch (error) {
             console.error("Error checking pending invites");
@@ -63,7 +63,7 @@ const InviteModal = ({ isOpen, onClose, onInviteSent  }) => {
                 setErrorMessage(`You already invited this user.`);
                 continue;
             }
-            const response = await postData('http://localhost:5157/backend/invite/Invite', invite);
+            const response = await postData('http://localhost:5127/backend/invite/Invite', invite);
             }
             setSelectedUsers([]);
             setErrorMessage('');

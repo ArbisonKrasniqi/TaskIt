@@ -67,7 +67,7 @@ const toggleEditLabelModal = (label) => {
   useEffect(() => {
     const fetchActiveBackgrounds = async () => {
       try {
-        const backgroundsResponse = await getData('http://localhost:5157/backend/background/GetActiveBackgrounds');
+        const backgroundsResponse = await getData('http://localhost:5127/backend/background/GetActiveBackgrounds');
         const backgroundsData = backgroundsResponse.data;
 
         if (backgroundsData && Array.isArray(backgroundsData) && backgroundsData.length > 0) {
@@ -94,7 +94,7 @@ const toggleEditLabelModal = (label) => {
   const fetchLabels = async () => {
     try {
       if (board && board.boardId) {
-        const labelsResponse = await getData(`http://localhost:5157/backend/label/GetLabelsByBoardId?boardId=${board.boardId}`);
+        const labelsResponse = await getData(`http://localhost:5127/backend/label/GetLabelsByBoardId?boardId=${board.boardId}`);
         const labelsData = labelsResponse.data;
         setLabels(labelsData);
       }
@@ -116,7 +116,7 @@ const toggleEditLabelModal = (label) => {
         isClosed: board.isClosed,
       };
 
-      const response = await putData('http://localhost:5157/backend/board/UpdateBoard', updatedBoard);
+      const response = await putData('http://localhost:5127/backend/board/UpdateBoard', updatedBoard);
       console.log('Board background updated successfully!', response.data);
 
       setBoard(prevBoard => ({
@@ -156,7 +156,7 @@ const toggleEditLabelModal = (label) => {
     };
 
     try {
-      const response = await putData('http://localhost:5157/backend/board/UpdateBoard', updatedBoard);
+      const response = await putData('http://localhost:5127/backend/board/UpdateBoard', updatedBoard);
       console.log('Board title updated successfully!', response.data);
 
       setBoard(prevBoard => ({
@@ -193,7 +193,7 @@ const toggleEditLabelModal = (label) => {
   const [searchTerm, setSearchTerm] = useState('');
   const getBoardActivities = async () =>{
     try{        
-            const activityResponse = await getDataWithId("http://localhost:5157/GetBoardActivityByBoardId?BoardId", board.boardId);
+            const activityResponse = await getDataWithId("http://localhost:5127/GetBoardActivityByBoardId?BoardId", board.boardId);
             console.log("Te dhenat e Board aktivitetit ",activityResponse.data)
             const activityData = activityResponse.data;
             if (activityData && Array.isArray(activityData) && activityData.length > 0) {

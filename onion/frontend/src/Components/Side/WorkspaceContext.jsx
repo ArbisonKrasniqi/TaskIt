@@ -51,7 +51,7 @@ export const WorkspaceProvider = ({ children }) => {
         const getWorkspaces = async () => {
             try {
                 setIsLoading(true);
-                    const workspacesResponse = await getDataWithId('http://localhost:5157/backend/workspace/GetWorkspacesByMemberId?memberId', userId);
+                    const workspacesResponse = await getDataWithId('http://localhost:5127/backend/workspace/GetWorkspacesByMemberId?memberId', userId);
                     const workspacesData = workspacesResponse.data;
                     if (workspacesData && Array.isArray(workspacesData) && workspacesData.length > 0) {
                         setWorkspaces(workspacesData);
@@ -88,7 +88,7 @@ export const WorkspaceProvider = ({ children }) => {
         const getActivities = async () =>{
             try{
                 if(workspace){
-                    const activityResponse = await getDataWithId("http://localhost:5157/GetWorkspaceActivityByWorkspaceId?WorkspaceId", WorkspaceId);
+                    const activityResponse = await getDataWithId("http://localhost:5127/GetWorkspaceActivityByWorkspaceId?WorkspaceId", WorkspaceId);
                     //console.log("Te dhenat e aktivitetit ",activityResponse.data)
                     const activityData = activityResponse.data;
                     if (activityData && Array.isArray(activityData) && activityData.length > 0) {
@@ -116,7 +116,7 @@ export const WorkspaceProvider = ({ children }) => {
         const getWorkspace = async () => {
             try {
                 if (WorkspaceId) {
-                    const workspaceResponse = await getDataWithId('http://localhost:5157/backend/workspace/GetWorkspaceById?workspaceId', WorkspaceId);
+                    const workspaceResponse = await getDataWithId('http://localhost:5127/backend/workspace/GetWorkspaceById?workspaceId', WorkspaceId);
                     const workspaceData = workspaceResponse.data;
                     //console.log('Workspace data: ', workspaceData);
                     setWorkspace(workspaceData);
@@ -155,13 +155,13 @@ export const WorkspaceProvider = ({ children }) => {
         const getBoards = async () => {
             try {
                 if (WorkspaceId && workspace && userId) {
-                    const boardsResponse = await getDataWithId('http://localhost:5157/backend/board/GetBoardsByWorkspaceId?workspaceId', WorkspaceId);
+                    const boardsResponse = await getDataWithId('http://localhost:5127/backend/board/GetBoardsByWorkspaceId?workspaceId', WorkspaceId);
                     const allBoards = boardsResponse.data;
                     
                         //largoj closed boards
                     const openBoards = allBoards.filter(board => !board.isClosed);
     
-                    const starredResponse = await getDataWithId('http://localhost:5157/backend/starredBoard/GetStarredBoardsByWorkspaceId?workspaceId', WorkspaceId);
+                    const starredResponse = await getDataWithId('http://localhost:5127/backend/starredBoard/GetStarredBoardsByWorkspaceId?workspaceId', WorkspaceId);
                     const starredBoards = starredResponse.data;
     
                     const starredBoardsIds = new Set(starredBoards.map(board => board.boardId));
@@ -203,7 +203,7 @@ export const WorkspaceProvider = ({ children }) => {
                     setMembers(data);
 
                     const memberDetail = await Promise.all(data.map(async member =>{
-                        const responseMemberDetail = await getDataWithId('http://localhost:5157/backend/user/adminUserID?userId', member.userId);                        
+                        const responseMemberDetail = await getDataWithId('http://localhost:5127/backend/user/adminUserID?userId', member.userId);                        
                         return responseMemberDetail.data;
                     }))
                     setMemberDetails(memberDetail);
@@ -227,7 +227,7 @@ export const WorkspaceProvider = ({ children }) => {
        }
        
         try {
-            const response = await deleteData('http://localhost:5157/backend/Members/RemoveMember',removeMemberDto);
+            const response = await deleteData('http://localhost:5127/backend/Members/RemoveMember',removeMemberDto);
             getMembers();
             
         } catch (error) {
@@ -254,7 +254,7 @@ export const WorkspaceProvider = ({ children }) => {
 
       const fetchClosedBoards=async ()=>{
         try{
-            const response = await getDataWithId('http://localhost:5157/backend/board/GetClosedBoards?workspaceId', WorkspaceId);
+            const response = await getDataWithId('http://localhost:5127/backend/board/GetClosedBoards?workspaceId', WorkspaceId);
             setClosedBoards(response.data);
         }catch(error){
             console.error("Error fetching closed boards");
@@ -268,7 +268,7 @@ export const WorkspaceProvider = ({ children }) => {
             const closedBoard = {
                 boardId: boardId,                
             };
-            const response = await postData('http://localhost:5157/backend/board/Close', closedBoard);
+            const response = await postData('http://localhost:5127/backend/board/Close', closedBoard);
             console.log("Board closed ",response.data);
            
             
@@ -297,7 +297,7 @@ export const WorkspaceProvider = ({ children }) => {
     };
 
     const sortByRecent = async () => {
-        const dataResponse = await getDataWithId('http://localhost:5157/backend/board/GetBoardsByWorkspaceId?workspaceId', WorkspaceId);
+        const dataResponse = await getDataWithId('http://localhost:5127/backend/board/GetBoardsByWorkspaceId?workspaceId', WorkspaceId);
         return dataResponse.data;
     };
 
@@ -322,17 +322,17 @@ export const WorkspaceProvider = ({ children }) => {
             if (isStarred) {
     
                     // Unstar the board
-                    await deleteData('http://localhost:5157/backend/starredBoard/UnstarBoard', data);
+                    await deleteData('http://localhost:5127/backend/starredBoard/UnstarBoard', data);
                 } else {
                     // Star the board
-                    await postData('http://localhost:5157/backend/starredBoard/StarBoard', data);
+                    await postData('http://localhost:5127/backend/starredBoard/StarBoard', data);
                 }
                 
                 // Re-fetch boards and starred boards
-                const boardsResponse = await getDataWithId('http://localhost:5157/backend/board/GetBoardsByWorkspaceId?workspaceId', WorkspaceId);
+                const boardsResponse = await getDataWithId('http://localhost:5127/backend/board/GetBoardsByWorkspaceId?workspaceId', WorkspaceId);
                 const allBoards = boardsResponse.data;
         
-                const starredResponse = await getDataWithId('http://localhost:5157/backend/starredBoard/GetStarredBoardsByWorkspaceId?workspaceId', WorkspaceId);
+                const starredResponse = await getDataWithId('http://localhost:5127/backend/starredBoard/GetStarredBoardsByWorkspaceId?workspaceId', WorkspaceId);
                 const updatedStarredBoards = starredResponse.data;
         
                 const starredBoardsIds = new Set(updatedStarredBoards.map(board => board.boardId));
@@ -363,7 +363,7 @@ export const WorkspaceProvider = ({ children }) => {
         }
     
         try {
-            const response = await getDataWithId('http://localhost:5157/backend/background/GetBackgroundByID?id', board.backgroundId);
+            const response = await getDataWithId('http://localhost:5127/backend/background/GetBackgroundByID?id', board.backgroundId);
     
             // Check if response contains image data
             if (response.data && response.data.imageData) {
@@ -399,7 +399,7 @@ export const WorkspaceProvider = ({ children }) => {
   
     const getActiveBackgrounds = async () => {
         try {
-            const backgroundsResponse = await getData('http://localhost:5157/backend/background/GetActiveBackgrounds');
+            const backgroundsResponse = await getData('http://localhost:5127/backend/background/GetActiveBackgrounds');
             const backgroundsData = backgroundsResponse.data;
 
             if (backgroundsData && Array.isArray(backgroundsData) && backgroundsData.length > 0) {
@@ -425,7 +425,7 @@ export const WorkspaceProvider = ({ children }) => {
     const handleDeleteWorkspace = async(workspaceId) =>{
         console.log('Deleting workspace with Id: ', workspaceId);
         try{
-            const response = await deleteData('http://localhost:5157/backend/workspace/DeleteWorkspace', { workspaceId: workspaceId });
+            const response = await deleteData('http://localhost:5127/backend/workspace/DeleteWorkspace', { workspaceId: workspaceId });
             console.log('Deleting workspace response:', response);
             navigate('/main/workspaces');
         }
@@ -437,7 +437,7 @@ export const WorkspaceProvider = ({ children }) => {
      const handleLeaveWorkspace = async(workspaceId, userId)=>{
         console.log('Leaving workspace with Id: ',workspaceId);
         try{
-            const response = await deleteData('http://localhost:5157/backend/Members/RemoveMember', {UserId: userId, WorkspaceId: workspaceId});
+            const response = await deleteData('http://localhost:5127/backend/Members/RemoveMember', {UserId: userId, WorkspaceId: workspaceId});
             console.log('Leaving workspace response:', response);
             navigate(`/main/workspaces`);
         }
@@ -449,7 +449,7 @@ export const WorkspaceProvider = ({ children }) => {
      const getTasks =async ()=>{
 
         try{
-            const tasksResponse = await getDataWithId('http://localhost:5157/backend/task/GetTasksByWorkspaceId?workspaceId', WorkspaceId);
+            const tasksResponse = await getDataWithId('http://localhost:5127/backend/task/GetTasksByWorkspaceId?workspaceId', WorkspaceId);
             const tasksData = tasksResponse.data;
             console.log("Tasks data: ",tasksData);
             setTasks(tasksData);
@@ -499,7 +499,7 @@ export const WorkspaceProvider = ({ children }) => {
     
         const getSentInvites = async () => {
             try {
-                const response = await getDataWithId('http://localhost:5157/backend/invite/GetInvitesByWorkspace?workspaceId', WorkspaceId);
+                const response = await getDataWithId('http://localhost:5127/backend/invite/GetInvitesByWorkspace?workspaceId', WorkspaceId);
                 let data = response.data;
                 //console.log("Sent Invites fetched: ", data);
         
@@ -513,11 +513,11 @@ export const WorkspaceProvider = ({ children }) => {
     
                 // Fetch inviter details for each invite
                 const invited = await Promise.all(pendingInvites.map(async invite => {
-                    const responseInvitee = await getDataWithId('http://localhost:5157/backend/user/adminUserID?userId', invite.inviteeId);
+                    const responseInvitee = await getDataWithId('http://localhost:5127/backend/user/adminUserID?userId', invite.inviteeId);
                     return responseInvitee.data;
                 }));
                 const workspaceTitlesData = await Promise.all(pendingInvites.map(async invite => {
-                    const responseWorkspace = await getDataWithId('http://localhost:5157/backend/workspace/getWorkspaceById?workspaceId', invite.workspaceId);
+                    const responseWorkspace = await getDataWithId('http://localhost:5127/backend/workspace/getWorkspaceById?workspaceId', invite.workspaceId);
                     return responseWorkspace.data.title; // Assuming the workspace object has a 'title' field
                 }));
     
@@ -541,7 +541,7 @@ export const WorkspaceProvider = ({ children }) => {
         const handleDeleteInvite = async(inviteId) => {
             console.log("Deleting invite with id: ", inviteId);
             try{
-                const response = await deleteData(`http://localhost:5157/backend/invite/DeleteInviteById?InviteId=${inviteId}`);
+                const response = await deleteData(`http://localhost:5127/backend/invite/DeleteInviteById?InviteId=${inviteId}`);
                 console.log("Deleting invite response: ",response);
                 getSentInvites();
             }
@@ -575,7 +575,7 @@ export const WorkspaceProvider = ({ children }) => {
             try {
               if (taskId) {
                 const response = await getDataWithId(
-                  'http://localhost:5157/backend/checklist/GetChecklistByTaskId?taskId',
+                  'http://localhost:5127/backend/checklist/GetChecklistByTaskId?taskId',
                   taskId
                 );
                 const data = response.data;
@@ -616,7 +616,7 @@ export const WorkspaceProvider = ({ children }) => {
           
               try {
                 const response = await getDataWithId(
-                  'http://localhost:5157/backend/checklistItems/GetChecklistItemByChecklistId?checklistId',
+                  'http://localhost:5127/backend/checklistItems/GetChecklistItemByChecklistId?checklistId',
                   checklist.checklistId
                 );
                 items[checklist.checklistId] = response.data; // Store items by checklist ID
@@ -641,7 +641,7 @@ export const WorkspaceProvider = ({ children }) => {
             const getList = async () => {
                 try {
                     if(listId){
-                        const listResponse = await getDataWithId('http://localhost:5157/backend/list/GetListById',listId);
+                        const listResponse = await getDataWithId('http://localhost:5127/backend/list/GetListById',listId);
                         const listData = listResponse.data;
                         setList(listData);
                     }

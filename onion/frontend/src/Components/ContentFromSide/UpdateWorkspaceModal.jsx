@@ -44,7 +44,7 @@ const UpdateWorkspaceModal = ({open, onClose, workspace, onWorkspaceUpdated})=>{
     console.log('Updating workspace with data: ',updatedWorkspace);
 
     try{
-        const response = await putData('http://localhost:5157/backend/workspace/UpdateWorkspace', updatedWorkspace);
+        const response = await putData('http://localhost:5127/backend/workspace/UpdateWorkspace', updatedWorkspace);
         console.log('Workspace updated successfully! ',response.data);
         onWorkspaceUpdated(updatedWorkspace);
         onClose();

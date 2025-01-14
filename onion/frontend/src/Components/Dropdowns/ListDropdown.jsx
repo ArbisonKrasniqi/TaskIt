@@ -13,7 +13,7 @@ const ListDropdown = ({ listId, onAddCardClick }) => {
   const handleDeleteList = async (listId) =>{
     if (boardId && workspaceContext.board) {
       try {
-        const response = await deleteData('http://localhost:5157/backend/list/DeleteList',{listId : listId});
+        const response = await deleteData('http://localhost:5127/backend/list/DeleteList',{listId : listId});
         boardContext.setLists(prevLists => prevLists.filter(l => l.listId != listId));
     } catch (error) {
         console.error('Error deleting list');

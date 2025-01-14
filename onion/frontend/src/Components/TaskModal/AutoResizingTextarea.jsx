@@ -29,7 +29,7 @@ const AutoResizingTextarea = ({ taskDescription }) => {
         dueDate: taskData.dueDate,
         listId: taskData.listId,
       };
-      await putData('http://localhost:5157/backend/task/UpdateTask', data);
+      await putData('http://localhost:5127/backend/task/UpdateTask', data);
       setDescription(tempDescription);
       taskModalsContext.setTaskData({ ...taskData, description: tempDescription });
       setIsEditing(false);

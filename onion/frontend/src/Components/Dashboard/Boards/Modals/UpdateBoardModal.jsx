@@ -32,7 +32,7 @@ const UpdateBoardModal = (props) => {
 
             console.log('Sending data:', data);
 
-            const response = await putData('http://localhost:5157/backend/board/UpdateBoard', data);
+            const response = await putData('http://localhost:5127/backend/board/UpdateBoard', data);
             console.log('Response:', response);
 
             const updatedBoards = boardsContext.boards.map(board => {

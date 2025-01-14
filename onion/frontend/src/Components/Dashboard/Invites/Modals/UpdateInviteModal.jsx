@@ -27,7 +27,7 @@ const UpdateInviteModal = (props)=>{
                 inviteeId: inviteeId,
                 inviteStatus: inviteStatus
             };
-            const response = await putData('http://localhost:5157/backend/invite/UpdateInvite', data);
+            const response = await putData('http://localhost:5127/backend/invite/UpdateInvite', data);
             console.log(response.data);
             const updatedInvites = invitesContext.invites.map(invite => {
                 if(invite.inviteId ===updateContext.inviteId){

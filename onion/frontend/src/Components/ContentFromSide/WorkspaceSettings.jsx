@@ -70,7 +70,7 @@ const WorkspaceSettings = () => {
         };
 
         try {
-            const response = await putData('http://localhost:5157/backend/workspace/UpdateWorkspace', updatedWorkspace);
+            const response = await putData('http://localhost:5127/backend/workspace/UpdateWorkspace', updatedWorkspace);
             setWorkspace(prevWorkspace => ({ ...prevWorkspace, description: description }));
             setIsEditing(false);
             setMessage("Workspace description updated successfully!");

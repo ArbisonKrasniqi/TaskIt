@@ -65,7 +65,7 @@ const CreateBoardModal = ({ open, onClose, onBoardCreated, children }) => {
             workspaceId: workspaceId
         };
         try {
-            const response = await postData('http://localhost:5157/backend/board/CreateBoard', newBoard);
+            const response = await postData('http://localhost:5127/backend/board/CreateBoard', newBoard);
             console.log('Full response:', response); 
         
                 console.log('Board created successfully:', response.data);

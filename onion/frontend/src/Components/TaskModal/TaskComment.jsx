@@ -23,7 +23,7 @@ const TaskComment = () => {
 
   const getComments = async () => {
     try {
-      const fetchedComments = await getDataWithId(`http://localhost:5157/backend/comment/GetCommentsByTaskId?taskId`, taskId);
+      const fetchedComments = await getDataWithId(`http://localhost:5127/backend/comment/GetCommentsByTaskId?taskId`, taskId);
       const sortedComments = fetchedComments.data.sort(
         (a, b) => new Date(b.dateAdded) - new Date(a.dateAdded)
       );
@@ -40,7 +40,7 @@ const TaskComment = () => {
   const handleSave = async () => {
     try {
       if (comment.trim()) {
-        await postData('http://localhost:5157/backend/comment/CreateComment', { content: comment, taskId });
+        await postData('http://localhost:5127/backend/comment/CreateComment', { content: comment, taskId });
         setComment('');
         setIsCommentInputFocused(false); // Hide buttons after saving
         getComments();
@@ -53,7 +53,7 @@ const TaskComment = () => {
   const handleSaveEdit = async (commentId) => {
     try {
       if (editedComment.trim()) {
-        await putData('http://localhost:5157/backend/comment/UpdateComment', { commentId, content: editedComment });
+        await putData('http://localhost:5127/backend/comment/UpdateComment', { commentId, content: editedComment });
         setEditingCommentId(null);
         setEditedComment('');
         getComments();
@@ -65,7 +65,7 @@ const TaskComment = () => {
 
   const handleDelete = async (commentId) => {
     try {
-      await deleteData('http://localhost:5157/backend/comment/DeleteComment', { commentId });
+      await deleteData('http://localhost:5127/backend/comment/DeleteComment', { commentId });
       getComments();
     } catch (error) {
       console.error('Error deleting comment');

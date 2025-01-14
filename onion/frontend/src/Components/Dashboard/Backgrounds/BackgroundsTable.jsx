@@ -10,7 +10,7 @@ const BackgroundsTable = () => {
         async function deleteBackground() {
             try {
                 const data = { backgroundId: id};
-                const response = await deleteData('http://localhost:5157/backend/background/DeleteBackgroundByID', data);
+                const response = await deleteData('http://localhost:5127/backend/background/DeleteBackgroundByID', data);
                 console.log(response);
 
                 const updateBackgrounds = backgroundsContext.backgrounds.filter(background => background.backgroundId !== id);

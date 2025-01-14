@@ -41,7 +41,7 @@ const CreateWorkspaceModal = ({open, onClose, onWorkspaceCreated, children}) => 
     console.log('Creating workspace with data: ',newWorkspace);
 
     try {
-      const response = await postData('http://localhost:5157/backend/workspace/CreateWorkspace', newWorkspace);
+      const response = await postData('http://localhost:5127/backend/workspace/CreateWorkspace', newWorkspace);
       console.log('Workspace created successfully:', response.data);
       onWorkspaceCreated(response.data);
       onClose();

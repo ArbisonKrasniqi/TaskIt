@@ -27,7 +27,7 @@ const MembersModal = () => {
                 userId: member.id,
                 taskId: taskId,
             };
-            var addedMember = await postData('http://localhost:5157/backend/TaskMembers/AddTaskMember', data);
+            var addedMember = await postData('http://localhost:5127/backend/TaskMembers/AddTaskMember', data);
             
             // Shtoje anetarin ne assignedMembers edhe largoje prej filteredBoardMembers
             setAssignedMembers([...assignedMembers, member]);
@@ -40,7 +40,7 @@ const MembersModal = () => {
     const removeMemberFromTask = async (member) => {
         try {
             const userId = member.id;
-            await deleteData(`http://localhost:5157/backend/TaskMembers/RemoveTaskMember?userId=${userId}&taskId=${taskId}`);
+            await deleteData(`http://localhost:5127/backend/TaskMembers/RemoveTaskMember?userId=${userId}&taskId=${taskId}`);
             
             // Largoje prej assignedMembers edhe shto prap ne filteredBoardMembers
             setAssignedMembers(assignedMembers.filter(m => m.id !== member.id));

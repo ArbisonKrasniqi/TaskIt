@@ -27,7 +27,7 @@ const UpdateBackgroundModal = (props) => {
 
             console.log('Sending data: ',data);
 
-            const response = await putData('http://localhost:5157/backend/background/UpdateBackground', data);
+            const response = await putData('http://localhost:5127/backend/background/UpdateBackground', data);
             console.log('Response: ',response);
 
             const updatedBackgrounds = backgroundsContext.backgrounds.map(background => {

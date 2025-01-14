@@ -54,7 +54,7 @@ const TaskModal = () => {
 
   const getTaskById = async () => {
     try {
-        const response = await getDataWithId('http://localhost:5157/backend/task/GetTaskById?taskId',taskId);
+        const response = await getDataWithId('http://localhost:5127/backend/task/GetTaskById?taskId',taskId);
         setTaskData(response.data);
     } catch (error) {
         console.error("Error fetching task by id");
@@ -70,7 +70,7 @@ const TaskModal = () => {
     useEffect(() => {
         const getListById = async () => {
             try {
-                const response = await getDataWithId('http://localhost:5157/backend/list/GetListById?listId',taskData.listId);
+                const response = await getDataWithId('http://localhost:5127/backend/list/GetListById?listId',taskData.listId);
                 setListData(response.data);
                 
             } catch (error) {
@@ -82,7 +82,7 @@ const TaskModal = () => {
 
     const fetchAssignedLabels = async () => {
         try {
-            const response = await getDataWithId('http://localhost:5157/backend/label/GetLabelsByTaskId?taskId',taskId);
+            const response = await getDataWithId('http://localhost:5127/backend/label/GetLabelsByTaskId?taskId',taskId);
             setAssignedLabels(response.data);
         } catch (error) {
             console.error("Error fetching assigned labels");
@@ -98,11 +98,11 @@ const TaskModal = () => {
     useEffect(() => {
         const fetchTaskMembers = async () => {
             try {
-                const response = await getDataWithId(`http://localhost:5157/backend/TaskMembers/GetAllTaskMembersByTaskId?taskId`, taskId);
+                const response = await getDataWithId(`http://localhost:5127/backend/TaskMembers/GetAllTaskMembersByTaskId?taskId`, taskId);
                 const data = response.data;
 
                 const taskMembers = await Promise.all(data.map(async (taskMember) => {
-                    const responseTaskMemberDetail = await getDataWithId('http://localhost:5157/backend/user/adminUserID?userId', taskMember.userId);
+                    const responseTaskMemberDetail = await getDataWithId('http://localhost:5127/backend/user/adminUserID?userId', taskMember.userId);
                     return responseTaskMemberDetail.data;
                 }));
 
@@ -129,7 +129,7 @@ const handleSaveTitle = async () => {
                 dateAdded: taskData.dateAdded,
                 dueDate: taskData.dueDate
             };
-            await putData('http://localhost:5157/backend/task/UpdateTask', data);
+            await putData('http://localhost:5127/backend/task/UpdateTask', data);
             setTaskData((prevData) => ({
                 ...prevData,
                 title: newTitle,
@@ -153,7 +153,7 @@ const [taskActivities, setTaskActivities] = useState([]);
       const getTaskActivities = async () => {
           try {
               if (taskId) {
-                  const taskActivityResponse = await getDataWithId('http://localhost:5157/GetTaskActivityByTaskId?TaskId', taskId);
+                  const taskActivityResponse = await getDataWithId('http://localhost:5127/GetTaskActivityByTaskId?TaskId', taskId);
                   const taskActivityData = taskActivityResponse.data;
                   if (taskActivityData && Array.isArray(taskActivityData) && taskActivityData.length > 0) {
                       setTaskActivities(taskActivityData);

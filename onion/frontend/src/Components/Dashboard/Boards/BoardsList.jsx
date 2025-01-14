@@ -23,7 +23,7 @@ const BoardsList = (workspaceIdParam) => {
                 const boardsWithWorkspaceId = await getDataWithId("/backend/board/GetBoardsByWorkspaceId?workspaceId", workspaceId);
                 setBoards(boardsWithWorkspaceId.data);
             } else {
-                const allBoards = await getData("http://localhost:5157/backend/board/GetAllBoards");
+                const allBoards = await getData("http://localhost:5127/backend/board/GetAllBoards");
                 setBoards(allBoards.data);
             }
             

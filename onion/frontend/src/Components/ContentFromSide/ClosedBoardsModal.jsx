@@ -28,7 +28,7 @@ const ClosedBoardsModal = ({ open, onClose }) => {
             const board = {
                 boardId: boardId,
             };
-            const response = await postData('http://localhost:5157/backend/board/Reopen', board);
+            const response = await postData('http://localhost:5127/backend/board/Reopen', board);
             console.log("Board reopened: ",response.data);
             
             
@@ -39,7 +39,7 @@ const ClosedBoardsModal = ({ open, onClose }) => {
                 prevBoards.filter(board => board.boardId !== boardId) 
             );
 
-            const reopenedBoard = await getDataWithId('http://localhost:5157/backend/board/GetBoardByID?id', boardId);
+            const reopenedBoard = await getDataWithId('http://localhost:5127/backend/board/GetBoardByID?id', boardId);
             const reopenedBoardData = reopenedBoard.data;
             console.log("Reopened board ",reopenedBoardData);
             setBoards((prevBoards) => [...prevBoards, reopenedBoardData]);
@@ -54,7 +54,7 @@ const ClosedBoardsModal = ({ open, onClose }) => {
     const handleDeleteBoard = async (boardId) => {
         console.log('Deleting board with ID:', boardId);
         try {
-          const response = await deleteData('http://localhost:5157/backend/board/DeleteBoardByID', { BoardId: boardId });
+          const response = await deleteData('http://localhost:5127/backend/board/DeleteBoardByID', { BoardId: boardId });
           console.log('Deleting board response:', response);
       
           // Filter the board out from the local state
@@ -64,7 +64,7 @@ const ClosedBoardsModal = ({ open, onClose }) => {
           setClosedBoards((prevBoards) => prevBoards.filter(board => board.boardId !== boardId));
       
           // Fetch the updated list of boards by workspace ID
-          const dataResponse = await getDataWithId('http://localhost:5157/backend/board/GetBoardsByWorkspaceId', { workspaceId: WorkspaceId });
+          const dataResponse = await getDataWithId('http://localhost:5127/backend/board/GetBoardsByWorkspaceId', { workspaceId: WorkspaceId });
           setBoards(dataResponse.data);
       
         } catch (error) {

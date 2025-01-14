@@ -38,7 +38,7 @@ const Checklist = () => {
     });
 
     try {
-      await putData(`http://localhost:5157/backend/checklistItems/ChangeChecklistItemChecked?checklistItemId=${checklistItemId}`, {});
+      await putData(`http://localhost:5127/backend/checklistItems/ChangeChecklistItemChecked?checklistItemId=${checklistItemId}`, {});
       getTaskActivities();
       getChecklistsByTask();
       setAddingItem(null);
@@ -64,9 +64,9 @@ const Checklist = () => {
 
   const handleChecklistDelete = async (checklistId) => {
     try {
-      const items = await getDataWithId('http://localhost:5157/backend/checklistItems/GetChecklistItemByChecklistId?checklistId', checklistId);;
+      const items = await getDataWithId('http://localhost:5127/backend/checklistItems/GetChecklistItemByChecklistId?checklistId', checklistId);;
 
-      await deleteData('http://localhost:5157/backend/checklist/DeleteChecklist', { checklistId });
+      await deleteData('http://localhost:5127/backend/checklist/DeleteChecklist', { checklistId });
       getChecklistsByTask();
       const updatedChecklists = checklists.filter(
         (checklist) => checklist.checklistId !== checklistId
@@ -99,7 +99,7 @@ const Checklist = () => {
         checklistId: checklistId
       };
 
-      const response = await postData(`http://localhost:5157/backend/checklistItems/CreateChecklistItem`, data);
+      const response = await postData(`http://localhost:5127/backend/checklistItems/CreateChecklistItem`, data);
 
       setChecklistItems(prevItems => {
         const updatedItems = { ...prevItems };
@@ -150,7 +150,7 @@ const Checklist = () => {
         checklistId: checklistId
       };
 
-      await putData('http://localhost:5157/backend/checklistItems/UpdateChecklistItem', data);
+      await putData('http://localhost:5127/backend/checklistItems/UpdateChecklistItem', data);
 
       setChecklistItems(prevItems => {
         const updatedItems = { ...prevItems };
@@ -201,7 +201,7 @@ const Checklist = () => {
         taskId: taskId
       };
 
-      await putData('http://localhost:5157/backend/checklist/UpdateChecklist',data);
+      await putData('http://localhost:5127/backend/checklist/UpdateChecklist',data);
 
       const updatedChecklists = checklists.map((checklist) =>
         checklist.checklistId === checklistId ? { ...checklist, title: editedChecklistTitle } : checklist

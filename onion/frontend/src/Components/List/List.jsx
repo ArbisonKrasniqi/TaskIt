@@ -41,7 +41,7 @@ const List = ({ list, children }) => {
           title: newListTitle
         };
 
-        await putData('http://localhost:5157/backend/list/UpdateList',data);
+        await putData('http://localhost:5127/backend/list/UpdateList',data);
         setIsEditingListTitle(false);
         getLists();
         setErrorMessage('');

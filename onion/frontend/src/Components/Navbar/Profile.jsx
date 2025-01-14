@@ -20,7 +20,7 @@ const [errorMessage, setErrorMessage]=useState('');
 
 const getUser = async ()=>{
     try{
-        const responseUser = await getDataWithId('http://localhost:5157/backend/user/adminUserID?userId', userId);
+        const responseUser = await getDataWithId('http://localhost:5127/backend/user/adminUserID?userId', userId);
         setUserData({
           id: responseUser.data.id,
           firstName: responseUser.data.firstName,
@@ -71,7 +71,7 @@ const handleSubmit = async (e)=>{
             
         };
         //console.log(updatedUserData);
-        const response = await putData("http://localhost:5157/backend/user/adminUpdateUser", updatedUserData);
+        const response = await putData("http://localhost:5127/backend/user/adminUpdateUser", updatedUserData);
         setModalMessage('Profile successfully updated');
         setIsModalOpen(true);
     }catch (error) {

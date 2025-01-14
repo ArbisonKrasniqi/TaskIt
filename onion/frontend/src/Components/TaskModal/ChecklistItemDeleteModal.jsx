@@ -5,7 +5,7 @@ const ChecklistItemDeleteModal = ({ checklistItemId, closeModal }) => {
 
   const handleDelete = async () => {
     try {
-        await deleteData('http://localhost:5157/backend/checklistItems/DeleteChecklistItem',{checklistItemId});
+        await deleteData('http://localhost:5127/backend/checklistItems/DeleteChecklistItem',{checklistItemId});
     } catch (error) {
         console.error("Error deleting checklist item:", error.message);
         if (error.response) {

@@ -15,7 +15,7 @@ const BoardsTable = () => {
         async function deleteBoard() {
             try {
                 const data = { boardId: id };
-                const response = await deleteData('http://localhost:5157/backend/board/DeleteBoardByID', data);
+                const response = await deleteData('http://localhost:5127/backend/board/DeleteBoardByID', data);
                 console.log(response);
 
                 const updateBoards = (boardsContext.boards || []).filter(board => board.boardId !== id);

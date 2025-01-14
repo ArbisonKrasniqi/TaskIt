@@ -25,7 +25,7 @@ const UpdateStarredBoardModal = (props)=>{
                 //te dhenat e tjera i ndryshojme
                 userId: userId,
             };
-            const response = await putData('http://localhost:5157/backend/starredBoard/UpdateStarredBoard', data);
+            const response = await putData('http://localhost:5127/backend/starredBoard/UpdateStarredBoard', data);
             console.log(response.data);
             const updatedStarredBoards = starredBoardsContext.starredBoards.map(starredBoard => {
                 if(starredBoard.starredBoardId ===updateContext.starredBoardId){

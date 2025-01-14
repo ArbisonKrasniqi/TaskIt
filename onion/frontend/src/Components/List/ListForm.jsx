@@ -30,7 +30,7 @@ const ListForm = ({ }) => {
         console.log('Creating list with data:', newList);
 
         try {
-            const response = await postData("http://localhost:5157/backend/list/CreateList", newList);
+            const response = await postData("http://localhost:5127/backend/list/CreateList", newList);
             boardContext.setLists([... boardContext.lists, response.data]);
             setListTitle("");
         } catch (error) {

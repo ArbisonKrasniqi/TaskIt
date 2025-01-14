@@ -40,7 +40,7 @@ const BackgroundCreationModal = ({ open, onClose, onBackgroundCreated }) => {
     console.log("Creating background with data: ", formData);
 
     try {
-        const response = await postData('http://localhost:5157/backend/background/CreateBackground', formData, {
+        const response = await postData('http://localhost:5127/backend/background/CreateBackground', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             }

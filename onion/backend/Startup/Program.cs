@@ -143,25 +143,48 @@ builder.Services.AddScoped<IInviteDeleteHandler, InviteDeleteHandler>();
 builder.Services.AddScoped<IMembersDeleteHandler, MembersDeleteHandler>();
 builder.Services.AddScoped<IWorkspaceActivityDeleteHandler, WorkspaceActivityDeleteHandler>();
 
+// CORS configuration
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp",
+        builder =>
+        {
+            builder.WithOrigins("http://localhost:3001", "http://localhost:3000") // Adjust origin as needed
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        });
+});
+
 var app = builder.Build();
 
 app.Use(async (context, next) =>
 {
-    var userContext = context.RequestServices.GetRequiredService<UserContext>();
     var httpContextAccessor = context.RequestServices.GetRequiredService<IHttpContextAccessor>();
-
     var httpContext = httpContextAccessor.HttpContext;
+
+    // Define paths to exclude from UserContext creation
+    var excludedPaths = new[] { "/backend/user/register", "/backend/user/login", "/backend/user/refreshToken" };
+
+    // Skip UserContext creation for excluded paths
+    if (httpContext != null && excludedPaths.Any(path => httpContext.Request.Path.Equals(path, StringComparison.OrdinalIgnoreCase)))
+    {
+        await next.Invoke();
+        return;
+    }
+
+    var userContext = context.RequestServices.GetRequiredService<UserContext>();
+
     if (httpContext != null && httpContext.Request.Headers.ContainsKey("Authorization"))
     {
         var authHeader = httpContext.Request.Headers["Authorization"].ToString();
         if (authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
         {
             var token = authHeader.Substring("Bearer ".Length).Trim();
-            // Decode JWT token and extract claims here (you can use a library like System.IdentityModel.Tokens.Jwt)
+            // Decode JWT token and extract claims here
             var handler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
             var jwtToken = handler.ReadJwtToken(token);
 
-            // Assuming your JWT contains these claims
+            // Populate UserContext with claims
             userContext.Id = jwtToken.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             userContext.Name = jwtToken.Claims.FirstOrDefault(c => c.Type == "Name")?.Value;
             userContext.Email = jwtToken.Claims.FirstOrDefault(c => c.Type == "Email")?.Value;
@@ -172,11 +195,14 @@ app.Use(async (context, next) =>
     await next.Invoke();
 });
 
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("AllowReactApp");
 
 app.UseAuthentication();
 app.UseAuthorization();

@@ -25,7 +25,7 @@ const NotificationButton = (props) => {
     
     const getInvites = async () => {
         try {
-            const response = await getDataWithId('http://localhost:5157/backend/invite/GetPendingInvitesByInvitee?inviteeId', userId);
+            const response = await getDataWithId('http://localhost:5127/backend/invite/GetPendingInvitesByInvitee?inviteeId', userId);
             let data = response.data;
             console.log("Invites fetched: ", data);
 
@@ -35,11 +35,11 @@ const NotificationButton = (props) => {
 
             // Fetch inviter details for each invite
             const inviters = await Promise.all(data.map(async invite => {
-                const responseInviter = await getDataWithId('http://localhost:5157/backend/user/adminUserID?userId', invite.inviterId);
+                const responseInviter = await getDataWithId('http://localhost:5127/backend/user/adminUserID?userId', invite.inviterId);
                 return responseInviter.data;
             }));
             const workspaceTitlesData = await Promise.all(data.map(async invite => {
-                const responseWorkspace = await getDataWithId('http://localhost:5157/backend/workspace/getWorkspaceById?workspaceId', invite.workspaceId);
+                const responseWorkspace = await getDataWithId('http://localhost:5127/backend/workspace/getWorkspaceById?workspaceId', invite.workspaceId);
                 return responseWorkspace.data.title; // Assuming the workspace object has a 'title' field
             }));
 
@@ -63,7 +63,7 @@ const NotificationButton = (props) => {
                 inviteStatus: status
             };
 
-            const response = await putData("http://localhost:5157/backend/invite/UpdateInviteStatus", updateDto);
+            const response = await putData("http://localhost:5127/backend/invite/UpdateInviteStatus", updateDto);
             console.log("Invite status updated ",response.data);
             getInvites();
             if(status === "Accepted"){

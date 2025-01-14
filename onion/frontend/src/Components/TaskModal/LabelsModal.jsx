@@ -19,7 +19,7 @@ function LabelsModal() {
         const getLabels = async () => {
             try {
                 if (boardId) {
-                    const labelsResponse = await getDataWithId('http://localhost:5157/backend/label/GetLabelsByBoardId?boardId',boardId);
+                    const labelsResponse = await getDataWithId('http://localhost:5127/backend/label/GetLabelsByBoardId?boardId',boardId);
                     setLabels(labelsResponse.data);
                 }
             } catch (error) {
@@ -35,7 +35,7 @@ function LabelsModal() {
 
     const getAssignedLabels = async () => {
       try {
-          const assignedLabelResponse = await getDataWithId('http://localhost:5157/backend/label/GetLabelsByTaskId?taskId',taskId);
+          const assignedLabelResponse = await getDataWithId('http://localhost:5127/backend/label/GetLabelsByTaskId?taskId',taskId);
           setSecondAssignedLabels(assignedLabelResponse.data.map(label => label.labelId));
       } catch (error) {
           console.error("Error fetching assigned labels");
@@ -66,7 +66,7 @@ function LabelsModal() {
                     labelId: label.labelId,
                     taskId: taskId
                 }
-                await deleteData('http://localhost:5157/backend/taskLabel/RemoveLabelFromTask',labelData);
+                await deleteData('http://localhost:5127/backend/taskLabel/RemoveLabelFromTask',labelData);
                 //fetchAssignedLabels();
                 getTaskById();
                 setSecondAssignedLabels(prev => prev.filter(id => id !== label.labelId));
@@ -82,7 +82,7 @@ function LabelsModal() {
                     labelId: label.labelId,
                     taskId: taskId
                 }
-                await postData('http://localhost:5157/backend/taskLabel/AssignLabelToTask',labelData);
+                await postData('http://localhost:5127/backend/taskLabel/AssignLabelToTask',labelData);
                 //fetchAssignedLabels();
                 getTaskById();
                 setSecondAssignedLabels(prev => [...prev, label.labelId]);
